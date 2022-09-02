@@ -374,8 +374,12 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                 rhs = net_reg_assign->GetRValExpr();
                 if (ID_VERIBINARYOPERATOR == rhs->GetClassId())
                 {
-                    stringstream lhsValue;
-                    lhs->PrettyPrint(lhsValue, 0);
+                    //stringstream lhsValue;
+                    //lhs->PrettyPrint(lhsValue, 0);
+                    vector<string> l_vec;
+                    bitBlast(lhs, l_vec);
+                    auto lhsVal = l_vec[0];
+                    packEscaped(lhsVal);
                     lrhs = rhs->GetLeft();
                     rrhs = rhs->GetRight();
                     if (!lrhs || !rrhs)
@@ -402,7 +406,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                                                               : b;
                         n_l.blocks.back().conns_.push_back({"---", b});
                     }
-                    n_l.blocks.back().conns_.push_back({"---", lhsValue.str()});
+                    n_l.blocks.back().conns_.push_back({"---", lhsVal});
                     if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
                     {
                         simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
