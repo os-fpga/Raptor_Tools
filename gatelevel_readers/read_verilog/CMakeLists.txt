@@ -20,7 +20,7 @@ if (PRODUCTION_BUILD)
     set (PRODUCTION_BUILD_FLAG "-DPRODUCTION_BUILD=1")
     add_definitions(-DPRODUCTION_BUILD)
     if (NOT RAPTOR)
-        get_filename_component(FLEX_LM_SRC_DIR "../Raptor_Tools/Flex_LM"
+        get_filename_component(FLEX_LM_SRC_DIR "../../Flex_LM"
           REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
         
         # Flex_LM directory already has been added by vpr/CMakeLists.txt
@@ -48,7 +48,7 @@ endfunction(files_to_dirs)
 
 file(GLOB_RECURSE LIB_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
 
-get_filename_component(VERIFIC_HOME "../Raptor_Tools/verific_rs"
+get_filename_component(VERIFIC_HOME "../../verific_rs"
     REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
 message("VERIFIC_HOME: ${VERIFIC_HOME}")
 file(GLOB_RECURSE LIB_HEADERS
@@ -73,7 +73,7 @@ list(APPEND VERIFIC_LIBS
     ${VERIFIC_HOME}/vhdl/vhdl-${OS}.a
     )
 
-files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.h)
+files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OPENSSL REQUIRED openssl)
 if(OPENSSL_FOUND)
@@ -88,8 +88,17 @@ endif()
 include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${FLEX_LM_SRC_DIR}
                             ${FLEX_LM_SRC_DIR}/machind
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/read_nl
                             ${CMAKE_CURRENT_BINARY_DIR}/include
 )
+message(STATUS "ID: ${LIB_INCLUDE_DIRS}")
+
+file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
+list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+
+# Add executable
+add_executable(read_verilog ${EXEC_SOURCE})
+target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
 
 #suppress Verific warnings
 add_compile_options(-w)
@@ -97,6 +106,7 @@ add_compile_options(-w)
 add_library(libreadver STATIC
     ${LIB_SOURCE}
 )
+SET_TARGET_PROPERTIES(libreadver PROPERTIES PREFIX "")
 target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS})
 
 if (NOT RAPTOR AND CMAKE_BUILD_TYPE STREQUAL "Debug")
