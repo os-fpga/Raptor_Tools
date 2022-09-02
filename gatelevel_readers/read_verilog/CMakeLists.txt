@@ -91,7 +91,6 @@ include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/read_nl
                             ${CMAKE_CURRENT_BINARY_DIR}/include
 )
-message(STATUS "ID: ${LIB_INCLUDE_DIRS}")
 
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
