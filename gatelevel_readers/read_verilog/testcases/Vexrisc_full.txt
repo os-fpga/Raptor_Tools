@@ -1,0 +1,30 @@
+
+mkdir ./netlists/Vexrisc_full
+mkdir ./netlists/Vexrisc_full/verilog
+mkdir ./netlists/Vexrisc_full/blif
+
+load_gcc-v9.1
+/eda_tools/opensource/yosys_verifc/yosys_verific_rs/yosys/install/bin/yosys
+plugin -i synth-rs
+echo on
+read_verilog ./rtl/Vexrisc_full/*.v
+-effort medium
+synth_rs -tech genesis
+  write_verilog                                      ./netlists/Vexrisc_full/verilog/Vexrisc_full.v
+  write_verilog -norename                            ./netlists/Vexrisc_full/verilog/Vexrisc_full-norename.v
+  write_verilog -defparam                            ./netlists/Vexrisc_full/verilog/Vexrisc_full-defparam.v.v
+  write_verilog -defparam -norename                  ./netlists/Vexrisc_full/verilog/Vexrisc_full-defparam-norename.v
+  write_verilog -nodec                               ./netlists/Vexrisc_full/verilog/Vexrisc_full-nodec.v
+  write_verilog -nodec -norename                     ./netlists/Vexrisc_full/verilog/Vexrisc_full-nodec-norename.v
+  write_verilog -nodec -defparam                     ./netlists/Vexrisc_full/verilog/Vexrisc_full-nodec-defparam.v
+  write_verilog -nodec -defparam -norename           ./netlists/Vexrisc_full/verilog/Vexrisc_full-nodec-defparam-norename.v
+  write_verilog -noexpr                              ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr.v
+  write_verilog -noexpr -norename                    ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-norename.v
+  write_verilog -noexpr -defparam                    ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-defparam.v
+  write_verilog -noexpr -defparam -norename          ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-defparam-norename.v
+  write_verilog -noexpr -nodec                       ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-nodec.v
+  write_verilog -noexpr -nodec -norename             ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-nodec-norename.v
+  write_verilog -noexpr -nodec -defparam             ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-nodec-defparam.v
+  write_verilog -noexpr -nodec -defparam -norename   ./netlists/Vexrisc_full/verilog/Vexrisc_full-noexpr-nodec-defparam-norename.v
+  write_blif  ./netlists/Vexrisc_full/blif/Vexrisc_full.blif 
+  exit

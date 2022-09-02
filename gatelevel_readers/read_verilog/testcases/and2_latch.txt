@@ -1,0 +1,31 @@
+
+mkdir ./netlists/and2_latch
+mkdir ./netlists/and2_latch/verilog
+mkdir ./netlists/and2_latch/blif
+
+load_gcc-v9.1
+/eda_tools/opensource/yosys_verifc/yosys_verific_rs/yosys/install/bin/yosys
+plugin -i synth-rs
+echo on
+read_verilog ./rtl/and2_latch/and2_latch.v
+-effort medium
+synth_rs -tech genesis
+  write_verilog                                      ./netlists/and2_latch/verilog/and2_latch.v
+  write_verilog -norename                            ./netlists/and2_latch/verilog/and2_latch-norename.v
+  write_verilog -defparam                            ./netlists/and2_latch/verilog/and2_latch-defparam.v
+  write_verilog -defparam -norename                  ./netlists/and2_latch/verilog/and2_latch-defparam-norename.v
+  write_verilog -nodec                               ./netlists/and2_latch/verilog/and2_latch-nodec.v
+  write_verilog -nodec -norename                     ./netlists/and2_latch/verilog/and2_latch-nodec-norename.v
+  write_verilog -nodec -defparam                     ./netlists/and2_latch/verilog/and2_latch-nodec-defparam.v
+  write_verilog -nodec -defparam -norename           ./netlists/and2_latch/verilog/and2_latch-nodec-defparam-norename.v
+  write_verilog -noexpr                              ./netlists/and2_latch/verilog/and2_latch-noexpr.v
+  write_verilog -noexpr -norename                    ./netlists/and2_latch/verilog/and2_latch-noexpr-norename.v
+  write_verilog -noexpr -defparam                    ./netlists/and2_latch/verilog/and2_latch-noexpr-defparam.v
+  write_verilog -noexpr -defparam -norename          ./netlists/and2_latch/verilog/and2_latch-noexpr-defparam-norename.v
+  write_verilog -noexpr -nodec                       ./netlists/and2_latch/verilog/and2_latch-noexpr-nodec.v
+  write_verilog -noexpr -nodec -norename             ./netlists/and2_latch/verilog/and2_latch-noexpr-nodec-norename.v
+  write_verilog -noexpr -nodec -defparam             ./netlists/and2_latch/verilog/and2_latch-noexpr-nodec-defparam.v
+  write_verilog -noexpr -nodec -defparam -norename   ./netlists/and2_latch/verilog/and2_latch-noexpr-nodec-defparam-norename.v
+  write_blif  ./netlists/and2_latch/blif/and2_latch.blif 
+  exit
+  
