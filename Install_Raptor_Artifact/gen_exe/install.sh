@@ -1,6 +1,5 @@
 #!/bin/bash
 set -e
-go_install=1
 echo -e "###############################################################################" 
 echo -e "\tInstalling Raptor, A Rapid Silicon complete Software solution"
 echo -e "###############################################################################"
@@ -12,7 +11,7 @@ shoud_i () {
 user_id_str=`id |  awk '{ print $1 }'`
 user_id=`echo "$user_id_str" | sed 's/uid=\([0-9]*\).*/\1/'`
 
-read -r -p "Do you want us to install these dependecies for you, It will need admin rights? [Y/n] " input
+read -r -p "Do you want us to install OS dependecies for you, It will need admin rights? [Y/n] " input
  
 case $input in
       [yY][eE][sS]|[yY])
@@ -35,7 +34,7 @@ case $input in
 
             ;;
       [nN][oO]|[nN])
-            echo "Okay, I will not attempt to installed these. But Raptor can't be run without them so exiting."
+            echo "Okay, I will not attempt to install. But Raptor can't be run without them so exiting."
             exit 1
             ;;
       *)
@@ -49,15 +48,15 @@ esac
 are_dep_ok () {
     if [ "$ostype" == "CentOS" ]
     then
-        echo -e "\nYou are installing Raptor on CentOS OS.\nKindly execute the centos_os_dep.sh with Admin rights to install all OS dependencies"
+        echo -e "\nYou are installing Raptor on CentOS OS.\nExecuting installer with Admin rights can install all OS dependencies"
     elif [ "$ostype" == "Ubuntu" ]
     then
-        echo -e "\nYou are installing Raptor for Ubuntu OS.\nKindly execute the ubuntu_os_dep.sh with Admin rights to install all OS dependencies"
+        echo -e "\nYou are installing Raptor for Ubuntu OS.\nExecuting installer with Admin rights can install all OS dependencies"
     else
         echo "unkown OS"
         exit 1
     fi
-read -r -p "Have you installed the above dependencies? [Y/n] " input
+read -r -p "Are OS dependencies are already installed? [Y/n] " input
  
 case $input in
       [yY][eE][sS]|[yY])
@@ -75,44 +74,6 @@ esac
 
 }
 
-# It is absolute now.  No longer used. Keeping it just for referance 
-write_raptor_sh () {
-
-#   raptor_home=$1
-    echo "#!/bin/bash" > $1/Raptor/raptor_setup.sh
-    echo -e "export PATH=$1/Raptor/bin:\$PATH" >> $1/Raptor/raptor_setup.sh
-    echo -e "export LD_LIBRARY_PATH=$1/Raptor/lib64/raptor/lib:$1/Raptor/lib:$1/Raptor/lib/raptor/lib:$1/Raptor/external_libs/qt_5_15_lib/lib:$1/Raptor/external_libs/gcc_9_lib:\$LD_LIBRARY_PATH"  >> $1/Raptor/raptor_setup.sh
-    cp $1/Raptor/share/raptor/doc/README.md $1/Raptor
-    echo -e "########################################################################################"
-    echo -e "# Installation is done :)"
-    echo -e "# To invoke Raptor\n         source $1/Raptor/raptor_setup.sh and type raptor --version"
-    echo -e "# For detail usage --> See\n      $1/Raptor/README.md"
-    echo -e "########################################################################################"
-}
-
-# install litex_rs
-
-install_litex_rs () {
-
-if [ ! -d $1/bin ]
-then 
-    echo "Doesn't look like a Raptor install directory so exiting"
-    exit 1
-fi
-litex_tar_file=$2
-if [ -f $litex_tar_file ]
-then
-    tar -xvzf $litex_tar_file -C $1/share
-    cd $1/share/litex_rs && python3 litex_rs_setup.py --dev --user --install
-    echo "Done installing Litex RS"
-    echo "Inorder to use Litex_RS plugin, Litex needs to be installed."
-    echo "To install Litex visit https://github.com/enjoy-digital/litex "
-else
-    echo "Kindly provide complete path to litex_rs.tar.gz file. So exiting"
-    exit 1
-fi
-}
-
 #Required path of tar file, external_lib tar file and destination directory where Raptor will be installed
 install_from_tar () {
 
@@ -121,7 +82,7 @@ install_from_tar () {
     echo -e "Raptor Tar file that will be used is\n$1"
 
     raptor_instl_dir=$(basename $1 .tar)
-    echo "name of folder should be $raptor_instl_dir"
+    echo "Raptor will be installed in $raptor_instl_dir"
 
     if [[ -f "$1" ]]
     then
@@ -157,7 +118,7 @@ ok=0
 [ "$1" != "${1#/}" ] || ok=1
 if [ $ok -eq 1 ]
 then
-    echo "Kindly provide absolute path to -r or --raptor_home option"
+    echo "Kindly provide absolute path to -r or --raptor-home option"
     exit 1
 fi
 
@@ -166,18 +127,12 @@ fi
 usage()
 {
   echo "Usage: install.sh            [ -h | --help]             show the help
-                             [ -r | --raptor-home  ]    Specify the absolute path of Directory where Raptor will be Installed. Default is /opt
-                             [ -l | --litex-tar  ]      Specify the tar file path of litex_rs.tar.gz like /home/user123/Downloads/Raptor_release/litex_rs.tar.gz. It requires Raptor install directory path"
+                             [ -r | --raptor-home  ]    Specify the absolute path of Directory where Raptor will be Installed. Default is /opt"
   exit 2
 }
 
-if [ $# -eq 0 ]; then
-    echo "No arguments provided"
-    usage
-    exit 1
-fi
 
-PARSED_ARGUMENTS=$(getopt -a -n install -o hr:l: --long help,raptor-home:,litex-tar: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n install -o hr: --long help,raptor-home: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -187,8 +142,7 @@ eval set -- "$PARSED_ARGUMENTS"
 while :
 do
   case "$1" in
-    -r | --raptor-home)     raptor_h="$2";   shift 2 ;;
-    -l | --litex-tar)        l_path="$2";    shift 2 ;;    
+    -r | --raptor-home)     raptor_h="$2";   shift 2 ;;  
     -h | --help)            usage  ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
@@ -205,18 +159,10 @@ echo "Detected OS type is $ostype"
 are_dep_ok
 
 # install from tar
-if [ $go_install -eq 1 ]
+t_path="./Raptor_*.tar"
+if [[ -z "$raptor_h" ]]
 then
-    t_path="./Raptor_*.tar"
-    if [[ -z "$t_path" ]]
-    then
-        echo "Installation required Tar file path of Raptor."
-        usage
-    fi
-    if [[ -z "$raptor_h" ]]
-    then
-        read -r -p "You have not specified the install path. Is /opt is good? [Y/n] " input
- 
+    read -r -p "You have not specified the install path. Is /opt is good? [Y/n] " input
 case $input in
       [yY][eE][sS]|[yY])
             echo "You say Yes. Proceeding to Install"
@@ -231,24 +177,7 @@ case $input in
             exit 1
             ;;
 esac
-    fi
-    is_raptor_home_absolute $raptor_h
-    install_from_tar $t_path $raptor_h
-    echo -e "Done installing Raptor"
-    #write_raptor_sh $raptor_h
-    if [[ ! -z "$l_path" ]]
-    then
-        echo "Installing Litex RS."
-        install_litex_rs $raptor_h/Raptor $l_path
-    fi  
-    exit
 fi
-
-if [ ! -z $raptor_h ]
-then
-    if [[ ! -z "$l_path" ]]
-    then
-        echo "Installing Litex RS."
-        install_litex_rs $raptor_h/Raptor $l_path
-    fi
-fi
+is_raptor_home_absolute $raptor_h
+install_from_tar $t_path $raptor_h
+echo -e "Done installing Raptor"

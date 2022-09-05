@@ -143,6 +143,12 @@ usage()
   exit 2
 }
 
+if [ $# -eq 0 ]; then
+    echo "No arguments provided"
+    usage
+    exit 1
+fi
+
 PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpmw: --long help,all,create_tar,production,manual,work_space: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
