@@ -1,8 +1,8 @@
 The below is Markdown syntax. For proper view kinly open in Markdown viewer
 ## Intro 
-The `gen_exe/install.sh` is wrapped around the tar exe to install the Raptor from the tar ball of Raptor.
+A brief guide to install Raptor.
 
-From FTP, the download tar.gz file has following files:
+The downloaded *.tar.gz file from FTP site contains below files:
 
 1. README.md (this file)
 2. Raptor exe like Raptor_x.x.x.run
@@ -11,8 +11,7 @@ From FTP, the download tar.gz file has following files:
 
 ### Prerequisites:
 
-* For CentOS, install the required OS dependencies given in centos_os_dep.sh
-* For Ubuntu, install the required OS dependencies given in ubuntu_os_dep.sh
+Raptor depends upon many OS dependecies. These dependecies can be installed by running the installer with SUDO privileges or as root user.
 
 ### Install Raptor
 
@@ -20,7 +19,7 @@ Upon executing the downloaded exe, it will create a folder named as Raptor_<vers
 
 #### Installing in default location
 
-Go to the directory where you have downloaded a Raptor exe and execute like below
+Go to the directory where you have downloaded a Raptor exe and execute it like below
 
 ```
 ./Raptor_x.x.x.run
@@ -38,7 +37,7 @@ Kindly replace `Raptor_x.x.x.run` with the version of Raptor exe file you have r
 
 ### Starting License:
 
-Rapid Silicon use FlexLM based license technology to license its product. The FlexLM depends upon lsb-core. Kindly do install them as per your OS.
+Rapid Silicon use FlexLM based license technology to license its product. The FlexLM depends upon lsb-core. Kindly install them as per your OS.
 
 #### To start a node locked license just simply set the below environment variable
 
@@ -48,19 +47,19 @@ export LM_LICENSE_FILE=<path to license file.lic>
 
 #### To start the floating type license file:
 
-1. Place the license file in a directory.
-2. In license file, write the name of your machine before your host id and port after the host id
-3. In the license file, correct the path of vendor daemon 
+1. Place the license file in a directory of your choice.
+2. In license file, write the name of your machine before host id and port after the host id
+3. In the license file, correct the path of `rapidsil` daemon 
 4. Now start the FlexLM daemon like below
 
 ```
-<path to lmgrd>/lmgrd -c <path of license file> -l <path to save the log file>
+${Raptor install directory}/bin/Flex_LM/lmgrd -c <path of license file> -l <path to save the log file>
 ```
 
-Now go to the machine where you have installed the Raptor and setup the below variable:
+Now go to the machine where you have installed the Raptor and set the below variable:
 
 ```
 export LM_LICENSE_FILE=<port>@<ip address of license server>
 ```
 
-For details, you can see the FlexLM lciense server administration guide.
+For further details, you can see the FlexLM lciense server administration guide.
