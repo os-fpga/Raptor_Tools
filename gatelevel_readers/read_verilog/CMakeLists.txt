@@ -95,9 +95,12 @@ include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
-# Add executable
-add_executable(read_verilog ${EXEC_SOURCE})
-target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
+
+# Add executable for internal use
+if(NOT PRODUCTION_BUILD)
+    add_executable(read_verilog ${EXEC_SOURCE})
+    target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
+endif()
 
 #suppress Verific warnings
 add_compile_options(-w)
