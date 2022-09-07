@@ -105,8 +105,6 @@ struct simple_netlist
         p_print(in_ports, f);
         f << "Netlist out ports ----: " << std::endl;
         p_print(out_ports, f);
-        //        f << "Netlist inout ports ----: " << std::endl;
-        //        p_print(inout_ports, f);
         f << "Netlist nets ----: " << std::endl;
         p_print(nets, f);
         f << "Netlist blocks ----: " << std::endl;
