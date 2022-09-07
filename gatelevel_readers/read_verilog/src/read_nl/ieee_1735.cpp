@@ -362,7 +362,6 @@ ieee_1735::EncryptAES_128_CBC(const char *in_buf, byte *key, byte *iv, unsigned 
 char *
 ieee_1735::DecryptAES_128_CBC(const char *in_buf, unsigned in_size, byte *key, byte *iv)
 {
-//std::cout << "AES:\n" << in_buf << "|" << Strings::len(in_buf) << std::endl ;
 
     // Create and initialise the context
     EVP_CIPHER_CTX *ctx ;

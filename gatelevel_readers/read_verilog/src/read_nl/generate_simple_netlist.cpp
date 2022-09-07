@@ -97,8 +97,6 @@ void bits(string exp, std::vector<std::string> &vec)
     ull = strtoull(str, &stops, bb);
     if (str == stops)
         throw(std::invalid_argument("No valid value in expression " + exp));
-    // if (stops != &dd[dd.size()])
-    // cout << "Warning: did not read all expression" << endl;
     bitset<64> bi(ull);
     string res(aa, '0');
     for (unsigned i = 0; i < res.size(); ++i)
@@ -110,7 +108,6 @@ void bits(string exp, std::vector<std::string> &vec)
     {
         if (bi[i])
         {
-            // cout << "Warning: Truncated value (missing bits of value 1)" << endl;
             break;
         }
     }
@@ -353,7 +350,6 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
     unsigned i;
     Array *module_items = module->GetModuleItems();
     VeriModuleItem *module_item;
-    // cout << "Module : " << module->GetName() << endl;
 
     n_l.name = module->GetName();
 
@@ -374,8 +370,6 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                 rhs = net_reg_assign->GetRValExpr();
                 if (ID_VERIBINARYOPERATOR == rhs->GetClassId())
                 {
-                    //stringstream lhsValue;
-                    //lhs->PrettyPrint(lhsValue, 0);
                     vector<string> l_vec;
                     bitBlast(lhs, l_vec);
                     auto lhsVal = l_vec[0];
@@ -385,9 +379,6 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                     if (!lrhs || !rrhs)
                         continue;
                     std::stringstream ssbits;
-                    //if (rrhs->IsConcat())
-                    //{
-
                     vector<string> r_vec;
                     bitBlast(rrhs, r_vec);
                     stringstream lutVal;
@@ -411,7 +402,6 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                     {
                         simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
                     }
-                    //}
                     else
                     {
                         std::cout << "ERROR: rrhs is not a concat" << std::endl;
@@ -503,31 +493,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
         {
             // Do Nothing
         }
-        // Iterate over all instances contained with this netlist
         Instance *instance;
-        // FOREACH_INSTANCE_OF_NETLIST(netlist, mi, instance)
-        // {
-        //     // cout << "\n\ninstance -------" << instance->Name() << endl;
-        //     // Iterate over all parameters of instance
-        //     char *param_name, *param_value;
-        //     FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
-        //     {
-        //         // Do what you want with them ...
-        //         // cout << "param_name " << param_name << "param_value " << param_value << endl;
-        //     }
-        //     // Iterate over all portrefs of instance
-        //     PortRef *portref;
-        //     FOREACH_PORTREF_OF_INST(instance, mi2, portref)
-        //     {
-        //         // Do what you want with it ...
-        //         Net *net_ = portref->GetNet();
-        //         // cout << "net " << net_->Name() << "  " << net_->LeftIndex() << "  " << net_->RightIndex() << endl;
-        //         // Instance *instance_ = portref->GetInst();
-        //         // // cout << "inst " << instance_->Name() << endl;
-        //         Port *port_ = portref->GetPort();
-        //         // cout << "Port " << port_->Name() << " dirdir " << port_->GetDir() << endl;
-        //     }
-        // }
         // Iterate over all references (Instances) of this netlist
         FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
         {
