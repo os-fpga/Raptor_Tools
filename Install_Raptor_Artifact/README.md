@@ -35,6 +35,15 @@ Go to the directory where you have downloaded a Raptor exe and execute like belo
 ```
 Kindly replace `Raptor_x.x.x.run` with the version of Raptor exe file you have received.
 
+#### Installing in preferred location and install dependencies allowed
+
+Go to the directory where you have downloaded a Raptor exe and execute like below
+
+```
+./Raptor_x.x.x.run -- -i -r <absolute path where Raptor will be installed>
+```
+Kindly replace `Raptor_x.x.x.run` with the version of Raptor exe file you have received.
+
 ### Starting License:
 
 Rapid Silicon use FlexLM based license technology to license its product. The FlexLM depends upon lsb-core. Kindly install them as per your OS.

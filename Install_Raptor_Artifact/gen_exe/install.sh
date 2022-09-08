@@ -11,7 +11,12 @@ shoud_i () {
 user_id_str=`id |  awk '{ print $1 }'`
 user_id=`echo "$user_id_str" | sed 's/uid=\([0-9]*\).*/\1/'`
 
-read -r -p "Do you want us to install OS dependecies for you, It will need admin rights? [Y/n] " input
+if [ -z $2 ]
+then
+    read -r -p "Do you want us to install OS dependecies for you, It will need admin rights? [Y/n] " input
+else
+    input=yes
+fi
  
 case $input in
       [yY][eE][sS]|[yY])
@@ -56,7 +61,13 @@ are_dep_ok () {
         echo "unkown OS"
         exit 1
     fi
-read -r -p "Are OS dependencies are already installed? [Y/n] " input
+
+if [ -z $1 ]
+then
+    read -r -p "Are OS dependencies are already installed? [Y/n] " input
+else
+    input=no
+fi
  
 case $input in
       [yY][eE][sS]|[yY])
@@ -64,7 +75,7 @@ case $input in
             ;;
       [nN][oO]|[nN])
             echo "You say No."
-            shoud_i $ostype
+            shoud_i $ostype $go_dep
             ;;
       *)
             echo "Invalid input..."
@@ -127,12 +138,13 @@ fi
 usage()
 {
   echo "Usage: install.sh            [ -h | --help]             show the help
+                             [ -i | --install-dep  ]    By specifying it on command line, you are allowing to install the dependecies. Must execute installer with admin rights.
                              [ -r | --raptor-home  ]    Specify the absolute path of Directory where Raptor will be Installed. Default is /opt"
   exit 2
 }
 
 
-PARSED_ARGUMENTS=$(getopt -a -n install -o hr: --long help,raptor-home: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n install -o hir: --long help,install-dep,raptor-home: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -143,6 +155,7 @@ while :
 do
   case "$1" in
     -r | --raptor-home)     raptor_h="$2";   shift 2 ;;  
+    -i | --install-dep)     go_dep=1;         shift   ;;
     -h | --help)            usage  ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
@@ -156,7 +169,7 @@ done
 ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
 echo "Detected OS type is $ostype"
 
-are_dep_ok
+are_dep_ok $go_dep
 
 # install from tar
 t_path="./Raptor_*.tar"
