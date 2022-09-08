@@ -82,6 +82,16 @@ struct inst
             f << " " << p.first << "=" << s;
         }
         f << std::endl;
+        for(auto& p : params_){
+            // TO_DO verify that verific gives always binary otherwise hande other formats
+            std::string s (p.second);
+            std::size_t found = s.find('b');
+            if (found==std::string::npos) found = s.find('B');
+            if (found!=std::string::npos){
+                for(int i = found ; i >= 0; i--) s[i] = ' ';
+            }
+            f << ".param " << p.first << " " << s << std::endl;
+        }
     }
     void blif_print(std::ostream &f)
     {
