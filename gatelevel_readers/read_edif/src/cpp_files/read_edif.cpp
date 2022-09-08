@@ -48,22 +48,18 @@
  * }
  * }*/
 int is_float(char *str) {
-  // printf ("\n entering is_float function to check %s", str );
   char *ptr = NULL;
   strtod(str, &ptr);
-
   return !*ptr;
 }
 
 int is_integer(char *str) {
-  // printf ("\n entering is_integer function to check %s", str );
   char *ptr = NULL;
   strtol(str, &ptr, 10);
   return !*ptr;
 }
 
 int is_lst_term(int c) {
-  // printf ("\n entering is_lst function to check %c", c );
   return c == EOF || isspace(c) || c == '(' || c == ')';
 }
 
@@ -105,7 +101,7 @@ struct SNode *snode_parse(FILE *fp) {
       node->type = LIST_START;
       my_number = my_number + 1;
       node->list_counter = my_number;
-      // node->list = snode_parse(fp);
+     
     } else if (c == '"') {
       // Read a string
       node = new SNode;

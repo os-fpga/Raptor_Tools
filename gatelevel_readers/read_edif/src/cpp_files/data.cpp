@@ -23,6 +23,7 @@
  * All the keywords will be first declared
  *
  */
+const std::string EDIF = "edif";
 const std::string CELL = "cell";
 // ports section
 const std::string INTERFACE = "interface";
@@ -31,12 +32,16 @@ const std::string ARRAY = "array";
 const std::string DIRECTION = "direction";
 const std::string CONTENTS = "contents";
 const std::string INSTANCE = "instance";
+const std::string INSTANCEREF = "instanceRef";
 const std::string RENAME = "rename";
 const std::string DESIGN = "design";
 const std::string NET = "net";
 const std::string LUT = "$lut";
 const std::string PORTREF = "portRef";
 const std::string MEMBER = "member";
+const std::string INTEGER_I = "integer";
+const std::string GND = "GND";
+const std::string VCC = "VCC";
 
 /*
  * This function is to compare the two strings either they are equal or not.
@@ -65,9 +70,10 @@ std::string find_top_(struct SNode *head) {
   while (current != NULL) {
     if (current->type == 2) {
       std::string input_string = current->value;
-      if (string_compare(DESIGN, input_string)) {
+      if (string_compare(EDIF, input_string)) {
         current = current->next;
         top = current->value;
+        break;
       }
     }
     current = current->next;
@@ -80,7 +86,7 @@ std::string find_top_(struct SNode *head) {
  * This function will extract the ports of each cell
  */
 void find_ports(struct SNode *head, int cell_start,
-                int cell_end) { // int initial_depth
+                int cell_end) {
 
   struct SNode *current = head;
   std::string port_name_renamed;
@@ -98,17 +104,17 @@ void find_ports(struct SNode *head, int cell_start,
         current = current->next;
         if (current->type == 0) {
           current = current->next;
-          if (string_compare("rename", current->value)) {
+          if (string_compare(RENAME, current->value)) {
             current = current->next;
             port_name_renamed = current->value;
             current = current->next;
             port_name_original = current->value;
           }
-          if (string_compare("array", current->value)) {
+          if (string_compare(ARRAY, current->value)) {
             current = current->next;
             if (current->type == 0) {
               current = current->next;
-              if (string_compare("rename", current->value)) {
+              if (string_compare(RENAME, current->value)) {
                 current = current->next;
                 port_name_renamed = current->value;
                 current = current->next;
@@ -142,13 +148,13 @@ void find_ports(struct SNode *head, int cell_start,
 
 
 void map_cell_ports(struct SNode *head) {
-  // std::vector<std::tuple<std::string, std::string, std::string>> p_ports;
+
 
   int cell_start = 0;
   int cell_end = 0;
   std::string cell_name_orig;
   std::string cell_name_renamed;
-  // bool is_lut = false;
+
 
   struct SNode *current = head;
   while (current != NULL) {
@@ -171,11 +177,7 @@ void map_cell_ports(struct SNode *head) {
         } else if (current->type == 2) {
           cell_name_renamed = current->value;
           cell_name_orig = current->value;
-          // std::cout << "The cell_orig_renamed  " << current->value <<
-          // std::endl;
         }
-        //  here we have to place the map function
-
         find_ports(current, cell_start, cell_end);
         cell_ports.insert({ cell_name_renamed, ports });
         ports.clear();
@@ -207,12 +209,10 @@ void resolve_instance(struct SNode *head) {
         if (current->type == 0) {
           current = current->next;
           current = current->next;
-
           instance_name_renamed = current->value;
           current = current->next;
           instance_name_orig = current->value;
           ins.instance_name_real = instance_name_orig;
-
           current = current->next;
         } else if (current->type == 2) {
           instance_name_renamed = current->value;
@@ -227,15 +227,13 @@ void resolve_instance(struct SNode *head) {
         auto it = cell_ports.find(CELL_REFERENCE);
         if (it != cell_ports.end())
           temprory_vector = it->second;
-
         auto cell_orig_it = cell_names.find(CELL_REFERENCE);
         std::string cell_orig_name;
         if (cell_orig_it != cell_names.end())
           cell_orig_name = cell_orig_it->second;
         ins.instance_name_real = cell_orig_name;
-
         // dedicated block for lut data
-        if (string_compare("$lut", cell_orig_name)) {
+        if (string_compare(LUT, cell_orig_name)) {
           t = 0;
           while (t != 11) {
             current = current->next;
@@ -243,33 +241,27 @@ void resolve_instance(struct SNode *head) {
           }
           bool is_hex;
           std::string property_lut_type = current->value;
-          if (string_compare("integer", property_lut_type)) {
+          if (string_compare(INTEGER_I, property_lut_type)) {
             is_hex = false;
           } else {
             is_hex = true;
           }
           current = current->next;
           Property_lut = current->value;
-          // std::cout << "The property lut is  " << current->value <<
-          // std::endl;
           t = 0;
           while (t != 8) {
             current = current->next;
             t++;
           }
           Property_width = current->value;
-          // std::cout << "The property width is  " << current->value <<
-          // std::endl;
           int Property_width_i = stoi(Property_width);
           std::string p_name = get<0>(temprory_vector[0]);
           p_size.push_back(std::make_pair(p_name, Property_width_i));
           if (Property_width_i > 1) {
             p_name = p_name + "[";
-            // for (int ip = (Property_width_i - 1); ip != (-1); ip--) {
             for (int ip = 0; ip <= (Property_width_i - 1); ip++) {
               std::string p_name_new = p_name + std::to_string(ip) + "]";
               conn.push_back(std::make_pair(p_name_new, "$undef"));
-              // std::cout << "The p_name is  is  " << p_name1 << std::endl;
             }
           } else {
             conn.push_back(std::make_pair(p_name, "$undef"));
@@ -315,8 +307,6 @@ void seperate_ports(std::string top_name) {
   for (unsigned int i = 0; i < ports.size(); i++) {
     int size = stoi(std::get<1>(ports[i]));
     if (string_compare("INPUT", get<2>(ports[i]))) {
-      // std::cout << "(" << std::get<0>(ports[i]) << "," << get<1>(ports[i]) <<
-      // ")" << std::endl;
       std::string port_name = std::get<3>(ports[i]);
       if (size == 0) {
         in_ports.push_back(std::get<3>(ports[i]));
@@ -328,7 +318,6 @@ void seperate_ports(std::string top_name) {
         }
       }
     } else if (string_compare("OUTPUT", get<2>(ports[i]))) {
-
       if (size == 0) {
         out_ports.push_back(std::get<3>(ports[i]));
         map_output.insert({ std::get<0>(ports[i]), std::get<3>(ports[i]) });
@@ -339,14 +328,9 @@ void seperate_ports(std::string top_name) {
           map_output.insert(
               {((std::get<0>(ports[i])) + "[" + to_string(s) + "]"),
                ((std::get<3>(ports[i])) + "[" + to_string(s) + "]") });
-          //  std::cout << "(" << ((std::get<0>(ports[i])) + "[" + to_string(s)
-          // + "]") << "," << ((std::get<3>(ports[i])) + "[" + to_string(s) +
-          // "]") << ")" << std::endl;
         }
       }
     } else if (string_compare("INOUT", get<2>(ports[i]))) {
-      // std::cout << "(" << std::get<0>(ports[i]) << "," << get<1>(ports[i]) <<
-      // ")" << std::endl;
       if (size == 0) {
         out_ports.push_back(std::get<3>(ports[i]));
       } else {
@@ -446,29 +430,15 @@ void find_cell_net(struct SNode *head, std::string top_name) {
                   temprory_vector = it->second;
                   int port_size;
                   for (int i = 0; i < temprory_vector.size(); i++) {
-                    //  std::cout<<"The port name is  "
-                    //<<(std::get<0>(temprory_vector[i]))<<std::endl;
-                    //  std::cout<<"The port size is  "
-                    //<<(std::get<1>(temprory_vector[i]))<<std::endl;
-                    //  std::cout<<"The port we are comparing is  "
-                    //<<port_ref<<std::endl;
                     if (string_compare(port_ref,
                                        std::get<0>(temprory_vector[i]))) {
-                      //                 std::cout<<"The port size is  "
-                      //<<(std::get<1>(temprory_vector[i]))<<std::endl;
                       port_size = stoi(std::get<1>(temprory_vector[i]));
                       port_size = port_size - 1;
-                      //std::cout << "The initial member  is  " << member_num
-                       //         << std::endl;
                       member_num = to_string(port_size - stoi(member_num));
                       member_num = "[" + member_num + "]";
-                      //                 std::cout<<"The final member  is  "
-                      //<<member_num<<std::endl;
                       break;
                     }
                   }
-
-                  // std::get<3>(ports[i])
                 } else {
                   std::vector<std::pair<std::string, int> > sizes;
                   auto it = instance_.find(instance_ref);
@@ -478,23 +448,11 @@ void find_cell_net(struct SNode *head, std::string top_name) {
                     sizes = ins.sizes;
                     int port_size;
                     for (int i = 0; i < sizes.size(); i++) {
-                      // std::cout<<"The port name is  "
-                      // <<(std::get<0>(sizes[i]))<<std::endl;
-                      // std::cout<<"The port size is  "
-                      // <<(std::get<1>(sizes[i]))<<std::endl;
-                      // std::cout<<"The port we are comparing is  "
-                      // <<port_ref<<std::endl;
                       if (string_compare(port_ref, std::get<0>(sizes[i]))) {
-                        //  std::cout<<"The port size is  "
-                        // <<(std::get<1>(sizes[i]))<<std::endl;
                         port_size = std::get<1>(sizes[i]);
                         port_size = port_size - 1;
-                        //std::cout << "The initial member  is  " << member_num
-                          //        << std::endl;
                         member_num = to_string(port_size - stoi(member_num));
                         member_num = "[" + member_num + "]";
-                        //   std::cout<<"The final member  is  "
-                        // <<member_num<<std::endl;
                         break;
                       }
                     }
@@ -509,7 +467,6 @@ void find_cell_net(struct SNode *head, std::string top_name) {
           }
         }
         instance ins;
-
         for (unsigned int z = 0; z < temp.size(); z++) {
           auto it = instance_.find(temp[z].first);
           if (it != instance_.end()) {
@@ -530,16 +487,9 @@ void find_cell_net(struct SNode *head, std::string top_name) {
             auto ports_it = map_output.find(temp[z].second);
             if (ports_it != map_output.end()) {
               std::string port_real_name = ports_it->second;
-              // std::cout<<"The port real name is  "
-              // <<port_real_name<<std::endl;
               for (auto ou_p = 0; ou_p < out_ports.size(); ou_p++) {
-                // std::cout<<"Comparing port  " <<out_ports[ou_p]<<" against "
-                // << port_real_name<<std::endl;
-
                 if (out_ports[ou_p] == port_real_name) {
                   special_vector.push_back(port_real_name);
-                  // std::cout<<"ports added in special vector "
-                  // <<port_real_name<<std::endl;
                   break;
                 }
               }
@@ -557,13 +507,10 @@ void find_cell_net(struct SNode *head, std::string top_name) {
           ins_false.instance_name_real = "$lut";
           ins_false.tt.push_back(row_);
           for (auto sv = 0; sv < special_vector.size(); sv++) {
-            // std::cout<<"sv =  " <<special_vector[sv]<<std::endl;
             if (!(string_compare(net_name, special_vector[sv]))) {
               ins_false.conn.push_back(std::make_pair(net_name, net_name));
               ins_false.conn.push_back(
                   std::make_pair(special_vector[sv], special_vector[sv]));
-              // std::cout<<"a new instance has been created with the name
-              // "<<net_name<< "and "<<special_vector[sv]<<std::endl;
               instance_.insert({ to_string(counter), ins_false });
               counter++;
               ins_false.conn.clear();
@@ -578,31 +525,23 @@ void find_cell_net(struct SNode *head, std::string top_name) {
           ins_false.instance_name_real = "$lut";
           ins_false.tt.push_back(row_);
           for (auto sv = 0; sv < special_vector.size(); sv++) {
-            // std::cout<<"sv =  " <<special_vector[sv]<<std::endl;
-            // if (!(string_compare(net_name, special_vector[sv])))     {
             ins_false.conn.push_back(std::make_pair(net_name, net_name));
             ins_false.conn.push_back(
                 std::make_pair(special_vector[sv], special_vector[sv]));
-            // std::cout<<"a new instance has been created with the name
-            // "<<net_name<< "and "<<special_vector[sv]<<std::endl;
             instance_.insert({ to_string(counter), ins_false });
             counter++;
             ins_false.conn.clear();
           }
         }
-
         special_vector.clear();
       }
     }
-
     current = current->next;
   }
 }
 
 void get_truth_table(std::string tt_output_str, int width, bool is_hex) {
-  // std::cout << "the input string is" << tt_output_str << ", " << width << ",
-  // " << is_hex << std::endl;
-
+ 
   std::vector<std::vector<int> > rows;
   std::string property_lut = tt_output_str;
   unsigned long long int index;
@@ -651,31 +590,35 @@ void get_truth_table(std::string tt_output_str, int width, bool is_hex) {
   }
 }
 
-void edif_bilf(char *argv_1, char *argv_2) 
-{
+
+void edif_bilf(char *argv_1, char *argv_2) {
   FILE *fp = fopen(argv_1, "r");
   if (fp == NULL) {
     perror("Failed to open the edif file : ");
   }
+ std::ofstream outfile(argv_2, ios::out);
+   if (!(outfile.is_open())) {
+     perror("Failed to open the blif file : ");
+   }
+
   std::vector<std::tuple<std::string, std::string, std::string, std::string> >
   temprory_vector;
+  printf("parsing the file\n");
   struct SNode *node = snode_parse(fp);
-
+  printf("Getting the top name\n");
   std::string top_name = find_top_(node);
-
+  printf("Mapping cell ports\n");
   map_cell_ports(node);
+  //printf("Making the ports on the basis of size\n");
   seperate_ports(top_name);
+  printf("Initializing the instance\n");
   resolve_instance(node);
+  printf("Getting the nets\n");
   find_cell_net(node, top_name);
 
   // passing data to simplenetlist.h
   simple_netlist sn;
-  ofstream outfile(argv_2, ios::out);
-  if (!(outfile.is_open())) {
-    perror("Failed to open the blif file : ");
-  }
   sn.name = top_name;
-
   sn.in_ports = in_ports;
   sn.out_ports = out_ports;
   sn.inout_ports = inout_ports;
@@ -698,4 +641,5 @@ void edif_bilf(char *argv_1, char *argv_2)
   end_print(outfile);
   printf("Close the file stream\n");
   fclose(fp);
+  outfile.close();
 }
