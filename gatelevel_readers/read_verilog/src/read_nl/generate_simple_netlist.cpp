@@ -96,7 +96,26 @@ void bits(string exp, std::vector<std::string> &vec)
     str = &dd[2];
     ull = strtoull(str, &stops, bb);
     if (str == stops)
-        throw(std::invalid_argument("No valid value in expression " + exp));
+    {
+        if ('x' == *str)
+        {
+            bool dontCarre = true;
+            for (int idx = 2; idx < dd.size(); ++idx)
+            {
+                if ('x' != dd[idx])
+                    dontCarre = false;
+            }
+            if (dontCarre)
+            {
+                for (unsigned i = 0; i < aa; ++i)
+                    vec.push_back("$undef");
+                return;
+            }
+            throw(std::invalid_argument("No valid value in expression " + exp));
+        }
+        else
+            throw(std::invalid_argument("No valid value in expression " + exp));
+    }
     bitset<64> bi(ull);
     string res(aa, '0');
     for (unsigned i = 0; i < res.size(); ++i)
