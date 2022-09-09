@@ -87,7 +87,7 @@ struct inst {
   }
 };
 
-struct simple_netlist {
+struct simple_netlist_beta {
   void p_print(std::ostream &f) {
     f << "Netlist Name ----: " << name << std::endl;
     f << "Netlist in ports ----: " << std::endl;
@@ -148,6 +148,6 @@ struct simple_netlist {
   std::vector<inst> blocks;
 };
 
-int parse_verilog(const char *file_name, simple_netlist &n_l);
+//int parse_verilog(const char *file_name, simple_netlist &n_l);
 
 #endif

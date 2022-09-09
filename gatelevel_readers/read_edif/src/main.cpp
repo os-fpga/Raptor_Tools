@@ -10,9 +10,9 @@ int main(int argc, char *argv[]) {
 
   printf("Open the file stream\n");
 
-  //  FILE* fp = fopen(argv[1], "r");
+    FILE* fp = fopen(argv[2], "w");
 
-  edif_bilf(argv[1], argv[2]);
+  edif_bilf(argv[1], fp);
 
   return 0;
 }
