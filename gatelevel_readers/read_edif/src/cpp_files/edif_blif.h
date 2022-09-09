@@ -4,5 +4,5 @@
 #include <vector>
 #include <iostream>
 
-using std::ofstream;
-void edif_bilf(char *argv_1, char *argv_2) ;
+//using std::ofstream;
+void edif_bilf(const char *argv_1, FILE *argv_2) ;

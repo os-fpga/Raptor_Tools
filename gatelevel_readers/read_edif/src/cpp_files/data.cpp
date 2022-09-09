@@ -16,7 +16,7 @@
 #include "data.h"
 #include "edif_blif.h"
 #include "read_edif.h"
-#include "simple_netlist.h"
+#include "simple_netlist_beta.h"
 
 /*
  * Keywords
@@ -591,15 +591,21 @@ void get_truth_table(std::string tt_output_str, int width, bool is_hex) {
 }
 
 
-void edif_bilf(char *argv_1, char *argv_2) {
+void edif_bilf(const char *argv_1, FILE *argv_2) {
   FILE *fp = fopen(argv_1, "r");
   if (fp == NULL) {
     perror("Failed to open the edif file : ");
   }
- std::ofstream outfile(argv_2, ios::out);
-   if (!(outfile.is_open())) {
-     perror("Failed to open the blif file : ");
-   }
+ //std::ofstream outfile(argv_2, ios::out);
+  // if (!(outfile.is_open())) {
+  //   perror("Failed to open the blif file : ");
+  // }
+   //{
+        std::stringstream ss;
+      //  n_l.b_print(ss);
+     //   fputs(ss.str().c_str(), infile);
+    //}
+   // rewind(infile);
 
   std::vector<std::tuple<std::string, std::string, std::string, std::string> >
   temprory_vector;
@@ -617,13 +623,13 @@ void edif_bilf(char *argv_1, char *argv_2) {
   find_cell_net(node, top_name);
 
   // passing data to simplenetlist.h
-  simple_netlist sn;
+  simple_netlist_beta sn;
   sn.name = top_name;
   sn.in_ports = in_ports;
   sn.out_ports = out_ports;
   sn.inout_ports = inout_ports;
 
-  sn.b_print(outfile);
+  sn.b_print(ss);
   instance INS;
   inst ins;
   for (auto it = instance_.begin(); it != instance_.end(); it++) {
@@ -636,10 +642,11 @@ void edif_bilf(char *argv_1, char *argv_2) {
     ins.name_ = it->first;
     ins.conns_ = INS.conn;
     ins.truthTable_ = INS.tt;
-    ins.blif_print(outfile);
+    ins.blif_print(ss);
   }
-  end_print(outfile);
+  end_print(ss);
   printf("Close the file stream\n");
   fclose(fp);
-  outfile.close();
+   fputs(ss.str().c_str(), argv_2);
+ // outfile.close();
 }
