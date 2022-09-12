@@ -57,6 +57,7 @@ using namespace Verific;
 #endif
 
 using namespace std;
+std::unordered_map<std::string, std::pair<int, int>> netBusMap;
 string dirs[] = {"DIR_INOUT", "DIR_IN", "DIR_OUT", "DIR_NONE"};
 void packEscaped(string &ss)
 {
@@ -144,8 +145,31 @@ bool bitBlast(string sig, vector<string> &res)
     }
     if (!sig.size())
         return false;
+    packEscaped(sig);
     if (sig.back() != ']')
-        res.push_back(sig);
+    {
+        if (netBusMap.find(sig) == end(netBusMap))
+            res.push_back(sig);
+        else
+        {
+            int li = netBusMap[sig].first;
+            int ri = netBusMap[sig].second;
+            int step = -1;
+            if (li < ri)
+                step = 1;
+            sig.push_back('[');
+            while (li != ri)
+            {
+                stringstream sbit;
+                sbit << sig << li << "]";
+                res.push_back(sbit.str());
+                li += step;
+            }
+            stringstream sbit;
+            sbit << sig << ri << "]";
+            res.push_back(sbit.str());
+        }
+    }
     else
     {
         int pos = -1;
@@ -346,9 +370,9 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
     Array files(1);
     files.Insert(file_name);
 
-    #ifdef PRODUCTION_BUILD
-    License_Manager license (License_Manager::LicensedProductName::READ_VERILOG);
-    #endif
+#ifdef PRODUCTION_BUILD
+    License_Manager license(License_Manager::LicensedProductName::READ_VERILOG);
+#endif
     Verific::veri_file::SetPragmaProtectObject(&ieee_1735);
     // Now analyze the top-level design. In case of failure return.
     if (!veri_file::AnalyzeMultipleFiles(&files, veri_file::VERILOG_2K))
@@ -371,6 +395,99 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
     VeriModuleItem *module_item;
 
     n_l.name = module->GetName();
+
+    // Get a handle to the top-level netlist
+    Netlist *top = Netlist::PresentDesign();
+    if (!top)
+    {
+        Message::PrintLine("Cannot find any handle to the top-level netlist");
+        return 5;
+    }
+    // Lets accumulate all netlist
+    Set netlists(POINTER_HASH);
+    top->Hierarchy(netlists, 0 /* bottom to top */);
+
+    // Now for each netlist, print the name of all netlists along with the instantiation
+    // reference count, and access some netlist information.
+    Netlist *netlist;
+    MapIter mi, mi2;
+    SetIter si;
+    SetIter si2;
+    vector<Netlist *> n_vec;
+    FOREACH_SET_ITEM(&netlists, si, &netlist)
+    {
+        n_vec.push_back(netlist);
+    }
+
+    while (n_vec.size())
+    {
+        auto netlist = n_vec.back();
+        n_vec.pop_back();
+        // Skip primitives and operators
+        if (netlist->IsPrimitive() || netlist->IsOperator())
+            continue;
+        // Print netlist name and reference count
+        Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "netlist %s was instantiated %d time(s) by netlist %s",
+                     netlist->Owner()->Name(), netlist->NumOfRefs(), top->Owner()->Name());
+        // Iterate over all ports of this netlist
+        const char *current_block_model = netlist->Owner()->Name();
+        Port *port;
+        FOREACH_PORT_OF_NETLIST(netlist, mi, port)
+        {
+            PortBus *portb = port->Bus();
+            if (DIR_INOUT == port->GetDir())
+                n_l.inout_ports.push_back(port->Name());
+            else if (DIR_OUT == port->GetDir())
+                n_l.out_ports.push_back(port->Name());
+            else if (DIR_IN == port->GetDir())
+                n_l.in_ports.push_back(port->Name());
+        }
+        // Iterate over all portbuses of this netlist
+        PortBus *portbus;
+        FOREACH_PORTBUS_OF_NETLIST(netlist, mi, portbus)
+        {
+            // Do Nothing ...
+        }
+        Net *net;
+        FOREACH_NET_OF_NETLIST(netlist, mi, net)
+        {
+            n_l.nets.push_back(net->Name());
+        }
+        // Iterate over all netbuses in this netlist
+        NetBus *netbus;
+        FOREACH_NETBUS_OF_NETLIST(netlist, mi, netbus)
+        {
+            netBusMap[netbus->Name()] = {netbus->LeftIndex(), netbus->RightIndex()};
+        }
+        Instance *instance;
+        // Iterate over all references (Instances) of this netlist
+        FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+        {
+            // Iterate over all parameters of instance
+            n_l.blocks.push_back(inst());
+            n_l.blocks.back().name_ = instance->Name();
+            n_l.blocks.back().mod_name_ = current_block_model;
+            char *param_name, *param_value;
+            FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
+            {
+                // Do what you want with them ...
+                n_l.blocks.back().params_[param_name] = param_value;
+            }
+            // Iterate over all portrefs of instance
+            PortRef *portref;
+            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+            {
+                // Do what you want with it ...
+                Net *net_ = portref->GetNet();
+                Port *port_ = portref->GetPort();
+                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+            }
+            if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+            {
+                simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
+            }
+        }
+    }
 
     FOREACH_ARRAY_ITEM(module_items, i, module_item)
     {
@@ -446,100 +563,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
             }
         }
     }
-
     veri_file::RemoveAllModules();
 
-    // Get a handle to the top-level netlist
-    Netlist *top = Netlist::PresentDesign();
-    if (!top)
-    {
-        Message::PrintLine("Cannot find any handle to the top-level netlist");
-        return 5;
-    }
-    // Lets accumulate all netlist
-    Set netlists(POINTER_HASH);
-    top->Hierarchy(netlists, 0 /* bottom to top */);
-
-    // Now for each netlist, print the name of all netlists along with the instantiation
-    // reference count, and access some netlist information.
-    Netlist *netlist;
-    MapIter mi, mi2;
-    SetIter si;
-    SetIter si2;
-    vector<Netlist *> n_vec;
-    FOREACH_SET_ITEM(&netlists, si, &netlist)
-    {
-        n_vec.push_back(netlist);
-    }
-
-    while (n_vec.size())
-    {
-        auto netlist = n_vec.back();
-        n_vec.pop_back();
-        // Skip primitives and operators
-        if (netlist->IsPrimitive() || netlist->IsOperator())
-            continue;
-        // Print netlist name and reference count
-        Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "netlist %s was instantiated %d time(s) by netlist %s",
-                     netlist->Owner()->Name(), netlist->NumOfRefs(), top->Owner()->Name());
-        // Iterate over all ports of this netlist
-        const char *current_block_model = netlist->Owner()->Name();
-        Port *port;
-        FOREACH_PORT_OF_NETLIST(netlist, mi, port)
-        {
-            PortBus *portb = port->Bus();
-            if (DIR_INOUT == port->GetDir())
-                n_l.inout_ports.push_back(port->Name());
-            else if (DIR_OUT == port->GetDir())
-                n_l.out_ports.push_back(port->Name());
-            else if (DIR_IN == port->GetDir())
-                n_l.in_ports.push_back(port->Name());
-        }
-        // Iterate over all portbuses of this netlist
-        PortBus *portbus;
-        FOREACH_PORTBUS_OF_NETLIST(netlist, mi, portbus)
-        {
-            // Do Nothing ...
-        }
-        Net *net;
-        FOREACH_NET_OF_NETLIST(netlist, mi, net)
-        {
-            n_l.nets.push_back(net->Name());
-        }
-        // Iterate over all netbuses in this netlist
-        NetBus *netbus;
-        FOREACH_NETBUS_OF_NETLIST(netlist, mi, netbus)
-        {
-            // Do Nothing
-        }
-        Instance *instance;
-        // Iterate over all references (Instances) of this netlist
-        FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
-        {
-            // Iterate over all parameters of instance
-            n_l.blocks.push_back(inst());
-            n_l.blocks.back().name_ = instance->Name();
-            n_l.blocks.back().mod_name_ = current_block_model;
-            char *param_name, *param_value;
-            FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
-            {
-                // Do what you want with them ...
-                n_l.blocks.back().params_[param_name] = param_value;
-            }
-            // Iterate over all portrefs of instance
-            PortRef *portref;
-            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
-            {
-                // Do what you want with it ...
-                Net *net_ = portref->GetNet();
-                Port *port_ = portref->GetPort();
-                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
-            }
-            if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
-            {
-                simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
-            }
-        }
-    }
     return 0;
 }
