@@ -351,7 +351,7 @@ void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<uns
 {
     unsigned long long width = veriValue(w);
     unsigned long long table = veriValue(tr);
-    unsigned p = 1;
+    unsigned long long p = 1;
     for (int i = 0; i < 64; ++i)
     {
         if (p & table)
