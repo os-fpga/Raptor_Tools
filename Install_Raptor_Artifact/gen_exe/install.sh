@@ -64,7 +64,7 @@ are_dep_ok () {
 
 if [ -z $1 ]
 then
-    read -r -p "Are OS dependencies are already installed? [Y/n] " input
+    read -r -p "Are OS dependencies already installed? [Y/n] " input
 else
     input=no
 fi
@@ -88,11 +88,19 @@ esac
 #Required path of tar file, external_lib tar file and destination directory where Raptor will be installed
 install_from_tar () {
 
+# 3rg input args is about verbosity. By default it is off
+if [ -z $3 ]
+then
+    tar_flags="-xf"
+else
+    tar_flags="-xvf"
+fi
 #    raptor_tar_path=$1
 #    RAPTOR_HOME=$2   --> install destination
     echo -e "Raptor Tar file that will be used is\n$1"
 
-    raptor_instl_dir=$(basename $1 .tar)
+    raptor_instl_dir=`echo $1 | sed -E 's/[A-Za-z_]/ /g;s/. {1,}$//;s/^ {1,}([0-9])/\1/'`
+    raptor_instl_dir=$2/RapidSilicon/Raptor/$raptor_instl_dir
     echo "Raptor will be installed in $raptor_instl_dir"
 
     if [[ -f "$1" ]]
@@ -103,10 +111,11 @@ install_from_tar () {
             echo "Seems like don't have write permission in $2"
             exit 1
         else
-            [[ ! -d "$2/$raptor_instl_dir" ]] && mkdir -p $2/$raptor_instl_dir
-            tar -xvf $1 -C $2/$raptor_instl_dir | tee $2/.raptor_install.log
-            cp $2/$raptor_instl_dir/share/raptor/doc/README.md $2/$raptor_instl_dir
-            mv $2/.raptor_install.log $2/$raptor_instl_dir
+            [[ ! -d "$raptor_instl_dir" ]] && mkdir -p $raptor_instl_dir || { echo "Specified Directory already has Raptor installed. Can't over write so exiting.."; exit 1; }
+            echo "Doing the installation...."
+            tar $tar_flags $1 -C $raptor_instl_dir | tee $2/.raptor_install.log
+            cp $raptor_instl_dir/share/raptor/doc/README.md $raptor_instl_dir
+            mv $2/.raptor_install.log $raptor_instl_dir
         fi
     else
         echo "Tar file of Raptor does not exist"
@@ -138,13 +147,14 @@ fi
 usage()
 {
   echo "Usage: install.sh            [ -h | --help]             show the help
-                             [ -i | --install-dep  ]    By specifying it on command line, you are allowing to install the dependecies. Must execute installer with admin rights.
+                             [ -i | --install-dep  ]    Turn on to install the dependecies. Must execute installer with admin rights. Useful in non-interactive mode
+                             [ -v | --verbose      ]    Turn on the verbosity.
                              [ -r | --raptor-home  ]    Specify the absolute path of Directory where Raptor will be Installed. Default is /opt"
   exit 2
 }
 
 
-PARSED_ARGUMENTS=$(getopt -a -n install -o hir: --long help,install-dep,raptor-home: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n install -o hivr: --long help,install-dep,verbose,raptor-home: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -156,6 +166,7 @@ do
   case "$1" in
     -r | --raptor-home)     raptor_h="$2";   shift 2 ;;  
     -i | --install-dep)     go_dep=1;         shift   ;;
+    -v | --verbose)         go_verbose=1;         shift   ;;
     -h | --help)            usage  ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
@@ -172,25 +183,11 @@ echo "Detected OS type is $ostype"
 are_dep_ok $go_dep
 
 # install from tar
-t_path="./Raptor_*.tar"
-if [[ -z "$raptor_h" ]]
+t_path="Raptor_*.tar"
+if [ -z $raptor_h ]
 then
-    read -r -p "You have not specified the install path. Is /opt is good? [Y/n] " input
-case $input in
-      [yY][eE][sS]|[yY])
-            echo "You say Yes. Proceeding to Install"
-            raptor_h=/opt
-            ;;
-      [nN][oO]|[nN])
-            echo "You say No. Kindly provide the Install path using -r or --raptor_home option"
-            usage
-            ;;
-      *)
-            echo "Invalid input..."
-            exit 1
-            ;;
-esac
+echo  "You have not specified the install path. Installing to /opt"
 fi
 is_raptor_home_absolute $raptor_h
-install_from_tar $t_path $raptor_h
+install_from_tar $t_path $raptor_h $go_verbose
 echo -e "Done installing Raptor"
