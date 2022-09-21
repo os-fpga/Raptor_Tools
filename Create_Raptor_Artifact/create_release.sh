@@ -7,6 +7,13 @@ do_scp=0
 printf "This script build and install Raptor\nIt creates tar of Raptor from custom install directory\n\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+# a temp function to do temporary work
+temp () {
+
+    # remove sta from Raptor install dir
+    rm -rvf $1/bin/sta $1/lib/libOpenSTA.a $1/include/sta
+}
+
 
 # this check is needed 
 is_raptor_home_absolute () {
@@ -70,6 +77,8 @@ done
 # append release number from command line
 create_tar_ () {
 
+# call temp function to do any temp work around
+temp $1
     source=$1
     destination=`dirname $2`
     destination=$destination/Install_Raptor_Artifact/gen_exe
