@@ -7,6 +7,7 @@ do_scp=0
 printf "This script build and install Raptor\nIt creates tar of Raptor from custom install directory\n\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
+
 # this check is needed 
 is_raptor_home_absolute () {
 
@@ -65,6 +66,8 @@ done
 #Required source: the path of directory where raptor is already installed
 # exe file will be created in Install_Raptor_Artifact
 # go_production will enable the encryption
+# do scp if running manually
+# append release number from command line
 create_tar_ () {
 
     source=$1
@@ -81,10 +84,10 @@ create_tar_ () {
         do_encryption $source
         fi
         tar -xvzf $2/external_libs.tar.gz -C $source
-        cd $destination && tar -cjvf Raptor_$raptor_version\.tar -C $source .
-        cd ../ && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 $destination  Raptor_$raptor_version\.run "Raptor installer" ./install.sh
+        cd $destination && tar -cjvf Raptor_$5\.tar -C $source .
+        cd ../ && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 $destination  Raptor_$5\.run "Raptor installer" ./install.sh
     fi
-    upload_to_ftp $2 "$raptor_version" $4
+    upload_to_ftp $2 $5 $4
 
 }
 
@@ -137,6 +140,7 @@ usage()
   echo "Usage: create_release.sh     [ -h | --help]             show the help
                              [ -c | --create_tar ]      Flag to turn on tar generation in present directory. It required -w or --work_space.
 			                 [ -p | --production]       Flag to turn on production build.
+                             [ -v | --raptor-version]   Raptor version for release
                              [ -m | --manual]           Flag to turn on manual uploading of scp.
                              [ -w | --work_space  ]     Specify the Directory where clone, build and installation will occur or where already pre-build raptor is exist.
                              [ -a | --all ]             Flag to turn on cloning, building, installation and tar generation. It required -w or --work_space"
@@ -149,7 +153,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpmw: --long help,all,create_tar,production,manual,work_space: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpmv:w: --long help,all,create_tar,production,manual,raptor-version:,work_space: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -160,6 +164,7 @@ while :
 do
   case "$1" in
     -w | --work_space)  w_dir="$2";   shift 2 ;;
+    -v | --raptor-version)  release="$2";   shift 2 ;;
     -c | --create_tar)  go_tar=1 ; shift  ;;
     -p | --production)  go_p=1 ; shift  ;;
     -m | --manual)      do_scp=1 ; shift  ;;
@@ -174,6 +179,12 @@ do
   esac
 done
 
+if [ -z $release ]
+then
+    echo "Providing Raptor release number is mandatory. Exiting"
+    exit 1
+fi
+
 ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
 echo "Detected OS type is $ostype"
 #are_dep_ok
@@ -185,7 +196,7 @@ then
         echo "Generate Tar from already installed Raptor. Required install directory path"
         exit 1
     fi
-    create_tar_ $w_dir $SCRIPT_DIR $go_p $do_scp
+    create_tar_ $w_dir $SCRIPT_DIR $go_p $do_scp $release
     echo "Done creating tar of already present Raptor"
     exit
 fi
@@ -199,6 +210,6 @@ then
     is_raptor_home_absolute $w_dir   
     clone_compile_install_from_rapo $w_dir $go_p
     echo "Done building and installing Raptor"
-    create_tar_ $w_dir/instl_dir $SCRIPT_DIR $go_p $do_scp
+    create_tar_ $w_dir/instl_dir $SCRIPT_DIR $go_p $do_scp $version
     echo "Done creating tar of recent build Raptor"
 fi
