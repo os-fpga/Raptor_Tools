@@ -29,14 +29,17 @@ fi
 }
 
 # make sure SSH keys are deployed to FTP server
-# input is absolute path to Tools directory
-# version of Raptor
+# $1 input is absolute path to Tools directory 
+# $2 version of Raptor
 # do manual scp or not (here it is $3 but coming as $4)
+# create version dir inside upload ($4)
 upload_to_ftp () {
 
 # create tar.gz having .run and README
 final_tar_dir=`dirname $1` 
 cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor_$2\.run README.md && rm Raptor_$2\.run  && echo "Done Creating final tar"
+mkdir -p $final_tar_dir/upload && rm -rf $final_tar_dir/upload/* && mkdir -p $final_tar_dir/upload/$4
+mv $final_tar_dir/Install_Raptor_Artifact/Raptor_$2\.tar.gz  $final_tar_dir/upload/$4
 
 # run this command only when running manually
 if [ $3 -eq 1 ]
@@ -96,7 +99,7 @@ temp $1
         cd $destination && tar -cjvf Raptor_$5\.tar -C $source .
         cd ../ && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 $destination  Raptor_$5\.run "Raptor installer" ./install.sh
     fi
-    upload_to_ftp $2 $5 $4
+    upload_to_ftp $2 $5 $4 "$raptor_version"
 
 }
 
