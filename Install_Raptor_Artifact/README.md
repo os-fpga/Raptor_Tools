@@ -2,7 +2,7 @@ The below is Markdown syntax. For proper view kinly open in Markdown viewer
 ## Intro 
 A brief guide to install Raptor.
 
-The downloaded *.tar.gz file from FTP site contains below files:
+The downloaded *.tar.gz file from FTP site contains following files:
 
 1. README.md (this file)
 2. Raptor exe like Raptor_x.x.x.run
@@ -15,34 +15,35 @@ Raptor depends upon many OS dependecies. These dependecies can be installed by r
 
 ### Install Raptor
 
-Upon executing the downloaded exe, it will create a folder named as Raptor_<version> and install binaries inside it.
+Upon executing the downloaded exe, it will create a folder named as {PREFIX}/RapidSilicon/Raptor/<release> and install binaries inside it.
 
-#### Installing in default location
+#### Installing with default options
 
-Go to the directory where you have downloaded a Raptor exe and execute it like below
-
-```
-./Raptor_x.x.x.run
-```
-Kindly replace `Raptor_x.x.x.run` with the version of Raptor exe file you have received.
-
-#### Installing in preferred location
-
-Go to the directory where you have downloaded a Raptor exe and execute like below
+With default options, you are allowing the Raptor exe to install all the OS pre requisite and install Raptor in default location i.e. /opt
+Providing any other options except -v | --verbose will have no effect in this case.
+Go to the directory where you have extracted the Raptor exe after downloading and execute it with SUDO/admin account like below
 
 ```
-./Raptor_x.x.x.run -- -r <absolute path where Raptor will be installed>
+./Raptor_x.x.run
 ```
-Kindly replace `Raptor_x.x.x.run` with the version of Raptor exe file you have received.
+Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have received.
 
-#### Installing in preferred location and install dependencies allowed
+#### Installing with personal choices
 
-Go to the directory where you have downloaded a Raptor exe and execute like below
+You have following command line options available:
+
+-b | --batch-mode   -> running in interactive mode. Mandatory if you want to use -r or -i option
+-r | --raptor-home  -> you are giving the absolute path of directory where Raptor will be installed
+-i | --install-dep  -> Turn on the OS dependecies installation
+-v | --verbose      -> increase the installer verbose.
+
+Go to the directory where you have extracted the Raptor exe after downloading and execute it with any or with all above mentioned options like below
 
 ```
-./Raptor_x.x.x.run -- -i -r <absolute path where Raptor will be installed>
-```
-Kindly replace `Raptor_x.x.x.run` with the version of Raptor exe file you have received.
+./Raptor_x.x.run -- -i -v -r <absolute path where Raptor will be installed>
+``` 
+
+Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have received.
 
 ### Starting License:
 
