@@ -621,21 +621,30 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                     char *param_name, *param_value;
                     n_l.blocks.back().params_["LUT"] = lutVal.str();
                     n_l.blocks.back().params_["WIDTH"] = string("32'd") + widthVal.str();
-                    for (int idx = r_vec.size() - 1; idx > -1; --idx)
-                    {
-                        auto b = r_vec[idx];
+                    if(r_vec.size() == 1){
+                        auto b = r_vec[0];
                         b = ("1" == b) ? "$true" : ("0" == b) ? "$false"
                                                               : b;
                         n_l.blocks.back().conns_.push_back({"---", b});
+                        n_l.blocks.back().conns_.push_back({"---", lhsVal});
+                        if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_)) {
+                            if((b == "$true") || (b == "$false"))
+                                n_l.blocks.back().truthTable_.push_back({1, 1});
+                            else
+                                simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
+                        }
                     }
-                    n_l.blocks.back().conns_.push_back({"---", lhsVal});
-                    if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
-                    {
-                        simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
-                    }
-                    else
-                    {
-                        std::cout << "ERROR: rrhs is not a concat" << std::endl;
+                    else{
+                        for (int idx = r_vec.size() - 1; idx > -1; --idx) {
+                            auto b = r_vec[idx];
+                            b = ("1" == b) ? "$true" : ("0" == b) ? "$false"
+                                                                  : b;
+                            n_l.blocks.back().conns_.push_back({"---", b});
+                        }
+                        n_l.blocks.back().conns_.push_back({"---", lhsVal});
+                        if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_)) {
+                            simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
+                        }
                     }
                 }
                 else
