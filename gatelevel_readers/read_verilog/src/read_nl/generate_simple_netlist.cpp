@@ -43,6 +43,8 @@
 #include <bitset>
 #include <cctype>
 #include <stdexcept>
+#include <boost/multiprecision/cpp_int.hpp>
+#include <algorithm>
 
 #include "DataBase.h" // Make (hierarchical netlist) database API available
 #include "simple_netlist.h"
@@ -55,7 +57,7 @@ using namespace Verific;
 #ifdef PRODUCTION_BUILD
 #include "License_manager.hpp"
 #endif
-
+using namespace boost::multiprecision;
 using namespace std;
 std::unordered_map<std::string, std::pair<int, int>> netBusMap;
 string dirs[] = {"DIR_INOUT", "DIR_IN", "DIR_OUT", "DIR_NONE"};
@@ -73,67 +75,159 @@ void packEscaped(string &ss)
         ss.pop_back();
 }
 
-void bits(string exp, std::vector<std::string> &vec)
+/*
+
+Limit of decimal support
+1024 bits
+309 decimal digits
+"179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137215";
+
+*/
+static string mx = "179769313486231590772930519078902473361797697894230657273430081157732675805500963132708477322407536021120113879871393357658789768814416622492847430639474124377767893424865485276302219601246094119453082952085005768838150682342462881473913110540827237163350510684586298239947245938479716304835356329624224137215";
+static map<char, string> hexDecoder = {
+    {'0', "0000"},
+    {'1', "0001"},
+    {'2', "0010"},
+    {'3', "0011"},
+    {'4', "0100"},
+    {'5', "0101"},
+    {'6', "0110"},
+    {'7', "0111"},
+    {'8', "1000"},
+    {'9', "1001"},
+    {'A', "1010"},
+    {'B', "1011"},
+    {'C', "1100"},
+    {'D', "1101"},
+    {'E', "1110"},
+    {'F', "1111"},
+    {'X', "xxxx"},
+    {'a', "1010"},
+    {'b', "1011"},
+    {'c', "1100"},
+    {'d', "1101"},
+    {'e', "1110"},
+    {'f', "1111"},
+    {'x', "xxxx"}};
+
+string bitsOfHexaDecimal(string &s)
 {
+    if (!s.size())
+    {
+        throw(std::invalid_argument("Can't generate an hexadecimal number out of an empty string"));
+    }
+    for (auto d : s)
+    {
+        if (!isxdigit(d) && d != 'x' && d != 'X')
+            throw(std::invalid_argument("Non hexadigit in hexadecimal string" + s));
+    }
+    string res = "";
+    res.reserve(4 * s.size());
+    for (auto d : s)
+    {
+        for (auto c : hexDecoder[d])
+            res.push_back(c);
+    }
+    return res;
+}
+
+int1024_t bigDecimalInteger(string &s)
+{
+    if (!s.size())
+    {
+        throw(std::invalid_argument("Can't generate a decimal number out of an empty string"));
+    }
+    for (auto d : s)
+    {
+        if (!isdigit(d))
+            throw(std::invalid_argument("Non digit in adecimal string" + s));
+    }
+    if (s.size() > mx.size() || (s.size() == mx.size() && s > mx))
+    {
+        throw(std::invalid_argument("Can't generate a decimal number bigger than " + mx));
+    }
+    int1024_t res = 0;
+    for (auto d : s)
+    {
+        res = res * 10;
+        res = res + (d - '0');
+    }
+    return res;
+}
+string bitsOfBigDecimal(string &s)
+{
+
+    string res = "";
+    int1024_t v = bigDecimalInteger(s);
+    int1024_t r;
+    while (v)
+    {
+        r = v % 2;
+        res.push_back(r ? '1' : '0');
+        v = v / 2;
+    }
+    reverse(begin(res), end(res));
+    return res;
+}
+void bits(string exp, std::vector<std::string> &vec, string &strRes)
+{
+    if (exp.size() < 4)
+        throw(std::invalid_argument("Not a valid expression, should be of size more than 3 " + exp));
     if (!isdigit(exp[0]))
         throw(std::invalid_argument("Not a valid expression (i.e 4'h0A9 ) " + exp));
     stringstream ss(exp);
-    string dd;
-    char *str, *stops;
-    unsigned long long ull;
-    unsigned int aa;
-    int bb = 2;
-    ss >> aa >> dd;
-    if (aa < 1 || aa > 64)
-        throw(std::invalid_argument("Not supporting more than 64 bit values or less than one bit " + exp));
-    if (dd[1] == 'b' || dd[1] == 'B')
-        bb = 2;
-    else if (dd[1] == 'h' || dd[1] == 'H')
-        bb = 16;
-    else if (dd[1] == 'd' || dd[1] == 'D')
-        bb = 10;
+    string rad_and_value;
+
+    unsigned int bit_size;
+    int base = 2;
+    ss >> bit_size >> rad_and_value;
+    string value = rad_and_value.substr(2);
+    string bit_value;
+
+    if (rad_and_value[1] == 'b' || rad_and_value[1] == 'B')
+    {
+        base = 2;
+        bit_value = value;
+        for (auto d : bit_value)
+        {
+            if ('1' != d && '0' != d && 'x' != d)
+                throw(std::invalid_argument("Not valid bit value " + string(1, d) + " in " + exp));
+        }
+    }
+    else if (rad_and_value[1] == 'h' || rad_and_value[1] == 'H')
+    {
+        base = 16;
+        bit_value = bitsOfHexaDecimal(value);
+    }
+    else if (rad_and_value[1] == 'd' || rad_and_value[1] == 'D')
+    {
+        base = 10;
+        bit_value = bitsOfBigDecimal(value);
+    }
     else
-        throw(std::invalid_argument("Invalid base indicator " + string(1, dd[1]) + ", should be in {d,D,b,B,h,H}"));
-    str = &dd[2];
-    ull = strtoull(str, &stops, bb);
-    if (str == stops)
+        throw(std::invalid_argument("Invalid base indicator " + string(1, rad_and_value[1]) + ", should be in {d,D,b,B,h,H}"));
+    strRes = string(bit_size, '0');
+    vec = vector<string>(bit_size, "0");
+
+    for (int idx = 0; idx < bit_size && idx < bit_value.size(); ++idx)
     {
-        if ('x' == *str)
-        {
-            bool dontCarre = true;
-            for (int idx = 2; idx < dd.size(); ++idx)
-            {
-                if ('x' != dd[idx])
-                    dontCarre = false;
-            }
-            if (dontCarre)
-            {
-                for (unsigned i = 0; i < aa; ++i)
-                    vec.push_back("$undef");
-                return;
-            }
-            throw(std::invalid_argument("No valid value in expression " + exp));
-        }
+        strRes[bit_size - 1 - idx] = bit_value[bit_value.size() - 1 - idx];
+        if ('x' == bit_value[bit_value.size() - 1 - idx])
+            vec[bit_size - 1 - idx] = "$undef";
         else
-            throw(std::invalid_argument("No valid value in expression " + exp));
+            vec[bit_size - 1 - idx] = std::string(1, bit_value[bit_value.size() - 1 - idx]);
     }
-    bitset<64> bi(ull);
-    string res(aa, '0');
-    for (unsigned i = 0; i < res.size(); ++i)
+    // expand leading x s
+    int pos = 0;
+    while (pos < vec.size() && "0" == vec[pos])
+        ++pos;
+    if (pos < vec.size() && "$undef" == vec[pos])
     {
-        if (bi[i])
-            res[res.size() - 1 - i] = '1';
-    }
-    for (unsigned i = aa; i < 64; ++i)
-    {
-        if (bi[i])
+        for (int idx = 0; idx < pos; ++idx)
         {
-            break;
+            vec[idx] = "$undef";
+            strRes[idx] = 'x';
         }
-    }
-    for (auto c : res)
-    {
-        vec.push_back(std::string(1, c));
     }
 }
 
@@ -273,6 +367,7 @@ bool GetBitNameReferences(string ss, int l, int r, vector<string> &vec)
 
 bool bitBlast(VeriExpression *port_expr, vector<string> &res)
 {
+    string bitdump;
     if (!port_expr)
         return false;
     if (port_expr->GetClassId() == ID_VERICONCAT)
@@ -287,7 +382,7 @@ bool bitBlast(VeriExpression *port_expr, vector<string> &res)
             expr->PrettyPrint(ss, 0); // Traverse (if you like ...)
             if (expr->IsConstExpr())
             {
-                bits(ss.str(), res);
+                bits(ss.str(), res, bitdump);
             }
             else
                 bitBlast(ss.str(), res);
@@ -301,7 +396,7 @@ bool bitBlast(VeriExpression *port_expr, vector<string> &res)
         port_expr->PrettyPrint(ss, 0); // Traverse (if you like ...)
         if (port_expr->IsConstExpr())
         {
-            bits(ss.str(), res);
+            bits(ss.str(), res, bitdump);
         }
         else
             bitBlast(ss.str(), res);
@@ -350,17 +445,17 @@ std::vector<unsigned> entryTruth(unsigned long long e, unsigned long long w)
 void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<unsigned>> &vec)
 {
     unsigned long long width = veriValue(w);
-    unsigned long long table = veriValue(tr);
-    unsigned long long p = 1;
-    for (int i = 0; i < 64; ++i)
+    string stringRes;
+    vector<string> v;
+    bits(tr, v, stringRes);
+    for (int i = 0; i < stringRes.size(); ++i)
     {
-        if (p & table)
+        if ('1' == stringRes[stringRes.size() - 1 - i])
         {
             auto ent = entryTruth(i, width);
             ent.push_back(1);
             vec.push_back(ent);
         }
-        p *= 2;
     }
 }
 
