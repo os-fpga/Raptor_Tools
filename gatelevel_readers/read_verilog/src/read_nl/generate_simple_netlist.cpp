@@ -66,13 +66,17 @@ void packEscaped(string &ss)
     unsigned int cnt = 0;
     for (unsigned int i = 0; i < ss.size(); ++i)
     {
-        if (ss[i] == '\\' || isspace(ss[i]))
+        
+        if (isspace(ss[i]))
             ++cnt;
         else
             ss[i - cnt] = ss[i];
     }
     while (cnt--)
         ss.pop_back();
+    if ('\\' == ss[0]) {
+        ss.erase(0,1);
+    }
 }
 
 /*
