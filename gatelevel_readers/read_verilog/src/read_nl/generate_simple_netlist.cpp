@@ -173,8 +173,9 @@ string bitsOfBigDecimal(string &s)
     reverse(begin(res), end(res));
     return res;
 }
-void bits(string exp, std::vector<std::string> &vec, string &strRes)
+void bits(string exp, std::vector<std::string> &vec_, string &strRes)
 {
+    std::vector<std::string> vec;
     if (exp.size() < 4)
         throw(std::invalid_argument("Not a valid expression, should be of size more than 3 " + exp));
     if (!isdigit(exp[0]))
@@ -232,6 +233,9 @@ void bits(string exp, std::vector<std::string> &vec, string &strRes)
             vec[idx] = "$undef";
             strRes[idx] = 'x';
         }
+    }
+    for(int vIdx = 0; vIdx < vec.size(); vIdx++){
+        vec_.push_back(vec[vIdx]);
     }
 }
 
@@ -384,12 +388,15 @@ bool bitBlast(VeriExpression *port_expr, vector<string> &res)
         {
             stringstream ss;
             expr->PrettyPrint(ss, 0); // Traverse (if you like ...)
+            string st = ss.str();
             if (expr->IsConstExpr())
             {
                 bits(ss.str(), res, bitdump);
             }
-            else
+            else{
                 bitBlast(ss.str(), res);
+            }
+                
         }
     }
     else
