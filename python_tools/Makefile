@@ -1,10 +1,15 @@
 SHELL := /bin/bash
-ROOT_DIR:=$(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
-PREFIX ?= $(ROOT_DIR)/instal_dir
+ROOT_DIR ?= $(shell dirname $(realpath $(firstword $(MAKEFILE_LIST))))
+PREFIX ?= /usr/local
 
-build: 
-	echo $(PREFIX)
+print_prefix:
+	@echo "Prefix is $(PREFIX)"
+
+build: print_prefix
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) -j $(CPU_CORES) -S . -B build 
 
 install: build
 	cmake --install build
+
+clean:
+	rm -rf build

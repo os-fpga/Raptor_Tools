@@ -36,6 +36,14 @@ do
   esac
 done
 
+
+git_urls="${@:1}"
+for var in "$git_urls"
+do
+    echo "$var"
+done
+#exit
+
 [[ -z $w_dir ]] && { echo "ERROR: Missing working directory"; exit 1; } || echo "Given Work Dir is $w_dir"
 [[ -z $point ]] && { echo "ERROR: Missing CMake stage"; exit 1; }       || echo "Given Stage is $point"
 
@@ -49,11 +57,15 @@ then
 cd $w_dir/share/envs/litex && echo "$(pwd)" > .venv && python3 -m pipenv install --no-site-packages
 # create temp directory, clone and build wheel file
 [[ ! -d $w_dir/litex_temp ]] && mkdir -p $w_dir/litex_temp
-cd $w_dir/litex_temp && git clone https://github.com/enjoy-digital/litex && cd litex && python3 setup.py bdist_wheel
-cd $w_dir/litex_temp && git clone --recursive https://github.com/m-labs/migen && cd migen && python3 setup.py bdist_wheel
+i=1
+for repo in $git_urls
+do
+cd $w_dir/litex_temp && git clone --recursive $repo $i && cd $i && python3 setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
 # install wheel files in virtual env
-cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $w_dir/litex_temp/litex/dist/litex-0.0.0-py3-none-any.whl
-cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $w_dir/litex_temp/migen/dist/migen-0.9.2-py3-none-any.whl 
+cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $wheel_file
+# next repo
+i=$(expr $i + 1)
+done
 fi
 # stage is install
 if [ $point == "install" ]

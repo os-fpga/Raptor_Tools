@@ -31,14 +31,20 @@ project(IP_Catalog)
 
 message(${PROJECT_SOURCE_DIR})
 
+#list of packages
+list(APPEND packages_for_venv
+    https://github.com/enjoy-digital/litex 
+    https://github.com/m-labs/migen
+  )
+
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/litex/.venv)
-    message(STATUS ".venv files, so not creating virtual environment again")
+    message(STATUS ".venv file exist, so not creating virtual environment again")
 
 else ()
 message(STATUS "IP_Catalog installation started")
 find_package(Python COMPONENTS Interpreter REQUIRED)
     
-execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_CURRENT_BINARY_DIR} -s build) 
+execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_CURRENT_BINARY_DIR} -s build ${packages_for_venv}) 
 message(STATUS "IP_Catalog installation completed")
 endif()
 
