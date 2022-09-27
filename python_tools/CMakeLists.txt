@@ -27,7 +27,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 
-project(IP_Catalog)
+project(Litex)
 
 message(${PROJECT_SOURCE_DIR})
 
@@ -50,13 +50,11 @@ endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/envs
                         DESTINATION share
-                        )
-#TODO
-set(install_path ${CMAKE_INSTALL_PREFIX})                     
+                        )                 
 
 install( CODE 
                 "
-message(STATUS \"${install_path} Ruuning at installtion time\")
+message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installtion time\")
 execute_process(COMMAND  bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_INSTALL_PREFIX} -s install)
 
         "
