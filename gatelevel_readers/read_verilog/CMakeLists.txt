@@ -72,7 +72,12 @@ list(APPEND VERIFIC_LIBS
     ${VERIFIC_HOME}/hier_tree/hier_tree-${OS}.a
     ${VERIFIC_HOME}/vhdl/vhdl-${OS}.a
     )
-
+set (BOOST_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost)
+set (BOOST_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/boost)
+#set (BOOST_LIBRARYDIR ${CMAKE_CURRENT_SOURCE_DIR}/boost/stage/lib)
+set (Boost_NO_BOOST_CMAKE ON)
+find_package (Boost)
+include_directories(${Boost_INCLUDE_DIRS})
 files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OPENSSL REQUIRED openssl)
@@ -99,7 +104,7 @@ list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 # Add executable for internal use
 if(NOT PRODUCTION_BUILD)
     add_executable(read_verilog ${EXEC_SOURCE})
-    target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
+    target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
 #suppress Verific warnings
@@ -109,7 +114,7 @@ add_library(libreadver STATIC
     ${LIB_SOURCE}
 )
 SET_TARGET_PROPERTIES(libreadver PROPERTIES PREFIX "")
-target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS})
+target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
 
 if (NOT RAPTOR AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_dependencies(libreadver verific)
