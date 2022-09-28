@@ -43,19 +43,21 @@ if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/litex/.venv)
 else ()
 message(STATUS "Litex virtual environment installation started")
 find_package(Python COMPONENTS Interpreter REQUIRED)
-    
-execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_CURRENT_BINARY_DIR} -s build ${packages_for_venv}) 
-message(STATUS "Litex virtual environment installation completed")
+
+if (RAPTOR)
+set(work_dir ${PROJECT_SOURCE_DIR}/..)
+else ()
+set(work_dir ${PROJECT_SOURCE_DIR})
 endif()
 
-install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/envs
-                        DESTINATION share
-                        )                 
+execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${work_dir} -s build ${packages_for_venv}) 
+message(STATUS "Litex virtual environment installation completed")
+endif()                
 
 install( CODE 
                 "
-message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installtion time\")
-execute_process(COMMAND  bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_INSTALL_PREFIX} -s install)
+message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installation time\")
+execute_process(COMMAND  bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -i ${CMAKE_INSTALL_PREFIX} -w ${work_dir} -s install)
         "
 )
 
