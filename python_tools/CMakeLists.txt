@@ -38,7 +38,7 @@ list(APPEND packages_for_venv
   )
 
 if (RAPTOR)
-set(work_dir ${PROJECT_SOURCE_DIR}/..)
+set(work_dir ${PROJECT_SOURCE_DIR}/../..)
 else ()
 set(work_dir ${PROJECT_SOURCE_DIR})
 endif()
