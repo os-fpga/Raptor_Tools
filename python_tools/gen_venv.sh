@@ -15,7 +15,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-PARSED_ARGUMENTS=$(getopt -a -n gen_venv -o hi:s:w: --long help,stage:,--install-dir,work-dir: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n gen_venv -o hi:s:w: --long help,stage:,install-dir,work-dir: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -40,11 +40,11 @@ done
 
 
 git_urls="${@:1}"
-for var in "$git_urls"
-do
-    echo "$var"
-done
-#exit
+# this for loop is for debugging purpose to print the given list of packages git URLs
+#for var in "$git_urls"
+#do
+#    echo "$var"
+#done
 
 [[ -z $w_dir ]] && { echo "ERROR: Missing working directory"; exit 1; } || echo "Given Work Dir is $w_dir/build"
 [[ -z $point ]] && { echo "ERROR: Missing CMake stage"; exit 1; }       || echo "Given Stage is $point"
@@ -55,15 +55,15 @@ command -v pipenv >/dev/null 2>&1  || { echo >&2; echo "ERROR: pipenv not found.
 if [ $point == "build" ]
 then
 # create envs/litex in build/share and echo absolute path in it
-[[ ! -d $w_dir/build/share/envs/litex ]] && mkdir -p $w_dir/share/envs/litex 
+[[ ! -d $w_dir/build/share/envs/litex ]] && mkdir -p $w_dir/build/share/envs/litex 
 cd $w_dir/build/share/envs/litex && echo "$(pwd)" > .venv && python3 -m pipenv install --no-site-packages
 cd $w_dir/build/share/envs/litex/bin && ./pip install pipenv
 # create temp directory, clone and build wheel file
-[[ ! -d $w_dir/litex_temp ]] && mkdir -p $w_dir/litex_temp
+[[ ! -d $w_dir/build/litex_temp ]] && mkdir -p $w_dir/build/litex_temp
 i=1
 for repo in $git_urls
 do
-cd $w_dir/litex_temp && git clone --recursive $repo $i && cd $i && python3 setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
+cd $w_dir/build/litex_temp && git clone --recursive $repo $i && cd $i && python3 setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
 # install wheel files in virtual env
 #TODO nadeem 09-27-22 Fix the hash mismatch during re-installation of wheel file. HINT: pip.lock file
 cd $w_dir/build/share/envs/litex && python3 -m pipenv install --skip-lock $wheel_file
@@ -74,8 +74,10 @@ fi
 # stage is install
 if [ $point == "install" ]
 then
+[[ -z $i_dir ]] && { echo "ERROR: Missing install directory"; exit 1; } || echo "Given Install Dir is $i_dir/build"
 echo "Install directory is $w_dir"
-cd $w_dir/build/share/envs/litex/bin/virtualenv-clone $w_dir/buold/share/envs/litex $i_dir/share 
+[[ ! -d $i_dir/share/envs/litex ]] && mkdir -p $i_dir/share/envs/ 
+$w_dir/build/share/envs/litex/bin/virtualenv-clone $w_dir/build/share/envs/litex $i_dir/share/envs/litex
 cd $i_dir/share/envs/litex && echo "$(pwd)" > .venv
 fi
 

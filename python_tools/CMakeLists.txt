@@ -37,18 +37,19 @@ list(APPEND packages_for_venv
     https://github.com/m-labs/migen
   )
 
+if (RAPTOR)
+set(work_dir ${PROJECT_SOURCE_DIR}/..)
+else ()
+set(work_dir ${PROJECT_SOURCE_DIR})
+endif()
+message(STATUS "WORK DIR from cmake is ${work_dir}")
+
 if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/litex/.venv)
     message(STATUS ".venv file exist, so not creating virtual environment again")
 
 else ()
 message(STATUS "Litex virtual environment installation started")
 find_package(Python COMPONENTS Interpreter REQUIRED)
-
-if (RAPTOR)
-set(work_dir ${PROJECT_SOURCE_DIR}/..)
-else ()
-set(work_dir ${PROJECT_SOURCE_DIR})
-endif()
 
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${work_dir} -s build ${packages_for_venv}) 
 message(STATUS "Litex virtual environment installation completed")
