@@ -41,11 +41,11 @@ if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/litex/.venv)
     message(STATUS ".venv file exist, so not creating virtual environment again")
 
 else ()
-message(STATUS "IP_Catalog installation started")
+message(STATUS "Litex virtual environment installation started")
 find_package(Python COMPONENTS Interpreter REQUIRED)
     
 execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_CURRENT_BINARY_DIR} -s build ${packages_for_venv}) 
-message(STATUS "IP_Catalog installation completed")
+message(STATUS "Litex virtual environment installation completed")
 endif()
 
 install(DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/envs
@@ -56,6 +56,5 @@ install( CODE
                 "
 message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installtion time\")
 execute_process(COMMAND  bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_INSTALL_PREFIX} -s install)
-
         "
 )
