@@ -58,3 +58,4 @@ message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installtion time\")
 execute_process(COMMAND  bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${CMAKE_INSTALL_PREFIX} -s install)
         "
 )
+

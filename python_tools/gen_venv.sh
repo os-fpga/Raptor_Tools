@@ -62,6 +62,7 @@ for repo in $git_urls
 do
 cd $w_dir/litex_temp && git clone --recursive $repo $i && cd $i && python3 setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
 # install wheel files in virtual env
+#TODO nadeem 09-27-22 Fix the hash mismatch during re-installation of wheel file. HINT: pip.lock file
 cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $wheel_file
 # next repo
 i=$(expr $i + 1)
@@ -73,3 +74,4 @@ then
 echo "Install directory is $w_dir"
 cd $w_dir/share/envs/litex && echo "$(pwd)" > .venv
 fi
+
