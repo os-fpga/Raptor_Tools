@@ -72,9 +72,12 @@ list(APPEND VERIFIC_LIBS
     ${VERIFIC_HOME}/hier_tree/hier_tree-${OS}.a
     ${VERIFIC_HOME}/vhdl/vhdl-${OS}.a
     )
-set (BOOST_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/boost)
-set (BOOST_ROOT ${CMAKE_CURRENT_SOURCE_DIR}/boost)
-#set (BOOST_LIBRARYDIR ${CMAKE_CURRENT_SOURCE_DIR}/boost/stage/lib)
+
+get_filename_component(BOOST_INCLUDE_DIR "../../libs/external/boost"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+get_filename_component(BOOST_ROOT "../../libs/external/boost"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
 set (Boost_NO_BOOST_CMAKE ON)
 find_package (Boost)
 include_directories(${Boost_INCLUDE_DIRS})
@@ -88,7 +91,6 @@ else()
     message("SSL not found")
     # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
 endif()
-
 
 include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${FLEX_LM_SRC_DIR}
