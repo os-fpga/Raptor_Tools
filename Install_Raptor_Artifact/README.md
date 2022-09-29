@@ -32,10 +32,10 @@ Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have rec
 
 You have following command line options available:
 
--b | --batch-mode   -> running in interactive mode. Mandatory if you want to use -r or -i option
--r | --raptor-home  -> you are giving the absolute path of directory where Raptor will be installed
--i | --install-dep  -> Turn on the OS dependecies installation
--v | --verbose      -> increase the installer verbose.
+* -b | --batch-mode   -> running in interactive mode. Mandatory if you want to use -r or -i option
+* -r | --raptor-home  -> you are giving the absolute path of directory where Raptor will be installed
+* -i | --install-dep  -> Turn on the OS dependecies installation
+* -v | --verbose      -> increase the installer verbosity.
 
 Go to the directory where you have extracted the Raptor exe after downloading and execute it with any or with all above mentioned options like below
 

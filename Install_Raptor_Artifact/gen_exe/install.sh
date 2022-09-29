@@ -6,50 +6,6 @@ echo -e "#######################################################################
 
 base_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
-shoud_i () {
-
-user_id_str=`id |  awk '{ print $1 }'`
-user_id=`echo "$user_id_str" | sed 's/uid=\([0-9]*\).*/\1/'`
-
-if [ -z $go_dep ]
-then
-    read -r -p "[?]     Do you want us to install OS dependecies for you, It will need admin rights? [Y/n] " input
-else
-    input=yes
-fi
- 
-case $input in
-      [yY][eE][sS]|[yY])
-            echo "[INFO]    You say Yes. Proceeding to Install"
-            if [ "$user_id" = 0 ]
-            then
-                if [ "$ostype" == "CentOS" ]
-                then
-                    bash  $base_dir/centos_os_dep.sh
-                fi
-                if [ "$ostype" == "Ubuntu" ]
-                then
-                    bash $base_dir/ubuntu_os_dep.sh
-                fi
-            else
-                echo "[ERROR]   You choose to install dependencies but you don't have admin rights."
-                echo "[ERROR]   Run this script with sudo or as root user"
-                exit 1
-            fi
-
-            ;;
-      [nN][oO]|[nN])
-            echo "[ERROR]   Okay, I will not attempt to install. But Raptor can't be run without them so exiting."
-            exit 1
-            ;;
-      *)
-            echo "[ERROR]   Invalid input..."
-            exit 1
-            ;;
-esac
-
-}
-
 are_dep_ok () {
     if [ "$ostype" == "CentOS" ]
     then
@@ -62,26 +18,25 @@ are_dep_ok () {
         exit 1
     fi
 
-if [ -z $1 ]
+user_id_str=`id |  awk '{ print $1 }'`
+user_id=`echo "$user_id_str" | sed 's/uid=\([0-9]*\).*/\1/'`
+
+echo "[INFO]    Proceeding to Install OS dependencies"
+if [ "$user_id" = 0 ]
 then
-    read -r -p "[?]     Are OS dependencies already installed? [Y/n] " input
+    if [ "$ostype" == "CentOS" ]
+    then
+        bash  $base_dir/centos_os_dep.sh
+    fi
+    if [ "$ostype" == "Ubuntu" ]
+    then
+        bash $base_dir/ubuntu_os_dep.sh
+    fi
 else
-    input=no
+    echo "[ERROR]   You choose to install dependencies but you don't have admin rights."
+    echo "[ERROR]   Run this script with sudo or as root user"
+    exit 1
 fi
- 
-case $input in
-      [yY][eE][sS]|[yY])
-            echo "[INFO]    You say Yes. Proceeding to Install"
-            ;;
-      [nN][oO]|[nN])
-            echo "[INFO]    You say No."
-            shoud_i $ostype
-            ;;
-      *)
-            echo "[ERROR]   Invalid input..."
-            exit 1
-            ;;
-esac
 
 }
 
@@ -97,7 +52,7 @@ else
 fi
 #    raptor_tar_path=$1
 #    RAPTOR_HOME=$2   --> install destination
-    echo -e "[INFO]     Raptor Tar file that will be used is\n$1"
+    echo -e "[INFO]     Raptor Tar file that will be used is $1"
 
     raptor_instl_dir=`echo $1 | sed -E 's/[A-Za-z_]/ /g;s/. {1,}$//;s/^ {1,}([0-9])/\1/'`
     raptor_instl_dir=$2/RapidSilicon/Raptor/$raptor_instl_dir
@@ -111,7 +66,7 @@ fi
             echo "[ERROR]   Seems like don't have write permission in $2"
             exit 1
         else
-            [[ ! -d "$raptor_instl_dir" ]] && mkdir -p $raptor_instl_dir || { echo "Specified Directory already has Raptor installed. Can't over write so exiting.."; exit 1; }
+            [[ ! -d "$raptor_instl_dir" ]] && mkdir -p $raptor_instl_dir || { echo "Specified Directory already has Raptor installed. Can't over write so aborting installation.. :("; exit 1; }
             echo "[INFO]    Doing the installation...."
             tar $tar_flags $1 -C $raptor_instl_dir | tee $2/.raptor_install.log
             cp $raptor_instl_dir/share/raptor/doc/README.md $raptor_instl_dir
@@ -124,8 +79,8 @@ fi
     
     echo -e "#####################################################################################################"
     echo -e "# Installation is done :)"
-    echo -e "# To invoke Raptor\n         source $2/$raptor_instl_dir/raptorenv_lin64.sh and type raptor --version"
-    echo -e "# For detail usage --> See\n      $2/$raptor_instl_dir/README.md"                      
+    echo -e "# To invoke Raptor\n         source $raptor_instl_dir/raptorenv_lin64.sh and type raptor --version"
+    echo -e "# For detail usage --> See\n      $raptor_instl_dir/README.md"                      
     echo -e "#######################################################################################################"
 
 
@@ -147,7 +102,7 @@ fi
 usage()
 {
   echo "Usage: install.sh            [ -h | --help]             show the help
-                             [ -s | ---dep  ]           Turn on the OS related dependecies installation. 
+                             [ -i | --install-dep  ]    Turn on the OS related dependecies installation. 
                              [ -v | --verbose      ]    Turn on the verbosity.
                              [ -b | --batch-mode   ]    Run installer in interactive mode.
                              [ -r | --raptor-home  ]    Specify the absolute path of Directory where Raptor will be Installed. Default is /opt"
@@ -188,12 +143,11 @@ t_path="Raptor_*.tar"
 if [ -z $go_interactive ] # interactive mode is off so go with defaults i.e. accept no command line options 
 then
     echo "Install all the OS dependecies"
-    go_dep=1
-    are_dep_ok $go_dep
+    are_dep_ok
     echo  "Installing to /opt"
     raptor_h=/opt
     install_from_tar $t_path $raptor_h $go_verbose
-    echo -e "[INFO]     Done installing Raptor"
+    echo -e "[INFO]     Done installing Raptor :)"
 else   # interactive mode ask user if command line options are not given
 
     if [ -z $dep_install ]
@@ -209,6 +163,6 @@ else   # interactive mode ask user if command line options are not given
     fi
     is_raptor_home_absolute $raptor_h
     install_from_tar $t_path $raptor_h $go_verbose
-    echo -e "[INFO]     Done installing Raptor"
+    echo -e "[INFO]     Done installing Raptor :)"
 
 fi
