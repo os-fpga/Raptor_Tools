@@ -73,6 +73,14 @@ list(APPEND VERIFIC_LIBS
     ${VERIFIC_HOME}/vhdl/vhdl-${OS}.a
     )
 
+get_filename_component(BOOST_INCLUDE_DIR "../../libs/external/boost"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+get_filename_component(BOOST_ROOT "../../libs/external/boost"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
+set (Boost_NO_BOOST_CMAKE ON)
+find_package (Boost)
+include_directories(${Boost_INCLUDE_DIRS})
 files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OPENSSL REQUIRED openssl)
@@ -83,7 +91,6 @@ else()
     message("SSL not found")
     # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
 endif()
-
 
 include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${FLEX_LM_SRC_DIR}
@@ -99,7 +106,7 @@ list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 # Add executable for internal use
 if(NOT PRODUCTION_BUILD)
     add_executable(read_verilog ${EXEC_SOURCE})
-    target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
+    target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
 endif()
 
 #suppress Verific warnings
@@ -109,7 +116,7 @@ add_library(libreadver STATIC
     ${LIB_SOURCE}
 )
 SET_TARGET_PROPERTIES(libreadver PROPERTIES PREFIX "")
-target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS})
+target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
 
 if (NOT RAPTOR AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_dependencies(libreadver verific)
