@@ -77,7 +77,7 @@ then
   # create temp directory, clone and build wheel file
   [[ ! -d $w_dir/litex_temp ]] && mkdir -p $w_dir/litex_temp
 
-  if [ ! -z "$g_url" ]
+  if [ ! -z "$g_urls" ]
   then
       for repo in $(echo $g_urls | sed "s/,/ /g")
       do
