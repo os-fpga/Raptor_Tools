@@ -88,7 +88,7 @@ then
       cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $wheel_file
       done
   fi
-  if [ ! -z "$r_file"]
+  if [ ! -z "$r_file" ]
   then
     [[ ! -f "$r_file" ]] && { echo "$r_file does not exist. Aborting"; exit 1; } 
     cd $w_dir/share/envs/litex/bin && ./pip3 install -r $r_file 
