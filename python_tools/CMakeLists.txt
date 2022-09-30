@@ -38,7 +38,7 @@ set(req_file ${PROJECT_SOURCE_DIR}/requirements.txt)
 
 #set build or debuild directory
 if (RAPTOR)
-    if (Debug)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
         set(work_dir ${PROJECT_SOURCE_DIR}/../../dbuild)
     else ()
     set(work_dir ${PROJECT_SOURCE_DIR}/../../build)
