@@ -33,7 +33,7 @@ message(${PROJECT_SOURCE_DIR})
 find_package(Python COMPONENTS Interpreter REQUIRED)
 
 #list of packages
-set(packages_for_venv "https://github.com/enjoy-digital/litex https://github.com/m-labs/migen" )
+set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 set(req_file ${PROJECT_SOURCE_DIR}/requirements.txt)
 
 #set build or debuild directory

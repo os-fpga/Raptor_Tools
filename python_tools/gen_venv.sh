@@ -18,7 +18,7 @@ usage()
   echo "Usage:      $0      [ -h | --help]                 show the help
                              [ -s | --stage ]               Stage of cmake build or install.
                              [ -i | --install-dir ]         Specify the Directory where install is happening.
-                             [ -g | --git-urls ]            GitHub HTTPs URLs separated by space within double quotes.
+                             [ -g | --git-urls ]            GitHub HTTPs URLs separated by comma within double quotes.
                              [ -r | --requirement-file ]    requirements.txt file.
                              [ -w | --work-dir  ]           Specify the Directory where build is happening."
   exit 2
@@ -56,9 +56,9 @@ do
 done
 
 # this for loop is for debugging purpose to print the given list of packages git URLs
-#for url in "$g_urls"
+#for url in $(echo $g_urls | sed "s/,/ /g")
 #do
-#    echo "$url"
+#   echo $url
 #done
 
 [[ -z $w_dir ]] && { echo "ERROR: Missing working directory"; exit 1; } || echo "Given Work Dir is $w_dir"
@@ -79,13 +79,13 @@ then
 
   if [ ! -z "$g_url" ]
   then
-      for repo in $g_urls
+      for repo in $(echo $g_urls | sed "s/,/ /g")
       do
-      repo_name=${repo##*/}
-      cd $w_dir/litex_temp && git clone --recursive $repo $repo_name && cd $repo_name && python3 setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
-      # install wheel files in virtual env
-      #TODO nadeem 09-27-22 Fix the hash mismatch during re-installation of wheel file. HINT: pip.lock file
-      cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $wheel_file
+        repo_name=${repo##*/}
+        cd $w_dir/litex_temp && git clone --recursive $repo $repo_name && cd $repo_name && python3 setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
+        # install wheel files in virtual env
+        #TODO nadeem 09-27-22 Fix the hash mismatch during re-installation of wheel file. HINT: pip.lock file
+        cd $w_dir/share/envs/litex && python3 -m pipenv install --skip-lock $wheel_file
       done
   fi
   if [ ! -z "$r_file" ]
