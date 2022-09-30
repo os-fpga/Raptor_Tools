@@ -15,13 +15,13 @@ Raptor depends upon many OS dependecies. These dependecies can be installed by r
 
 ### Install Raptor
 
-Upon executing the downloaded exe, it will create a folder named as {PREFIX}/RapidSilicon/Raptor/<release> and install binaries inside it.
+Upon executing the downloaded executable, it will create a folder named as {PREFIX}/RapidSilicon/Raptor/<release> and install binaries inside it.
 
 #### Installing with default options
 
-With default options, you are allowing the Raptor exe to install all the OS pre requisite and install Raptor in default location i.e. /opt
-Providing any other options except -v | --verbose will have no effect in this case.
-Go to the directory where you have extracted the Raptor exe after downloading and execute it with SUDO/admin account like below
+With default options, you are allowing the Raptor executable to install all the OS pre requisite and install Raptor in default location i.e. /opt
+Providing any other options except `-v or --verbose` will have no effect in this case.
+Go to the directory where you have extracted the Raptor executable after downloading and execute it with SUDO/admin account like below
 
 ```
 ./Raptor_x.x.run
@@ -37,13 +37,13 @@ You have following command line options available:
 * -i | --install-dep  -> Turn on the OS dependecies installation
 * -v | --verbose      -> increase the installer verbosity.
 
-Go to the directory where you have extracted the Raptor exe after downloading and execute it with any or with all above mentioned options like below
+Go to the directory where you have extracted the Raptor executable after downloading and execute it with any or with all above mentioned options like below
 
 ```
 ./Raptor_x.x.run -- -i -v -r <absolute path where Raptor will be installed>
 ``` 
 
-Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have received.
+Kindly replace `Raptor_x.x.run` with the version of Raptor executable file you have received.
 
 ### Starting License:
 
