@@ -30,31 +30,35 @@ endif(NOT CMAKE_BUILD_TYPE)
 project(Litex)
 
 message(${PROJECT_SOURCE_DIR})
+find_package(Python COMPONENTS Interpreter REQUIRED)
 
 #list of packages
-list(APPEND packages_for_venv
-    https://github.com/enjoy-digital/litex 
-    https://github.com/m-labs/migen
-  )
+set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
+set(req_file ${PROJECT_SOURCE_DIR}/requirements.txt)
 
+#set build or debuild directory
 if (RAPTOR)
-set(work_dir ${PROJECT_SOURCE_DIR}/../..)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(work_dir ${PROJECT_SOURCE_DIR}/../../dbuild)
+    else ()
+    set(work_dir ${PROJECT_SOURCE_DIR}/../../build)
+    endif()
 else ()
-set(work_dir ${PROJECT_SOURCE_DIR})
+    set(work_dir ${PROJECT_SOURCE_DIR}/build)
 endif()
 message(STATUS "WORK DIR from cmake is ${work_dir}")
 
-if(EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/litex/.venv)
+#execute the script
+if(EXISTS ${work_dir}/share/envs/litex/.venv)
     message(STATUS ".venv file exist, so not creating virtual environment again")
-
 else ()
 message(STATUS "Litex virtual environment installation started")
-find_package(Python COMPONENTS Interpreter REQUIRED)
 
-execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${work_dir} -s build ${packages_for_venv}) 
+execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${work_dir} -s build -g ${packages_for_venv} -r ${req_file}) 
 message(STATUS "Litex virtual environment installation completed")
 endif()                
 
+#execute script on install time
 install( CODE 
                 "
 message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installation time\")

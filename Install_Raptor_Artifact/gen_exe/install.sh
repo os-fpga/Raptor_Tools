@@ -70,7 +70,9 @@ fi
             echo "[INFO]    Doing the installation...."
             tar $tar_flags $1 -C $raptor_instl_dir | tee $2/.raptor_install.log
             cp $raptor_instl_dir/share/raptor/doc/README.md $raptor_instl_dir
+            cd $raptor_instl_dir/share/envs/litex && echo $(pwd) > .venv
             mv $2/.raptor_install.log $raptor_instl_dir
+            chmod -R 755 $raptor_instl_dir
         fi
     else
         echo "[ERROR]   Tar file of Raptor does not exist"
@@ -81,7 +83,7 @@ fi
     echo -e "# Installation is done :)"
     echo -e "# To invoke Raptor\n         source $raptor_instl_dir/raptorenv_lin64.sh and type raptor --version"
     echo -e "# For detail usage --> See\n      $raptor_instl_dir/README.md"                      
-    echo -e "#######################################################################################################"
+    echo -e "#####################################################################################################"
 
 
 }
@@ -166,3 +168,4 @@ else   # interactive mode ask user if command line options are not given
     echo -e "[INFO]     Done installing Raptor :)"
 
 fi
+
