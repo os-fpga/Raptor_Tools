@@ -578,7 +578,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
             FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
             {
                 // Do what you want with them ...
-                bool is_valid is_string_param(value) || is_binary_param(value) || is_real_param(value);
+                bool is_valid = is_string_param(param_value) || is_binary_param(param_value) || is_real_param(param_value);
                 if (is_valid) {
                     n_l.blocks.back().params_[param_name] = param_value;
                 }
