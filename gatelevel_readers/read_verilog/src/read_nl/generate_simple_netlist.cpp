@@ -578,7 +578,10 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
             FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
             {
                 // Do what you want with them ...
-                n_l.blocks.back().params_[param_name] = param_value;
+                bool is_valid is_string_param(value) || is_binary_param(value) || is_real_param(value);
+                if (is_valid) {
+                    n_l.blocks.back().params_[param_name] = param_value;
+                }
             }
             // Iterate over all portrefs of instance
             PortRef *portref;
