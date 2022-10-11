@@ -59,7 +59,7 @@ rs_device="gemini/gemini_vpr.xml mpw1/TSMC22nm_vpr.xml"
 for device in $rs_device
 do
     echo "Encrypting --> $device_base_dir/$device"
-    $SCRIPT_DIR/Encryption_method/Encryption_method $device_base_dir/$device  $device_base_dir/$device\e 
+    $SCRIPT_DIR/Encryption_method/Encryption_method $device_base_dir/$device  $device_base_dir/$device\e $SCRIPT_DIR/Encryption_method/public_key 
     rm -f $device_base_dir/$device
 done
 # change the name of devices on device.xml
