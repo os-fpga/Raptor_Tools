@@ -16,21 +16,5 @@ git+https://github.com/litex-hub/pythondata-software-compiler_rt.git#egg=pythond
 git+https://github.com/litex-hub/valentyusb.git@hw_cdc_eptri#egg=valentyusb
 git+https://github.com/litex-hub/litex-boards.git#egg=litex-boards
 git+https://github.com/litex-hub/pythondata-misc-tapcfg.git#egg=pythondata-misc-tapcfg
-git+https://github.com/litex-hub/pythondata-cpu-lm32.git#egg=pythondata-cpu-lm32
-git+https://github.com/litex-hub/pythondata-cpu-mor1kx.git#egg=pythondata-cpu-mor1kx
-git+https://github.com/litex-hub/pythondata-cpu-marocchino.git#egg=pythondata-cpu-marocchino
-git+https://github.com/litex-hub/pythondata-cpu-microwatt.git@b940b55acff#egg=pythondata-cpu-microwatt
-
-git+https://github.com/litex-hub/pythondata-cpu-blackparrot.git#egg=pythondata-cpu-blackparrot
-git+https://github.com/litex-hub/pythondata-cpu-cv32e40p.git#egg=pythondata-cpu-cv32e40p    
-git+https://github.com/litex-hub/pythondata-cpu-cv32e41p.git#egg=pythondata-cpu-cv32e41p    
-git+https://github.com/litex-hub/pythondata-cpu-cva5.git#egg=pythondata-cpu-cva5
-git+https://github.com/litex-hub/pythondata-cpu-cva6.git#egg=pythondata-cpu-cva6        
-git+https://github.com/litex-hub/pythondata-cpu-ibex.git@d3d53df#egg=pythondata-cpu-ibex        
-git+https://github.com/litex-hub/pythondata-cpu-minerva.git#egg=pythondata-cpu-minerva
-git+https://github.com/litex-hub/pythondata-cpu-naxriscv.git#egg=pythondata-cpu-naxriscv
-git+https://github.com/litex-hub/pythondata-cpu-picorv32.git#egg=pythondata-cpu-picorv32
-git+https://github.com/litex-hub/pythondata-cpu-rocket.git#egg=pythondata-cpu-rocket
-git+https://github.com/litex-hub/pythondata-cpu-serv.git#egg=pythondata-cpu-serv
 git+https://github.com/litex-hub/pythondata-cpu-vexriscv-smp.git#egg=pythondata-cpu-vexriscv-smp  
 
