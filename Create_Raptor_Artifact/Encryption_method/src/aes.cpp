@@ -1,5 +1,6 @@
 #include"obfuscate.h"
 #include "function.h"
+#include "openssl_rsa.h"
 #define AES_BLOCK_SIZE 256
 const int BUFSIZE = 4096;
 
@@ -14,23 +15,16 @@ const unsigned   default_pbkdf2_saltlen_ = 8;
 
 class Enc_Dec {
 public:
-	 unsigned char *key = NULL, *iv = NULL;
-	 Enc_Dec (const string &sourcefile, const string &destfile){
-		 OpenSSL_add_all_algorithms();
-		// cout<<"Password: ";
-		 string passphrase = "OnE dAy RaPiDsilc@N wIll bE GrE@9 CAMp!!?";
-		 //	cin>>passphrase;
-		 key =key_generation(passphrase,default_keysize_, default_pbkdf2_iterations_,default_pbkdf2_saltlen_ );
-                            
-         //string enc_or_dec;
-		 //cout<<"For encryption input: E \nFor decryption input: D "<<endl;
-		 //cin>>enc_or_dec;
-		 //if (!strcmp(enc_or_dec.c_str(), "E")) {
-		 encrypt_file(sourcefile,destfile);
-		   //  } else if (!strcmp(enc_or_dec.c_str(), "D")) {
-		     // decrypt_file(sourcefile,destfile);
-		    // }
+	unsigned char *key = NULL, *iv=NULL; 
+	Enc_Dec (const string &sourcefile, const string &destfile, char* input_pp){
+	OpenSSL_add_all_algorithms();
+    string passphrase = "OnE dAy RaPiDsilc@N wIll bE GrE@9 CAMp!!?";
+    char *message = new char[passphrase.length() + 1];
+    strcpy(message, passphrase.c_str());
+    encrypt(input_pp,message);
 
+	key =key_generation(passphrase,default_keysize_, default_pbkdf2_iterations_,default_pbkdf2_saltlen_ );
+	encrypt_file(sourcefile,destfile);
 	 }
 private:
 
@@ -43,7 +37,6 @@ int encrypt_file(const string &sourcefile,const string &destfile)
     char ciphername[100] = {0};
     const EVP_CIPHER *ciph;
     unsigned char inbuf[BUFSIZE], outbuf[BUFSIZE + AES_BLOCK_SIZE<<1]; // specific to AES
-    //string dest = "out_"+sourcefile;
     fstream ofile;
     ifstream ifile;
     int bytes_read, bytes_encrypted,
@@ -73,7 +66,6 @@ int encrypt_file(const string &sourcefile,const string &destfile)
     }
     //EVP_CIPHER_CTX_init(&enc_ctx);
     if (!EVP_EncryptInit_ex(enc_ctx, ciph, NULL, key, iv)) {
-        // returns 0 for failure (wtf?)
         cerr << "Cannot initialize encryption cipher " << ciphername << endl;
         goto free_data;
     }
@@ -108,122 +100,31 @@ int encrypt_file(const string &sourcefile,const string &destfile)
     ifile.close();
     ofile.close();
     rc = 0;
-    
-free_data:
-    delete [] key;
-    delete [] iv;
-    
-    return rc;
-}
-/*
-int decrypt_file(const string &sourcefile,const string &destfile)
-{
-    int rc = 1;
-   // enc_ctx
-   EVP_CIPHER_CTX *dec_ctx = EVP_CIPHER_CTX_new();
-EVP_CIPHER_CTX_init(dec_ctx);
-    char ciphername[100] = {0};
-    const EVP_CIPHER *ciph;
-    unsigned char inbuf[BUFSIZE], outbuf[BUFSIZE + AES_BLOCK_SIZE<<1]; // specific to AES
-    //string dest = "dec_" + sourcefile;
-    fstream ofile;
-    ifstream ifile;
-    int bytes_read, bytes_decrypted,
-        total_bytes_read = 0, total_bytes_decrypted = 0;
-    
-    // 1. Open input file
-    ifile.open(sourcefile.c_str(), ios::in | ios::binary);
-    if (!ifile.is_open()) {
-        cerr << "Cannot open input file " << sourcefile << endl;
-        return rc;
-    }
-    
-    // 2. Check that input file is of the type we expect
-    //    by checking for magic string at header of file
-    char magic[128] = {0};
-
-    // 2. Check that output file can be opened and written to
-    ofile.open(destfile, ios::out | ios::binary | ios::trunc);
-    if (!ofile.is_open()) {
-        cerr << "Cannot open input file " << sourcefile << endl;
-        return rc;
-    }
-    
-    // 3. Derive key from passphrase, create salt and IV
-    unsigned char salt_value[default_pbkdf2_saltlen_];
-
-    // 4. Initialize encryption engine / context / etc.
-    snprintf(ciphername, 99, "%s-%d-%s",
-             default_encryption_cipher_.c_str(),
-             default_keysize_, default_encryption_mode_.c_str()); // FIXME
-    if (!(ciph = EVP_get_cipherbyname(ciphername))) {
-        cerr << "Cannot find algorithm " << ciphername << endl;
-        goto free_data;
-    }
-    EVP_CIPHER_CTX_init(dec_ctx);
-    if (!EVP_DecryptInit_ex(dec_ctx, ciph, NULL, key, iv)) {
-        // returns 0 for failure (wtf?)
-        cerr << "Cannot initialize decryption cipher " << ciphername << endl;
-        goto free_data;
-    }
-    
-    // 5.1 Read source blocks, decrypt, write to output stream
-    while (!ifile.eof()) {
-        ifile.read((char*) inbuf, BUFSIZE);
-        bytes_read = (int) ifile.gcount();
-        if (bytes_read > 0) {
-            if (!EVP_DecryptUpdate(dec_ctx, outbuf, &bytes_decrypted,
-                                   inbuf, bytes_read)) {
-                cerr << "Error decrypting chunk at byte " << total_bytes_decrypted <<
-                endl;
-                goto free_data;
-            }
-//            assert(bytes_decrypted > 0); // this is not necessarily true
-            if (bytes_decrypted > 0)
-                ofile.write((char*)outbuf, bytes_decrypted);
-            
-            total_bytes_read += bytes_read;
-            total_bytes_decrypted = bytes_decrypted;
-        }
-        bytes_read = bytes_decrypted = 0;
-    }
-    // 5.2 Encrypt remaining data and write final block of output
-    EVP_DecryptFinal_ex(dec_ctx, outbuf, &bytes_decrypted);
-    if (bytes_decrypted > 0) {
-        ofile.write((char*)outbuf, bytes_decrypted);
-    }
-    printf("\n File Decrypted\n");
-    //6. clean up
-    ofile.close();
-    ifile.close();
-    rc = 0;
 free_data:
     delete [] key;
     delete [] iv;
     return rc;
 }
-*/
+
 int usage(const char *programname) 
 {
-    cerr << "Usage: " << programname << ": Enter the input and output file" << endl;
+    cerr << "Usage: " << programname << ": Enter the input file to encrypt and output file to write and the public key " << endl;
     return 1;
 }
-
 };
 
 int usage(const char *programname)
 {
-    cerr << "Usage: " << programname << ": Enter the input and output file" << endl;
+    cerr << "Usage: " << programname << ": Enter the input file to encrypt and output file to write and the public key " << endl;
     return 1;
 }
+
 int main(int argc, char *argv[]) 
 {
-
-
-    if (argc != 3) {
+    if (argc != 4) {
         return usage(argv[0]);
     }
-    Enc_Dec E1 (argv[1],argv[2]);
+    Enc_Dec E1 (argv[1],argv[2], argv[3]);
     return 0;
 }
 

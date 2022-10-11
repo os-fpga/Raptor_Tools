@@ -17,6 +17,16 @@ For OpenSSL on ubuntu
 ```
 sudo apt-get install libssl-dev
 ```
+The complete list of libraries it uses is as follows
+	linux-vdso.so.1 
+        libcrypto.so.10 
+        libstdc++.so.6 
+        libm.so.6 
+        libgcc_s.so.1 
+        libc.so.6 
+        libdl.so.2 
+        libz.so.1
+        
 
 and on CentOS
 
@@ -28,20 +38,18 @@ yum install openssl-libs
 
 To Encrypt the files
 
-./Encryption_method <input_file to be encrypted>  <output_file which contains the encrypted data>
+./Encryption_method <input_file to be encrypted>  <output_file which contains the encrypted data> <public_key>
 
-In case if you wants to test the file.
+If you want to build the file just do make.
 
-./Decryption_method <input_file to be decrepted>  <output_file which contains the decrypted data>
+## OUTPUTS
+
+The output will be an encrypted file mentioned above and a vpr_e.bin file. If the password is changed replace the vpr_e.bin in the Raptor
 
 ## Requirements
 
 The initial need is to encrypt the architecture files and to add support of encrypted architecture 
-files the extension used for them is ".exml" please use this extension.
+files the extension used for them is ".xmle" please use this extension.
 
 **Note**
 
-The reason of providing two seperate methods is to ease your work as if both are in one executeable 
-you will have to select every time what you will have to do.
-If you need to change anything I have also provided the source code src directory kindly build it with the following command
-g++ aes.cpp -o result -lcrypto
