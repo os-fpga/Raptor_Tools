@@ -72,7 +72,7 @@ if [ $point == "build" ]
 then
   # create envs/litex in build/share and echo absolute path in it
   [[ ! -d $w_dir/share/envs/litex ]] && mkdir -p $w_dir/share/envs/litex 
-  cd $w_dir/share/envs/litex && echo "$(pwd)" > .venv && python3 -m pipenv install --no-site-packages
+  cd $w_dir/share/envs/litex && echo "$(pwd)" > .venv && python3 -m pipenv install --python 3.6 --no-site-packages
   cd $w_dir/share/envs/litex/bin && ./pip install pipenv
   # create temp directory, clone and build wheel file
   [[ ! -d $w_dir/litex_temp ]] && mkdir -p $w_dir/litex_temp
