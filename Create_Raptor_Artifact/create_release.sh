@@ -54,6 +54,7 @@ fi
 
 do_encryption () {
 
+cd $SCRIPT_DIR/Encryption_method/src && make
 device_base_dir=$1/share/raptor/etc/devices
 rs_device="gemini/gemini_vpr.xml mpw1/TSMC22nm_vpr.xml"
 for device in $rs_device
