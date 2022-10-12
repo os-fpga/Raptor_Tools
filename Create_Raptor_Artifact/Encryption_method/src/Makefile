@@ -3,7 +3,7 @@ OBJECTS += \
 		openssl_rsa.o \
 		
 
-TERGET = Encryption_method
+TERGET = ../Encryption_method
 
 LIB		+= -lcrypto
 
