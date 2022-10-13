@@ -72,7 +72,7 @@ fi
             cp $raptor_instl_dir/share/raptor/doc/README.md $raptor_instl_dir
             cd $raptor_instl_dir/share/envs/litex && echo $(pwd) > .venv
             mv $2/.raptor_install.log $raptor_instl_dir
-            chmod -R 755 $raptor_instl_dir/../RapidSilicon
+            chmod -R 755 $raptor_instl_dir/../../../RapidSilicon
         fi
     else
         echo "[ERROR]   Tar file of Raptor does not exist"
