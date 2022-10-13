@@ -1,4 +1,6 @@
-The below is Markdown syntax. For proper view kinly open in Markdown viewer
+
+This file is in Markdown syntax. For better readability, kindly open in Markdown viewer
+
 ## Intro 
 A brief guide to install Raptor.
 
@@ -32,7 +34,7 @@ Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have rec
 
 You have following command line options available:
 
-* -b | --batch-mode   -> running in interactive mode. Mandatory if you want to use -r or -i option
+* -b | --batch-mode   -> running in interactive mode. **Mandatory if you want to use -r or -i option**
 * -r | --raptor-home  -> you are giving the absolute path of directory where Raptor will be installed
 * -i | --install-dep  -> Turn on the OS dependecies installation
 * -v | --verbose      -> increase the installer verbosity.

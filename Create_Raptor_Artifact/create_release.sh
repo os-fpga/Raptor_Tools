@@ -152,7 +152,7 @@ usage()
 {
   echo "Usage: create_release.sh     [ -h | --help]             show the help
                              [ -c | --create_tar ]      Flag to turn on tar generation in present directory. It required -w or --work_space.
-			                 [ -p | --production]       Flag to turn on production build.
+			     [ -p | --production]       Flag to turn on production build.
                              [ -v | --raptor-version]   Raptor version for release
                              [ -m | --manual]           Flag to turn on manual uploading of scp.
                              [ -w | --work_space  ]     Specify the Directory where clone, build and installation will occur or where already pre-build raptor is exist.
