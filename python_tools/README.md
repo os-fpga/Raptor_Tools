@@ -1,6 +1,6 @@
 ## Intro
 
-This directory contains a bash script to create virtual envrironment for Litex python packages at build stage and clone the virtaul the environment to install directory.
+This directory contains a bash script to create virtual envrironment for Litex python packages at build stage and clone the virtaul environment to install directory.
 
 ## Dependencies:
 
@@ -35,6 +35,6 @@ Script creates the virtaul environment and install following packages inside it:
 * pythondata-misc-tapcfg
 * pythondata-cpu-vexriscv-smp
 
-These pacakges are installed at build stage. The end user will receive all these packages insied a Tar of Raptor and does not need install them. 
+These packages are installed at build stage. The end user will receive all these packages bundle inside the Raptor. He does not need to install them or create virtual environment.   
 
 
