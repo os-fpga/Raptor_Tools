@@ -22,18 +22,26 @@ Upon executing the downloaded executable, it will create a folder named as {PREF
 #### Installing with default options
 
 With default options, you are allowing the Raptor executable to install all the OS pre requisite and install Raptor in default location i.e. /opt
-Providing any other options except `-v or --verbose` will have no effect in this case.
+Providing any other options except `-v or --verbose and --accept` will have no effect in this case.
 Go to the directory where you have extracted the Raptor executable after downloading and execute it with SUDO/admin account like below
 
 ```
-./Raptor_x.x.run
+./Raptor_x.x.run 
 ```
+
+Or if you want to accept the license
+
+```
+./Raptor_x.x.run --accept 
+```
+
 Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have received.
 
 #### Installing with personal choices
 
 You have following command line options available:
 
+* --accept            -> Grant acceptance of license on command line. It will still print the license. Please read it. 
 * -b | --batch-mode   -> running in interactive mode. **Mandatory if you want to use -r or -i option**
 * -r | --raptor-home  -> you are giving the absolute path of directory where Raptor will be installed
 * -i | --install-dep  -> Turn on the OS dependecies installation
@@ -42,7 +50,13 @@ You have following command line options available:
 Go to the directory where you have extracted the Raptor executable after downloading and execute it with any or with all above mentioned options like below
 
 ```
-./Raptor_x.x.run -- -i -v -r <absolute path where Raptor will be installed>
+./Raptor_x.x.run -- -b -i -v -r <absolute path where Raptor will be installed>
+``` 
+
+You can add --accept option as well. Like
+
+```
+./Raptor_x.x.run --accept -- -b -i -v -r <absolute path where Raptor will be installed>
 ``` 
 
 Kindly replace `Raptor_x.x.run` with the version of Raptor executable file you have received.
