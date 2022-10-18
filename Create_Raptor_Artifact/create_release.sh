@@ -98,7 +98,7 @@ temp $1
         fi
         tar -xvzf $2/external_libs.tar.gz -C $source
         cd $destination && tar -cjvf Raptor_$5\.tar -C $source .
-        [ -f $SCRIPT_DIR/../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
+        [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
         cd ../ && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 --license $lic $destination Raptor_$5\.run "Raptor installer" ./install.sh
     fi
     upload_to_ftp $2 $5 $4 "$raptor_version"
