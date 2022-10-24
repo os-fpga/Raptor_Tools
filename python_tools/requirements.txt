@@ -1,5 +1,5 @@
+meson==0.60.3
 git+https://github.com/litex-hub/pythondata-cpu-vexriscv.git#egg=pythondata-cpu-vexriscv
-
 git+https://github.com/enjoy-digital/liteeth.git#egg=liteeth
 git+https://github.com/enjoy-digital/litedram.git#egg=litedram
 git+https://github.com/enjoy-digital/litepcie.git#egg=litepcie
@@ -9,10 +9,8 @@ git+https://github.com/enjoy-digital/liteiclink.git#egg=liteiclink
 git+https://github.com/enjoy-digital/litescope.git#egg=litescope
 git+https://github.com/enjoy-digital/litejesd204b.git#egg=litejesd204b
 git+https://github.com/litex-hub/litespi.git#egg=litespi
-
 git+https://github.com/litex-hub/pythondata-software-picolibc.git#egg=pythondata-software-picolibc
 git+https://github.com/litex-hub/pythondata-software-compiler_rt.git#egg=pythondata-software-compiler_rt
-
 git+https://github.com/litex-hub/valentyusb.git@hw_cdc_eptri#egg=valentyusb
 git+https://github.com/litex-hub/litex-boards.git#egg=litex-boards
 git+https://github.com/litex-hub/pythondata-misc-tapcfg.git#egg=pythondata-misc-tapcfg
