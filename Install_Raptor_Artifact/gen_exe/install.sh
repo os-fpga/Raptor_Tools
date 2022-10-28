@@ -7,21 +7,12 @@ echo -e "#######################################################################
 base_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 are_dep_ok () {
-    if [ "$ostype" == "CentOS" ]
-    then
-        echo -e "\n[INFO]   You are installing Raptor on CentOS OS."
-    elif [ "$ostype" == "Ubuntu" ]
-    then
-        echo -e "\n[INFO]   You are installing Raptor for Ubuntu OS."
-    else
-        echo "unkown OS"
-        exit 1
-    fi
+
+echo "[INFO]    Proceeding to Install OS dependencies"
 
 user_id_str=`id |  awk '{ print $1 }'`
 user_id=`echo "$user_id_str" | sed 's/uid=\([0-9]*\).*/\1/'`
 
-echo "[INFO]    Proceeding to Install OS dependencies"
 if [ "$user_id" = 0 ]
 then
     if [ "$ostype" == "CentOS" ]
@@ -103,16 +94,16 @@ fi
 
 usage()
 {
-  echo "Usage: install.sh            [ -h | --help]             show the help
-                             [ -i | --install-dep  ]    Turn on the OS related dependecies installation. 
-                             [ -v | --verbose      ]    Turn on the verbosity.
-                             [ -b | --batch-mode   ]    Run installer in interactive mode.
-                             [ -r | --raptor-home  ]    Specify the absolute path of Directory where Raptor will be Installed. Default is /opt"
+  echo "Usage: install.sh            [ -h | --help]                 show the help
+                             [ -i | --install-dep  ]        Turn on the OS related dependecies installation. 
+                             [ -v | --verbose      ]        Turn on the verbosity.
+                             [ -b | --no-dep-install   ]    Turn off the OS related dependecies installation
+                             [ -r | --raptor-home  ]        Specify the absolute path of Directory where Raptor will be Installed. Default is /opt"
   exit 2
 }
 
 
-PARSED_ARGUMENTS=$(getopt -a -n install -o hivbr: --long help,install-dep,verbose,batch-mode,raptor-home: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n install -o hivbr: --long help,install-dep,verbose,no-dep-install,raptor-home: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -125,7 +116,7 @@ do
     -r | --raptor-home)     raptor_h="$2";   shift 2 ;;  
     -i | --install-dep)     dep_install="yes";         shift   ;;
     -v | --verbose)         go_verbose=1;         shift   ;;
-    -b | --batch-mode)      go_interactive="yes";         shift   ;;
+    -b | --no-dep-install)      bypass_dep="yes";         shift   ;;
     -h | --help)            usage  ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
@@ -137,35 +128,73 @@ do
 done
 
 ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
-echo "[INFO]    Detected OS type is $ostype"
+#echo "[INFO]    Installing Raptor on $ostype"
+if [ "$ostype" == "CentOS" ]
+then
+    echo -e "\n[INFO]   You are installing Raptor on CentOS OS."
+elif [ "$ostype" == "Ubuntu" ]
+then
+    echo -e "\n[INFO]   You are installing Raptor for Ubuntu OS."
+else
+    echo "unkown OS"
+    exit 1
+fi
+
 
 # install from tar
 t_path="Raptor_*.tar"
 
-if [ -z $go_interactive ] # interactive mode is off so go with defaults i.e. accept no command line options 
+if [ "$dep_install" == "yes" ] && [ "$bypass_dep" == "yes" ]
 then
-    echo "Install all the OS dependecies"
-    are_dep_ok
-    echo  "Installing to /opt"
-    raptor_h=/opt
-    install_from_tar $t_path $raptor_h $go_verbose
-    echo -e "[INFO]     Done installing Raptor :)"
-else   # interactive mode ask user if command line options are not given
-
-    if [ -z $dep_install ]
-    then
-        echo "[INFO]    Skipping OS dependencies installation"
-    else
-        are_dep_ok
-    fi
-    if [ -z $raptor_h ]
-    then
-        echo "[INFO]    Raptor install path is not specified so falling back to /opt"
-        raptor_h=/opt
-    fi
-    is_raptor_home_absolute $raptor_h
-    install_from_tar $t_path $raptor_h $go_verbose
-    echo -e "[INFO]     Done installing Raptor :)"
-
+    echo "[ERROR]       Install Dependencies and not install Dependencies can't be true at same time."
+    echo "[ERROR]       Aborting Installation"
+    exit 2
 fi
+
+if [ "$bypass_dep" == "yes" ]
+then
+    echo "[WARNING]    Not attempting to install dependencies. But Some features of Raptor will not work"
+
+elif [ "$dep_install" == "yes" ] # received yes from command line for OS
+then
+        are_dep_ok
+else # did not receive anything thing regarding dependencies so ask the user
+    echo -e "[INFO]         Raptor needs Python 3.6 and Qt plugins for its proper functionality"
+    read -r -p "[?]             Would you like to install above dependencies. Need Admin/SUDO rights [y|Y][]n|N] " input
+    case $input in
+      [yY][eE][sS]|[yY])
+            echo "[INFO]    You said Yes."
+            are_dep_ok
+            ;;
+      [nN][oO]|[nN])
+            echo "[WARNING]    Not attempting to install dependencies. But Some features of Raptor will not work"
+            ;;
+      *)
+            echo "Invalid input..."
+            exit 1
+            ;;
+    esac
+fi 
+
+if [ -z $raptor_h ]
+    then
+        echo "[INFO]    Raptor install path is not specified."
+        read -r -p "[?]     Is /opt good? May need Admin/SUDO Rights [Y/n] " input
+        case $input in
+            [yY][eE][sS]|[yY])
+                raptor_h=/opt
+                ;;
+            [nN][oO]|[nN])
+                read -r -p "[?]     Please type absolute path for installation directory:  " raptor_h    
+            ;;
+      *)
+            echo "Invalid input..."
+            exit 1
+            ;;
+        esac
+fi
+is_raptor_home_absolute $raptor_h
+install_from_tar $t_path $raptor_h $go_verbose
+echo -e "[INFO]     Done installing Raptor :)"
+
 
