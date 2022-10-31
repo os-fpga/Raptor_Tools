@@ -50,10 +50,14 @@
 #include "DataBase.h" // Make (hierarchical netlist) database API available
 #include "simple_netlist.h"
 #include "ieee_1735.h"
+#include "RuntimeFlags.h"
+#include "VeriCompileFlags.h" // Verilog-specific compile flags
 
 #ifdef VERIFIC_NAMESPACE
 using namespace Verific;
 #endif
+
+unsigned err = RuntimeFlags::SetVar("veri_preserve_user_nets", 1);
 
 #ifdef PRODUCTION_BUILD
 #include "License_manager.hpp"
@@ -67,7 +71,7 @@ void packEscaped(string &ss)
     unsigned int cnt = 0;
     for (unsigned int i = 0; i < ss.size(); ++i)
     {
-        
+
         if (isspace(ss[i]))
             ++cnt;
         else
@@ -75,31 +79,38 @@ void packEscaped(string &ss)
     }
     while (cnt--)
         ss.pop_back();
-    if ('\\' == ss[0]) {
-        ss.erase(0,1);
+    if ('\\' == ss[0])
+    {
+        ss.erase(0, 1);
     }
 }
 
-bool is_string_param_(const std::string& param) {
+bool is_string_param_(const std::string &param)
+{
     /* Empty param is considered a string */
-    if (param.empty()) {
+    if (param.empty())
+    {
         return true;
     }
 
     /* There have to be at least 2 characters (the quotes) */
-    if (param.length() < 2) {
+    if (param.length() < 2)
+    {
         return false;
     }
 
     /* The first and the last characters must be quotes */
     size_t len = param.length();
-    if (param[0] != '"' || param[len - 1] != '"') {
+    if (param[0] != '"' || param[len - 1] != '"')
+    {
         return false;
     }
 
     /* There mustn't be any other quotes except for escaped ones */
-    for (size_t i = 1; i < (len - 1); ++i) {
-        if (param[i] == '"' && param[i - 1] != '\\') {
+    for (size_t i = 1; i < (len - 1); ++i)
+    {
+        if (param[i] == '"' && param[i - 1] != '\\')
+        {
             return false;
         }
     }
@@ -108,15 +119,19 @@ bool is_string_param_(const std::string& param) {
     return true;
 }
 
-bool is_binary_param_(const std::string& param) {
+bool is_binary_param_(const std::string &param)
+{
     /* Must be non-empty */
-    if (param.empty()) {
+    if (param.empty())
+    {
         return false;
     }
 
     /* The string must contain only '0' and '1' */
-    for (size_t i = 0; i < param.length(); ++i) {
-        if (param[i] != '0' && param[i] != '1') {
+    for (size_t i = 0; i < param.length(); ++i)
+    {
+        if (param[i] != '0' && param[i] != '1')
+        {
             return false;
         }
     }
@@ -125,17 +140,21 @@ bool is_binary_param_(const std::string& param) {
     return true;
 }
 
-bool is_real_param_(const std::string& param) {
-    const std::string chars = "012345678.";
+bool is_real_param_(const std::string &param)
+{
+    const std::string chars = "0123456789.";
 
     /* Must be non-empty */
-    if (param.empty()) {
+    if (param.empty())
+    {
         return false;
     }
 
     /* The string mustn't contain any other chars that the expected ones */
-    for (size_t i = 0; i < param.length(); ++i) {
-        if (chars.find(param[i]) == std::string::npos) {
+    for (size_t i = 0; i < param.length(); ++i)
+    {
+        if (chars.find(param[i]) == std::string::npos)
+        {
             return false;
         }
     }
@@ -299,7 +318,8 @@ void bits(string exp, std::vector<std::string> &vec_, string &strRes)
             strRes[idx] = 'x';
         }
     }
-    for(int vIdx = 0; vIdx < vec.size(); vIdx++){
+    for (int vIdx = 0; vIdx < vec.size(); vIdx++)
+    {
         vec_.push_back(vec[vIdx]);
     }
 }
@@ -458,10 +478,10 @@ bool bitBlast(VeriExpression *port_expr, vector<string> &res)
             {
                 bits(ss.str(), res, bitdump);
             }
-            else{
+            else
+            {
                 bitBlast(ss.str(), res);
             }
-                
         }
     }
     else
@@ -642,9 +662,27 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
             FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
             {
                 // Do what you want with them ...
-                bool is_valid = is_string_param_(param_value) || is_binary_param_(param_value) || is_real_param_(param_value);
-                if (is_valid) {
+                string literal(param_value);
+                vector<string> v;
+                string param_v;
+                bool is_valid = false;
+                try
+                {
+                    bits(literal, v, param_v);
+                }
+                catch (...)
+                {
+                    param_v = literal;
+                }
+                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
+
+                if (is_valid)
+                {
                     n_l.blocks.back().params_[param_name] = param_value;
+                }
+                else
+                {
+                    //Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
                 }
             }
             // Iterate over all portrefs of instance
@@ -700,28 +738,33 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                     char *param_name, *param_value;
                     n_l.blocks.back().params_["LUT"] = lutVal.str();
                     n_l.blocks.back().params_["WIDTH"] = string("32'd") + widthVal.str();
-                    if(r_vec.size() == 1){
+                    if (r_vec.size() == 1)
+                    {
                         auto b = r_vec[0];
                         b = ("1" == b) ? "$true" : ("0" == b) ? "$false"
                                                               : b;
                         n_l.blocks.back().conns_.push_back({"---", b});
                         n_l.blocks.back().conns_.push_back({"---", lhsVal});
-                        if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_)) {
-                            if((b == "$true") || (b == "$false"))
+                        if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+                        {
+                            if ((b == "$true") || (b == "$false"))
                                 n_l.blocks.back().truthTable_.push_back({1, 1});
                             else
                                 simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
                         }
                     }
-                    else{
-                        for (int idx = r_vec.size() - 1; idx > -1; --idx) {
+                    else
+                    {
+                        for (int idx = r_vec.size() - 1; idx > -1; --idx)
+                        {
                             auto b = r_vec[idx];
                             b = ("1" == b) ? "$true" : ("0" == b) ? "$false"
                                                                   : b;
                             n_l.blocks.back().conns_.push_back({"---", b});
                         }
                         n_l.blocks.back().conns_.push_back({"---", lhsVal});
-                        if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_)) {
+                        if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+                        {
                             simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
                         }
                     }
