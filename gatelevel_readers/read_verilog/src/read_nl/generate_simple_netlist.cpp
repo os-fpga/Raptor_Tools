@@ -86,7 +86,7 @@ void packEscaped(string &ss)
     }
 }
 
-bool is_string_param(const std::string &param)
+bool is_string_param_(const std::string &param)
 {
     /* Empty param is considered a string */
     if (param.empty())
@@ -120,7 +120,7 @@ bool is_string_param(const std::string &param)
     return true;
 }
 
-bool is_binary_param(const std::string &param)
+bool is_binary_param_(const std::string &param)
 {
     /* Must be non-empty */
     if (param.empty())
@@ -141,7 +141,7 @@ bool is_binary_param(const std::string &param)
     return true;
 }
 
-bool is_real_param(const std::string &param)
+bool is_real_param_(const std::string &param)
 {
     /* Must be non-empty */
     if (param.empty())
@@ -674,7 +674,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                 {
                     param_v = literal;
                 }
-                is_valid = is_string_param(param_v) || is_binary_param(param_v) || is_real_param(param_v);
+                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
 
                 if (is_valid)
                 {
