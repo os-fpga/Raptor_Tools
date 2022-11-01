@@ -537,8 +537,8 @@ std::vector<unsigned> entryTruth(unsigned long long e, unsigned long long w)
 
 void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<unsigned>> &vec)
 {
-    if(is_binary_param(w)) w = "32'b" + w;
-    if(is_binary_param(tr)) tr = "512'b" + tr;
+    if(is_binary_param_(w)) w = "32'b" + w;
+    if(is_binary_param_(tr)) tr = "512'b" + tr;
     unsigned long long width = veriValue(w);
     string stringRes;
     vector<string> v;
