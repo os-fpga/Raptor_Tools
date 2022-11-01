@@ -48,7 +48,7 @@ struct inst
         {
             string s = (conns_[idx].second == "n1") ? "$false" : conns_[idx].second;
             s = (s == "n2") ? "$true" : s;
-            s = (s=="n3") ? "$undef" : s;
+            s = (s == "n3") ? "$undef" : s;
             if ('\\' == s[0])
                 s[0] = ' ';
             f << " " << s;
@@ -78,18 +78,24 @@ struct inst
         {
             string s = (p.second == "n1") ? "$false" : p.second;
             s = (s == "n2") ? "$true" : s;
-            s = (s=="n3") ? "$undef" : s;
+            s = (s == "n3") ? "$undef" : s;
             f << " " << p.first << "=" << s;
         }
         f << std::endl;
-        for(auto& p : params_){
+        for (auto &p : params_)
+        {
             // TO_DO verify that verific gives always binary otherwise hande other formats
-            std::string s (p.second);
+            std::string s(p.second);
             std::size_t found = s.find('b');
-            if (found==std::string::npos) found = s.find('B');
-            if (found!=std::string::npos){
-                for(int i = found ; i >= 0; i--) s[i] = ' ';
+            if (found == std::string::npos)
+                found = s.find('B');
+            if (found != std::string::npos)
+            {
+                for (int i = found; i >= 0; i--)
+                    s[i] = ' ';
             }
+            while (s.size() && (s.back() == '"' || isspace(s.back())))
+                s.pop_back();
             f << ".param " << p.first << " " << s << std::endl;
         }
     }
