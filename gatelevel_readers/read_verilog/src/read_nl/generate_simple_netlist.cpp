@@ -46,6 +46,7 @@
 #include <stdexcept>
 #include <boost/multiprecision/cpp_int.hpp>
 #include <algorithm>
+#include <regex>
 
 #include "DataBase.h" // Make (hierarchical netlist) database API available
 #include "simple_netlist.h"
@@ -85,7 +86,7 @@ void packEscaped(string &ss)
     }
 }
 
-bool is_string_param_(const std::string &param)
+bool is_string_param(const std::string &param)
 {
     /* Empty param is considered a string */
     if (param.empty())
@@ -119,7 +120,7 @@ bool is_string_param_(const std::string &param)
     return true;
 }
 
-bool is_binary_param_(const std::string &param)
+bool is_binary_param(const std::string &param)
 {
     /* Must be non-empty */
     if (param.empty())
@@ -140,23 +141,19 @@ bool is_binary_param_(const std::string &param)
     return true;
 }
 
-bool is_real_param_(const std::string &param)
+bool is_real_param(const std::string &param)
 {
-    const std::string chars = "0123456789.";
-
     /* Must be non-empty */
     if (param.empty())
     {
         return false;
     }
 
-    /* The string mustn't contain any other chars that the expected ones */
-    for (size_t i = 0; i < param.length(); ++i)
+    /* The string must match the regular expression */
+    static const std::regex real_number_expr("[+-]?([0-9]*\\.[0-9]+)|([0-9]+\\.[0-9]*)");
+    if (!std::regex_match(param, real_number_expr))
     {
-        if (chars.find(param[i]) == std::string::npos)
-        {
-            return false;
-        }
+        return false;
     }
 
     /* This is a real number param */
@@ -257,7 +254,7 @@ string bitsOfBigDecimal(string &s)
     reverse(begin(res), end(res));
     return res;
 }
-void bits(string exp, std::vector<std::string> &vec_, string &strRes)
+void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
 {
     std::vector<std::string> vec;
     if (exp.size() < 4)
@@ -294,7 +291,7 @@ void bits(string exp, std::vector<std::string> &vec_, string &strRes)
         bit_value = bitsOfBigDecimal(value);
     }
     else
-        throw(std::invalid_argument("Invalid base indicator " + string(1, rad_and_value[1]) + ", should be in {d,D,b,B,h,H}"));
+        throw(std::invalid_argument("Invalid base indicator " + string(1, rad_and_value[1]) + " in " + exp + ", should be in {d,D,b,B,h,H}"));
     strRes = string(bit_size, '0');
     vec = vector<string>(bit_size, "0");
 
@@ -500,7 +497,7 @@ bool bitBlast(VeriExpression *port_expr, vector<string> &res)
     return true;
 }
 
-unsigned long long veriValue(std::string exp)
+unsigned long long veriValue(const string &exp)
 {
     if (!isdigit(exp[0]))
         throw(std::invalid_argument("Not a valid expression (i.e 4'h0A9 ) " + exp));
@@ -519,7 +516,7 @@ unsigned long long veriValue(std::string exp)
     else if (dd[1] == 'd' || dd[1] == 'D')
         bb = 10;
     else
-        throw(std::invalid_argument("Invalid base indicator " + string(1, dd[1]) + ", should be in {d,D,b,B,h,H}"));
+        throw(std::invalid_argument("Invalid base indicator " + string(1, dd[1]) + " in " + exp + ", should be in {d,D,b,B,h,H}"));
     str = &dd[2];
     return strtoull(str, &stops, bb);
 }
@@ -540,10 +537,13 @@ std::vector<unsigned> entryTruth(unsigned long long e, unsigned long long w)
 
 void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<unsigned>> &vec)
 {
+    if(is_binary_param(w)) w = "32'b" + w;
+    if(is_binary_param(tr)) tr = "512'b" + tr;
     unsigned long long width = veriValue(w);
     string stringRes;
     vector<string> v;
     bits(tr, v, stringRes);
+
     for (int i = 0; i < stringRes.size(); ++i)
     {
         if ('1' == stringRes[stringRes.size() - 1 - i])
@@ -674,15 +674,15 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                 {
                     param_v = literal;
                 }
-                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
+                is_valid = is_string_param(param_v) || is_binary_param(param_v) || is_real_param(param_v);
 
                 if (is_valid)
                 {
-                    n_l.blocks.back().params_[param_name] = param_value;
+                    n_l.blocks.back().params_[param_name] = param_v;
                 }
                 else
                 {
-                    //Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
+                    // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
                 }
             }
             // Iterate over all portrefs of instance
