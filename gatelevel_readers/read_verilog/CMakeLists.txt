@@ -107,6 +107,9 @@ list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 if(NOT PRODUCTION_BUILD)
     add_executable(read_verilog ${EXEC_SOURCE})
     target_link_libraries(read_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
+	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+	    add_dependencies(read_verilog verific)
+	endif()
 endif()
 
 #suppress Verific warnings
@@ -118,6 +121,6 @@ add_library(libreadver STATIC
 SET_TARGET_PROPERTIES(libreadver PROPERTIES PREFIX "")
 target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
 
-if (NOT RAPTOR AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_dependencies(libreadver verific)
 endif()
