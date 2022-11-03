@@ -1,0 +1,12 @@
+SHELL := /bin/bash
+PREFIX ?= /usr/local
+
+build: 
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) -S . -B build 
+
+install: build
+	cmake --install build
+
+clean:
+	rm -rf build sim.tar.gz
+
