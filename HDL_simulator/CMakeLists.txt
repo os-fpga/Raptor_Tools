@@ -32,29 +32,31 @@ project(HDL_Simulator)
 message(${PROJECT_SOURCE_DIR})
 
 set(FETCHCONTENT_QUIET FALSE)
-set(Release_URL https://github.com/RapidSilicon/pre_build_artifacts/archive/refs/tags/v1.2.tar.gz)
+set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hd_simulator.zip)
+set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
 
 #set download dir in build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(Destination_Dir ${PROJECT_SOURCE_DIR}/../../dbuild/sim.tar.gz)
+        set(Extraction_dir ${PROJECT_SOURCE_DIR}/../../dbuild/bin)
     else ()
-    set(Destination_Dir ${PROJECT_SOURCE_DIR}/../../build/sim.tar.gz)
+    set(Extraction_dir ${PROJECT_SOURCE_DIR}/../../build/bin)
     endif()
 else ()
-    set(Destination_Dir ${PROJECT_SOURCE_DIR}/build/sim.tar.gz)
+    set(Extraction_dir ${PROJECT_SOURCE_DIR}/build/bin)
 endif()
+execute_process(
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${Extraction_dir}
+)
+
 message(STATUS "Download DIR from cmake is ${Destination_Dir}")
-
-set (Extraction_dir ${PROJECT_SOURCE_DIR} )
-message(STATUS "Extraction DIR from cmake is ${Extraction_dir}}")
-
+message(STATUS "Extraction DIR from cmake is ${Extraction_dir}")
 
 #check if file already exist to prevent over download
 if(EXISTS ${Destination_Dir})
-    message(STATUS "HDL Simulator downlaod tar already exist. Skipping its downlaod")
-elseif(EXISTS ${Extraction_dir}/pre_build_artifacts-1.2)
-    message(STATUS "HDL Simulator Extracted tar already exist. Skipping it")
+    message(STATUS "HDL Simulator downlaod zip already exist. Skipping its downlaod")
+#elseif(EXISTS ${Extraction_dir}/pre_build_artifacts-1.2)
+#    message(STATUS "HDL Simulator Extracted tar already exist. Skipping it")
 else()
     #download and record status
     message(STATUS "Downloading HDL simulator Pre-build Binaries")
@@ -62,7 +64,7 @@ else()
     file(SIZE ${Destination_Dir} SIM_Download_Size)
 
 
-    if(${SIM_Download_Size} EQUAL 204231293 )
+    if(${SIM_Download_Size} EQUAL 243403538 )
         message(STATUS "Pre-built verilator downloaded with expected size (${SIM_Download_Size})")
         #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
         execute_process(

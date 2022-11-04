@@ -96,7 +96,7 @@ temp $1
         then 
         do_encryption $source
         fi
-	cd $SCRIPT_DIR && wget https://github.com/RapidSilicon/pre_build_artifacts/releases/download/v1.0/external_libs.tar.gz
+	cd $SCRIPT_DIR && wget https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs.tar.gz
         tar -xvzf $2/external_libs.tar.gz -C $source
         cd $destination && tar -cjvf Raptor_$5\.tar -C $source .
         [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
