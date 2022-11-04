@@ -31,13 +31,30 @@ project(HDL_Simulator)
 
 message(${PROJECT_SOURCE_DIR})
 
-set(Release_URL https://github.com/RapidSilicon/pre_build_artifacts/archive/refs/tags/v1.2.tar.gz)
-set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
 set(FETCHCONTENT_QUIET FALSE)
+set(Release_URL https://github.com/RapidSilicon/pre_build_artifacts/archive/refs/tags/v1.2.tar.gz)
+
+#set download dir in build or debuild directory
+if (RAPTOR)
+    if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+        set(Destination_Dir ${PROJECT_SOURCE_DIR}/../../dbuild/sim.tar.gz)
+    else ()
+    set(Destination_Dir ${PROJECT_SOURCE_DIR}/../../build/sim.tar.gz)
+    endif()
+else ()
+    set(Destination_Dir ${PROJECT_SOURCE_DIR}/build/sim.tar.gz)
+endif()
+message(STATUS "Download DIR from cmake is ${Destination_Dir}")
+
+set (Extraction_dir ${PROJECT_SOURCE_DIR} )
+message(STATUS "Extraction DIR from cmake is ${Extraction_dir}}")
+
 
 #check if file already exist to prevent over download
 if(EXISTS ${Destination_Dir})
-    message(STATUS "HDL Simulator pre compiled tar already exist. Skipping its downlaod")
+    message(STATUS "HDL Simulator downlaod tar already exist. Skipping its downlaod")
+elseif(EXISTS ${Extraction_dir}/pre_build_artifacts-1.2)
+    message(STATUS "HDL Simulator Extracted tar already exist. Skipping it")
 else()
     #download and record status
     message(STATUS "Downloading HDL simulator Pre-build Binaries")
@@ -45,31 +62,16 @@ else()
     file(SIZE ${Destination_Dir} SIM_Download_Size)
 
 
-    if(${SIM_Download_Size} EQUAL 203785023 )
+    if(${SIM_Download_Size} EQUAL 204231293 )
         message(STATUS "Pre-built verilator downloaded with expected size (${SIM_Download_Size})")
+        #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
+        execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
+        WORKING_DIRECTORY ${Extraction_dir}
+        )
     else()
         message(STATUS "ERROR: Fail to Downloaded pre-built verilator.Expected size is (${SIM_Download_Size})")
     endif()
-
-    #set build or debuild directory
-    if (RAPTOR)
-        if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-            set(extract_dir ${PROJECT_SOURCE_DIR}/../../dbuild)
-        else ()
-        set(extract_dir ${PROJECT_SOURCE_DIR}/../../build)
-        endif()
-    else ()
-        set(extract_dir ${PROJECT_SOURCE_DIR}/build)
-    endif()
-    message(STATUS "WORK DIR from cmake is ${extract_dir}")
-
-
-    #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${extract_dir} VERBOSE ) # this need cmake version >= 3.18. 
-    execute_process(
-         COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
-         WORKING_DIRECTORY ${extract_dir}
-    )
-
 endif ()
 
 ##execute the script
