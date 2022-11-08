@@ -1,7 +1,10 @@
 SHELL := /bin/bash
 PREFIX ?= /usr/local
 
-build: 
+print_prefix:
+	@echo "Prefix is $(PREFIX)"
+
+build: print_prefix
 	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) -S . -B build 
 
 install: build

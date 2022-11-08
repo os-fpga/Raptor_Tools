@@ -32,7 +32,7 @@ project(HDL_Simulator)
 message(${PROJECT_SOURCE_DIR})
 
 set(FETCHCONTENT_QUIET FALSE)
-set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hd_simulator.zip)
+set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hdl_simulator.zip)
 set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
 
 #set download dir in build or debuild directory
@@ -64,7 +64,7 @@ else()
     file(SIZE ${Destination_Dir} SIM_Download_Size)
 
 
-    if(${SIM_Download_Size} EQUAL 243403538 )
+    if(${SIM_Download_Size} EQUAL 205951449 )
         message(STATUS "Pre-built verilator downloaded with expected size (${SIM_Download_Size})")
         #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
         execute_process(
@@ -72,25 +72,12 @@ else()
         WORKING_DIRECTORY ${Extraction_dir}
         )
     else()
-        message(STATUS "ERROR: Fail to Downloaded pre-built verilator.Expected size is (${SIM_Download_Size})")
+        message(STATUS "ERROR: Fail to Downloaded pre-built verilator. Size is (${SIM_Download_Size})")
     endif()
 endif ()
 
-##execute the script
-#if(EXISTS ${work_dir}/share/envs/litex/.venv)
-#    message(STATUS ".venv file exist, so not creating virtual environment again")
-#else ()
-#message(STATUS "Litex virtual environment installation started")
-#
-#execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -w ${work_dir} -s build -g ${packages_for_venv} -r ${req_file}) 
-#message(STATUS "Litex virtual environment installation completed")
-#endif()                
-#
-##execute script on install time
-#install( CODE 
-#                "
-#message(STATUS \"${CMAKE_INSTALL_PREFIX} Ruuning at installation time\")
-#execute_process(COMMAND  bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -i ${CMAKE_INSTALL_PREFIX} -w ${work_dir} -s install)
-#        "
-#)
+# uncomment to debug the install target in this cmake
+#install(
+#        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/HDL_simulator DESTINATION  ${CMAKE_INSTALL_PREFIX}
+#	)
 
