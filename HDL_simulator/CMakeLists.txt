@@ -55,29 +55,37 @@ message(STATUS "Extraction DIR from cmake is ${Extraction_dir}")
 #check if file already exist to prevent over download
 if(EXISTS ${Destination_Dir})
     message(STATUS "HDL Simulator downlaod zip already exist. Skipping its downlaod")
-#elseif(EXISTS ${Extraction_dir}/pre_build_artifacts-1.2)
-#    message(STATUS "HDL Simulator Extracted tar already exist. Skipping it")
 else()
-    #download and record status
+    #download and print status
     message(STATUS "Downloading HDL simulator Pre-build Binaries")
     file(DOWNLOAD ${Release_URL} ${Destination_Dir} SHOW_PROGRESS)
     file(SIZE ${Destination_Dir} SIM_Download_Size)
 
-
     if(${SIM_Download_Size} EQUAL 205951449 )
-        message(STATUS "Pre-built verilator downloaded with expected size (${SIM_Download_Size})")
+        message(STATUS "Successfully Donwloadeded Pre-built verilator with expected size (${SIM_Download_Size})")
         #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
-        execute_process(
-        COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
-        WORKING_DIRECTORY ${Extraction_dir}
-        )
     else()
-        message(STATUS "ERROR: Fail to Downloaded pre-built verilator. Size is (${SIM_Download_Size})")
+        message(STATUS "ERROR: Fail to Downloaded pre-built verilator. Download size (${SIM_Download_Size}) does not match to 205951449")
     endif()
 endif ()
 
+file(SIZE ${Destination_Dir} SIM_Download_Size)
+if(${SIM_Download_Size} EQUAL 205951449 )
+  message(STATUS "Pre-built verilator downloaded is present with expected size (${SIM_Download_Size})")
+ #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
+ execute_process(
+        COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
+        WORKING_DIRECTORY ${Extraction_dir}
+  )
+else()
+        message(STATUS "ERROR: Fail to Extract pre-built verilator. Size is (${SIM_Download_Size}) that is different from expected size")
+endif()
+
+
+
 # uncomment to debug the install target in this cmake
-#install(
-#        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/HDL_simulator DESTINATION  ${CMAKE_INSTALL_PREFIX}
-#	)
+install(
+        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/HDL_simulator DESTINATION  ${CMAKE_INSTALL_PREFIX}
+USE_SOURCE_PERMISSIONS	
+)
 
