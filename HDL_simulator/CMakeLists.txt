@@ -84,8 +84,8 @@ endif()
 
 
 # uncomment to debug the install target in this cmake
-install(
-        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/HDL_simulator DESTINATION  ${CMAKE_INSTALL_PREFIX}
-USE_SOURCE_PERMISSIONS	
-)
+#install(
+#        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/HDL_simulator DESTINATION  ${CMAKE_INSTALL_PREFIX}
+#USE_SOURCE_PERMISSIONS	
+#)
 
