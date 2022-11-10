@@ -791,5 +791,17 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
     }
     veri_file::RemoveAllModules();
 
+    string js_port_file(file_name);
+    while ('.' != js_port_file.back())
+    {
+        js_port_file.pop_back();
+    }
+    js_port_file.pop_back();
+    js_port_file += "_ports.json";
+    ofstream myfile;
+    myfile.open(js_port_file.c_str());
+    n_l.b_port_print_json(myfile);
+    myfile.close();
+
     return 0;
 }

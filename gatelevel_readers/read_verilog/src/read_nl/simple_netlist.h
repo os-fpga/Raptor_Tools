@@ -126,6 +126,34 @@ struct simple_netlist
         f << "Netlist blocks ----: " << std::endl;
         p_print(blocks, f);
     }
+    void b_port_print_json(std::ostream &f)
+    {
+        bool first = true;
+        f << "{\n\t\"inputs\": [";
+        for (auto &in : in_ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
+            if (!first)
+                f << ",";
+            f << "\n\t\t\"" << in << "\"";
+            first = false;
+        }
+        f << "\n\t]," << endl;
+        first = true;
+        f << "\n\t\"outputs\": [";
+        for (auto &in : out_ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
+            if (!first)
+                f << ",";
+            f << "\n\t\t\"" << in << "\"";
+            first = false;
+         }
+        f << "\n\t]\n}"<< endl;
+    }
+
     void b_print(std::ostream &f)
     {
         f << ".model " << name << std::endl;
@@ -139,7 +167,11 @@ struct simple_netlist
         f << endl;
         f << ".outputs";
         for (auto &in : out_ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
             f << " " << in;
+        }
         f << endl;
         f << ".names $false" << endl;
         f << ".names $true\n1" << endl;
