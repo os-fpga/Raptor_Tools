@@ -82,7 +82,7 @@ done
 create_tar_ () {
 
 # call temp function to do any temp work around
-temp $1
+#temp $1
     source=$1
     destination=`dirname $2`
     destination=$destination/Install_Raptor_Artifact/gen_exe
@@ -100,7 +100,7 @@ temp $1
         tar -xvzf $2/external_libs.tar.gz -C $source
         cd $destination && tar -cjvf Raptor_$5\.tar -C $source .
         [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
-        cd ../ && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 --license $lic $destination Raptor_$5\.run "Raptor installer" ./install.sh
+        cd ../ && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 --license $lic --help-header $destination/short_help $destination Raptor_$5\.run "Raptor installer" ./install.sh
     fi
     upload_to_ftp $2 $5 $4 "$raptor_version"
 
