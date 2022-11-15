@@ -61,6 +61,33 @@ bool string_compare(const std::string &f_name, const std::string &ext) {
   }
   return true;
 }
+
+/*
+ * Handle remaining
+ */
+
+struct SNode *handle_renaiming(struct SNode *head, std::string &original, std::string &renamed) {
+  
+  struct SNode *current = head;
+  current = current->next;
+            if (current->type == 0) {
+              current = current->next;
+              if (string_compare(RENAME, current->value)) {
+                current = current->next;
+                renamed = current->value;
+                current = current->next;
+                original = current->value;
+                current = current->next;
+              }
+            //
+            } else if (current->type == 2) {
+          renamed = current->value;
+          original = current->value;
+        }
+          //  current = current->next;
+  return current;
+}
+
 /*
  *
  */
@@ -93,13 +120,19 @@ void find_ports(struct SNode *head, int cell_start,
   std::string port_size;
   std::string port_direction;
   std::string port_name_original;
-  int c_start = cell_start;
-  while (c_start != cell_end) {
-    if ((current->type == 0) || (current->type == 5)) {
-      c_start = current->list_counter;
+  int c_e=0;
+ // int c_start = cell_start;
+  while (c_e >= 0) {
+    if ( (current->type == 5)) {
+      c_e = ((current->list_counter)-cell_start);
+    }
+    int port_start=0;
+    if (current->type == 0) {
+      port_start = current->list_counter;
     }
     if (current->type == 2) {
       if (string_compare(PORT, current->value)) {
+
         port_size = "0";
         current = current->next;
         if (current->type == 0) {
@@ -111,20 +144,7 @@ void find_ports(struct SNode *head, int cell_start,
             port_name_original = current->value;
           }
           if (string_compare(ARRAY, current->value)) {
-            current = current->next;
-            if (current->type == 0) {
-              current = current->next;
-              if (string_compare(RENAME, current->value)) {
-                current = current->next;
-                port_name_renamed = current->value;
-                current = current->next;
-                port_name_original = current->value;
-              }
-              current = current->next;
-            } else {
-              port_name_renamed = current->value;
-              port_name_original = current->value;
-            }
+            current = handle_renaiming(current,port_name_original,port_name_renamed);
             current = current->next;
             port_size = current->value;
           }
@@ -167,17 +187,7 @@ void map_cell_ports(struct SNode *head) {
     if (current->type == 2) {
       std::string input_string = current->value;
       if (string_compare(CELL, input_string)) {
-        current = current->next;
-        if (current->type == 0) {
-          current = current->next;
-          current = current->next;
-          cell_name_renamed = current->value;
-          current = current->next;
-          cell_name_orig = current->value;
-        } else if (current->type == 2) {
-          cell_name_renamed = current->value;
-          cell_name_orig = current->value;
-        }
+        current = handle_renaiming(current,cell_name_orig,cell_name_renamed);
         find_ports(current, cell_start, cell_end);
         cell_ports.insert({ cell_name_renamed, ports });
         ports.clear();
@@ -195,6 +205,9 @@ void resolve_instance(struct SNode *head) {
   std::string CELL_REFERENCE;
   std::string Property_lut;
   std::string Property_width;
+  std::string property_lut_type;
+  int ins_start=0;
+  int ins_end = 0;
   struct SNode *current = head;
   std::vector<std::tuple<std::string, std::string, std::string, std::string> >
   temprory_vector;
@@ -202,28 +215,51 @@ void resolve_instance(struct SNode *head) {
   std::vector<std::pair<std::string, int> > p_size;
   // print the map to check
   while (current != NULL) {
+     if (current->type == 0) {
+      ins_start = current->list_counter;
+    }
+    if (current->type == 5) {
+      ins_end = current->list_counter;
+    }
     if (current->type == 2) {
       std::string input_string = current->value;
       if (string_compare(INSTANCE, input_string)) {
-        current = current->next;
-        if (current->type == 0) {
+        current = handle_renaiming(current,instance_name_orig,instance_name_renamed);
+        ins.instance_name_real = instance_name_orig;
+         int c_e=0;
+
+      while (c_e >= 0) {
+        if ( (current->type == 5)) {
+        c_e = ((current->list_counter)-ins_start);
+      }
+      if ( (current->type == 2)) {
+         if (string_compare("cellRef", current->value)){
+          current = current->next;
+          CELL_REFERENCE = current->value;
+         }
+         if (string_compare("property", current->value)){
+          current = current->next;
+            if (string_compare("LUT", current->value)){
           current = current->next;
           current = current->next;
-          instance_name_renamed = current->value;
+         property_lut_type = current->value;
+         current = current->next;
+          Property_lut = current->value;
+            }
+          if (string_compare("WIDTH", current->value)){
           current = current->next;
-          instance_name_orig = current->value;
-          ins.instance_name_real = instance_name_orig;
           current = current->next;
-        } else if (current->type == 2) {
-          instance_name_renamed = current->value;
-        }
-        int t = 0;
-        while (t != 6) {
-          current = current->next;
-          t++;
-        }
-        // std::cout << "The cell_ref is  " << current->value << std::endl;
-        CELL_REFERENCE = current->value;
+         //property_lut_type = current->value;
+         current = current->next;
+          Property_width = current->value;
+            }
+         }
+
+      }
+       current = current->next;
+    } 
+       
+      
         auto it = cell_ports.find(CELL_REFERENCE);
         if (it != cell_ports.end())
           temprory_vector = it->second;
@@ -234,26 +270,14 @@ void resolve_instance(struct SNode *head) {
         ins.instance_name_real = cell_orig_name;
         // dedicated block for lut data
         if (string_compare(LUT, cell_orig_name)) {
-          t = 0;
-          while (t != 11) {
-            current = current->next;
-            t++;
-          }
+         
           bool is_hex;
-          std::string property_lut_type = current->value;
+         // property_lut_type = current->value;
           if (string_compare(INTEGER_I, property_lut_type)) {
             is_hex = false;
           } else {
             is_hex = true;
           }
-          current = current->next;
-          Property_lut = current->value;
-          t = 0;
-          while (t != 8) {
-            current = current->next;
-            t++;
-          }
-          Property_width = current->value;
           int Property_width_i = stoi(Property_width);
           std::string p_name = get<0>(temprory_vector[0]);
           p_size.push_back(std::make_pair(p_name, Property_width_i));
@@ -396,7 +420,6 @@ void find_cell_net(struct SNode *head, std::string top_name) {
                 current = current->next;
                 member_num = current->value;
                 member_exit = true;
-                // member_num = "[" + member_num + "]";
                 current = current->next;
               } else {
                 port_ref = current->value;
@@ -596,17 +619,7 @@ void edif_bilf(const char *argv_1, FILE *argv_2) {
   if (fp == NULL) {
     perror("Failed to open the edif file : ");
   }
- //std::ofstream outfile(argv_2, ios::out);
-  // if (!(outfile.is_open())) {
-  //   perror("Failed to open the blif file : ");
-  // }
-   //{
-        std::stringstream ss;
-      //  n_l.b_print(ss);
-     //   fputs(ss.str().c_str(), infile);
-    //}
-   // rewind(infile);
-
+  std::stringstream ss;
   std::vector<std::tuple<std::string, std::string, std::string, std::string> >
   temprory_vector;
   printf("parsing the file\n");
