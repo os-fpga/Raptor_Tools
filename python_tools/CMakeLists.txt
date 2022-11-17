@@ -40,12 +40,12 @@ set(py_exe_expected_size 108116381)
 #set build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(work_dir ${PROJECT_SOURCE_DIR}/../../dbuild/share/env)
+        set(work_dir ${PROJECT_SOURCE_DIR}/../../dbuild/share/envs)
     else ()
-    set(work_dir ${PROJECT_SOURCE_DIR}/../../build/share/env)
+    set(work_dir ${PROJECT_SOURCE_DIR}/../../build/share/envs)
     endif()
 else ()
-    set(work_dir ${PROJECT_SOURCE_DIR}/build/share/env)
+    set(work_dir ${PROJECT_SOURCE_DIR}/build/share/envs)
 endif()
 # create directory in advance
 execute_process(
@@ -83,7 +83,7 @@ set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com
 set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_packages.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 78705833)
+set(litex_expected_size 78724223)
 # calculate md5sum
 file(MD5 ${req_file} CalculatedCheckSum)
 #compare the md5sum
@@ -135,7 +135,7 @@ endif()
 
 if(NOT RAPTOR)
 install(
-      DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/env DESTINATION  ${CMAKE_INSTALL_PREFIX}
+      DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/envs DESTINATION  ${CMAKE_INSTALL_PREFIX}
       USE_SOURCE_PERMISSIONS
 )
 endif()

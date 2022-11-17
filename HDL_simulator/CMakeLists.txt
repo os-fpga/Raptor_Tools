@@ -71,12 +71,14 @@ endif ()
 
 file(SIZE ${Destination_Dir} SIM_Download_Size)
 if(${SIM_Download_Size} EQUAL 205951449 )
-  message(STATUS "Pre-built verilator downloaded is present with expected size (${SIM_Download_Size})")
- #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
- execute_process(
+    message(STATUS "Pre-built verilator downloaded is present with expected size (${SIM_Download_Size})")
+    #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
+    if(NOT EXISTS ${Extraction_dir}/HDL_simulator)
+    execute_process(
         COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
         WORKING_DIRECTORY ${Extraction_dir}
-  )
+    )
+    endif()
 else()
         message(STATUS "ERROR: Fail to Extract pre-built verilator. Size is (${SIM_Download_Size}) that is different from expected size")
 endif()
