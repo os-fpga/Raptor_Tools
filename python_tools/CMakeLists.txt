@@ -83,7 +83,7 @@ set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com
 set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_packages.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 78705833)
+set(litex_expected_size 78724223)
 # calculate md5sum
 file(MD5 ${req_file} CalculatedCheckSum)
 #compare the md5sum
