@@ -40,12 +40,12 @@ set(py_exe_expected_size 108116381)
 #set build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-        set(work_dir ${PROJECT_SOURCE_DIR}/../../dbuild/share/env)
+        set(work_dir ${PROJECT_SOURCE_DIR}/../../dbuild/share/envs)
     else ()
-    set(work_dir ${PROJECT_SOURCE_DIR}/../../build/share/env)
+    set(work_dir ${PROJECT_SOURCE_DIR}/../../build/share/envs)
     endif()
 else ()
-    set(work_dir ${PROJECT_SOURCE_DIR}/build/share/env)
+    set(work_dir ${PROJECT_SOURCE_DIR}/build/share/envs)
 endif()
 # create directory in advance
 execute_process(
@@ -135,7 +135,7 @@ endif()
 
 if(NOT RAPTOR)
 install(
-      DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/env DESTINATION  ${CMAKE_INSTALL_PREFIX}
+      DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/share/envs DESTINATION  ${CMAKE_INSTALL_PREFIX}
       USE_SOURCE_PERMISSIONS
 )
 endif()
