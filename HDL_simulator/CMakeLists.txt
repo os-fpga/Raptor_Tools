@@ -32,9 +32,9 @@ project(HDL_Simulator)
 message(${PROJECT_SOURCE_DIR})
 
 set(FETCHCONTENT_QUIET FALSE)
-set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hdl_simulator.zip)
+set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hdl_simulator_v0.1.zip)
 set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
-
+set(expected_size 217069892)
 #set download dir in build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -61,7 +61,7 @@ else()
     file(DOWNLOAD ${Release_URL} ${Destination_Dir} SHOW_PROGRESS)
     file(SIZE ${Destination_Dir} SIM_Download_Size)
 
-    if(${SIM_Download_Size} EQUAL 205951720 )
+    if(${SIM_Download_Size} EQUAL ${expected_size} )
         message(STATUS "Successfully Donwloadeded Pre-built verilator with expected size (${SIM_Download_Size})")
         #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
     else()
@@ -70,7 +70,7 @@ else()
 endif ()
 
 file(SIZE ${Destination_Dir} SIM_Download_Size)
-if(${SIM_Download_Size} EQUAL 205951720 )
+if(${SIM_Download_Size} EQUAL ${expected_size} )
     message(STATUS "Pre-built verilator downloaded is present with expected size (${SIM_Download_Size})")
     #file(ARCHIVE_EXTRACT INPUT ${Destination_Dir} DESTINATION ${Extraction_dir} VERBOSE ) # this need cmake version >= 3.18. 
     if(NOT EXISTS ${Extraction_dir}/HDL_simulator)
