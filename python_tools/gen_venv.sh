@@ -73,9 +73,9 @@ command -v pipenv >/dev/null 2>&1  || { echo >&2; echo "ERROR: pipenv not found.
 if [ $point == "build" ]
 then
   # create envs/litex in build/share and echo absolute path in it
-  [[ ! -d $w_dir/share/envs/litex ]] && mkdir -p $w_dir/share/envs/litex 
-  cd $w_dir/share/envs/litex && echo "$(pwd)" > .venv && $py_exe -m pipenv install --python 3.8 --no-site-packages
-  cd $w_dir/share/envs/litex/bin && ./pip install pipenv
+  [[ ! -d $w_dir/litex ]] && mkdir -p $w_dir/litex 
+  cd $w_dir/litex && echo "$(pwd)" > .venv && $py_exe -m pipenv install --python 3.8 --no-site-packages
+  cd $w_dir/litex/bin && ./pip install pipenv
   # create temp directory, clone and build wheel file
   [[ ! -d $w_dir/litex_temp ]] && mkdir -p $w_dir/litex_temp
 
@@ -87,13 +87,13 @@ then
         cd $w_dir/litex_temp && git clone --recursive $repo $repo_name && cd $repo_name && $py_exe setup.py bdist_wheel && wheel_file=$(realpath -s dist/*.whl)
         # install wheel files in virtual env
         #TODO nadeem 09-27-22 Fix the hash mismatch during re-installation of wheel file. HINT: pip.lock file
-        cd $w_dir/share/envs/litex && $py_exe -m pipenv install --skip-lock $wheel_file
+        cd $w_dir/litex && $py_exe -m pipenv install --skip-lock $wheel_file
       done
   fi
   if [ ! -z "$r_file" ]
   then
     [[ ! -f "$r_file" ]] && { echo "$r_file does not exist. Aborting"; exit 1; } 
-    cd $w_dir/share/envs/litex/bin && ./pip3 install -r $r_file 
+    cd $w_dir/litex/bin && ./pip3 install -r $r_file 
   fi
 fi
 # stage is install

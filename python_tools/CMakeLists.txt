@@ -76,14 +76,14 @@ endif()
 
 # requirements.txt file
 set(req_file ${PROJECT_SOURCE_DIR}/requirements.txt)
-set(expected_req_txt_md5 "dd73fe7d483fe7f1c350424da049299e")
+set(expected_req_txt_md5 "ddf0997da695a1f2e1ed70641178d4f7")
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_packages.tar.gz")
+set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_packages_241122.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 78724223)
+set(litex_expected_size 83608431)
 # calculate md5sum
 file(MD5 ${req_file} CalculatedCheckSum)
 #compare the md5sum
@@ -111,18 +111,18 @@ if("${expected_req_txt_md5}"  STREQUAL  "${CalculatedCheckSum}") #Comapre checks
     else()
         message(STATUS "ERROR: Fail to Downloaded Litex env.Expected size is (${litex_expected_size}) but got (${ENV_Download_Size})")
     endif()
-#else() # uncomment it and generate , upload the tar again. requirement.txt is altered.
-#    set(PYTHON_EXE ${PROJECT_SOURCE_DIR}/python3.8/bin/python3.8)
-#    message(STATUS "WORK DIR from cmake is ${work_dir}")
-#    #execute the script
-#    if(EXISTS ${work_dir}/share/envs/litex/.venv)
-#        message(STATUS ".venv file exist, so not creating virtual environment again")
-#    else ()
-#    message(STATUS "Litex virtual environment installation started")
-#
-#    execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -x ${PYTHON_EXE} -w ${work_dir} -s build -g ${packages_for_venv} -r ${req_file}) 
-#    message(STATUS "Litex virtual environment installation completed")
-#    endif()                
+else() # uncomment it and generate , upload the tar again. requirement.txt is altered.
+    set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8)
+    message(STATUS "WORK DIR from cmake is ${work_dir}")
+    #execute the script
+    if(EXISTS ${work_dir}/share/envs/litex/.venv)
+        message(STATUS ".venv file exist, so not creating virtual environment again")
+    else ()
+    message(STATUS "Litex virtual environment installation started")
+
+    execute_process(COMMAND bash ${PROJECT_SOURCE_DIR}/gen_venv.sh -x ${PYTHON_EXE} -w ${work_dir} -s build -g ${packages_for_venv} -r ${req_file}) 
+    message(STATUS "Litex virtual environment installation completed")
+    endif()                
 endif ()
 
 if(NOT EXISTS ${work_dir}/litex/bin/python3.8)
