@@ -285,10 +285,10 @@ void resolve_instance(struct SNode *head) {
             p_name = p_name + "[";
             for (int ip = 0; ip <= (Property_width_i - 1); ip++) {
               std::string p_name_new = p_name + std::to_string(ip) + "]";
-              conn.push_back(std::make_pair(p_name_new, "$undef"));
+              conn.push_back(std::make_pair(p_name_new, ""));
             }
           } else {
-            conn.push_back(std::make_pair(p_name, "$undef"));
+            conn.push_back(std::make_pair(p_name, ""));
           }
           p_name = get<0>(temprory_vector[1]);
           p_size.push_back(
@@ -301,12 +301,12 @@ void resolve_instance(struct SNode *head) {
             int size = stoi(std::get<1>(temprory_vector[ip]));
             p_size.push_back(std::make_pair(p_name, size));
             if (size == 0) {
-              conn.push_back(std::make_pair(p_name, "$undef"));
+              conn.push_back(std::make_pair(p_name, ""));
             } else {
               for (auto s = 0; s < size; s++) {
                 p_name = (std::get<3>(temprory_vector[ip])) + "[" +
                          to_string(s) + "]";
-                conn.push_back(std::make_pair(p_name, "$undef"));
+                conn.push_back(std::make_pair(p_name, ""));
               }
             }
           }
@@ -634,6 +634,8 @@ void edif_bilf(const char *argv_1, FILE *argv_2) {
   resolve_instance(node);
   printf("Getting the nets\n");
   find_cell_net(node, top_name);
+   
+  
 
   // passing data to simplenetlist.h
   simple_netlist_beta sn;
@@ -653,6 +655,16 @@ void edif_bilf(const char *argv_1, FILE *argv_2) {
       continue;
     }
     ins.name_ = it->first;
+    
+    for (auto itv = INS.conn.begin(); itv != INS.conn.end(); itv++){
+      
+      if (itv->second == "")
+      {
+        INS.conn.erase(itv);
+        itv--;
+      }
+    }
+    
     ins.conns_ = INS.conn;
     ins.truthTable_ = INS.tt;
     ins.blif_print(ss);
