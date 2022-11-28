@@ -67,6 +67,22 @@ using namespace boost::multiprecision;
 using namespace std;
 std::unordered_map<std::string, std::pair<int, int>> netBusMap;
 string dirs[] = {"DIR_INOUT", "DIR_IN", "DIR_OUT", "DIR_NONE"};
+
+void packEscaped(string &ss);
+bool is_string_param_(const std::string &param);
+bool is_binary_param_(const std::string &param);
+bool is_real_param_(const std::string &param);
+string bitsOfHexaDecimal(string &s);
+int1024_t bigDecimalInteger(string &s);
+string bitsOfBigDecimal(string &s);
+void bits(const string &exp, std::vector<std::string> &vec_, string &strRes);
+bool bitBlast(string sig, vector<string> &res);
+bool GetBitNameReferences(string ss, int l, int r, vector<string> &vec);
+bool bitBlast(VeriExpression *port_expr, vector<string> &res);
+unsigned long long veriValue(const string &exp);
+std::vector<unsigned> entryTruth(unsigned long long e, unsigned long long w);
+void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<unsigned>> &vec);
+
 void packEscaped(string &ss)
 {
     unsigned int cnt = 0;
@@ -265,14 +281,12 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
     string rad_and_value;
 
     unsigned int bit_size;
-    int base = 2;
     ss >> bit_size >> rad_and_value;
     string value = rad_and_value.substr(2);
     string bit_value;
 
     if (rad_and_value[1] == 'b' || rad_and_value[1] == 'B')
     {
-        base = 2;
         bit_value = value;
         for (auto d : bit_value)
         {
@@ -282,12 +296,10 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
     }
     else if (rad_and_value[1] == 'h' || rad_and_value[1] == 'H')
     {
-        base = 16;
         bit_value = bitsOfHexaDecimal(value);
     }
     else if (rad_and_value[1] == 'd' || rad_and_value[1] == 'D')
     {
-        base = 10;
         bit_value = bitsOfBigDecimal(value);
     }
     else
@@ -295,7 +307,7 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
     strRes = string(bit_size, '0');
     vec = vector<string>(bit_size, "0");
 
-    for (int idx = 0; idx < bit_size && idx < bit_value.size(); ++idx)
+    for (unsigned idx = 0; idx < bit_size && idx < bit_value.size(); ++idx)
     {
         strRes[bit_size - 1 - idx] = bit_value[bit_value.size() - 1 - idx];
         if ('x' == bit_value[bit_value.size() - 1 - idx])
@@ -304,18 +316,18 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
             vec[bit_size - 1 - idx] = std::string(1, bit_value[bit_value.size() - 1 - idx]);
     }
     // expand leading x s
-    int pos = 0;
+    unsigned pos = 0;
     while (pos < vec.size() && "0" == vec[pos])
         ++pos;
     if (pos < vec.size() && "$undef" == vec[pos])
     {
-        for (int idx = 0; idx < pos; ++idx)
+        for (unsigned idx = 0; idx < pos; ++idx)
         {
             vec[idx] = "$undef";
             strRes[idx] = 'x';
         }
     }
-    for (int vIdx = 0; vIdx < vec.size(); vIdx++)
+    for (unsigned vIdx = 0; vIdx < vec.size(); vIdx++)
     {
         vec_.push_back(vec[vIdx]);
     }
@@ -537,14 +549,16 @@ std::vector<unsigned> entryTruth(unsigned long long e, unsigned long long w)
 
 void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<unsigned>> &vec)
 {
-    if(is_binary_param_(w)) w = "32'b" + w;
-    if(is_binary_param_(tr)) tr = "512'b" + tr;
+    if (is_binary_param_(w))
+        w = "32'b" + w;
+    if (is_binary_param_(tr))
+        tr = "512'b" + tr;
     unsigned long long width = veriValue(w);
     string stringRes;
     vector<string> v;
     bits(tr, v, stringRes);
 
-    for (int i = 0; i < stringRes.size(); ++i)
+    for (unsigned i = 0; i < stringRes.size(); ++i)
     {
         if ('1' == stringRes[stringRes.size() - 1 - i])
         {
@@ -600,14 +614,14 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
 
     // Now for each netlist, print the name of all netlists along with the instantiation
     // reference count, and access some netlist information.
-    Netlist *netlist;
+    Netlist *netlist_;
     MapIter mi, mi2;
     SetIter si;
     SetIter si2;
     vector<Netlist *> n_vec;
-    FOREACH_SET_ITEM(&netlists, si, &netlist)
+    FOREACH_SET_ITEM(&netlists, si, &netlist_)
     {
-        n_vec.push_back(netlist);
+        n_vec.push_back(netlist_);
     }
 
     while (n_vec.size())
@@ -629,9 +643,16 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
             if (DIR_INOUT == port->GetDir())
                 n_l.inout_ports.push_back(port->Name());
             else if (DIR_OUT == port->GetDir())
+            {
                 n_l.out_ports.push_back(port->Name());
+                n_l.ports.push_back(port->Name());
+            }
             else if (DIR_IN == port->GetDir())
+            {
                 n_l.in_ports.push_back(port->Name());
+                n_l.ports.push_back(port->Name());
+                n_l.in_set.insert(port->Name());
+            }
         }
         // Iterate over all portbuses of this netlist
         PortBus *portbus;
@@ -755,7 +776,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
                     }
                     else
                     {
-                        for (int idx = r_vec.size() - 1; idx > -1; --idx)
+                        for (int idx = (int)r_vec.size() - 1; idx > -1; --idx)
                         {
                             auto b = r_vec[idx];
                             b = ("1" == b) ? "$true" : ("0" == b) ? "$false"

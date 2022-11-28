@@ -44,7 +44,7 @@ struct inst
     void blif_names_print(std::ostream &f)
     {
         f << ".names";
-        for (int idx = conns_.size() - 2; idx >= 0; --idx)
+        for (int idx = (int)conns_.size() - 2; idx >= 0; --idx)
         {
             string s = (conns_[idx].second == "n1") ? "$false" : conns_[idx].second;
             s = (s == "n2") ? "$true" : s;
@@ -56,7 +56,7 @@ struct inst
         f << " " << conns_.back().second << std::endl;
         for (auto &v : truthTable_)
         {
-            for (int i = 0; i < v.size() - 1; ++i)
+            for (unsigned i = 0; i < v.size() - 1; ++i)
             {
                 f << v[i];
             }
@@ -91,7 +91,7 @@ struct inst
                 found = s.find('B');
             if (found != std::string::npos)
             {
-                for (int i = found; i >= 0; i--)
+                for (int i = (int)found; i >= 0; i--)
                     s[i] = ' ';
             }
             while (s.size() && (s.back() == '"' || isspace(s.back())))
@@ -129,6 +129,29 @@ struct simple_netlist
     void b_port_print_json(std::ostream &f)
     {
         bool first = true;
+        f << "[\n  {\n\t\"ports\": [";
+        for (auto &in : ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
+            if (!first)
+                f << ",";
+            f << "\n\t  {";
+            string s = "output";
+            f << "\n\t\t\"direction\": \"" << ((in_set.find(in)==end(in_set)) ? "output" : "input") << "\",";
+            f << "\n\t\t\"name\": \"" << in << "\",";
+            f << "\n\t\t\"type\": \"WIRE\"";
+            f << "\n\t  }" ;
+            first = false;
+        }
+        f << "\n\t]," << endl;
+        f << "\t\"topModule\": \"" << name << "\"" << endl;
+        f << "  }\n]" << endl;
+    }
+
+    void b_port_print_separate_json(std::ostream &f)
+    {
+        bool first = true;
         f << "{\n\t\"inputs\": [";
         for (auto &in : in_ports)
         {
@@ -150,8 +173,8 @@ struct simple_netlist
                 f << ",";
             f << "\n\t\t\"" << in << "\"";
             first = false;
-         }
-        f << "\n\t]\n}"<< endl;
+        }
+        f << "\n\t]\n}" << endl;
     }
 
     void b_print(std::ostream &f)
@@ -206,11 +229,13 @@ struct simple_netlist
         f << std::endl;
     }
     std::string name;
+    std::vector<std::string> ports;
     std::vector<std::string> in_ports;
     std::vector<std::string> out_ports;
     std::vector<std::string> inout_ports;
     std::vector<std::string> nets;
     std::vector<inst> blocks;
+    std::unordered_set<std::string> in_set;
 };
 
 int parse_verilog(const char *file_name, simple_netlist &n_l);
