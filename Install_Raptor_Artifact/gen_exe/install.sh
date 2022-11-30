@@ -142,7 +142,7 @@ fi
 
 
 # install from tar
-t_path="Raptor_*.tar"
+t_path="Raptor_*.tar.gz"
 
 if [ "$dep_install" == "yes" ] && [ "$bypass_dep" == "yes" ]
 then
