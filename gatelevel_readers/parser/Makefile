@@ -1,6 +1,6 @@
 CC = g++
-CFLAGS = -g -Wall -Wextra -Werror
+CFLAGS = -g -Wall -Wextra 
 OUTDIR = bin
 
-main: src/sexpr.cpp test/main.cpp
+main: test/cells_sep.cpp  src/sexpr.cpp test/pprint.cpp  test/main.cpp 
 	$(CC) $(CFLAGS) -o $(OUTDIR)/$@ $^
