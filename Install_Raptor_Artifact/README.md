@@ -64,19 +64,19 @@ You have following command line options available:
 Go to the directory where you have extracted the Raptor executable after downloading and execute it with any or with all above mentioned options like below.
 
 ```
-./Raptor_x.x.run -- -r <absolute path where Raptor will be installed>
+./Raptor_x.x.run -r <absolute path where Raptor will be installed>
 ``` 
 
 You can add --accept option as well to accept the EULA license. Like
 
 ```
-./Raptor_x.x.run --accept -- -v -r <absolute path where Raptor will be installed>
+./Raptor_x.x.run --accept -v -r <absolute path where Raptor will be installed>
 ``` 
 
 And if you want to install dependencies as well which needs SUDO/Admin privileges, you can execute the installer as:
 
 ```
-sudo ./Raptor_x.x.run --accept -- -v -i -r <absolute path where Raptor will be installed>
+sudo ./Raptor_x.x.run --accept -v -i -r <absolute path where Raptor will be installed>
 ``` 
 
 Kindly replace `Raptor_x.x.run` with the version of Raptor executable file you have received.

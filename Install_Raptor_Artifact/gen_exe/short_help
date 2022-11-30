@@ -21,14 +21,13 @@ Non-interactive Mode:>
 ^^^^^^^^^^^^^^^^^^^^^
 1): Do not install OS related dependencies of Raptor but install Raptor at custom path, then execute the installer with command 
 
-            ./Raptor_x.x.run --accept -- --no-dep-install -r <absolute path where Raptor will be installed>
+            ./Raptor_x.x.run --accept --no-dep-install -r <absolute path where Raptor will be installed>
 
 This assume that all OS dependencies of Raptor are already installed. 
 
 2): To install OS related dependencies and Raptor at custom path, then execute with SUDO/Admin privileges
 
-          sudo ./Raptor_x.x.run --accept -- --install-dep -r <absolute path where Raptor will be installed>
+          sudo ./Raptor_x.x.run --accept --install-dep -r <absolute path where Raptor will be installed>
 
-NOTE:>   -- is important for passing command line options 
+NOTE:> For details of command line options, see the README.md
 ^^^^
-For details of command line options, see the README.md
