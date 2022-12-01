@@ -1,4 +1,4 @@
-#include "edif_blif.h"
+#include "edif_blif.hpp"
 std::vector<std::pair<
     /*net_name           */ std::string,
     /* net instance ref  */ std::string>>
@@ -374,7 +374,7 @@ void edif_blif(FILE *InputFile, const char *edif_bl)
   std::vector<std::string> inout_ports;
   pprint p1;
   cells_sep cell1_;
-  
+
   // Read the file into a tree
   struct SNode *node = snode_parse(InputFile);
   cell1_.iterate(node);

@@ -24,7 +24,7 @@ endfunction(files_to_dirs)
 file(GLOB_RECURSE LIB_SOURCES
     ./src/*.cpp)
 file(GLOB_RECURSE LIB_HEADERS
-    ./src/*.h)
+    ./src/*.hpp)
 
 file(GLOB_RECURSE EXEC_SOURCE ./test/main.cpp)
 list(APPEND EXEC_SOURCE ${LIB_SOURCES})

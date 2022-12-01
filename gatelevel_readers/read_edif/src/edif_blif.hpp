@@ -1,3 +1,6 @@
+#ifndef EDIF_BLIF
+#define EDIF_BLIF
+
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -43,3 +46,5 @@ std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
                              std::string ins_ref, std::string port_name);
 
 void edif_blif(FILE *InputFile, const char *edif_bl);
+
+#endif

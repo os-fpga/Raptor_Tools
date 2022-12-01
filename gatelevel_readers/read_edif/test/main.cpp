@@ -1,4 +1,4 @@
-#include "edif_blif.h"
+#include "edif_blif.hpp"
 
 int main(int argc, char *argv[])
 {

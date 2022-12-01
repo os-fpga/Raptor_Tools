@@ -1,3 +1,5 @@
+#ifndef CELL_SEP
+#define CELL_SEP
 #include <assert.h>
 #include <stdio.h>
 #include <string.h>
@@ -102,3 +104,5 @@ public:
     std::vector<struct cells> cells_vector;
     void iterate(struct SNode *head);
 };
+
+#endif
