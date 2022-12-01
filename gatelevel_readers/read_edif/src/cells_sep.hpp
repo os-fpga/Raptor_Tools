@@ -90,7 +90,7 @@ public:
     };
 
     std::string top_module;
-    void print_linklist(struct SNode *head);
+    //void print_linklist(struct SNode *head);
     void ports(struct SNode *head);
     void instances(struct SNode *head);
     void get_nets(struct SNode *head, std::string net_name);

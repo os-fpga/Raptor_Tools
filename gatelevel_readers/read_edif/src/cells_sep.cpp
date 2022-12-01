@@ -16,38 +16,6 @@
 //     return true;
 // }
 
-void cells_sep::cells_sep::print_linklist(struct SNode *head)
-{
-    struct SNode *current = head;
-    while (current != NULL)
-    {
-
-        if (current->type == LIST)
-        {
-            struct SNode *child = current->list;
-            // printf("\ngoing into the child node\n");
-            print_linklist(child);
-        }
-        if (current->type == STRING)
-        {
-            printf("\nThe string is  %s", current->value);
-        }
-        if (current->type == SYMBOL)
-        {
-            printf("\nThe symbol is  %s", current->value);
-        }
-        if (current->type == INTEGER)
-        {
-            printf("\nThe integer is  %s", current->value);
-        }
-        if (current->type == FLOAT)
-        {
-            printf("\nThe float is  %s", current->value);
-        }
-
-        current = current->next;
-    }
-}
 // Get the port data from the
 // every time the keyword port is occurs in a cell this function is called and the available data is extracted from this node
 

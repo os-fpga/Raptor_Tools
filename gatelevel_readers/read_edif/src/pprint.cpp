@@ -1,6 +1,38 @@
 #include "pprint.hpp"
 using namespace std;
 
+void pprint::print_linklist(struct SNode *head)
+{
+    struct SNode *current = head;
+    while (current != NULL)
+    {
+
+        if (current->type == LIST)
+        {
+            struct SNode *child = current->list;
+            // printf("\ngoing into the child node\n");
+            print_linklist(child);
+        }
+        if (current->type == STRING)
+        {
+            printf("\nThe string is  %s", current->value);
+        }
+        if (current->type == SYMBOL)
+        {
+            printf("\nThe symbol is  %s", current->value);
+        }
+        if (current->type == INTEGER)
+        {
+            printf("\nThe integer is  %s", current->value);
+        }
+        if (current->type == FLOAT)
+        {
+            printf("\nThe float is  %s", current->value);
+        }
+
+        current = current->next;
+    }
+}
 void pprint::ports_print(std::vector<std::tuple<std::string, std::string, std::string, std::string>> &ports_vector)
 {
   for (long unsigned int i = 0; i < ports_vector.size(); i++)

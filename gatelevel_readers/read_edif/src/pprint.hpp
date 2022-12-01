@@ -2,6 +2,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include "cells_sep.hpp"
 class pprint
 {
 private:
@@ -36,5 +37,7 @@ public:
                                               /*net port reference  */ std::string,
                                               /*net pin number   */ std::string,
                                               /* net instance ref  */ std::string>>>
+                                              
                         &net_map);
+    void print_linklist(struct SNode *head);
 };
