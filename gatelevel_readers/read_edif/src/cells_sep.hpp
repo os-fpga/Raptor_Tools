@@ -5,7 +5,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
-#include "../src/sexpr.hpp"
+#include "../src/edif_parsing.hpp"
 class cells_sep
 {
 public:

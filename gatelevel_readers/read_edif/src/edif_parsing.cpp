@@ -4,7 +4,7 @@
 #include <string.h>
 #include <string>
 
-#include "sexpr.hpp"
+#include "edif_parsing.hpp"
 
 #define BUFFER_MAX 512
 

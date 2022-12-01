@@ -22,11 +22,11 @@ function(files_to_dirs file_list directory_list)
 endfunction(files_to_dirs)
 
 file(GLOB_RECURSE LIB_SOURCES
-    ./src/cpp_files/*.cpp)
+    ./src/*.cpp)
 file(GLOB_RECURSE LIB_HEADERS
-    ./src/cpp_files/*.h)
+    ./src/*.h)
 
-file(GLOB_RECURSE EXEC_SOURCE ./src/main.cpp)
+file(GLOB_RECURSE EXEC_SOURCE ./test/main.cpp)
 list(APPEND EXEC_SOURCE ${LIB_SOURCES})
 
 files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS ) #./src/*/*.h
