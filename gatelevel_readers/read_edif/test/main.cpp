@@ -5,9 +5,9 @@ int main(int argc, char *argv[])
 
 if (argc == 3)
   {
-    FILE *infile = fopen(argv[1], "r");
-    const char* edif_bl=argv[2];
-    edif_blif(edif_bl,infile);
+    FILE *outfile = fopen(argv[2], "w");
+    const char* infile=argv[1];
+    edif_blif(infile,outfile);
     return 0;
   }
   else{

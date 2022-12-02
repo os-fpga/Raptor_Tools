@@ -45,6 +45,6 @@ std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
                                  net_reduced_map,
                              std::string ins_ref, std::string port_name);
 
-void edif_blif( const char *edif_bl,FILE *InputFile);
+void edif_blif( const char *InputFile,FILE *edif_bl);
 
 #endif

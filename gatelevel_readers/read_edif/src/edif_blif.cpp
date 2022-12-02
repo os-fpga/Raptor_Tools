@@ -366,7 +366,7 @@ std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
   return "";
 }
 
-void edif_blif(const char *edif_bl,FILE *InputFile)
+void edif_blif(const char *InputFile,FILE *edif_bl)
 {
 
   std::vector<std::string> in_ports;
@@ -375,11 +375,13 @@ void edif_blif(const char *edif_bl,FILE *InputFile)
   pprint p1;
   cells_sep cell1_;
 
+  FILE *fp;
+  fp = fopen(InputFile, "r");
   // Read the file into a tree
-  struct SNode *node = snode_parse(InputFile);
+  struct SNode *node = snode_parse(fp);
   cell1_.iterate(node);
   // Close the file stream
-  fclose(InputFile);
+  fclose(fp);
   simple_netlist sn;
 
   std::stringstream ss;
@@ -484,8 +486,7 @@ void edif_blif(const char *edif_bl,FILE *InputFile)
      p1.ports_print(cell1_.cells_vector[it].ports_vector);
      p1.nets_print(cell1_.cells_vector[it].net_map);
    }*/
-  FILE *cp = fopen(edif_bl, "w");
   sn.b_print(ss);
-  fputs(ss.str().c_str(), cp);
+  fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
 }
