@@ -7,7 +7,7 @@ if (argc == 3)
   {
     FILE *infile = fopen(argv[1], "r");
     const char* edif_bl=argv[2];
-    edif_blif(infile,edif_bl);
+    edif_blif(edif_bl,infile);
     return 0;
   }
   else{

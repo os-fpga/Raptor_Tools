@@ -366,7 +366,7 @@ std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
   return "";
 }
 
-void edif_blif(FILE *InputFile, const char *edif_bl)
+void edif_blif(const char *edif_bl,FILE *InputFile)
 {
 
   std::vector<std::string> in_ports;
