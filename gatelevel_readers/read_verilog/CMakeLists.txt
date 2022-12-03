@@ -22,7 +22,7 @@ if (PRODUCTION_BUILD)
     if (NOT RAPTOR)
         get_filename_component(FLEX_LM_SRC_DIR "../../Flex_LM"
           REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-        
+
         # Flex_LM directory already has been added by vpr/CMakeLists.txt
     endif()
     message("FLEX: "  ${FLEX_LM_SRC_DIR})
@@ -54,7 +54,7 @@ message("VERIFIC_HOME: ${VERIFIC_HOME}")
 file(GLOB_RECURSE LIB_HEADERS
     ${VERIFIC_HOME}/*/*.h)
 
-if (NOT RAPTOR AND CMAKE_BUILD_TYPE STREQUAL "Debug")
+if (NOT RAPTOR AND NOT YOSYS_VERIFIC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(${VERIFIC_HOME} "verific_rs")
 endif()
 
