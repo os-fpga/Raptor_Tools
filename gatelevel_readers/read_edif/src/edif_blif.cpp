@@ -271,7 +271,7 @@ void ports_addition(std::vector<std::string>
                     std::string port_name, int port_size)
 {
 
-  if (port_size == 0)
+  if ((port_size == 0)||(port_size == 1))
   {
     ports.push_back(port_name);
   }
