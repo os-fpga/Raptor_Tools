@@ -45,7 +45,21 @@ void cells_sep::ports(struct SNode *head)
             else if (string_compare("array", child->value))
             {
                 child = child->next;
-                port_name_orig = child->value;
+                if (child->type == LIST)
+                {
+                    struct SNode *n_child = child->list;
+                    if (string_compare("rename", n_child->value))
+                    {
+                        n_child = n_child->next;
+                        port_name_renamed = n_child->value;
+                        n_child = n_child->next;
+                        port_name_orig = n_child->value;
+                    }
+                }
+                else
+                {
+                    port_name_orig = child->value;
+                                }
                 child = child->next;
                 port_size = child->value;
             }
@@ -61,8 +75,12 @@ void cells_sep::cells_sep::instances(struct SNode *head)
     bool is_lut = false;
     struct SNode *current = head;
     // current = current->next;
-    std::string inst_name_orig, inst_name_renamed, inst_cell_ref, prop_lut, prop_width;
-
+    // std::string inst_name_orig, inst_name_renamed, inst_cell_ref, prop_lut, prop_width;
+    std::string inst_name_orig = "";
+    std::string inst_name_renamed = "";
+    std::string inst_cell_ref = "";
+    std::string prop_lut = "";
+    std::string prop_width = "";
     while (current != NULL)
     {
         if (current->type == LIST)
@@ -76,14 +94,14 @@ void cells_sep::cells_sep::instances(struct SNode *head)
                 child = child->next;
                 inst_name_orig = child->value;
             }
-            else if (string_compare("viewRef", child->value))
+            else if ((string_compare("viewRef", child->value))||(string_compare("viewref", child->value)))
             {
                 child = child->next;
                 child = child->next;
                 if (child->type == LIST)
                 {
                     struct SNode *n_child = child->list;
-                    if (string_compare("cellRef", n_child->value))
+                    if ((string_compare("cellRef", n_child->value))||(string_compare("cellref", n_child->value)))
                         n_child = n_child->next;
                     inst_cell_ref = n_child->value;
                 }
@@ -106,7 +124,7 @@ void cells_sep::cells_sep::instances(struct SNode *head)
                         is_lut = true;
                     }
                 }
-                if (string_compare("WIDTH", child->value))
+                else if (string_compare("WIDTH", child->value))
                 {
                     child = child->next;
                     if (child->type == LIST)
@@ -116,7 +134,7 @@ void cells_sep::cells_sep::instances(struct SNode *head)
                         prop_width = n_child->value;
                     }
                 }
-                if (string_compare("INIT", child->value))
+                else if (string_compare("INIT", child->value))
                 {
                     child = child->next;
                     if (child->type == LIST)
@@ -139,7 +157,9 @@ void cells_sep::cells_sep::instances(struct SNode *head)
 void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name) //, std::string net_name
 {
     struct SNode *current = head; // list for the joined
-    std::string net_port_ref, net_member, net_instance_ref;
+    std::string net_port_ref = "";
+    std::string net_member = "";
+    std::string net_instance_ref = "";
 
     while (current != NULL) // iterate untill the joined does not end
     {
@@ -275,12 +295,9 @@ void cells_sep::cells_sep::get_cell_data(struct SNode *head, std::string cell_na
             }
             if (string_compare("net", current->value))
             {
-
                 current = current->next;
-
                 if (current->type == LIST)
                 {
-
                     nets(current, "net");
                 }
                 else
@@ -289,7 +306,7 @@ void cells_sep::cells_sep::get_cell_data(struct SNode *head, std::string cell_na
                     nets(current, net_name);
                 }
                 cell_->net_map = net_map;
-                //net_map.clear();
+                // net_map.clear();
             }
         }
         current = current->next;
