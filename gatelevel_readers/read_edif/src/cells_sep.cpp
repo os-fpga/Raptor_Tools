@@ -1,21 +1,5 @@
 #include "cells_sep.hpp"
 
-// bool cells_sep::string_compare(const std::string &f_name, const std::string &ext)
-// {
-//     if (ext.size() > f_name.size())
-//         return false;
-//     auto ext_it = ext.rbegin();
-//     auto f_it = f_name.rbegin();
-//     while (ext_it != ext.rend() && f_it != f_name.rend())
-//     {
-//         if (*ext_it != *f_it)
-//             return false;
-//         ++ext_it;
-//         ++f_it;
-//     }
-//     return true;
-// }
-
 // Get the port data from the
 // every time the keyword port is occurs in a cell this function is called and the available data is extracted from this node
 
@@ -59,7 +43,7 @@ void cells_sep::ports(struct SNode *head)
                 else
                 {
                     port_name_orig = child->value;
-                                }
+                }
                 child = child->next;
                 port_size = child->value;
             }
@@ -94,14 +78,14 @@ void cells_sep::cells_sep::instances(struct SNode *head)
                 child = child->next;
                 inst_name_orig = child->value;
             }
-            else if ((string_compare("viewRef", child->value))||(string_compare("viewref", child->value)))
+            else if ((string_compare("viewRef", child->value)) || (string_compare("viewref", child->value)))
             {
                 child = child->next;
                 child = child->next;
                 if (child->type == LIST)
                 {
                     struct SNode *n_child = child->list;
-                    if ((string_compare("cellRef", n_child->value))||(string_compare("cellref", n_child->value)))
+                    if ((string_compare("cellRef", n_child->value)) || (string_compare("cellref", n_child->value)))
                         n_child = n_child->next;
                     inst_cell_ref = n_child->value;
                 }

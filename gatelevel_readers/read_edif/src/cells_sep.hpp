@@ -25,7 +25,7 @@ public:
         /*Port size           */ std::string>>
         ports_vector;
 
-    // inst_name_orig, inst_name_renamed, inst_cell_ref, prop_lut, prop_width
+ 
     std::tuple<
         /*instance name original  */ std::string,
         /*Instance name renamed   */ std::string,
@@ -92,7 +92,6 @@ public:
     };
 
     std::string top_module;
-    //void print_linklist(struct SNode *head);
     void ports(struct SNode *head);
     void instances(struct SNode *head);
     void get_nets(struct SNode *head, std::string net_name);

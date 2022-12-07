@@ -349,19 +349,28 @@ std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
 
                                                        /*net_name           */ std::string,
                                                        /* net instance ref  */ std::string>>> &
-                                 net_reduced_map,
+                                                                    net_reduced_map,
                              std::string ins_ref, std::string port_name)
 {
   std::pair<std::string, std::string> port_ref_pair = std::make_pair(port_name, ins_ref);
   std::pair<std::string, std::string> port_init_pair;
+std::vector<std::pair<
 
+                                                       /*net_name           */ std::string,
+                                                       /* net instance ref  */ std::string>>::iterator t;
   for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++)
   {
     for (long unsigned int i = 0; i < it->second.size(); i++)
     {
       port_init_pair = it->second[i];
-      if (port_init_pair == port_ref_pair)
+      if (port_init_pair == port_ref_pair){
+        t = (it->second.begin()+i);
+        port_init_pair= *t;
+       // std::cout << "The deleted pair is "<< port_init_pair.first<< " " <<port_init_pair.second<<std::endl;
+        it->second.erase(t);
+        
         return it->first;
+      }
     }
   }
   return "";
@@ -399,7 +408,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
 */
   for (unsigned int itv = 0; itv < cell1_.cells_vector.size(); itv++)
   {
-
+    // Initially create a net vector in which only the port name and its corresponding net is present.
     for (auto it = cell1_.cells_vector[itv].net_map.begin(); it != cell1_.cells_vector[itv].net_map.end(); it++)
     {
 
@@ -417,11 +426,14 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
       net_reduced_map.insert({it->first, net_reduced_vector});
       net_reduced_vector.clear();
     }
-
+    // find the top cell which will be build for the blif
     if (string_compare(cell1_.cells_vector[itv].cell_name_orig, cell1_.top_module))
     {
+      // get the cell ios and place it in the simple netlist vector
       seperate_ports(cell1_.cells_vector[itv].ports_vector, sn.in_ports, sn.out_ports, sn.inout_ports, false, "");
-      cell1_.instance_vector = cell1_.cells_vector[itv].instance_vector;
+
+      cell1_.instance_vector = cell1_.cells_vector[itv].instance_vector; // use it directly remove it at the end
+      //  add up all the instances
       for (unsigned int iti = 0; iti < cell1_.instance_vector.size(); iti++)
       {
         inst ins_;
@@ -438,16 +450,16 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
           // std::cout<< "comparing string "<< cell1_.cells_vector[itvv].cell_name_renamed<< " with "<< std::get<2>(cell1_.instance_vector[iti])<<std::endl;
           if (string_compare(cell1_.cells_vector[itvv].cell_name_renamed, std::get<2>(cell1_.instance_vector[iti])))
           {
+            // Get all the ports of that instance cell
             seperate_ports(cell1_.cells_vector[itvv].ports_vector, in_ports, out_ports, inout_ports, std::get<5>(cell1_.instance_vector[iti]), std::get<4>(cell1_.instance_vector[iti]));
             int inpt = 0;
 
             // Getting the net connections from the ports
-            // Now entering the inputs
+            // First entering the inputs
             input_port_size = in_ports.size();
-           
+
             for (inpt = in_ports.size() - 1; inpt >= 0; inpt--)
             {
-              
               std::string result_net = find_corresp_net(net_reduced_map, ins_.name_, in_ports[inpt]);
               if (!string_compare(result_net, ""))
                 ins_.conns_.push_back(std::make_pair(in_ports[inpt], result_net));
@@ -459,6 +471,12 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
               std::string result_net = find_corresp_net(net_reduced_map, ins_.name_, out_ports[inpt]);
               if (!string_compare(result_net, ""))
                 ins_.conns_.push_back(std::make_pair(out_ports[inpt], result_net));
+            }
+            for (inpt = 0; inpt < inout_ports.size(); inpt++)
+            {
+              std::string result_net = find_corresp_net(net_reduced_map, ins_.name_, inout_ports[inpt]);
+              if (!string_compare(result_net, ""))
+                ins_.conns_.push_back(std::make_pair(inout_ports[inpt], result_net));
             }
 
             break;
@@ -496,6 +514,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
       }
     }
   }
+
   // std::cout << "The cell vector size is : " << cell1_.cells_vector.size() << std::endl;
   /* for (unsigned int it = 0; it < cell1_.cells_vector.size(); it++)
    {
@@ -506,6 +525,35 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
      p1.ports_print(cell1_.cells_vector[it].ports_vector);
      p1.nets_print(cell1_.cells_vector[it].net_map);
    }*/
+  // The remaining nets are connected with the ports or ground or vcc so adding 
+    for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++)
+  {
+    //std::cout<< "The net name is " << it->first << std::endl;
+    
+    for (long unsigned int i = 0; i < it->second.size(); i++)
+    {
+      
+      //No need to connect the string port name with the string name and name might be same but it should be of different instances
+      if ((it->first!=std::get<0>(it->second[i])) && (string_compare(std::get<1>(it->second[i]), ""))  )
+      {
+        inst ins_;
+      ins_.mod_name_ = "$lut";
+      // 
+        ins_.conns_.push_back(std::make_pair(it->first, it->first));
+        ins_.conns_.push_back(std::make_pair(std::get<0>(it->second[i]), std::get<0>(it->second[i])));
+        get_truth_table("2", 1, false, ins_.truthTable_);
+        sn.blocks.push_back(ins_);
+      }
+
+     // std::cout << "The net port ref is " << std::get<0>(it->second[i]) << std::endl;
+     
+     // std::cout << "The net instance reference is " << std::get<1>(it->second[i]) << std::endl;
+    }
+  }
+
+
+
+
   sn.b_print(ss);
   fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
