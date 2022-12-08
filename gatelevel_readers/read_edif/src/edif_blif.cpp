@@ -331,16 +331,16 @@ void seperate_ports(std::vector<std::tuple<
       //     size = stoi(std::get<3>(ports_vector[i]));
       // }
 
-      std::string port_name = std::get<0>(ports_vector[i]);
-      ports_addition(in_ports, std::get<0>(ports_vector[i]), size);
+      //std::string port_name = std::get<0>(ports_vector[i]);
+      ports_addition(in_ports, std::get<1>(ports_vector[i]), size);
     }
     else if (string_compare("OUTPUT", get<2>(ports_vector[i])))
     {
-      ports_addition(out_ports, std::get<0>(ports_vector[i]), size);
+      ports_addition(out_ports, std::get<1>(ports_vector[i]), size);
     }
     else if (string_compare("INOUT", get<2>(ports_vector[i])))
     {
-      ports_addition(inout_ports, std::get<0>(ports_vector[i]), size);
+      ports_addition(inout_ports, std::get<1>(ports_vector[i]), size);
     }
   }
 }
@@ -409,7 +409,26 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
   for (unsigned int itv = 0; itv < cell1_.cells_vector.size(); itv++)
   {
     // Initially create a net vector in which only the port name and its corresponding net is present.
-    for (auto it = cell1_.cells_vector[itv].net_map.begin(); it != cell1_.cells_vector[itv].net_map.end(); it++)
+    //  for (auto it = cell1_.cells_vector[itv].net_map.begin(); it != cell1_.cells_vector[itv].net_map.end(); it++)
+    //{
+
+    //  for (long unsigned int i = 0; i < it->second.size(); i++)
+    //  {
+
+    //    std::string port_name = std::get<0>(it->second[i]);
+
+    //    if (!string_compare(std::get<1>(it->second[i]), ""))
+    //    {
+    //      port_name = port_name + "[" + std::get<1>(it->second[i]) + "]";
+    //    }
+   //     net_reduced_vector.push_back(std::make_pair(port_name, std::get<2>(it->second[i])));
+   //   }
+   //   net_reduced_map.insert({it->first, net_reduced_vector});
+   //   net_reduced_vector.clear();
+   // }
+
+     // Initially create a net vector in which only the port name and its corresponding net is present.
+      for (auto it = cell1_.cells_vector[itv].net_map.begin(); it != cell1_.cells_vector[itv].net_map.end(); it++)
     {
 
       for (long unsigned int i = 0; i < it->second.size(); i++)
@@ -417,15 +436,38 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
 
         std::string port_name = std::get<0>(it->second[i]);
 
-        if (!string_compare(std::get<1>(it->second[i]), ""))
+        if (!string_compare(std::get<1>(it->second[i]), ""))  // condition check if member exist
         {
-          port_name = port_name + "[" + std::get<1>(it->second[i]) + "]";
+          if (string_compare(std::get<2>(it->second[i]), ""))// condition check if the port is from top module
+          {
+              std::cout<< "find the port from the top module" <<std::endl ;
+              for (auto itp = 0; itp < cell1_.cells_vector[itv].ports_vector.size(); itp++)
+              {
+                  std::cout<< std::get<3>(cell1_.cells_vector[itv].ports_vector[itp]) <<std::endl ;
+                   std::cout<< "comparing " << std::get<1>(cell1_.cells_vector[itv].ports_vector[itp])<< " with " << std::get<0>(it->second[i])  <<std::endl ;
+                  if(string_compare(std::get<1>(cell1_.cells_vector[itv].ports_vector[itp]), std::get<0>(it->second[i]) ))//comparing the port names
+                  {
+                    int port_size = stoi( std::get<3>(cell1_.cells_vector[itv].ports_vector[itp]) ) -1;
+                    int pin_number = stoi( std::get<1>(it->second[i]));
+                    std::cout<< "previous: "<<pin_number <<std::endl ;
+                    pin_number = port_size -pin_number;
+                     std::cout<< "New: "<<pin_number <<std::endl ;
+                    port_name = port_name + "[" + std::to_string(pin_number) + "]";
+                  }
+              }
+
+          }
+          else
+          {
+            port_name = port_name + "[" + std::get<1>(it->second[i]) + "]";
+          }
         }
         net_reduced_vector.push_back(std::make_pair(port_name, std::get<2>(it->second[i])));
       }
       net_reduced_map.insert({it->first, net_reduced_vector});
       net_reduced_vector.clear();
     }
+
     // find the top cell which will be build for the blif
     if (string_compare(cell1_.cells_vector[itv].cell_name_orig, cell1_.top_module))
     {
@@ -528,7 +570,8 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
   // The remaining nets are connected with the ports or ground or vcc so adding 
     for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++)
   {
-    //std::cout<< "The net name is " << it->first << std::endl;
+  //  std::cout
+//<< "The net name is " << it->first << std::endl;
     
     for (long unsigned int i = 0; i < it->second.size(); i++)
     {

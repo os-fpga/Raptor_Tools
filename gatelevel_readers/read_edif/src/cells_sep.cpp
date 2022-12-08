@@ -43,6 +43,7 @@ void cells_sep::ports(struct SNode *head)
                 else
                 {
                     port_name_orig = child->value;
+                    port_name_renamed = child->value;
                 }
                 child = child->next;
                 port_size = child->value;
