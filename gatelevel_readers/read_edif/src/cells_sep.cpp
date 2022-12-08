@@ -139,7 +139,7 @@ void cells_sep::cells_sep::instances(struct SNode *head)
 
 // One net can connect to multiple pins of lut or sub circuits so a seperate mechanism is developed to get the net connection
 
-void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name) //, std::string net_name
+void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned) //, std::string net_name
 {
     struct SNode *current = head; // list for the joined
     std::string net_port_ref = "";
@@ -178,7 +178,7 @@ void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name) //
                     }
                     child = child->next;
                 }
-                net_vector.push_back(std::make_tuple(net_port_ref, net_member, net_instance_ref));
+                net_vector.push_back(std::make_tuple(net_port_ref, net_member, net_instance_ref,net_name_remaned ));
                 net_port_ref = net_member = net_instance_ref = "";
             }
         }
@@ -191,6 +191,7 @@ void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name) //
 void cells_sep::cells_sep::nets(struct SNode *head, std::string net_name)
 {
     std::string n_net_name = net_name;
+    std::string n_net_name_renamed = net_name;
     struct SNode *current = head;
     while (current != NULL)
     {
@@ -201,7 +202,7 @@ void cells_sep::cells_sep::nets(struct SNode *head, std::string net_name)
             if (string_compare("rename", child->value))
             {
                 child = child->next;
-
+                    n_net_name_renamed = child->value;
                 child = child->next;
 
                 n_net_name = child->value;
@@ -209,7 +210,7 @@ void cells_sep::cells_sep::nets(struct SNode *head, std::string net_name)
             if (string_compare("joined", child->value))
             {
 
-                get_nets(child, n_net_name);
+                get_nets(child, n_net_name, n_net_name_renamed);
             }
         }
 

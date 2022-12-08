@@ -48,21 +48,24 @@ public:
         //*net name original  */ std::string,
         /*net port reference  */ std::string,
         /*net pin number   */ std::string,
-        /* net instance ref  */ std::string>
+        /* net instance ref  */ std::string,
+        /*net name original  */ std::string>
         net_tuple;
 
     std::vector<std::tuple<
         //*net name original  */ std::string,
         /*net port reference  */ std::string,
         /*net pin number   */ std::string,
-        /* net instance ref  */ std::string>>
+        /* net instance ref  */ std::string,
+        /*net name original  */ std::string>>
         net_vector;
 
     std::map<std::string, std::vector<std::tuple<
                               //*net name original  */ std::string,
                               /*net port reference  */ std::string,
                               /*net pin number   */ std::string,
-                              /* net instance ref  */ std::string>>>
+                              /* net instance ref  */ std::string,
+                                /*net name original  */ std::string>>>
         net_map;
 
     struct cells
@@ -87,14 +90,15 @@ public:
                                   //*net name original  */ std::string,
                                   /*net port reference  */ std::string,
                                   /*net pin number   */ std::string,
-                                  /* net instance ref  */ std::string>>>
+                                  /* net instance ref  */ std::string,
+                                  /*net name original  */ std::string>>>
             net_map;
     };
 
     std::string top_module;
     void ports(struct SNode *head);
     void instances(struct SNode *head);
-    void get_nets(struct SNode *head, std::string net_name);
+    void get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned);
     void nets(struct SNode *head, std::string net_name);
     void get_cell_data(struct SNode *head, std::string cell_name, struct cells *cell_);
 

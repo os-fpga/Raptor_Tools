@@ -1,12 +1,14 @@
 #include "edif_blif.hpp"
-std::vector<std::pair<
+std::vector<std::tuple<
     /*net_name           */ std::string,
-    /* net instance ref  */ std::string>>
+    /* net instance ref  */ std::string,
+    /* net name renamed  */ std::string>>
     net_reduced_vector;
-std::map<std::string, std::vector<std::pair<
+std::map<std::string, std::vector<std::tuple<
 
                           /*net_name           */ std::string,
-                          /* net instance ref  */ std::string>>>
+                          /* net instance ref  */ std::string,
+                          /* net name renamed  */ std::string>>>
     net_reduced_map;
 struct inst
 {
@@ -345,27 +347,29 @@ void seperate_ports(std::vector<std::tuple<
   }
 }
 
-std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
+std::string find_corresp_net(std::map<std::string, std::vector<std::tuple<
 
                                                        /*net_name           */ std::string,
-                                                       /* net instance ref  */ std::string>>> &
+                                                       /* net instance ref  */ std::string,
+                                                        /* net name  renamed  */ std::string>>> &
                                                                     net_reduced_map,
                              std::string ins_ref, std::string port_name)
 {
   std::pair<std::string, std::string> port_ref_pair = std::make_pair(port_name, ins_ref);
   std::pair<std::string, std::string> port_init_pair;
-std::vector<std::pair<
+std::vector<std::tuple<
 
                                                        /*net_name           */ std::string,
-                                                       /* net instance ref  */ std::string>>::iterator t;
+                                                       /* net instance ref  */ std::string,
+                                                        /* net name  renamed  */ std::string>>::iterator t;
   for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++)
   {
     for (long unsigned int i = 0; i < it->second.size(); i++)
     {
-      port_init_pair = it->second[i];
+      port_init_pair = std::make_pair (std::get<0>(it->second[i]),std::get<1>(it->second[i]));
       if (port_init_pair == port_ref_pair){
         t = (it->second.begin()+i);
-        port_init_pair= *t;
+        //port_init_pair= *t;
        // std::cout << "The deleted pair is "<< port_init_pair.first<< " " <<port_init_pair.second<<std::endl;
         it->second.erase(t);
         
@@ -440,18 +444,18 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
         {
           if (string_compare(std::get<2>(it->second[i]), ""))// condition check if the port is from top module
           {
-              std::cout<< "find the port from the top module" <<std::endl ;
+             // std::cout<< "find the port from the top module" <<std::endl ;
               for (auto itp = 0; itp < cell1_.cells_vector[itv].ports_vector.size(); itp++)
               {
-                  std::cout<< std::get<3>(cell1_.cells_vector[itv].ports_vector[itp]) <<std::endl ;
-                   std::cout<< "comparing " << std::get<1>(cell1_.cells_vector[itv].ports_vector[itp])<< " with " << std::get<0>(it->second[i])  <<std::endl ;
+                 // std::cout<< std::get<3>(cell1_.cells_vector[itv].ports_vector[itp]) <<std::endl ;
+                   //std::cout<< "comparing " << std::get<1>(cell1_.cells_vector[itv].ports_vector[itp])<< " with " << std::get<0>(it->second[i])  <<std::endl ;
                   if(string_compare(std::get<1>(cell1_.cells_vector[itv].ports_vector[itp]), std::get<0>(it->second[i]) ))//comparing the port names
                   {
                     int port_size = stoi( std::get<3>(cell1_.cells_vector[itv].ports_vector[itp]) ) -1;
                     int pin_number = stoi( std::get<1>(it->second[i]));
-                    std::cout<< "previous: "<<pin_number <<std::endl ;
+                    //std::cout<< "previous: "<<pin_number <<std::endl ;
                     pin_number = port_size -pin_number;
-                     std::cout<< "New: "<<pin_number <<std::endl ;
+                    // std::cout<< "New: "<<pin_number <<std::endl ;
                     port_name = port_name + "[" + std::to_string(pin_number) + "]";
                   }
               }
@@ -462,7 +466,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
             port_name = port_name + "[" + std::get<1>(it->second[i]) + "]";
           }
         }
-        net_reduced_vector.push_back(std::make_pair(port_name, std::get<2>(it->second[i])));
+        net_reduced_vector.push_back(std::make_tuple(port_name, std::get<2>(it->second[i]),std::get<3>(it->second[i])));
       }
       net_reduced_map.insert({it->first, net_reduced_vector});
       net_reduced_vector.clear();
@@ -577,7 +581,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl)
     {
       
       //No need to connect the string port name with the string name and name might be same but it should be of different instances
-      if ((it->first!=std::get<0>(it->second[i])) && (string_compare(std::get<1>(it->second[i]), ""))  )
+      if (((it->first!=std::get<0>(it->second[i]))&&(std::get<0>(it->second[i])!=std::get<2>(it->second[i]))) && (string_compare(std::get<1>(it->second[i]), ""))  )
       {
         inst ins_;
       ins_.mod_name_ = "$lut";
