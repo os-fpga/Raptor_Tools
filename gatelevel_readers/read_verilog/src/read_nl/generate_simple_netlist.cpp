@@ -66,7 +66,6 @@ unsigned err = RuntimeFlags::SetVar("veri_preserve_user_nets", 1);
 using namespace boost::multiprecision;
 using namespace std;
 std::unordered_map<std::string, std::pair<int, int>> netBusMap;
-string dirs[] = {"DIR_INOUT", "DIR_IN", "DIR_OUT", "DIR_NONE"};
 
 void packEscaped(string &ss);
 bool is_string_param_(const std::string &param);
