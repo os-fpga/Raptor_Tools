@@ -112,10 +112,7 @@ if(NOT PRODUCTION_BUILD)
 	endif()
 endif()
 
-# Set final flags
-#
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${WARN_FLAGS} ${SANITIZE_FLAGS} -I${TCL_INCLUDE_PATH} -fpic")
-message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+
 
 #suppress Verific warnings
 add_compile_options(-w)
@@ -125,7 +122,8 @@ add_library(libreadver STATIC
 )
 SET_TARGET_PROPERTIES(libreadver PROPERTIES PREFIX "")
 target_link_libraries(libreadver PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
-
+set_property(TARGET libreadver PROPERTY POSITION_INDEPENDENT_CODE ON)
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_dependencies(libreadver verific)
 endif()
