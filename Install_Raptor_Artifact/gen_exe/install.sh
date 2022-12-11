@@ -45,7 +45,7 @@ fi
 #    RAPTOR_HOME=$2   --> install destination
     echo -e "[INFO]     Raptor Tar file that will be used is $1"
 
-    raptor_instl_dir=`echo $1 | sed -r 's/.*_([0-9]*.[0-9]*)\..*/\1/g`
+    raptor_instl_dir=`echo $1 | sed -r 's/.*_([0-9]*.[0-9]*)\..*/\1/g'`
     raptor_instl_dir=$2/RapidSilicon/Raptor/$raptor_instl_dir
     echo "[INFO]    Raptor will be installed in $raptor_instl_dir"
 
