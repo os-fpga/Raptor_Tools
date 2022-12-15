@@ -236,6 +236,8 @@ struct simple_netlist
     std::vector<std::string> nets;
     std::vector<inst> blocks;
     std::unordered_set<std::string> in_set;
+    bool encrypted = false;
+
 };
 
 int parse_verilog(const char *file_name, simple_netlist &n_l);

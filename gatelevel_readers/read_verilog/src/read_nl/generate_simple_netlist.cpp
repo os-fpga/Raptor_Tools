@@ -676,6 +676,8 @@ int parse_verilog(const char *file_name, simple_netlist &n_l)
         {
             // Iterate over all parameters of instance
             n_l.blocks.push_back(inst());
+            if (instance->IsProtected())
+                n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
             n_l.blocks.back().name_ = instance->Name();
             n_l.blocks.back().mod_name_ = current_block_model;
             char *param_name, *param_value;
