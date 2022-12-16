@@ -7,6 +7,7 @@
 #include <vector>
 #include <tuple>
 #include <map>
+#include <unordered_map>
 #include "../src/edif_parsing.hpp"
 class cells_sep
 {
@@ -60,7 +61,7 @@ public:
         /*net name original  */ std::string>>
         net_vector;
 
-    std::map<std::string, std::vector<std::tuple<
+    std::unordered_map<std::string, std::vector<std::tuple<
                               //*net name original  */ std::string,
                               /*net port reference  */ std::string,
                               /*net pin number   */ std::string,
@@ -86,7 +87,7 @@ public:
             /*Port direction      */ std::string,
             /*Port size           */ std::string>>
             ports_vector;
-        std::map<std::string, std::vector<std::tuple<
+        std::unordered_map<std::string, std::vector<std::tuple<
                                   //*net name original  */ std::string,
                                   /*net port reference  */ std::string,
                                   /*net pin number   */ std::string,
@@ -98,8 +99,8 @@ public:
     std::string top_module;
     void ports(struct SNode *head);
     void instances(struct SNode *head);
-    void get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned);
-    void nets(struct SNode *head, std::string net_name);
+    void get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned,struct cells *cell_);
+    void nets(struct SNode *head, std::string net_name, struct cells *cell_);
     void get_cell_data(struct SNode *head, std::string cell_name, struct cells *cell_);
 
 public:

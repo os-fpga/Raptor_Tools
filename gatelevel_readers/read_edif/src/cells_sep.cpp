@@ -139,7 +139,7 @@ void cells_sep::cells_sep::instances(struct SNode *head)
 
 // One net can connect to multiple pins of lut or sub circuits so a seperate mechanism is developed to get the net connection
 
-void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned) //, std::string net_name
+void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned, struct cells *cell_) //, std::string net_name
 {
     struct SNode *current = head; // list for the joined
     std::string net_port_ref = "";
@@ -184,11 +184,11 @@ void cells_sep::cells_sep::get_nets(struct SNode *head, std::string net_name, st
         }
         current = current->next;
     }
-    net_map.insert({net_name, net_vector});
+    cell_->net_map.insert({net_name, net_vector});
     net_vector.clear();
 }
 
-void cells_sep::cells_sep::nets(struct SNode *head, std::string net_name)
+void cells_sep::cells_sep::nets(struct SNode *head, std::string net_name, struct cells *cell_)
 {
     std::string n_net_name = net_name;
     std::string n_net_name_renamed = net_name;
@@ -210,7 +210,7 @@ void cells_sep::cells_sep::nets(struct SNode *head, std::string net_name)
             if (string_compare("joined", child->value))
             {
 
-                get_nets(child, n_net_name, n_net_name_renamed);
+                get_nets(child, n_net_name, n_net_name_renamed, cell_);
             }
         }
 
@@ -284,14 +284,14 @@ void cells_sep::cells_sep::get_cell_data(struct SNode *head, std::string cell_na
                 current = current->next;
                 if (current->type == LIST)
                 {
-                    nets(current, "net");
+                    nets(current, "net",cell_);
                 }
                 else
                 {
                     std::string net_name = current->value;
-                    nets(current, net_name);
+                    nets(current, net_name, cell_);
                 }
-                cell_->net_map = net_map;
+                //cell_->net_map = net_map;
                 // net_map.clear();
             }
         }
