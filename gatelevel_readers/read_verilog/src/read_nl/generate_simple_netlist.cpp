@@ -216,8 +216,9 @@ string bitsOfHexaDecimal(string &s)
     {
         throw(std::invalid_argument("Can't generate an hexadecimal number out of an empty string"));
     }
-    for (auto d : s)
+    for (auto& d : s)
     {
+        if(d == 'z' || d == 'Z') d = 'x';
         if (!isxdigit(d) && d != 'x' && d != 'X')
             throw(std::invalid_argument("Non hexadigit in hexadecimal string" + s));
     }
@@ -287,8 +288,9 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
     if (rad_and_value[1] == 'b' || rad_and_value[1] == 'B')
     {
         bit_value = value;
-        for (auto d : bit_value)
+        for (auto& d : bit_value)
         {
+            if(d == 'z' || d == 'Z') d = 'x';
             if ('1' != d && '0' != d && 'x' != d)
                 throw(std::invalid_argument("Not valid bit value " + string(1, d) + " in " + exp));
         }
