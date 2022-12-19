@@ -27,7 +27,7 @@ jobs:
           
     - name: Install dependencies
       run: 
-        sudo apt-get install libssl-dev
+        sudo apt-get install libssl-dev && pip3 install blifparser
 
     - name: Build 
       shell: bash
