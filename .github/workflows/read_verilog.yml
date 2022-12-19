@@ -1,0 +1,51 @@
+name: Read Verilog Workflow
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  Read_Verilog_Ubuntu:
+    runs-on: ubuntu-20.04
+    steps:
+
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.11.0
+      with:
+        access_token: ${{ github.token }}
+        
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_VERIFIC_RS }}
+
+    - name: Checkout code
+      uses: actions/checkout@v3.2.0
+      with:
+        fetch-depth: 0
+        submodules: true
+          
+    - name: Install dependencies
+      run: 
+        sudo apt-get install libssl-dev && pip3 install blifparser
+
+    - name: Build 
+      shell: bash
+      run: |
+        cd gatelevel_readers/read_verilog && mkdir build && cd build && cmake .. && make -j
+
+    - name: test 
+      shell: bash
+      run: |
+        cd gatelevel_readers/read_verilog/tescases/ci_tests
+        for d in */ ; do
+          [ -L "${d%/}" ] && continue
+          echo "${d%/}"
+          cd "${d%/}"
+          ../../../build/read_verilog "${d%/}".v "${d%/}"_v.blif
+          python3 ../../../../compare_blif/compare_blif.py "${d%/}".blif "${d%/}"_v.blif ../ || exit
+          #rm -rf "${d%/}"_v.blif
+          #rm -rf "${d%/}"_ports.json ../report.csv
+          cd ..
+        done
