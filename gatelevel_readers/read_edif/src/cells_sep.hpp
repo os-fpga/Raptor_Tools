@@ -33,7 +33,7 @@ public:
         /*Instance cell reference  */ std::string,
         /*Instance property lut    */ std::string,
         /*Instance property width   */ std::string,
-        /* check is lut */ bool>
+        /* check is lut */              bool>
         instance_tuple;
 
     std::vector<std::tuple<
@@ -42,7 +42,7 @@ public:
         /*Instance cell reference  */ std::string,
         /*Instance property lut    */ std::string,
         /*Instance property width   */ std::string,
-        /* check is lut */ bool>>
+        /* check is lut */                  bool>>
         instance_vector;
 
     std::tuple<
@@ -97,8 +97,8 @@ public:
     };
 
     std::string top_module;
-    void ports(struct SNode *head);
-    void instances(struct SNode *head);
+    void ports(struct SNode *head, std::string port_name,struct cells *cell_);
+    void instances(struct SNode *head, std::string instance_name,struct cells *cell_);
     void get_nets(struct SNode *head, std::string net_name, std::string net_name_remaned,struct cells *cell_);
     void nets(struct SNode *head, std::string net_name, struct cells *cell_);
     void get_cell_data(struct SNode *head, std::string cell_name, struct cells *cell_);
