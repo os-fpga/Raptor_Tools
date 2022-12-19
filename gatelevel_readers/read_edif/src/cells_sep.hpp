@@ -105,7 +105,7 @@ public:
 
 public:
    // bool string_compare(const std::string &f_name, const std::string &ext);
-    std::vector<struct cells> cells_vector;
+    std::map<std::string, struct cells> cells_map;
     void iterate(struct SNode *head);
 };
 

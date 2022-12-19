@@ -38,7 +38,7 @@ void seperate_ports(std::vector<std::tuple<
                         &inout_ports,
                     bool is_lut, std::string width);
 
-std::string find_corresp_net(std::map<std::string, std::vector<std::pair<
+std::string find_corresp_net(std::unordered_map<std::string, std::vector<std::pair<
 
                                                        /*net_name           */ std::string,
                                                        /* net instance ref  */ std::string>>> &

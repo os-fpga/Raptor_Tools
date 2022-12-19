@@ -236,11 +236,11 @@ void cells_sep::cells_sep::get_cell_data(struct SNode *head,
         } else {
           // get all the ports
           ports(current, current->value, cell_);
-          //ports_tuple = std::make_tuple(current->value, current->value,
-                                       // std::get<2>(ports_tuple),
-                                       // std::get<3>(ports_tuple));
+          // ports_tuple = std::make_tuple(current->value, current->value,
+          // std::get<2>(ports_tuple),
+          // std::get<3>(ports_tuple));
         }
-        //cell_->ports_vector.push_back(ports_tuple);
+        // cell_->ports_vector.push_back(ports_tuple);
       }
       // ports_vector.clear();
       if (string_compare("instance", current->value)) {
@@ -287,7 +287,7 @@ void cells_sep::cells_sep::iterate(struct SNode *head) {
           cells_.cell_name_renamed = current->value;
           get_cell_data(current, current->value, &cells_);
         }
-        cells_vector.push_back(cells_);
+        cells_map.insert({cells_.cell_name_renamed, cells_});
       }
       if (string_compare("edif", current->value)) {
         current = current->next;

@@ -263,7 +263,7 @@ void seperate_ports(std::vector<std::tuple<
           size = stoi(width);
         }
       }
-      
+
       ports_addition(in_ports, std::get<0>(ports_vector[i]), size);
     } else if (string_compare("OUTPUT", get<2>(ports_vector[i]))) {
       ports_addition(out_ports, std::get<0>(ports_vector[i]), size);
@@ -274,7 +274,7 @@ void seperate_ports(std::vector<std::tuple<
 }
 
 std::string find_corresp_net(
-    std::map<std::string, std::vector<std::tuple<
+    std::unordered_map<std::string, std::vector<std::tuple<
 
                               /*net_name           */ std::string,
                               /* net instance ref  */ std::string,
@@ -309,17 +309,17 @@ std::string find_corresp_net(
 
 void edif_blif(const char *InputFile, FILE *edif_bl) {
 
- std::vector<std::tuple<
-    /*net_name           */ std::string,
-    /* net instance ref  */ std::string,
-    /* net name renamed  */ std::string>>
-    net_reduced_vector;
-std::map<std::string, std::vector<std::tuple<
+  std::vector<std::tuple<
+      /*net_name           */ std::string,
+      /* net instance ref  */ std::string,
+      /* net name renamed  */ std::string>>
+      net_reduced_vector;
+  std::unordered_map<std::string, std::vector<std::tuple<
 
-                          /*net_name           */ std::string,
-                          /* net instance ref  */ std::string,
-                          /* net name renamed  */ std::string>>>
-    net_reduced_map;
+                            /*net_name           */ std::string,
+                            /* net instance ref  */ std::string,
+                            /* net name renamed  */ std::string>>>
+      net_reduced_map;
   pprint p1;
   cells_sep cell1_;
 
@@ -334,12 +334,15 @@ std::map<std::string, std::vector<std::tuple<
 
   std::stringstream ss;
   sn.name = cell1_.top_module;
-  
-  for (unsigned int itv = 0; itv < cell1_.cells_vector.size(); itv++) {
+
+  for (auto itv = cell1_.cells_map.begin(); itv != cell1_.cells_map.end();
+       itv++) {
+    std::string cell_name = itv->first;
+    cells_sep::cells cell_curr = itv->second;
     // Initially create a net vector in which only the port name and its
     // corresponding net is present.
-    for (auto it = cell1_.cells_vector[itv].net_map.begin();
-         it != cell1_.cells_vector[itv].net_map.end(); it++) {
+    for (auto it = cell_curr.net_map.begin(); it != cell_curr.net_map.end();
+         it++) {
 
       for (long unsigned int i = 0; i < it->second.size(); i++) {
 
@@ -352,16 +355,13 @@ std::map<std::string, std::vector<std::tuple<
                   std::get<2>(it->second[i]),
                   "")) // condition check if the port is from top module
           {
-            for (auto itp = 0;
-                 itp < cell1_.cells_vector[itv].ports_vector.size(); itp++) {
+            for (auto itp = 0; itp < cell_curr.ports_vector.size(); itp++) {
               if (string_compare(
-                      std::get<1>(cell1_.cells_vector[itv].ports_vector[itp]),
+                      std::get<1>(cell_curr.ports_vector[itp]),
                       std::get<0>(it->second[i]))) // comparing the port names
               {
                 int port_size =
-                    stoi(std::get<3>(
-                        cell1_.cells_vector[itv].ports_vector[itp])) -
-                    1;
+                    stoi(std::get<3>(cell_curr.ports_vector[itp])) - 1;
                 int pin_number = stoi(std::get<1>(it->second[i]));
                 pin_number = port_size - pin_number;
                 port_name = port_name + "[" + std::to_string(pin_number) + "]";
@@ -379,38 +379,44 @@ std::map<std::string, std::vector<std::tuple<
     }
 
     // find the top cell which will be build for the blif
-    if (string_compare(cell1_.cells_vector[itv].cell_name_orig,
-                       cell1_.top_module)) {
+    if (string_compare(cell_curr.cell_name_orig, cell1_.top_module)) {
       // get the cell ios and place it in the simple netlist vector
-      seperate_ports(cell1_.cells_vector[itv].ports_vector, sn.in_ports,
-                     sn.out_ports, sn.inout_ports, false, "");
+      seperate_ports(cell_curr.ports_vector, sn.in_ports, sn.out_ports,
+                     sn.inout_ports, false, "");
 
-      cell1_.instance_vector =
-          cell1_.cells_vector[itv]
-              .instance_vector; // use it directly remove it at the end
+      // cell1_.instance_vector =
+      //  cell_curr.instance_vector; // use it directly remove it at the end
       //  add up all the instances
-      for (unsigned int iti = 0; iti < cell1_.instance_vector.size(); iti++) {
+      for (unsigned int iti = 0; iti < cell_curr.instance_vector.size();
+           iti++) {
         inst ins_;
         int input_port_size;
-        ins_.name_ =
-            std::get<1>(cell1_.instance_vector[iti]); // write the instance name
+        ins_.name_ = std::get<1>(
+            cell_curr.instance_vector[iti]); // write the instance name
         ins_.mod_name_ = std::get<2>(
-            cell1_.instance_vector[iti]); // write the instance model name
-        if ((string_compare(std::get<2>(cell1_.instance_vector[iti]), "GND")) ||
-            (string_compare(std::get<2>(cell1_.instance_vector[iti]), "VCC")))
+            cell_curr.instance_vector[iti]); // write the instance model name
+        if ((string_compare(std::get<2>(cell_curr.instance_vector[iti]),
+                            "GND")) ||
+            (string_compare(std::get<2>(cell_curr.instance_vector[iti]),
+                            "VCC")))
           continue;
-        for (unsigned int itvv = 0; itvv < cell1_.cells_vector.size(); itvv++) {
+        // for (auto itvv = 0; itvv != cell1_.cells_vector.size(); itvv++) {
+        auto itvv =
+            cell1_.cells_map.find(std::get<2>(cell_curr.instance_vector[iti]));
+        if (itvv != cell1_.cells_map.end()) {
+          std::string inst_name = itvv->first;
+          cells_sep::cells cell_inst = itvv->second;
           std::vector<std::string> in_ports;
           std::vector<std::string> out_ports;
           std::vector<std::string> inout_ports;
-          
-          if (string_compare(cell1_.cells_vector[itvv].cell_name_renamed,
-                             std::get<2>(cell1_.instance_vector[iti]))) {
+
+          if (string_compare(cell_inst.cell_name_renamed,
+                             std::get<2>(cell_curr.instance_vector[iti]))) {
             // Get all the ports of that instance cell
-            seperate_ports(cell1_.cells_vector[itvv].ports_vector, in_ports,
-                           out_ports, inout_ports,
-                           std::get<5>(cell1_.instance_vector[iti]),
-                           std::get<4>(cell1_.instance_vector[iti]));
+            seperate_ports(cell_inst.ports_vector, in_ports, out_ports,
+                           inout_ports,
+                           std::get<5>(cell_curr.instance_vector[iti]),
+                           std::get<4>(cell_curr.instance_vector[iti]));
             int inpt = 0;
 
             // Getting the net connections from the ports
@@ -440,36 +446,37 @@ std::map<std::string, std::vector<std::tuple<
                     std::make_pair(inout_ports[inpt], result_net));
             }
 
-            break;
+            // break;
           }
-        }
-        if (std::get<5>(cell1_.instance_vector[iti])) {
-          ins_.mod_name_ = "$lut";
-          bool is_hex = false;
-          int pos = std::get<3>(cell1_.instance_vector[iti]).find("h");
-          if (pos != string::npos) {
-            is_hex = true;
-          }
-          int width;
+          //}
+          if (std::get<5>(cell_curr.instance_vector[iti])) {
+            ins_.mod_name_ = "$lut";
+            bool is_hex = false;
+            int pos = std::get<3>(cell_curr.instance_vector[iti]).find("h");
+            if (pos != string::npos) {
+              is_hex = true;
+            }
+            int width;
 
-          if (string_compare(std::get<4>(cell1_.instance_vector[iti]), "")) {
-            width = input_port_size;
+            if (string_compare(std::get<4>(cell_curr.instance_vector[iti]),
+                               "")) {
+              width = input_port_size;
+            } else {
+
+              width = stoi(std::get<4>(cell_curr.instance_vector[iti]));
+            }
+
+            get_truth_table(std::get<3>(cell_curr.instance_vector[iti]), width,
+                            is_hex, ins_.truthTable_);
+
+            sn.blocks.push_back(ins_);
           } else {
-
-            width = stoi(std::get<4>(cell1_.instance_vector[iti]));
+            sn.blocks.push_back(ins_);
           }
-
-          get_truth_table(std::get<3>(cell1_.instance_vector[iti]), width,
-                          is_hex, ins_.truthTable_);
-
-          sn.blocks.push_back(ins_);
-        } else {
-          sn.blocks.push_back(ins_);
         }
       }
     }
   }
-
   // The remaining nets are connected with the ports or ground or vcc so adding
   for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++) {
 
