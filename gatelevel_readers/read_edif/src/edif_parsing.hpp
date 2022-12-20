@@ -1,5 +1,10 @@
 #ifndef EDIF_PARSING
 #define EDIF_PARSING
+#include <ctype.h>
+#include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
+#include <string>
 
 enum SNodeType {
   LIST,
