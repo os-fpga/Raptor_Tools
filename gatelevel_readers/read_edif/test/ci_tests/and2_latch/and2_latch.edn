@@ -1,4 +1,4 @@
-(edif and2
+(edif and2_latch
   (edifVersion 2 0 0)
   (edifLevel 0)
   (keywordMap (keywordLevel 0))
@@ -30,11 +30,22 @@
         )
       )
     )
+    (cell dff
+      (cellType GENERIC)
+      (view VIEW_NETLIST
+        (viewType NETLIST)
+        (interface
+          (port C (direction INPUT))
+          (port D (direction INPUT))
+          (port Q (direction OUTPUT))
+        )
+      )
+    )
   )
   (library DESIGN
     (edifLevel 0)
     (technology (numberDefinition))
-    (cell and2
+    (cell and2_latch
       (cellType GENERIC)
       (view VIEW_NETLIST
         (viewType NETLIST)
@@ -42,20 +53,35 @@
           (port a (direction INPUT))
           (port b (direction INPUT))
           (port c (direction OUTPUT))
+          (port clk (direction INPUT))
+          (port d (direction OUTPUT))
         )
         (contents
           (instance GND (viewRef VIEW_NETLIST (cellRef GND (libraryRef LIB))))
           (instance VCC (viewRef VIEW_NETLIST (cellRef VCC (libraryRef LIB))))
-          (instance (rename id00002 "$abc$228$auto$blifparse.cc:515:parse_blif$229")
+          (instance (rename id00002 "$abc$237$auto$blifparse.cc:515:parse_blif$238")
             (viewRef VIEW_NETLIST (cellRef id00001 (libraryRef LIB)))
             (property LUT (integer 8))
             (property WIDTH (integer 2)))
+          (instance (rename id00003 "$auto$ff.cc:262:slice$89")
+            (viewRef VIEW_NETLIST (cellRef dff (libraryRef LIB))))
           (net a (joined
               (portRef (member A 1) (instanceRef id00002))
               (portRef a)
             )
           )
+          (net clk (joined
+              (portRef C (instanceRef id00003))
+              (portRef clk)
+            )
+          )
+          (net d (joined
+              (portRef Q (instanceRef id00003))
+              (portRef d)
+            )
+          )
           (net c (joined
+              (portRef D (instanceRef id00003))
               (portRef Y (instanceRef id00002))
               (portRef c)
             )
@@ -69,7 +95,7 @@
       )
     )
   )
-  (design and2
-    (cellRef and2 (libraryRef DESIGN))
+  (design and2_latch
+    (cellRef and2_latch (libraryRef DESIGN))
   )
 )
