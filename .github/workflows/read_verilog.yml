@@ -3,7 +3,7 @@ name: Read Verilog Workflow
 on:
   push:
   pull_request:
-# Read_Verilog_Ubuntu:
+
 jobs:
   linux-gcc:
     name: ${{ matrix.mode }}
