@@ -49,7 +49,7 @@ jobs:
       shell: bash
       run: |
         cd gatelevel_readers/read_verilog && mkdir build && cd build && cmake .. && make -j
-        cd tescases/ci_tests
+        cd ../tescases/ci_tests
         for d in */ ; do
           [ -L "${d%/}" ] && continue
           echo "${d%/}"
@@ -66,7 +66,7 @@ jobs:
       shell: bash
       run: |
         cd gatelevel_readers/read_edif && mkdir build && cd build && cmake .. && make -j
-        cd test/ci_tests
+        cd ../test/ci_tests
         for d in */ ; do
           [ -L "${d%/}" ] && continue
           echo "${d%/}"
