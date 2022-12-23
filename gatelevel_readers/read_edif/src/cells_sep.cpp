@@ -231,27 +231,19 @@ void cells_sep::cells_sep::get_cell_data(struct SNode *head,
         if (current->type == LIST) {
           // get all the ports
           ports(current, "", cell_);
-          // ports_tuple = std::make_tuple(port_name_orig, port_name_renamed,
-          // port_direction, port_size);
+
         } else {
           // get all the ports
           ports(current, current->value, cell_);
-          // ports_tuple = std::make_tuple(current->value, current->value,
-          // std::get<2>(ports_tuple),
-          // std::get<3>(ports_tuple));
         }
-        // cell_->ports_vector.push_back(ports_tuple);
       }
-      // ports_vector.clear();
+
       if (string_compare("instance", current->value)) {
         current = current->next;
         if (current->type == LIST) {
           instances(current, "", cell_);
         } else {
           instances(current, current->value, cell_);
-          // instance_tuple = std::make_tuple(current->value, current->value,
-          // std::get<2>(instance_tuple), std::get<3>(instance_tuple),
-          // std::get<4>(instance_tuple), std::get<5>(instance_tuple));
         }
         // cell_->instance_vector.push_back(instance_tuple);
       }

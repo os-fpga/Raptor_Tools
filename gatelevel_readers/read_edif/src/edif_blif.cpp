@@ -276,9 +276,9 @@ void seperate_ports(std::vector<std::tuple<
 std::string find_corresp_net(
     std::unordered_map<std::string, std::vector<std::tuple<
 
-                              /*net_name           */ std::string,
-                              /* net instance ref  */ std::string,
-                              /* net name  renamed  */ std::string>>>
+                                        /*net_name           */ std::string,
+                                        /* net instance ref  */ std::string,
+                                        /* net name  renamed  */ std::string>>>
         &net_reduced_map,
     std::string ins_ref, std::string port_name) {
   std::pair<std::string, std::string> port_ref_pair =
@@ -316,15 +316,20 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
       net_reduced_vector;
   std::unordered_map<std::string, std::vector<std::tuple<
 
-                            /*net_name           */ std::string,
-                            /* net instance ref  */ std::string,
-                            /* net name renamed  */ std::string>>>
+                                      /*net_name           */ std::string,
+                                      /* net instance ref  */ std::string,
+                                      /* net name renamed  */ std::string>>>
       net_reduced_map;
   pprint p1;
   cells_sep cell1_;
 
   FILE *fp;
   fp = fopen(InputFile, "r");
+  if (fp == NULL)
+  {
+    std::cout<< "Unable to read the input file: " <<InputFile<< std::endl;
+    return;
+  }
   // Read the file into a tree
   struct SNode *node = snode_parse(fp);
   cell1_.iterate(node);
@@ -355,7 +360,8 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                   std::get<2>(it->second[i]),
                   "")) // condition check if the port is from top module
           {
-            for (long unsigned int itp = 0; itp < cell_curr.ports_vector.size(); itp++) {
+            for (long unsigned int itp = 0; itp < cell_curr.ports_vector.size();
+                 itp++) {
               if (string_compare(
                       std::get<1>(cell_curr.ports_vector[itp]),
                       std::get<0>(it->second[i]))) // comparing the port names
@@ -429,7 +435,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                 ins_.conns_.push_back(
                     std::make_pair(in_ports[inpt], result_net));
             }
-            long unsigned int inpt1 =0;
+            long unsigned int inpt1 = 0;
             // First putting the output
             for (inpt1 = 0; inpt1 < out_ports.size(); inpt1++) {
               std::string result_net = find_corresp_net(
@@ -452,7 +458,8 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
           if (std::get<5>(cell_curr.instance_vector[iti])) {
             ins_.mod_name_ = "$lut";
             bool is_hex = false;
-            const long unsigned int pos = std::get<3>(cell_curr.instance_vector[iti]).find("h");
+            const long unsigned int pos =
+                std::get<3>(cell_curr.instance_vector[iti]).find("h");
             if (pos != string::npos) {
               is_hex = true;
             }
@@ -475,46 +482,48 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
           }
         }
       }
-    
-  
-  // The remaining nets are connected with the ports or ground or vcc so adding
-  for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++) {
 
-    for (long unsigned int i = 0; i < it->second.size(); i++) {
+      // The remaining nets are connected with the ports or ground or vcc so
+      // adding
+      for (auto it = net_reduced_map.begin(); it != net_reduced_map.end();
+           it++) {
 
-      // No need to connect the string port name with the string name and name
-      // might be same but it should be of different instances
-      if (((it->first != std::get<0>(it->second[i])) &&
-           (std::get<0>(it->second[i]) != std::get<2>(it->second[i]))) &&
-          (string_compare(std::get<1>(it->second[i]), ""))) {
-        inst ins_;
-        ins_.mod_name_ = "$lut";
-        //
-        ins_.conns_.push_back(std::make_pair(it->first, it->first));
-        // check if the port name is from the io's. if it is renamed then use the original name  
-        if (string_compare (std::get<1>(it->second[i]), ""))
-        {
-          for (long unsigned int itp= 0; itp<cell_curr.ports_vector.size(); itp++)
-          { 
-            if (string_compare(std::get<0>(it->second[i]),std::get<1>(cell_curr.ports_vector[itp]) ))
-            {//std::string port_name = std::get<0>(cell_curr.ports_vector[itp]);
-            //std::cout<<"Adding the port" <<std::get<0>(cell_curr.ports_vector[itp]);
-            ins_.conns_.push_back(std::make_pair(std::get<0>(cell_curr.ports_vector[itp]),
-                                             std::get<0>(cell_curr.ports_vector[itp])));
-          }}
+        for (long unsigned int i = 0; i < it->second.size(); i++) {
+
+          // No need to connect the string port name with the string name and
+          // name might be same but it should be of different instances
+          if (((it->first != std::get<0>(it->second[i])) &&
+               (std::get<0>(it->second[i]) != std::get<2>(it->second[i]))) &&
+              (string_compare(std::get<1>(it->second[i]), ""))) {
+            inst ins_;
+            ins_.mod_name_ = "$lut";
+            //
+            ins_.conns_.push_back(std::make_pair(it->first, it->first));
+            // check if the port name is from the io's. if it is renamed then
+            // use the original name
+            if (string_compare(std::get<1>(it->second[i]), "")) {
+              for (long unsigned int itp = 0;
+                   itp < cell_curr.ports_vector.size(); itp++) {
+                if (string_compare(std::get<0>(it->second[i]),
+                                   std::get<1>(cell_curr.ports_vector[itp]))) {
+                  ins_.conns_.push_back(
+                      std::make_pair(std::get<0>(cell_curr.ports_vector[itp]),
+                                     std::get<0>(cell_curr.ports_vector[itp])));
+                }
+              }
+            } else {
+              ins_.conns_.push_back(std::make_pair(std::get<0>(it->second[i]),
+                                                   std::get<0>(it->second[i])));
+            }
+            get_truth_table("2", 1, false, ins_.truthTable_);
+            sn.blocks.push_back(ins_);
+          }
         }
-        else
-        {
-        ins_.conns_.push_back(std::make_pair(std::get<0>(it->second[i]),
-                                             std::get<0>(it->second[i])));
-        }
-        get_truth_table("2", 1, false, ins_.truthTable_);
-        sn.blocks.push_back(ins_);
       }
     }
   }
-    }}
   sn.b_print(ss);
   fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
+
 }
