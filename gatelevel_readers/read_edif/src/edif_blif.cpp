@@ -38,7 +38,7 @@ struct inst {
     }
     f << " " << conns_.back().second << std::endl;
     for (auto &v : truthTable_) {
-      for (int i = 0; i < v.size() - 1; ++i) {
+      for (long unsigned int i = 0; i < v.size() - 1; ++i) {
         f << v[i];
       }
       f << " " << v[v.size() - 1] << endl;
@@ -355,7 +355,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                   std::get<2>(it->second[i]),
                   "")) // condition check if the port is from top module
           {
-            for (auto itp = 0; itp < cell_curr.ports_vector.size(); itp++) {
+            for (long unsigned int itp = 0; itp < cell_curr.ports_vector.size(); itp++) {
               if (string_compare(
                       std::get<1>(cell_curr.ports_vector[itp]),
                       std::get<0>(it->second[i]))) // comparing the port names
@@ -429,21 +429,21 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                 ins_.conns_.push_back(
                     std::make_pair(in_ports[inpt], result_net));
             }
-
+            long unsigned int inpt1 =0;
             // First putting the output
-            for (inpt = 0; inpt < out_ports.size(); inpt++) {
+            for (inpt1 = 0; inpt1 < out_ports.size(); inpt1++) {
               std::string result_net = find_corresp_net(
-                  net_reduced_map, ins_.name_, out_ports[inpt]);
+                  net_reduced_map, ins_.name_, out_ports[inpt1]);
               if (!string_compare(result_net, ""))
                 ins_.conns_.push_back(
-                    std::make_pair(out_ports[inpt], result_net));
+                    std::make_pair(out_ports[inpt1], result_net));
             }
-            for (inpt = 0; inpt < inout_ports.size(); inpt++) {
+            for (inpt1 = 0; inpt1 < inout_ports.size(); inpt1++) {
               std::string result_net = find_corresp_net(
-                  net_reduced_map, ins_.name_, inout_ports[inpt]);
+                  net_reduced_map, ins_.name_, inout_ports[inpt1]);
               if (!string_compare(result_net, ""))
                 ins_.conns_.push_back(
-                    std::make_pair(inout_ports[inpt], result_net));
+                    std::make_pair(inout_ports[inpt1], result_net));
             }
 
             // break;
@@ -452,7 +452,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
           if (std::get<5>(cell_curr.instance_vector[iti])) {
             ins_.mod_name_ = "$lut";
             bool is_hex = false;
-            int pos = std::get<3>(cell_curr.instance_vector[iti]).find("h");
+            const long unsigned int pos = std::get<3>(cell_curr.instance_vector[iti]).find("h");
             if (pos != string::npos) {
               is_hex = true;
             }
@@ -494,7 +494,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
         // check if the port name is from the io's. if it is renamed then use the original name  
         if (string_compare (std::get<1>(it->second[i]), ""))
         {
-          for (auto itp= 0; itp<cell_curr.ports_vector.size(); itp++)
+          for (long unsigned int itp= 0; itp<cell_curr.ports_vector.size(); itp++)
           { 
             if (string_compare(std::get<0>(it->second[i]),std::get<1>(cell_curr.ports_vector[itp]) ))
             {//std::string port_name = std::get<0>(cell_curr.ports_vector[itp]);
