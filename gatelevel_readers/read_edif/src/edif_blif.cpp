@@ -320,7 +320,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                                       /* net instance ref  */ std::string,
                                       /* net name renamed  */ std::string>>>
       net_reduced_map;
-  pprint p1;
+  //pprint p1;
   cells_sep cell1_;
 
   FILE *fp;
