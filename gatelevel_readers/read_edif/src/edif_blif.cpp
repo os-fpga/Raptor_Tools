@@ -325,9 +325,8 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
 
   FILE *fp;
   fp = fopen(InputFile, "r");
-  if (fp == NULL)
-  {
-    std::cout<< "Unable to read the input file: " <<InputFile<< std::endl;
+  if (fp == NULL) {
+    std::cout << "Unable to read the input file: " << InputFile << std::endl;
     return;
   }
   // Read the file into a tree
@@ -390,9 +389,6 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
       seperate_ports(cell_curr.ports_vector, sn.in_ports, sn.out_ports,
                      sn.inout_ports, false, "");
 
-      // cell1_.instance_vector =
-      //  cell_curr.instance_vector; // use it directly remove it at the end
-      //  add up all the instances
       for (unsigned int iti = 0; iti < cell_curr.instance_vector.size();
            iti++) {
         inst ins_;
@@ -406,7 +402,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
             (string_compare(std::get<2>(cell_curr.instance_vector[iti]),
                             "VCC")))
           continue;
-        // for (auto itvv = 0; itvv != cell1_.cells_vector.size(); itvv++) {
+
         auto itvv =
             cell1_.cells_map.find(std::get<2>(cell_curr.instance_vector[iti]));
         if (itvv != cell1_.cells_map.end()) {
@@ -451,10 +447,8 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                 ins_.conns_.push_back(
                     std::make_pair(inout_ports[inpt1], result_net));
             }
-
-            // break;
           }
-          //}
+
           if (std::get<5>(cell_curr.instance_vector[iti])) {
             ins_.mod_name_ = "$lut";
             bool is_hex = false;
@@ -525,5 +519,4 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
   sn.b_print(ss);
   fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
-
 }
