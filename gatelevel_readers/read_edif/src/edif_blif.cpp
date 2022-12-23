@@ -475,8 +475,8 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
           }
         }
       }
-    }
-  }
+    
+  
   // The remaining nets are connected with the ports or ground or vcc so adding
   for (auto it = net_reduced_map.begin(); it != net_reduced_map.end(); it++) {
 
@@ -491,14 +491,29 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
         ins_.mod_name_ = "$lut";
         //
         ins_.conns_.push_back(std::make_pair(it->first, it->first));
+        // check if the port name is from the io's. if it is renamed then use the original name  
+        if (string_compare (std::get<1>(it->second[i]), ""))
+        {
+          for (auto itp= 0; itp<cell_curr.ports_vector.size(); itp++)
+          { 
+            if (string_compare(std::get<0>(it->second[i]),std::get<1>(cell_curr.ports_vector[itp]) ))
+            {//std::string port_name = std::get<0>(cell_curr.ports_vector[itp]);
+            //std::cout<<"Adding the port" <<std::get<0>(cell_curr.ports_vector[itp]);
+            ins_.conns_.push_back(std::make_pair(std::get<0>(cell_curr.ports_vector[itp]),
+                                             std::get<0>(cell_curr.ports_vector[itp])));
+          }}
+        }
+        else
+        {
         ins_.conns_.push_back(std::make_pair(std::get<0>(it->second[i]),
                                              std::get<0>(it->second[i])));
+        }
         get_truth_table("2", 1, false, ins_.truthTable_);
         sn.blocks.push_back(ins_);
       }
     }
   }
-
+    }}
   sn.b_print(ss);
   fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
