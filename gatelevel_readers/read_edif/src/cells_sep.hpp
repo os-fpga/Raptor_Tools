@@ -11,45 +11,7 @@
 #include <vector>
 class cells_sep {
 public:
-  // std::tuple<
-  //     /*Port name original  */ std::string,
-  //     /*Port name renamed   */ std::string,
-  //     /*Port direction      */ std::string,
-  //     /*Port size           */ std::string>
-  //     ports_tuple;
 
-  // std::vector<std::tuple<
-  //     /*Port name original  */ std::string,
-  //     /*Port name renamed   */ std::string,
-  //     /*Port direction      */ std::string,
-  //     /*Port size           */ std::string>>
-  //     ports_vector;
-
-  // std::tuple<
-  //     /*instance name original  */ std::string,
-  //     /*Instance name renamed   */ std::string,
-  //     /*Instance cell reference  */ std::string,
-  //     /*Instance property lut    */ std::string,
-  //     /*Instance property width   */ std::string,
-  //     /* check is lut */              bool>
-  //     instance_tuple;
-
-  // std::vector<std::tuple<
-  //     /*instance name original  */ std::string,
-  //     /*Instance name renamed   */ std::string,
-  //     /*Instance cell reference  */ std::string,
-  //     /*Instance property lut    */ std::string,
-  //     /*Instance property width   */ std::string,
-  //     /* check is lut */                  bool>>
-  //     instance_vector;
-
-  // std::tuple<
-  //     //*net name original  */ std::string,
-  //     /*net port reference  */ std::string,
-  //     /*net pin number   */ std::string,
-  //     /* net instance ref  */ std::string,
-  //     /*net name original  */ std::string>
-  //     net_tuple;
 
   std::vector<std::tuple<
       //*net name original  */ std::string,
@@ -58,14 +20,6 @@ public:
       /* net instance ref  */ std::string,
       /*net name original  */ std::string>>
       net_vector;
-
-  // std::unordered_map<std::string, std::vector<std::tuple<
-  //                           //*net name original  */ std::string,
-  //                           /*net port reference  */ std::string,
-  //                           /*net pin number   */ std::string,
-  //                           /* net instance ref  */ std::string,
-  //                             /*net name original  */ std::string>>>
-  //     net_map;
 
   struct cells {
     std::string cell_name_orig;

@@ -18,7 +18,7 @@
 #include <cstring> // strchr ...
 #include <cctype>  // isalpha, etc ...
 using namespace std;
-#include "pprint.hpp"
+#include "cells_sep.hpp"
 void get_truth_table(std::string tt_output_str, int width, bool is_hex, std::vector<std::vector<unsigned>> &tt_vector);
 void ports_addition(std::vector<std::string>
                         &ports,
