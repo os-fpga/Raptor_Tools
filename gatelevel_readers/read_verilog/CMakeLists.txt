@@ -16,9 +16,9 @@ endif(NOT CMAKE_BUILD_TYPE)
 project(read_verilog)
 
 if (PRIVATE_KEY_FILENAME)
-    add_definitions(-DPRIVATE_KEY_FILE=)
+    add_definitions(-DPRIVATE_KEY_FILENAME)
 else()
-    add_definitions(-DPRIVATE_KEY_FILE="${CMAKE_CURRENT_SOURCE_DIR}/private_key_example.pem")
+    add_definitions(-DPRIVATE_KEY_FILENAME="${CMAKE_CURRENT_SOURCE_DIR}/private_key_example.pem")
 endif()
 
 if (PRODUCTION_BUILD)
