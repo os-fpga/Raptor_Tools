@@ -25,7 +25,7 @@ project(Litex)
 message(${PROJECT_SOURCE_DIR})
 # set download fetch URL as per OS
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    set(py_fatch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/python3.8_static_lib.tar.gz")
+    set(py_fatch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/python3.8_static_lib_271222.tar.gz")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(py_fatch_url "https://www.python.org/ftp/python/3.8.7/python-3.8.7-embed-amd64.zip")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
@@ -36,7 +36,7 @@ endif()
 # set the name of file and folder to put the download
 set(py_exe_zip ${PROJECT_SOURCE_DIR}/python_3.zip)
 # set the expected size
-set(py_exe_expected_size 108116381)
+set(py_exe_expected_size 113609077)
 #set build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -80,10 +80,10 @@ set(expected_req_txt_md5 "ddf0997da695a1f2e1ed70641178d4f7")
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_packages_241122.tar.gz")
+set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_packages_291222.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 83608431)
+set(litex_expected_size 83611354)
 # calculate md5sum
 file(MD5 ${req_file} CalculatedCheckSum)
 #compare the md5sum

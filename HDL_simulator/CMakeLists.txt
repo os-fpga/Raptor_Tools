@@ -32,9 +32,9 @@ project(HDL_Simulator)
 message(${PROJECT_SOURCE_DIR})
 
 set(FETCHCONTENT_QUIET FALSE)
-set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hdl_simulator_v0.1.zip)
+set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hdl_simulator_v0.2.zip)
 set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
-set(expected_size 217069892)
+set(expected_size 237991184)
 #set download dir in build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
