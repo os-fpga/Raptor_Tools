@@ -15,8 +15,10 @@ endif(NOT CMAKE_BUILD_TYPE)
 # set the project name
 project(read_verilog)
 
-if (NOT RAPTOR)
-    add_definitions(-DPRIVATE_KEY_FILENAME="${CMAKE_CURRENT_SOURCE_DIR}/private_key_example.pem")
+if (PRIVATE_KEY_FILENAME)
+    add_definitions(-DPRIVATE_KEY_FILE=)
+else()
+    add_definitions(-DPRIVATE_KEY_FILE="${CMAKE_CURRENT_SOURCE_DIR}/private_key_example.pem")
 endif()
 
 if (PRODUCTION_BUILD)

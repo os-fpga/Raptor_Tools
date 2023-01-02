@@ -28,7 +28,6 @@
 #include "obfuscate.h"
 
 #define PADDING RSA_PKCS1_PADDING
-#define PRIVATE_KEY_FILENAME "private_key_example.pem"
 
 #ifdef VERIFIC_NAMESPACE
 using namespace Verific ;
