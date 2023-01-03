@@ -1,16 +1,16 @@
 #include "edif_blif.hpp"
 
-struct inst {
+struct inst_ed {
   std::string name_;
   std::string mod_name_;
   std::vector<std::pair<std::string, std::string>> conns_;
   std::unordered_map<std::string, std::string> params_;
   std::vector<std::vector<unsigned>> truthTable_;
-  inst() {}
-  inst(std::string name, std::string mod_name,
+  inst_ed() {}
+  inst_ed(std::string name, std::string mod_name,
        std::vector<std::pair<std::string, std::string>> conn)
       : name_(name), mod_name_(mod_name), conns_(conn) {}
-  void p_print(std::ostream &f) {
+  void p_print_ed(std::ostream &f) {
 
     f << "Instance : " << name_ << " of module " << mod_name_ << std::endl;
     for (auto &p : conns_) {
@@ -86,17 +86,17 @@ struct inst {
   }
 };
 
-struct simple_netlist {
-  void p_print(std::ostream &f) {
+struct simple_netlist_ed {
+  void p_print_ed(std::ostream &f) {
     f << "Netlist Name ----: " << name << std::endl;
     f << "Netlist in ports ----: " << std::endl;
-    p_print(in_ports, f);
+    p_print_ed(in_ports, f);
     f << "Netlist out ports ----: " << std::endl;
-    p_print(out_ports, f);
+    p_print_ed(out_ports, f);
     f << "Netlist nets ----: " << std::endl;
-    p_print(nets, f);
+    p_print_ed(nets, f);
     f << "Netlist blocks ----: " << std::endl;
-    p_print(blocks, f);
+    p_print_ed(blocks, f);
   }
   void b_port_print_json(std::ostream &f) {
     bool first = true;
@@ -123,7 +123,7 @@ struct simple_netlist {
     f << "\n\t]\n}" << endl;
   }
 
-  void b_print(std::ostream &f) {
+  void b_print_ed (std::ostream &f) {
     f << ".model " << name << std::endl;
     f << ".inputs";
     for (auto &in : in_ports) {
@@ -142,25 +142,25 @@ struct simple_netlist {
     f << ".names $false" << endl;
     f << ".names $true\n1" << endl;
     f << ".names $undef" << endl;
-    b_print(blocks, f);
+    b_print_ed (blocks, f);
     f << ".end" << endl;
   }
-  void b_print(std::vector<inst> v, std::ostream &f) {
+  void b_print_ed (std::vector<inst_ed> v, std::ostream &f) {
     for (auto &el : v) {
       el.blif_print(f);
     }
   }
-  void p_print(std::vector<std::string> v, std::ostream &f) {
+  void p_print_ed(std::vector<std::string> v, std::ostream &f) {
     for (auto &el : v) {
       f << "\t" << el;
       f << std::endl;
     }
     f << std::endl;
   }
-  void p_print(std::vector<inst> v, std::ostream &f) {
+  void p_print_ed(std::vector<inst_ed> v, std::ostream &f) {
     for (auto &el : v) {
       f << "\t";
-      el.p_print(f);
+      el.p_print_ed(f);
       f << std::endl;
     }
     f << std::endl;
@@ -170,7 +170,7 @@ struct simple_netlist {
   std::vector<std::string> out_ports;
   std::vector<std::string> inout_ports;
   std::vector<std::string> nets;
-  std::vector<inst> blocks;
+  std::vector<inst_ed> blocks;
 };
 
 void get_truth_table(std::string tt_output_str, int width, bool is_hex,
@@ -334,7 +334,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
   cell1_.iterate(node);
   // Close the file stream
   fclose(fp);
-  simple_netlist sn;
+  simple_netlist_ed sn;
 
   std::stringstream ss;
   sn.name = cell1_.top_module;
@@ -391,7 +391,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
 
       for (unsigned int iti = 0; iti < cell_curr.instance_vector.size();
            iti++) {
-        inst ins_;
+        inst_ed ins_;
         int input_port_size;
         ins_.name_ = std::get<1>(
             cell_curr.instance_vector[iti]); // write the instance name
@@ -489,7 +489,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
           if (((it->first != std::get<0>(it->second[i])) &&
                (std::get<0>(it->second[i]) != std::get<2>(it->second[i]))) &&
               (string_compare(std::get<1>(it->second[i]), ""))) {
-            inst ins_;
+            inst_ed ins_;
             ins_.mod_name_ = "$lut";
             //
             ins_.conns_.push_back(std::make_pair(it->first, it->first));
@@ -516,7 +516,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
       }
     }
   }
-  sn.b_print(ss);
+  sn.b_print_ed (ss);
   fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
 }
