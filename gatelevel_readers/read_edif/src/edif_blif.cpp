@@ -509,6 +509,9 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
               ins_.conns_.push_back(std::make_pair(std::get<0>(it->second[i]),
                                                    std::get<0>(it->second[i])));
             }
+            ins_.conns_.push_back(
+                      std::make_pair(std::get<0>(it->second[i]),
+                                     std::get<0>(it->second[i])));
             get_truth_table("2", 1, false, ins_.truthTable_);
             sn.blocks.push_back(ins_);
           }
