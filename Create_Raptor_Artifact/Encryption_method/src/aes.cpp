@@ -121,10 +121,37 @@ int usage(const char *programname)
 
 int main(int argc, char *argv[]) 
 {
-    if (argc != 4) {
+   //Atleast 4 arguments are needed
+   // arg[0]  is the binary
+   // arg [1] is the number of files
+   // arg [2] is the input file for the encryption
+   // the rest are the files to be encrypted
+   int numb ;
+   sscanf(argv[1], "%d", &numb);
+   printf (" The number of input files are : %d\n", numb);
+   int check_numb = numb + 3;
+    if (argc < 4) {
         return usage(argv[0]);
     }
-    Enc_Dec E1 (argv[1],argv[2], argv[3]);
+    else if (argc != check_numb)
+    {
+         //cerr << "Usage: " The number of file to be increpted is not equal to number of inputs " << endl;
+    return 1;
+    }
+    else
+    {
+        for (int i = 0; i< numb; i++)
+        {
+            int str_size = strlen(argv[i+3]);
+            char* outputfile = new char [str_size];
+            strcpy (outputfile, argv[i+3]);
+            char e_add = 'e';
+            strncat (outputfile, &e_add, 1) ;
+             printf (" The input file name is : %s \n The output file name is %s \n", argv[i+3], outputfile);
+            Enc_Dec E1 (argv[i+3],outputfile, argv[2]);
+        }
+    }    
     return 0;
 }
+
 
