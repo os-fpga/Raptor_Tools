@@ -15,6 +15,10 @@ endif(NOT CMAKE_BUILD_TYPE)
 # set the project name
 project(read_verilog)
 
+if (NOT PRIVATE_KEY_FILENAME)
+    add_definitions(-DPRIVATE_KEY_FILENAME="${CMAKE_CURRENT_SOURCE_DIR}/private_key_example.pem")
+endif()
+
 if (PRODUCTION_BUILD)
     message("Production Build type set to ON")
     set (PRODUCTION_BUILD_FLAG "-DPRODUCTION_BUILD=1")

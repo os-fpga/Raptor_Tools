@@ -21,6 +21,8 @@ function(files_to_dirs file_list directory_list)
     set(${directory_list} ${dir_list} PARENT_SCOPE)
 endfunction(files_to_dirs)
 
+add_compile_options(-Wall)
+
 file(GLOB_RECURSE LIB_SOURCES
     ./src/*.cpp)
 file(GLOB_RECURSE LIB_HEADERS
