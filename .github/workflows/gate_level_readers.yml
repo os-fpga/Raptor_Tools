@@ -5,8 +5,22 @@ on:
   pull_request:
 
 jobs:
-  Read_Verilog_Ubuntu:
+  linux-gcc:
+    name: ${{ matrix.mode }}
+
     runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+        - verilog
+        - edif
+    env:
+      MODE: ${{ matrix.mode }}
+
     steps:
 
     - name: Cancel previous
@@ -30,15 +44,12 @@ jobs:
       run: 
         sudo apt-get install libssl-dev && pip3 install blifparser
 
-    - name: Build 
+    - name: Read_Verilog_Ubuntu
+      if: matrix.mode == 'verilog' 
       shell: bash
       run: |
         cd gatelevel_readers/read_verilog && mkdir build && cd build && cmake .. && make -j
-
-    - name: test 
-      shell: bash
-      run: |
-        cd gatelevel_readers/read_verilog/tescases/ci_tests
+        cd ../tescases/ci_tests
         for d in */ ; do
           [ -L "${d%/}" ] && continue
           echo "${d%/}"
@@ -46,6 +57,23 @@ jobs:
           ../../../build/read_verilog "${d%/}".v "${d%/}"_v.blif
           python3 ../../../../compare_blif/compare_blif.py "${d%/}".blif "${d%/}"_v.blif ../ || exit
           #rm -rf "${d%/}"_v.blif
+          #rm -rf "${d%/}"_ports.json ../report.csv
+          cd ..
+        done
+
+    - name: Read_EDIF_Ubuntu
+      if: matrix.mode == 'edif' 
+      shell: bash
+      run: |
+        cd gatelevel_readers/read_edif && mkdir build && cd build && cmake .. && make -j
+        cd ../test/ci_tests
+        for d in */ ; do
+          [ -L "${d%/}" ] && continue
+          echo "${d%/}"
+          cd "${d%/}"
+          ../../../build/read_edif "${d%/}".edn "${d%/}"_e.blif
+          python3 ../../../../compare_blif/compare_blif.py "${d%/}".blif "${d%/}"_e.blif ../ || exit
+          #rm -rf "${d%/}"_e.blif
           #rm -rf "${d%/}"_ports.json ../report.csv
           cd ..
         done
