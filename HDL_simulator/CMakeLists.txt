@@ -35,6 +35,9 @@ set(FETCHCONTENT_QUIET FALSE)
 set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/hdl_simulator_v0.3.zip)
 set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
 set(expected_size 238344987)
+set(DO_DOWNLOAD 0)
+set(DO_EXTRACTION 0)
+#set(expected_content_size )
 #set download dir in build or debuild directory
 if (RAPTOR)
     if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -52,52 +55,50 @@ execute_process(
 message(STATUS "Download DIR from cmake is ${Destination_Dir}")
 message(STATUS "Extraction DIR from cmake is ${Extraction_dir}")
 
-
-
 #check if file already exist to prevent over download
 if(EXISTS ${Destination_Dir})
     message(STATUS "HDL Simulator downlaod zip already exist.")
     file(SIZE ${Destination_Dir} SIM_Download_Size)
-
     if(${SIM_Download_Size} EQUAL ${expected_size} )
         message(STATUS "Already present download zip will be used") 
     else()
-        message(STATUS "Downloading HDL simulator Pre-build Binaries again as previous one is out of date")
-        file(DOWNLOAD ${Release_URL} ${Destination_Dir} SHOW_PROGRESS STATUS DOWNLOAD_STATUS)
-        list (GET DOWNLOAD_STATUS 0 STATUS_CODE)
-        if (NOT ${STATUS_CODE} EQUAL "0")
-            message(FATAL_ERROR "Exit status of download is ${STATUS_CODE}")
-            #message(STATUS "ERROR: Fail to Downloaded pre-built verilator. Download size (${SIM_Download_Size}) does not match to 205951449")
-        else()
-            file(SIZE ${Destination_Dir} SIM_Download_Size)
-            message(STATUS "Successfully Donwloadeded Pre-built verilator with expected size (${SIM_Download_Size})") 
-        endif()
+        message(STATUS "Already present download zip is outdated so downloading again")
+        set(DO_DOWNLOAD 1)
+        set(DO_EXTRACTION 1)
     endif()
 else()
-    message(STATUS "Downloading HDL simulator Pre-build Binaries")
+    message(STATUS "Freash Downloading HDL simulator Pre-build Binaries")
+    set(DO_DOWNLOAD 1)
+    set(DO_EXTRACTION 1)
+endif()
+
+if(${DO_DOWNLOAD} EQUAL 1)
+#    message(STATUS "Downloading HDL simulator Pre-build Binaries")
     file(DOWNLOAD ${Release_URL} ${Destination_Dir} SHOW_PROGRESS STATUS DOWNLOAD_STATUS)
     list (GET DOWNLOAD_STATUS 0 STATUS_CODE)
     if (NOT ${STATUS_CODE} EQUAL "0")
         message(FATAL_ERROR "Exit status of download is ${STATUS_CODE}")
-        #message(STATUS "ERROR: Fail to Downloaded pre-built verilator. Download size (${SIM_Download_Size}) does not match to 205951449")
     else()
-        file(SIZE ${Destination_Dir} SIM_Download_Size)
         message(STATUS "Successfully Donwloadeded Pre-built verilator with expected size (${SIM_Download_Size})") 
     endif()
 endif ()
 
-#-------------------------------------------
-if(EXISTS ${Extraction_dir}/HDL_simulator/setup_sim)
-    message(STATUS "Extracted Content exist so skipping it")
-else ()
-add_custom_target(unzip_sim ALL
-                COMMENT      "      Extracting HDL Simulator        "
-                DEPENDS ${Destination_Dir}
-                BYPRODUCTS ${Extraction_dir}/HDL_simulator
-                COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
-                WORKING_DIRECTORY ${Extraction_dir}
-                )
+#-------------------Unzip------------------------
+if((NOT EXISTS ${Extraction_dir}/HDL_simulator/setup_sim) OR (NOT EXISTS ${Extraction_dir}/HDL_simulator/GHDL) OR (NOT EXISTS ${Extraction_dir}/HDL_simulator/iverilog) OR (NOT EXISTS ${Extraction_dir}/HDL_simulator/systemc_2.3.3) OR (NOT EXISTS ${Extraction_dir}/HDL_simulator/verilator))
+    set(DO_EXTRACTION 1)
 endif()
+
+if(${DO_EXTRACTION} EQUAL 1)
+ add_custom_target(unzip_sim ALL
+                 COMMENT      "      Extracting HDL Simulator        "
+                 DEPENDS ${Destination_Dir}
+                 BYPRODUCTS ${Extraction_dir}/HDL_simulator
+                 COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
+                 WORKING_DIRECTORY ${Extraction_dir}
+                 )
+ else ()
+      message(STATUS "Extracted Content exist and haven't download new zip so skipping it")
+ endif()
 
 #install(
 #        DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/bin/HDL_simulator DESTINATION  ${CMAKE_INSTALL_PREFIX}
