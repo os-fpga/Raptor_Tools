@@ -135,7 +135,8 @@ int main(int argc, char *argv[])
     }
     else if (argc != check_numb)
     {
-         //cerr << "Usage: " The number of file to be increpted is not equal to number of inputs " << endl;
+         cerr << "Usage: " << argv[0]<< ": The number of file to be increpted is not equal to number of inputs " << endl;
+        // cerr << "Usage: " The number of file to be increpted is not equal to number of inputs " << endl;
     return 1;
     }
     else
