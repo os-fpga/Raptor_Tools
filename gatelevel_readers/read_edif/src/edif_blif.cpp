@@ -8,7 +8,7 @@ struct inst_ed {
   std::vector<std::vector<unsigned>> truthTable_;
   inst_ed() {}
   inst_ed(std::string name, std::string mod_name,
-       std::vector<std::pair<std::string, std::string>> conn)
+          std::vector<std::pair<std::string, std::string>> conn)
       : name_(name), mod_name_(mod_name), conns_(conn) {}
   void p_print_ed(std::ostream &f) {
 
@@ -123,7 +123,7 @@ struct simple_netlist_ed {
     f << "\n\t]\n}" << endl;
   }
 
-  void b_print_ed (std::ostream &f) {
+  void b_print_ed(std::ostream &f) {
     f << ".model " << name << std::endl;
     f << ".inputs";
     for (auto &in : in_ports) {
@@ -142,10 +142,10 @@ struct simple_netlist_ed {
     f << ".names $false" << endl;
     f << ".names $true\n1" << endl;
     f << ".names $undef" << endl;
-    b_print_ed (blocks, f);
+    b_print_ed(blocks, f);
     f << ".end" << endl;
   }
-  void b_print_ed (std::vector<inst_ed> v, std::ostream &f) {
+  void b_print_ed(std::vector<inst_ed> v, std::ostream &f) {
     for (auto &el : v) {
       el.blif_print(f);
     }
@@ -320,7 +320,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
                                       /* net instance ref  */ std::string,
                                       /* net name renamed  */ std::string>>>
       net_reduced_map;
-  //pprint p1;
+  // pprint p1;
   cells_sep cell1_;
 
   FILE *fp;
@@ -496,22 +496,59 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
             // check if the port name is from the io's. if it is renamed then
             // use the original name
             if (string_compare(std::get<1>(it->second[i]), "")) {
+              // This confirms that the port is of top module
+              // if the port is from top module it can be renamed so get the
+              // original name
               for (long unsigned int itp = 0;
                    itp < cell_curr.ports_vector.size(); itp++) {
-                if (string_compare(std::get<0>(it->second[i]),
-                                   std::get<1>(cell_curr.ports_vector[itp]))) {
+                // posibilities are that in the port list is array which can be
+                // renamed
+                //std::cout << "comparing " << std::get<0>(it->second[i])
+                //          << " with "
+                //          << std::get<1>(cell_curr.ports_vector[itp])
+                //          << std::endl;
+                
+                // first we will check if the member exist then it will compare
+                // it will create the ports bit by bit if member exists
+                if (!string_compare("",
+                                    std::get<3>(cell_curr.ports_vector[itp]))) {
+                // member exists
+                  int number = stoi(std::get<3>(cell_curr.ports_vector[itp]));
+                 // std::cout << " port size is " << number << std::endl;
+                  for (int k = 0; k <= number; k++) {
+                    // now ports with their number will be created
+                    // renamed port name is used as the array can be renamed or the port name may also be renamed.
+                    int port_orig_num = number-k;
+                    std::string port_name =
+                        std::get<1>(cell_curr.ports_vector[itp]) + "[" +
+                        to_string(port_orig_num) + "]";
+                    //std::cout<< "comparing "<< std::get<0>(it->second[i]) << " with " << port_name << std::endl;
+                    if (string_compare(std::get<0>(it->second[i]), port_name)) {
+                        std::string port_name_orig =
+                        std::get<0>(cell_curr.ports_vector[itp]) + "[" +
+                        to_string(port_orig_num) + "]";
+
+                      ins_.conns_.push_back(
+                          std::make_pair(port_name_orig, port_name_orig));
+                        break;
+                    }
+                  }
+                }// if the member does not exist then it will be added directly 
+                else if (string_compare(
+                               std::get<0>(it->second[i]),
+                               std::get<1>(cell_curr.ports_vector[itp]))) {
+
                   ins_.conns_.push_back(
                       std::make_pair(std::get<0>(cell_curr.ports_vector[itp]),
                                      std::get<0>(cell_curr.ports_vector[itp])));
                 }
               }
-            } else {
+            }// if it is not from the io of the top module then it will be added directly 
+            else {
               ins_.conns_.push_back(std::make_pair(std::get<0>(it->second[i]),
                                                    std::get<0>(it->second[i])));
             }
-            ins_.conns_.push_back(
-                      std::make_pair(std::get<0>(it->second[i]),
-                                     std::get<0>(it->second[i])));
+    
             get_truth_table("2", 1, false, ins_.truthTable_);
             sn.blocks.push_back(ins_);
           }
@@ -519,7 +556,7 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
       }
     }
   }
-  sn.b_print_ed (ss);
+  sn.b_print_ed(ss);
   fputs(ss.str().c_str(), edif_bl);
   snode_free(node);
 }
