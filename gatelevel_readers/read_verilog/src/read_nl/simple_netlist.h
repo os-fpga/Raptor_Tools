@@ -240,6 +240,6 @@ struct simple_netlist
 
 };
 
-int parse_verilog(const char *file_name, simple_netlist &n_l);
+int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file);
 
 #endif

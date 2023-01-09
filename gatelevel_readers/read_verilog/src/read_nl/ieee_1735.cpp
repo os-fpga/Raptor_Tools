@@ -19,6 +19,7 @@
 #include <fstream>
 #include <cstring> // For memset and memcpy
 #include <sstream> // For istringstream
+#include <filesystem>
 
 #include "Strings.h"
 #include "Array.h"
@@ -40,6 +41,14 @@ ieee_1735::ieee_1735() : Protect(BLOCK_SIZE)
         _session_key[i] = (std::rand() % 256) ;
     }
     _session_key[BLOCK_SIZE] = '\0' ;
+}
+
+void ieee_1735::set_pvt_key(const char *key_file) {
+    pvt_key_file = key_file;
+}
+
+const char* ieee_1735::get_pvt_key(){
+    return pvt_key_file;
 }
 
 unsigned
@@ -153,19 +162,20 @@ ieee_1735::GetEncryptionFooter()
 char *
 ieee_1735::decrypt(void)
 {
-    #ifdef PRIVATE_KEY_FILENAME
-        std::ifstream f(PRIVATE_KEY_FILENAME) ;
+    const char *key_file = get_pvt_key();
+    std::string rsa;
+    if (std::filesystem::exists(key_file)) {
+        std::ifstream f(key_file) ;
         if (!f.is_open()) {
             std::cerr << "Error: unable to open private key file: "
-                      << PRIVATE_KEY_FILENAME << std::endl ;
+                      << key_file << std::endl ;
             return 0 ;
         }
-        std::string rsa((std::istreambuf_iterator<char>(f)),
+        std::string rsa_((std::istreambuf_iterator<char>(f)),
                          std::istreambuf_iterator<char>()) ;
-        f.close() ; 
-    #endif
-
-    #ifndef PRIVATE_KEY_FILENAME
+        rsa = rsa_;
+        f.close() ;
+    } else {
         const char* pkey = AY_OBFUSCATE("-----BEGIN RSA PRIVATE KEY-----\n"
 "MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAORGrby5UnrjIZmo4mtY8ckBJ7nh\n"
 "7fU/VQs0jDrBr0qI5yuu8f+tOrvBn3ErdjTHCZmM5+H+5/z36DAcFBYYwwyZmk+3oDeNHTygzRGY\n" 
@@ -180,8 +190,9 @@ ieee_1735::decrypt(void)
 "AOydhEuQmAxEeluZ4/5phvJuBczDssf38wQWWuOTsnvZTPQHp1oC4bDSD7YdpiGyks9tc0Wcvobu\n" 
 "kcAfBkNnr6g=\n"
 "-----END RSA PRIVATE KEY-----\n");
-        std::string rsa(pkey);
-    #endif
+        std::string rsa_(pkey);
+        rsa = rsa_;
+    }
 
     BIO *keybio = BIO_new_mem_buf((byte *) rsa.data(), -1) ;
     if (keybio == NULL) {
