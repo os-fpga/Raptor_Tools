@@ -18,6 +18,7 @@ public:
     virtual ~ieee_1735() {}
 
     typedef unsigned char byte ;
+    const char* pvt_key_file;
 
     // Encryption methods
     virtual unsigned encrypt(const char *in_buf, char **out_buf, unsigned in_size) ;
@@ -27,6 +28,8 @@ public:
     // Decryption method
     virtual char *decrypt(void) ;
     virtual verific_stream *get_decryption_stream() ;
+    void set_pvt_key(const char *key_file) ;
+    const char* get_pvt_key();
 
 protected:
 

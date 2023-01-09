@@ -42,6 +42,14 @@ ieee_1735::ieee_1735() : Protect(BLOCK_SIZE)
     _session_key[BLOCK_SIZE] = '\0' ;
 }
 
+void ieee_1735::set_pvt_key(const char *key_file) {
+    pvt_key_file = key_file;
+}
+
+const char* ieee_1735::get_pvt_key(){
+    return pvt_key_file;
+}
+
 unsigned
 ieee_1735::encrypt(const char *in_buf, char **out_buf, unsigned in_size)
 {
@@ -153,15 +161,32 @@ ieee_1735::GetEncryptionFooter()
 char *
 ieee_1735::decrypt(void)
 {
-    std::ifstream f(PRIVATE_KEY_FILENAME) ;
+    const char *key_file = get_pvt_key();
+    std::string rsa;
+    std::ifstream f(key_file) ;
     if (!f.is_open()) {
-        std::cerr << "Error: unable to open private key file: "
-                  << PRIVATE_KEY_FILENAME << std::endl ;
-        return 0 ;
+        const char* pkey = AY_OBFUSCATE("-----BEGIN RSA PRIVATE KEY-----\n"
+"MIICdwIBADANBgkqhkiG9w0BAQEFAASCAmEwggJdAgEAAoGBAORGrby5UnrjIZmo4mtY8ckBJ7nh\n"
+"7fU/VQs0jDrBr0qI5yuu8f+tOrvBn3ErdjTHCZmM5+H+5/z36DAcFBYYwwyZmk+3oDeNHTygzRGY\n" 
+"mnA4vh8CwUGRyAzsE4u3eCmlsdCtmvJHFdeTIUigFIkBhMa67il+Q7M0fs7TNQ3CF8zPAgMBAAEC\n" 
+"gYBfj4LtjTsM/IY1WDCotYxKE/S4aO7/iqqkTTQi6K/j6Nm1PMBLww3iSZTggEw0ndnT8NuljNs6\n" 
+"1+DYOvjhoy4LDsDC9MvaB/V/FlowVyCWvuaHW7OWE9/ipG43+pt+C9FmPqdOjKgw6Kdh4io6vnFv\n" 
+"SEZPFUN2NJH47Jnh/0JuEQJBAPpY95WvGFbSin+fxhVNOO7KlUGSVQuaye//IXdzm6PD/hH1Em2Z\n" 
+"M1nv+XR+I1/LRpOJKrJfwSKozsKzzmbU/1cCQQDpbiLwmb8mUj6JaZ+q5PNwArCBNaAw6Lz8icwK\n" 
+"x3nsjBQOYOpUKndVLIucwSv8qg9jwvKAgiHTgJGpjl7uh8tJAkEArsIuSvJIxksA3ah2CWa3yJHo\n" 
+"cTaqYYhzUTLDdPRiAIcPtA9lBtb8LttDQxvOq89l/BWzlYMceopmkyobelNTzwJAVcEMPO9+dYmJ\n" 
+"R9nxukpZ1DBov08ABne51dyZhOw7MldTluSrsTfYlwXCVFfy3ONsu+2GQQeNfbGh0XRoE6D3YQJB\n" 
+"AOydhEuQmAxEeluZ4/5phvJuBczDssf38wQWWuOTsnvZTPQHp1oC4bDSD7YdpiGyks9tc0Wcvobu\n" 
+"kcAfBkNnr6g=\n"
+"-----END RSA PRIVATE KEY-----\n");
+        std::string rsa_(pkey);
+        rsa = rsa_;
+    } else {
+        std::string rsa_((std::istreambuf_iterator<char>(f)),
+                         std::istreambuf_iterator<char>()) ;
+        rsa = rsa_;
+        f.close() ;
     }
-    std::string rsa((std::istreambuf_iterator<char>(f)),
-                     std::istreambuf_iterator<char>()) ;
-    f.close() ;
 
     BIO *keybio = BIO_new_mem_buf((byte *) rsa.data(), -1) ;
     if (keybio == NULL) {

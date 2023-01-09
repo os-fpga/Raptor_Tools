@@ -570,11 +570,13 @@ void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<uns
     }
 }
 
-int parse_verilog(const char *file_name, simple_netlist &n_l)
+int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file)
 {
+    //PRIVATE_KEY_FILENAME
     ieee_1735 ieee_1735;
     Array files(1);
     files.Insert(file_name);
+    ieee_1735.set_pvt_key(key_file);
 
 #ifdef PRODUCTION_BUILD
     License_Manager license(License_Manager::LicensedProductName::READ_VERILOG);
