@@ -161,7 +161,7 @@ ieee_1735::GetEncryptionFooter()
 char *
 ieee_1735::decrypt(void)
 {
-        const char *key_file = get_pvt_key();
+    const char *key_file = get_pvt_key();
     std::string rsa;
     std::ifstream f(key_file) ;
     if (!f.is_open()) {
