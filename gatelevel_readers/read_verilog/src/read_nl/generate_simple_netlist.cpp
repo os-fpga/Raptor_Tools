@@ -47,7 +47,6 @@
 #include <boost/multiprecision/cpp_int.hpp>
 #include <algorithm>
 #include <regex>
-#include <filesystem>
 
 #include "DataBase.h" // Make (hierarchical netlist) database API available
 #include "simple_netlist.h"
