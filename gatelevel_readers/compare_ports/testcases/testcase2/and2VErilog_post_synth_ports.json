@@ -1,0 +1,52 @@
+[
+  {
+	"ports": [
+	  {
+		"direction": "input",
+		"name": "b[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "c[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "c[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "c[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[0]",
+		"type": "WIRE"
+	  }
+	],
+	"topModule": "and2"
+  }
+]
