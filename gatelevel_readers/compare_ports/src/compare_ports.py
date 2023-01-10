@@ -46,12 +46,11 @@ def main():
 
         setRTLPorts = set_ports(rtlPortsFile)
         setPostSynthPorts = set_ports(postSynthPortsFile)
-        print(setRTLPorts)
-        print(setPostSynthPorts)
         if setRTLPorts == setPostSynthPorts:
-            print("files are same")
+            print("\nPre and Post synthesis ports are same")
         else:
-            print("files are different")
+            print("\nError :  Pre and Post synthesis ports are different")
+            sys.exit(1)
 
 if __name__ == "__main__":
 
