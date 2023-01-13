@@ -22,16 +22,14 @@ void hier_info(char* hierInfo) {
 std::set<std::map<std::string, std::string>> get_rtl_ports() {
     auto json = nlohmann::json::parse(rtlBuffer.str());
     for (auto port : json[0]["ports"]) {
-        std::map<string, string> portInfo;
-        string pName = port["name"].dump(4).c_str();
-        //portInfo.insert(pair<string, string>("Name", port["name"].dump(4).c_str()));
-        string dir = port["direction"].dump(4).c_str();
+        string pName = port["name"];
+        string dir = port["direction"];
         if (dir == "input") {
-            dir = "INPUT";
+            dir = "Input";
         } else if (dir == "output") {
-            dir = "OUTPUT";
+            dir = "Output";
         } else if (dir == "inout") {
-            dir = "INOUT";
+            dir = "Inout";
         }
         
         if (port.contains("range")){
@@ -42,33 +40,25 @@ std::set<std::map<std::string, std::string>> get_rtl_ports() {
                 lsb = msb;
                 msb = temp;
             }
-            std::cout << "LSB : " << lsb << "MSB : " << msb << endl;
             if (lsb != msb){
                 for (int idx=lsb; idx<=msb; idx++){
+                    std::map<string, string> portInfo;
                     string indexedPort = pName + "[" + to_string(idx) + "]";
-                    std::cout << "IP : " << indexedPort << endl;
                     portInfo.insert(pair<string, string>("Name", indexedPort));
                     portInfo.insert(pair<string, string>("Direction", dir));
-                    for (auto el : portInfo) {
-            std::cout << el.first << "=oo " << el.second << '\n';
-        }
+                    rtlPortsInfo.insert(portInfo);
                 }
             } else{
+                std::map<string, string> portInfo;
                 portInfo.insert(pair<string, string>("Name", pName));
                 portInfo.insert(pair<string, string>("Direction", dir));
+                rtlPortsInfo.insert(portInfo);
             }
-            //portInfo.insert(pair<string, string>("LSB", to_string(lsb)));
-            //portInfo.insert(pair<string, string>("MSB", to_string(msb)));
         } else {
+            std::map<string, string> portInfo;
             portInfo.insert(pair<string, string>("Name", pName));
             portInfo.insert(pair<string, string>("Direction", dir));
-        }
-        //portInfo.insert(pair<string, string>("Type", port["type"].dump(4).c_str()));
-        rtlPortsInfo.insert(portInfo);
-    }
-    for (auto it = rtlPortsInfo.begin(); it != rtlPortsInfo.end(); ++it){
-        for (auto el : *it) {
-            std::cout << el.first << "=" << el.second << '\n';
+            rtlPortsInfo.insert(portInfo);
         }
     }
     return rtlPortsInfo;
@@ -77,17 +67,16 @@ std::set<std::map<std::string, std::string>> get_rtl_ports() {
 std::set<std::map<std::string, std::string>> get_nl_ports() {
     auto json = nlohmann::json::parse(nlBuffer.str());
     for (auto port : json[0]["ports"]) {
-        std::map<string, string> portInfo;
-        portInfo.insert(pair<string, string>("Name", port["name"].dump(4).c_str()));
-        string dir = port["direction"].dump(4).c_str();
+        string pName = port["name"];
+        string dir = port["direction"];
         if (dir == "input") {
-            dir = "INPUT";
+            dir = "Input";
         } else if (dir == "output") {
-            dir = "OUTPUT";
+            dir = "Output";
         } else if (dir == "inout") {
-            dir = "INOUT";
+            dir = "Inout";
         }
-        portInfo.insert(pair<string, string>("Direction", dir));
+        
         if (port.contains("range")){
             int lsb = port["range"]["lsb"];
             int msb = port["range"]["msb"];
@@ -96,15 +85,25 @@ std::set<std::map<std::string, std::string>> get_nl_ports() {
                 lsb = msb;
                 msb = temp;
             }
-            portInfo.insert(pair<string, string>("LSB", to_string(lsb)));
-            portInfo.insert(pair<string, string>("MSB", to_string(msb)));
-        }
-        //portInfo.insert(pair<string, string>("Type", port["type"].dump(4).c_str()));
-        nlPortsInfo.insert(portInfo);
-    }
-    for (auto it = nlPortsInfo.begin(); it != nlPortsInfo.end(); ++it){
-        for (auto el : *it) {
-            std::cout << el.first << "=" << el.second << '\n';
+            if (lsb != msb){
+                for (int idx=lsb; idx<=msb; idx++){
+                    std::map<string, string> portInfo;
+                    string indexedPort = pName + "[" + to_string(idx) + "]";
+                    portInfo.insert(pair<string, string>("Name", indexedPort));
+                    portInfo.insert(pair<string, string>("Direction", dir));
+                    nlPortsInfo.insert(portInfo);
+                }
+            } else{
+                std::map<string, string> portInfo;
+                portInfo.insert(pair<string, string>("Name", pName));
+                portInfo.insert(pair<string, string>("Direction", dir));
+                nlPortsInfo.insert(portInfo);
+            }
+        } else {
+            std::map<string, string> portInfo;
+            portInfo.insert(pair<string, string>("Name", pName));
+            portInfo.insert(pair<string, string>("Direction", dir));
+            nlPortsInfo.insert(portInfo);
         }
     }
     return nlPortsInfo;
