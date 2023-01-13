@@ -117,10 +117,10 @@ int compare_ports(char* portInfo, char* hierInfo) {
     rtlPorts = get_rtl_ports();
     nlPorts = get_nl_ports();
     if(rtlPorts == nlPorts){
-        printf("yessssssss ports are same");
+        printf("Ports are same\n");
         return 0;
     } else {
-        printf("nooooo ports are different");
+        throw std::runtime_error("Error: Ports are different\n");
         return 1;
     }
 }
