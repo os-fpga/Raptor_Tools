@@ -1,0 +1,1 @@
+/nfs_eda_sw/softwares/opensource/gcc/gcc-11.2.0/bin/g++     CMakeFiles/compare_info.dir/src/compare_ports.cpp.o CMakeFiles/compare_info.dir/main.cpp.o  -o compare_info  -Wl,-rpath,/nfs_scratch/scratch/eda/behzad/Raptor/Raptor_Tools/gatelevel_readers/compare_ports libcompare.so /usr/lib64/libtcl.so 

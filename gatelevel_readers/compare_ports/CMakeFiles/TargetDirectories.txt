@@ -1,0 +1,4 @@
+/nfs_scratch/scratch/eda/behzad/Raptor/Raptor_Tools/gatelevel_readers/compare_ports/CMakeFiles/rebuild_cache.dir
+/nfs_scratch/scratch/eda/behzad/Raptor/Raptor_Tools/gatelevel_readers/compare_ports/CMakeFiles/compare_info.dir
+/nfs_scratch/scratch/eda/behzad/Raptor/Raptor_Tools/gatelevel_readers/compare_ports/CMakeFiles/edit_cache.dir
+/nfs_scratch/scratch/eda/behzad/Raptor/Raptor_Tools/gatelevel_readers/compare_ports/CMakeFiles/libcompare.dir
