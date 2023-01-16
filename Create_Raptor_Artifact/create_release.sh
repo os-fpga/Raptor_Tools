@@ -4,8 +4,16 @@ go_tar=0
 go_all=0
 go_p=0
 do_scp=0
+go_cmake=0
 printf "This script build and install Raptor\nIt creates tar of Raptor from custom install directory\n\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+run_cmake () {
+    cmake -DRAPTOR_INSTALL_PATH=$1 -DCMAKE_INSTALL_PREFIX=$SCRIPT_DIR/packages/com.rapidsilicon.raptor/data -S . -B build
+    cmake --build build 
+    cmake --install build
+    cd $SCRIPT_DIR/build && make package && mv *.run $SCRIPT_DIR/Install_Raptor_Artifact
+}
 
 # a temp function to do temporary work
 temp () {
@@ -157,6 +165,7 @@ usage()
 			     [ -p | --production]       Flag to turn on production build.
                              [ -v | --raptor-version]   Raptor version for release
                              [ -m | --manual]           Flag to turn on manual uploading of scp.
+                             [ -C | --cmake-qt]         Flag to turn on cmake installer pack.
                              [ -w | --work_space  ]     Specify the Directory where clone, build and installation will occur or where already pre-build raptor is exist.
                              [ -a | --all ]             Flag to turn on cloning, building, installation and tar generation. It required -w or --work_space"
   exit 2
@@ -168,7 +177,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpmv:w: --long help,all,create_tar,production,manual,raptor-version:,work_space: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpCmv:w: --long help,all,create_tar,production,cmake-qt,manual,raptor-version:,work_space: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -183,7 +192,8 @@ do
     -c | --create_tar)  go_tar=1 ; shift  ;;
     -p | --production)  go_p=1 ; shift  ;;
     -m | --manual)      do_scp=1 ; shift  ;;
-    -a | --all)         go_all=1 ; shift  ;;    
+    -a | --all)         go_all=1 ; shift  ;;
+    -C | --cmake-qt)    go_cmake=1 ; shift  ;;    
     -h | --help)        usage  ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
@@ -193,6 +203,15 @@ do
        usage ;;
   esac
 done
+
+if [ $go_cmake -eq 1 ]
+then
+    run_cmake $w_dir
+    release=`cd $SCRIPT_DIR/build && ls -l | grep *.run | awk '{print $9}'`
+    releease=`echo $release | sed -r 's/.*-([0-9]*.[0-9]*)\-..*/\1/g'`
+    raptor_version=`$w_dir/bin/raptor --version | grep "Version" | awk '{print $3}'`
+    upload_to_ftp $SCRIPT_DIR $release $do_scp "$raptor_version"
+fi
 
 if [ -z $release ]
 then
