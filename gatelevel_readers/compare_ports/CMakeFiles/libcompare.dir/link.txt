@@ -1,1 +1,0 @@
-/nfs_eda_sw/softwares/opensource/gcc/gcc-11.2.0/bin/g++ -fPIC   -shared -Wl,-soname,libcompare.so -o libcompare.so CMakeFiles/libcompare.dir/src/compare_ports.cpp.o CMakeFiles/libcompare.dir/main.cpp.o CMakeFiles/libcompare.dir/src/compare_ports_wrap.cpp.o  /usr/lib64/libtcl.so 
