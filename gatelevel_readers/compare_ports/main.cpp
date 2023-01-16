@@ -5,7 +5,9 @@
 using namespace std;
 int main(int argc, char** argv){
 
-    cout << "Hello from design info. Version: " << endl;;
+    char* portInfo = argv[1];
+    char* hierInfo = argv[2];
+    compare_ports(portInfo, hierInfo);
     return 0;
 }
 
