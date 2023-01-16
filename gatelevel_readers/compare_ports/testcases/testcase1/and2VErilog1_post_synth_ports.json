@@ -1,0 +1,22 @@
+[
+  {
+	"ports": [
+	  {
+		"direction": "input",
+		"name": "a",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "c",
+		"type": "WIRE"
+	  }
+	],
+	"topModule": "and2"
+  }
+]
