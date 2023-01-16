@@ -117,7 +117,7 @@ int compare_ports(char* portInfo, char* hierInfo) {
     rtlPorts = get_rtl_ports();
     nlPorts = get_nl_ports();
     if(rtlPorts == nlPorts){
-        printf("Ports are same\n");
+        printf("Pre and Post synthesis ports are same\n");
         return 0;
     } else {
         throw std::runtime_error("Error: Ports are different\n");
