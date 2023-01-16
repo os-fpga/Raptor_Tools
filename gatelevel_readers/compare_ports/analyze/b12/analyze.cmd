@@ -1,3 +1,0 @@
--vlog-incdir .
--vhdl rtl/b12.vhd
--top b12
