@@ -106,9 +106,9 @@ target_link_libraries(Encryption_method OpenSSL::Crypto)
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Encrypt XML files and copy README to top DIR"
     # 2 is number of devices and below is the path to xml files
-	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/Encryption_method 2 ${PROJECT_SOURCE_DIR}/Encryption_method/public_key 
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/Encryption_method 1 ${PROJECT_SOURCE_DIR}/Encryption_method/public_key 
                                                             ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/gemini/gemini_vpr.xml 
-                                                            ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
+                                                           # ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
     # below command will delete the files
     COMMAND ${CMAKE_COMMAND} -E remove -f  ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/gemini/gemini_vpr.xml
                                            ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml

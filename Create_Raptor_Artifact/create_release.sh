@@ -9,10 +9,12 @@ printf "This script build and install Raptor\nIt creates tar of Raptor from cust
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 run_cmake () {
+    [ -d "$SCRIPT_DIR/build" ] && rm -rf $SCRIPT_DIR/build
     cmake -DRAPTOR_INSTALL_PATH=$1 -DCMAKE_INSTALL_PREFIX=$SCRIPT_DIR/packages/com.rapidsilicon.raptor/data -S . -B build
-    cmake --build build 
-    cmake --install build
-    cd $SCRIPT_DIR/build && make package && mv *.run $SCRIPT_DIR/Install_Raptor_Artifact
+    [ $? -eq 0 ] && cmake --build build || exit 1 
+    [ $? -eq 0 ] && cmake --install build || exit 1
+    cd $SCRIPT_DIR/build && make package && mv *.run $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker
+
 }
 
 # a temp function to do temporary work
@@ -45,7 +47,7 @@ upload_to_ftp () {
 
 # create tar.gz having .run and README
 final_tar_dir=`dirname $1` 
-cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor_$2\.run README.md && rm Raptor_$2\.run  && echo "Done Creating final tar"
+cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor*.run README.md && rm Raptor*.run  && echo "Done Creating final tar"
 mkdir -p $final_tar_dir/upload && rm -rf $final_tar_dir/upload/* && mkdir -p $final_tar_dir/upload/$4
 mv $final_tar_dir/Install_Raptor_Artifact/Raptor_$2\.tar.gz  $final_tar_dir/upload/$4
 
@@ -207,10 +209,13 @@ done
 if [ $go_cmake -eq 1 ]
 then
     run_cmake $w_dir
-    release=`cd $SCRIPT_DIR/build && ls -l | grep *.run | awk '{print $9}'`
-    releease=`echo $release | sed -r 's/.*-([0-9]*.[0-9]*)\-..*/\1/g'`
+    release=`cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && ls -l | grep *.run | awk '{print $9}'`
+    release=`echo $release | sed -r 's/.*-([0-9]*.[0-9]*)\-..*/\1/g'`
     raptor_version=`$w_dir/bin/raptor --version | grep "Version" | awk '{print $3}'`
+    [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
+    cd $SCRIPT_DIR/../Install_Raptor_Artifact && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 --help-header $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker/short_help $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker Raptor_$release\.run "Raptor installer" ./install.sh
     upload_to_ftp $SCRIPT_DIR $release $do_scp "$raptor_version"
+    exit
 fi
 
 if [ -z $release ]
