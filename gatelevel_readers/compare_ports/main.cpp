@@ -10,16 +10,3 @@ int main(int argc, char** argv){
     compare_ports(portInfo, hierInfo);
     return 0;
 }
-
-
-
-/*
-
-.../design_data$ tclsh
-% load ./libdesign.so
-% test_block
-test_block at line 9
-% exit
-.../design_data$ 
-
-*/
