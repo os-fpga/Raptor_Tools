@@ -4,8 +4,18 @@ go_tar=0
 go_all=0
 go_p=0
 do_scp=0
+go_cmake=0
 printf "This script build and install Raptor\nIt creates tar of Raptor from custom install directory\n\n"
 SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
+
+run_cmake () {
+    [ -d "$SCRIPT_DIR/build" ] && rm -rf $SCRIPT_DIR/build
+    cmake -DRAPTOR_INSTALL_PATH=$1 -DCMAKE_INSTALL_PREFIX=$SCRIPT_DIR/packages/com.rapidsilicon.raptor/data -S . -B build
+    [ $? -eq 0 ] && cmake --build build || exit 1 
+    [ $? -eq 0 ] && cmake --install build || exit 1
+    cd $SCRIPT_DIR/build && make package && mv *.run $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker
+
+}
 
 # a temp function to do temporary work
 temp () {
@@ -37,7 +47,7 @@ upload_to_ftp () {
 
 # create tar.gz having .run and README
 final_tar_dir=`dirname $1` 
-cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor_$2\.run README.md && rm Raptor_$2\.run  && echo "Done Creating final tar"
+cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor*.run README.md && rm Raptor*.run  && echo "Done Creating final tar"
 mkdir -p $final_tar_dir/upload && rm -rf $final_tar_dir/upload/* && mkdir -p $final_tar_dir/upload/$4
 mv $final_tar_dir/Install_Raptor_Artifact/Raptor_$2\.tar.gz  $final_tar_dir/upload/$4
 
@@ -157,6 +167,7 @@ usage()
 			     [ -p | --production]       Flag to turn on production build.
                              [ -v | --raptor-version]   Raptor version for release
                              [ -m | --manual]           Flag to turn on manual uploading of scp.
+                             [ -C | --cmake-qt]         Flag to turn on cmake installer pack.
                              [ -w | --work_space  ]     Specify the Directory where clone, build and installation will occur or where already pre-build raptor is exist.
                              [ -a | --all ]             Flag to turn on cloning, building, installation and tar generation. It required -w or --work_space"
   exit 2
@@ -168,7 +179,7 @@ if [ $# -eq 0 ]; then
     exit 1
 fi
 
-PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpmv:w: --long help,all,create_tar,production,manual,raptor-version:,work_space: -- "$@")
+PARSED_ARGUMENTS=$(getopt -a -n create_release -o hacpCmv:w: --long help,all,create_tar,production,cmake-qt,manual,raptor-version:,work_space: -- "$@")
 VALID_ARGUMENTS=$?
 if [ "$VALID_ARGUMENTS" != "0" ]; then
   usage
@@ -183,7 +194,8 @@ do
     -c | --create_tar)  go_tar=1 ; shift  ;;
     -p | --production)  go_p=1 ; shift  ;;
     -m | --manual)      do_scp=1 ; shift  ;;
-    -a | --all)         go_all=1 ; shift  ;;    
+    -a | --all)         go_all=1 ; shift  ;;
+    -C | --cmake-qt)    go_cmake=1 ; shift  ;;    
     -h | --help)        usage  ;;
     # -- means the end of the arguments; drop this, and break out of the while loop
     --) shift; break ;;
@@ -193,6 +205,18 @@ do
        usage ;;
   esac
 done
+
+if [ $go_cmake -eq 1 ]
+then
+    run_cmake $w_dir
+    release=`cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && ls -l | grep *.run | awk '{print $9}'`
+    release=`echo $release | sed -r 's/.*-([0-9]*.[0-9]*)\-..*/\1/g'`
+    raptor_version=`$w_dir/bin/raptor --version | grep "Version" | awk '{print $3}'`
+    [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
+    cd $SCRIPT_DIR/../Install_Raptor_Artifact && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 --help-header $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker/short_help $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker Raptor_$release\.run "Raptor installer" ./install.sh
+    upload_to_ftp $SCRIPT_DIR $release $do_scp "$raptor_version"
+    exit
+fi
 
 if [ -z $release ]
 then

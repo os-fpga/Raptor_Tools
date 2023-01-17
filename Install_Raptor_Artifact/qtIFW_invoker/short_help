@@ -1,0 +1,39 @@
+############################################################################### 
+                Raptor, A Rapid Silicon complete Software solution 
+                            Installation Help
+###############################################################################
+
+Print this Help message:
+
+    ./Raptor_x.x.run --help
+
+=> Make sure to provide empty directory for the installation as installer wipe the directory before doing installation 
+
+GUI Mode:>
+^^^^^^^^^^^^^^^^^
+1): With SUDO/Admin privileges, say yes to dependencies installation and default path when installer prompt for questions. 
+
+        sudo ./Raptor_x.x.run 
+
+2): Without SUDO/Admin privileges, say no to dependencies installation and choose custom writeable path when installer prompt for questions
+
+                    ./Raptor_x.x.run 
+
+Batch Mode (No GUI):>
+^^^^^^^^^^^^^^^^^^^^^
+1): Do not install OS related dependencies and install Raptor at desired path, then execute the installer with command 
+
+            ./Raptor_x.x.run  --batch --accept --no-dep-install -r <absolute path where Raptor will be installed>
+
+This assume that all OS dependencies of Raptor are already installed. 
+
+2): Do not install OS related dependencies and Raptor at pre-defined path, then execute with SUDO/Admin privileges
+
+          sudo ./Raptor_x.x.run --batch --accept --no-dep-install -r /opt/raptor
+
+2): To install OS related dependencies and Raptor at pre-defined path, then execute with SUDO/Admin privileges
+
+          sudo ./Raptor_x.x.run --batch --accept --install-dep -r /opt/raptor
+
+NOTE:> For details of command line options and license setup, see the README.md
+^^^^

@@ -12,20 +12,30 @@ const int default_blocksize_ = 128;
 const string default_encryption_mode_ = "cbc";
 const unsigned   default_pbkdf2_iterations_ = 1000;
 const unsigned   default_pbkdf2_saltlen_ = 8;
-
+int usage(const char *programname) 
+{
+    cerr << "Usage: " << programname << ": Enter the input file to encrypt and output file to write and the public key " << endl;
+    return 1;
+}
 class Enc_Dec {
-public:
+
 	unsigned char *key = NULL, *iv=NULL; 
-	Enc_Dec (const string &sourcefile, const string &destfile, char* input_pp){
-	OpenSSL_add_all_algorithms();
     string passphrase = "OnE dAy RaPiDsilc@N wIll bE GrE@9 CAMp!!?";
     char *message = new char[passphrase.length() + 1];
+    public:
+	Enc_Dec (const string &sourcefile, const string &destfile, char* input_pp){
+	OpenSSL_add_all_algorithms();
     strcpy(message, passphrase.c_str());
     encrypt(input_pp,message);
-
 	key =key_generation(passphrase,default_keysize_, default_pbkdf2_iterations_,default_pbkdf2_saltlen_ );
 	encrypt_file(sourcefile,destfile);
 	 }
+     ~Enc_Dec (){
+        delete [] key;
+        delete [] iv;
+        delete [] message;
+
+     }
 private:
 
 int encrypt_file(const string &sourcefile,const string &destfile)
@@ -45,6 +55,7 @@ int encrypt_file(const string &sourcefile,const string &destfile)
     // 1. Open input file
     ifile.open(sourcefile.c_str(), ios::in | ios::binary);
     if (!ifile.is_open()) {
+         //delete [] key;
         cerr << "Cannot open input file " << sourcefile << endl;
         return rc;
     }
@@ -52,7 +63,8 @@ int encrypt_file(const string &sourcefile,const string &destfile)
     // 2. Check that output file can be opened and written
     ofile.open(destfile.c_str(), ios::out | ios::binary | ios::trunc);
     if (!ofile.is_open()) {
-        cerr << "Cannot open input file " << sourcefile << endl;
+         //delete [] key;
+        cerr << "Cannot open output file " << sourcefile << endl;
         return rc;
     }
     // 4. Initialize encryption engine / context / etc.
@@ -62,12 +74,12 @@ int encrypt_file(const string &sourcefile,const string &destfile)
              default_keysize_, default_encryption_mode_.c_str());
     if (!(ciph = EVP_get_cipherbyname(ciphername))) {
         cerr << "Cannot find algorithm " << ciphername << endl;
-        goto free_data;
+        return rc;
     }
     //EVP_CIPHER_CTX_init(&enc_ctx);
     if (!EVP_EncryptInit_ex(enc_ctx, ciph, NULL, key, iv)) {
         cerr << "Cannot initialize encryption cipher " << ciphername << endl;
-        goto free_data;
+        return rc;
     }
     
     // 5.2 Read source file block, encrypt, and write to output stream
@@ -79,7 +91,7 @@ int encrypt_file(const string &sourcefile,const string &destfile)
                                   inbuf, bytes_read)) {
                 cerr << "Error encrypting chunk at byte "
                     << total_bytes_encrypted << endl;
-                goto free_data;
+                return rc;
             }
 //            assert(bytes_encrypted > 0);
             if (bytes_encrypted > 0)
@@ -95,29 +107,19 @@ int encrypt_file(const string &sourcefile,const string &destfile)
     if (bytes_encrypted > 0) {
         ofile.write((char*)outbuf, bytes_encrypted);
     }
-    printf("\n File Encrypted\n");
+    std::cout<<"\n File Encrypted "<<  sourcefile<< std::endl;
     // 6. cleanup
     ifile.close();
     ofile.close();
     rc = 0;
 free_data:
-    delete [] key;
-    delete [] iv;
+    //delete [] key;
+    //delete [] iv;
     return rc;
-}
-
-int usage(const char *programname) 
-{
-    cerr << "Usage: " << programname << ": Enter the input file to encrypt and output file to write and the public key " << endl;
-    return 1;
 }
 };
 
-int usage(const char *programname)
-{
-    cerr << "Usage: " << programname << ": Enter the input file to encrypt and output file to write and the public key " << endl;
-    return 1;
-}
+
 
 int main(int argc, char *argv[]) 
 {
@@ -148,8 +150,23 @@ int main(int argc, char *argv[])
             strcpy (outputfile, argv[i+3]);
             char e_add = 'e';
             strncat (outputfile, &e_add, 1) ;
-             printf (" The input file name is : %s \n The output file name is %s \n", argv[i+3], outputfile);
-            Enc_Dec E1 (argv[i+3],outputfile, argv[2]);
+             //printf (" The input file name is : %s \n The output file name is %s \n", argv[i+3], outputfile);
+            ifstream ifile;
+            ifile.open(argv[i+3], ios::in | ios::binary);
+             if (ifile.is_open()) {
+         //delete [] key;
+          Enc_Dec E1 (argv[i+3],outputfile, argv[2]);
+            delete [] outputfile; 
+       
+    }
+
+    else {
+         cerr << "Cannot open input file " << argv[i+3] << endl;
+        continue;
+    }
+
+
+           
         }
     }    
     return 0;

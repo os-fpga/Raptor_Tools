@@ -7,79 +7,70 @@ A brief guide to install Raptor.
 The downloaded *.tar.gz file from FTP site contains following files:
 
 1. README.md (this file)
-2. Raptor exe like Raptor_x.x.x.run
+2. Raptor exe like Raptor_x.x.run
 
 ## Installing Raptor
 
 ### Prerequisites:
 
-Raptor depends upon many OS dependecies. These dependecies can be installed by running the installer with SUDO privileges or as root user.
+Raptor depends upon OS dependecies. These dependecies can be installed by running the installer with SUDO privileges or as root user.
 
 ### Install Raptor
 
+Installer has 2 modes. 
+1): GUI mode
+2): Batch mode
+
+Provide empty directory to installer for installation as installer wipe the directory before doing installation
 Upon executing the downloaded executable, it will create a folder named as {provided path or /opt}/RapidSilicon/Raptor/{release} and install binaries inside it.
 
-#### Installing without any command line options
+#### In GUI mode
 
-1): With SUDO/Admin privileges, say yes to dependencies installation and default path when installer prompt for questions. 
-
-```
-sudo ./Raptor_x.x.run 
-```
-
-2): Without SUDO/Admin privileges, say no to dependencies installation and default path when installer prompt for questions
+1): Install Raptor as well as dependencies. Invoke installer like below:
 
 ```
-./Raptor_x.x.run 
+            sudo ./Raptor_x.x.run 
+```
+
+2): Install only Raptor with no dependencies. Make sure you select install directory with write permissions and on prompting for dependencies installation, say, click no
+
+```
+                    ./Raptor_x.x.run 
+```
+
+#### In Batch mode
+
+You have following command line options available:
+
+* --batch                   -> [Mandatory] Run in batch
+* --accept                  -> [Mandatory] Grant acceptance of license on command line. It will still print the license. Please read it.  
+* -r | --raptor-home        -> [Mandatory] Giving the absolute path of directory where Raptor will be installed. 
+* -i | --install-dep        -> Turn on the OS dependecies installation. This will need SUDO/Admin privileges
+* -b | --no-dep-install     -> Turn off the OS related dependecies installation
+
+Note: It is mandatory to provide either --install-dep or --no-dep-install.
+
+Above options can be used in following combinations
+
+1): Without SUDO/Admin privileges, Installing at desired path with no OS dependencies:
+
+```
+     ./Raptor_x.x.run  --batch --accept --no-dep-install -r <absolute path where Raptor will be installed>
+```
+
+2): With SUDO/Admin privileges, say yes to dependencies installation on prompt with default path. 
+
+```
+    sudo ./Raptor_x.x.run --batch --accept --install-dep -r /opt/raptor 
+```
+
+3): With SUDO/Admin privileges, say yes to dependencies installation on prompt with custom path.
+
+```
+    sudo ./Raptor_x.x.run --batch --accept --install-dep -r <absolute path where Raptor will be installed> 
 ```
 
 Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have received.
-
-#### Installing with personal choices (With SUDO/Admin privileges)
-
-You have following command line options available:
-
-sudo ./Raptor_x.x.run <options>
-
-* --accept            -> Grant acceptance of license on command line. It will still print the license. Please read it. 
-* -r | --raptor-home  -> Giving the absolute path of directory where Raptor will be installed
-* -i | --install-dep  -> Turn on the OS dependecies installation. This will need SUDO/Admin privileges
-* -v | --verbose      -> Increase the installer verbosity.
-
-#### Installing with personal choices (Without SUDO/Admin privileges)
-
-You have following command line options available:
-
-./Raptor_x.x.run <options>
-
-* --accept               -> Grant acceptance of license on command line. It will still print the license. Please read it. 
-* -b | --no-dep-install  -> By pass the OS related dependencies installation
-* -r | --raptor-home     -> Giving the absolute path of directory where Raptor will be installed
-* -v | --verbose         -> Increase the installer verbosity.
-
-
-
-**Note**: When using -i or --install-dep SUDO/Admin privileges are required.      
-
-Go to the directory where you have extracted the Raptor executable after downloading and execute it with any or with all above mentioned options like below.
-
-```
-./Raptor_x.x.run -r <absolute path where Raptor will be installed>
-``` 
-
-You can add --accept option as well to accept the EULA license. Like
-
-```
-./Raptor_x.x.run --accept -v -r <absolute path where Raptor will be installed>
-``` 
-
-And if you want to install dependencies as well which needs SUDO/Admin privileges, you can execute the installer as:
-
-```
-sudo ./Raptor_x.x.run --accept -v -i -r <absolute path where Raptor will be installed>
-``` 
-
-Kindly replace `Raptor_x.x.run` with the version of Raptor executable file you have received.
 
 ### Starting Raptor
 
