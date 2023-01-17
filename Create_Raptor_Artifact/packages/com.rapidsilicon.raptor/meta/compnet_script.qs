@@ -76,3 +76,8 @@ Component.prototype.installationFinished = function()
         console.log(e);
     }
 }
+
+Component.prototype.createOperationsForArchive = function(archive)
+{
+    component.addOperation("Extract", archive, "@TargetDir@/RapidSilicon/Raptor/@Version@");
+}

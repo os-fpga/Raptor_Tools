@@ -21,9 +21,9 @@ project(RaptorInstaller DESCRIPTION "Package install artifacts as single executa
 
 set(FETCHCONTENT_QUIET FALSE)
 set(RELEASE_VERSION ${RELEASE_YEAR}.${RELEASE_MONTH})
-set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../RapidSilicon/Raptor/${RELEASE_VERSION})
+#set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../RapidSilicon/Raptor/${RELEASE_VERSION})
 set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs_231222.tar.gz)
-set(Destination_Dir ${RAPTOR_INSTALL_PATH}/external_libs.tar.gz)
+set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
 set(expected_size 238344987)
 
 # list of devices to encrypt.
@@ -37,37 +37,23 @@ if (NOT RAPTOR_INSTALL_PATH)
   set(RAPTOR_INSTALL_PATH "Empty")
 endif() 
 
-# copy from the install path to release version directory
+# change the device name in device.xml  
 if (EXISTS ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml)
-    if(NOT EXISTS ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/device.xml)
-    message(STATUS "---     Copy to Release Version Directory")
-    execute_process(
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${RAPTOR_INSTALL_PATH_V}
-        COMMAND ${CMAKE_COMMAND} -E copy_directory ${RAPTOR_INSTALL_PATH} ${RAPTOR_INSTALL_PATH_V}
-    )
-    else()
-        message(STATUS "---     No need to copy to Release Version Directory")
-    endif()
-else()
-    message(FATAL_ERROR "---    RAPTOR_INSTALL_PATH is not provide. Existing")   
-endif()
-
-# change the device name in device.xml after copy to release version directory 
-if (EXISTS ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/device.xml)
-    message(STATUS "---     Provided Raptor Install Path with version is ${RAPTOR_INSTALL_PATH_V}")
-    file(READ ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/device.xml FILE_CONTENTS)
+    message(STATUS "---     Provided Raptor Install Path with is ${RAPTOR_INSTALL_PATH}")
+    file(READ ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml FILE_CONTENTS)
     foreach(device IN LISTS RS_DEVICES)
       message(STATUS "---      Updating ${device} ...")
       string(REPLACE "${device}" "${device}e" FILE_CONTENTS ${FILE_CONTENTS})  # TODO: this add e each time. Prevent it 
     endforeach()
-    file(WRITE ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/device.xml ${FILE_CONTENTS})
-    file(WRITE ${RAPTOR_INSTALL_PATH_V}/share/envs/litex/.venv "#write absolute path of directory where this file is present" )
+    file(WRITE ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml ${FILE_CONTENTS})
+    file(WRITE ${RAPTOR_INSTALL_PATH}/share/envs/litex/.venv "#write absolute path of directory where this file is present" )
+    file(WRITE ${RAPTOR_INSTALL_PATH}/share/envs/litex/.project "#write absolute path of directory where this file is present" )
 else()
-    message(FATAL_ERROR "---    RAPTOR_INSTALL_PATH with version does not exist. Exiting")
+    message(FATAL_ERROR "---    RAPTOR_INSTALL_PATH does not exist. Exiting")
 endif()
 
 # download external libs
-if (NOT EXISTS  ${RAPTOR_INSTALL_PATH}/external_libs.tar.gz)
+if (NOT EXISTS  ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
     file(DOWNLOAD ${EXT_LIBS_URL} ${Destination_Dir} SHOW_PROGRESS STATUS DOWNLOAD_STATUS)
     list (GET DOWNLOAD_STATUS 0 STATUS_CODE)
     if (NOT ${STATUS_CODE} EQUAL "0")
@@ -80,25 +66,25 @@ else()
 endif()
 
 # Extract external libs
-if(NOT EXISTS ${RAPTOR_INSTALL_PATH_V}/external_libs)
+if(NOT EXISTS ${RAPTOR_INSTALL_PATH}/external_libs)
     message(STATUS "---     Extracting External Libs")
     execute_process (
             COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
-                                WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH_V}
+                                WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}
     )
 else()
     message(STATUS "---     Extracted Content present so skipping it")
 endif()
 
 # compile encryption exe
-file(GLOB SOURCES "${PROJECT_SOURCE_DIR}/Encryption_method/src/*.cpp")
+file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/src/*.cpp")
 find_package(OpenSSL REQUIRED)
 add_executable(Encryption_method
         ${SOURCES}
 )
 target_include_directories(Encryption_method
     PRIVATE 
-        ${PROJECT_SOURCE_DIR}/Encryption_method/src
+        ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/src
 )
 target_link_libraries(Encryption_method OpenSSL::Crypto)
 
@@ -106,27 +92,27 @@ target_link_libraries(Encryption_method OpenSSL::Crypto)
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Encrypt XML files and copy README to top DIR"
     # 2 is number of devices and below is the path to xml files
-	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/Encryption_method 1 ${PROJECT_SOURCE_DIR}/Encryption_method/public_key 
-                                                            ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/gemini/gemini_vpr.xml 
-                                                           # ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
+	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/Encryption_method 2 ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key 
+                                                            ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/gemini/gemini_vpr.xml 
+                                                            ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
     # below command will delete the files
-    COMMAND ${CMAKE_COMMAND} -E remove -f  ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/gemini/gemini_vpr.xml
-                                           ${RAPTOR_INSTALL_PATH_V}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
-    COMMAND ${CMAKE_COMMAND} -E copy ${RAPTOR_INSTALL_PATH_V}/share/raptor/doc/README.md ${RAPTOR_INSTALL_PATH_V}                                   
+    COMMAND ${CMAKE_COMMAND} -E remove -f  ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/gemini/gemini_vpr.xml
+                                           ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
+    COMMAND ${CMAKE_COMMAND} -E copy ${RAPTOR_INSTALL_PATH}/share/raptor/doc/README.md ${RAPTOR_INSTALL_PATH}                                   
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
 
 # zip the release folder
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Zip the Release"
-    COMMAND ${CMAKE_COMMAND} -E tar cvf Raptor_release.zip --format=zip ${RAPTOR_INSTALL_PATH_V}                                    
-    WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}/..
+    COMMAND ${CMAKE_COMMAND} -E tar cvf Raptor_release.zip --format=zip ${RAPTOR_INSTALL_PATH}/* ${RAPTOR_INSTALL_PATH}/.raptorenv_lin64.sh                                    
+    WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}
 )
 
 set(COMPONENT_NAME_MAIN "Raptor")
 set(COMPONENT_NAME_DEPENDENCIES "RuntimeLibs")
 
-install( FILES ${RAPTOR_INSTALL_PATH}/../Raptor_release.zip
+install( FILES ${RAPTOR_INSTALL_PATH}/Raptor_release.zip
             DESTINATION . 
             COMPONENT ${COMPONENT_NAME_MAIN}
         )
