@@ -1,6 +1,7 @@
 #include"obfuscate.h"
 #include "function.h"
 #include "openssl_rsa.h"
+#include <string>
 #define AES_BLOCK_SIZE 256
 const int BUFSIZE = 4096;
 
@@ -23,7 +24,7 @@ class Enc_Dec {
     string passphrase = "OnE dAy RaPiDsilc@N wIll bE GrE@9 CAMp!!?";
     char *message = new char[passphrase.length() + 1];
     public:
-	Enc_Dec (const string &sourcefile, const string &destfile, char* input_pp){
+	Enc_Dec (const string &sourcefile, const string &destfile,  char* input_pp){
 	OpenSSL_add_all_algorithms();
     strcpy(message, passphrase.c_str());
     encrypt(input_pp,message);
@@ -31,9 +32,11 @@ class Enc_Dec {
 	encrypt_file(sourcefile,destfile);
 	 }
      ~Enc_Dec (){
+        if (key)
         delete [] key;
+        if (iv)
         delete [] iv;
-        delete [] message;
+       // delete [] message;
 
      }
 private:
@@ -119,57 +122,36 @@ free_data:
 }
 };
 
+//if I can count never give a number.
 
 
-int main(int argc, char *argv[]) 
+int main(int argc, char *argv[])
 {
-   //Atleast 4 arguments are needed
-   // arg[0]  is the binary
-   // arg [1] is the number of files
-   // arg [2] is the input file for the encryption
-   // the rest are the files to be encrypted
-   int numb ;
-   sscanf(argv[1], "%d", &numb);
-   printf (" The number of input files are : %d\n", numb);
-   int check_numb = numb + 3;
-    if (argc < 4) {
-        return usage(argv[0]);
-    }
-    else if (argc != check_numb)
+    // Atleast 3 arguments are needed
+    //  arg[0]  is the binary
+    //  arg [1] is the encryption key
+    //  arg [2] is the input file for the encryption
+    //  the rest are the files to be encrypted
+    int numb;
+
+    if (argc < 3)
     {
-         cerr << "Usage: " << argv[0]<< ": The number of file to be increpted is not equal to number of inputs " << endl;
-        // cerr << "Usage: " The number of file to be increpted is not equal to number of inputs " << endl;
-    return 1;
+        return usage(argv[0]);
     }
     else
     {
-        for (int i = 0; i< numb; i++)
+        numb = argc - 2;
+        for (int i = 0; i < numb; i++)
         {
-            int str_size = strlen(argv[i+3]);
-            char* outputfile = new char [str_size];
-            strcpy (outputfile, argv[i+3]);
-            char e_add = 'e';
-            strncat (outputfile, &e_add, 1) ;
-             //printf (" The input file name is : %s \n The output file name is %s \n", argv[i+3], outputfile);
-            ifstream ifile;
-            ifile.open(argv[i+3], ios::in | ios::binary);
-             if (ifile.is_open()) {
-         //delete [] key;
-          Enc_Dec E1 (argv[i+3],outputfile, argv[2]);
-            delete [] outputfile; 
-       
-    }
-
-    else {
-         cerr << "Cannot open input file " << argv[i+3] << endl;
-        continue;
-    }
-
-
-           
+            std::string inF(argv[i + 2]);
+            std::string outF = inF + "e";
+            std::string key(argv[1]);
+            char * Key_ = const_cast<char*> ( key.c_str() );
+            Enc_Dec E1(inF.c_str(), outF.c_str(), Key_);
         }
-    }    
+    }
     return 0;
 }
 
 
+  

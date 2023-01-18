@@ -69,7 +69,7 @@ void encrypt ( char* p_key,char *input_message){
     else{
         //LOG("Data has been encrypted.");
         create_encrypted_file(encrypt, public_key);
-        delete [] encrypt;
+        //delete [] encrypt;
         //LOG("Encrypted file has been created.");
     }
 }
