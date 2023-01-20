@@ -1,6 +1,6 @@
 ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
-dep_list_redhat="gperftools libxcb xcb-util libxkbcommon-devel libxkbcommon-x11-devel xcb-util-image-devel xcb-util-keysyms-devel xcb-util-renderutil-devel xcb-util-wm-devel gtk3"
-dep_list_debian="libgoogle-perftools-dev qtbase5-dev libgtk-3-0"
+dep_list_redhat="gperftools libxcb xcb-util libxkbcommon-devel libxkbcommon-x11-devel xcb-util-image-devel xcb-util-keysyms-devel xcb-util-renderutil-devel xcb-util-wm-devel gtk3 "
+dep_list_debian="libgoogle-perftools-dev qtbase5-dev libgtk-3-0 build-essential"
 #echo "[INFO]    Installing Raptor on $ostype"
 if [ "$ostype" == "CentOS" ]
 then
@@ -10,9 +10,10 @@ then
         echo "$dep"
         sudo yum install $dep
     done
+    sudo yum group install 'Development Tools'
 elif [ "$ostype" == "Ubuntu" ]
 then
-    [ `which apt` ] && echo "Package manager is apt" || { echo "Fail to find package manager. Manually install below dependencies"; echo $dep_list_debian; exit 1; }
+    [ `which apt` ] && echo "Package manager is apt" || { echo "Fail to find package manager. Manually install below dependencies"; echo "$dep_list_debian Development Tools"; exit 1; }
     for dep in $dep_list_debian
     do
         echo "$dep"

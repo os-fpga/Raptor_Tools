@@ -9,6 +9,30 @@ The downloaded *.tar.gz file from FTP site contains following files:
 1. README.md (this file)
 2. Raptor exe like Raptor_x.x.run
 
+## Before you begin:
+
+Raptor installer use QT installer Framework. If you have installed the OS with Desktop environment enabled then you can skip and move to Raptor installation. You can run below command to check either Desktop environment is installed or not:
+
+```
+echo $XDG_CURRENT_DESKTOP
+```
+
+If above command print nothing then you are running headless (just command line with no Desktop environment installed) then make sure to install below dependencies. 
+
+On Debian:
+
+```
+    sudo apt install qtbase5-dev -y
+```
+
+On RedHat:
+
+```
+    sudo yum install -y xcb-util-image-devel xcb-util-keysyms-devel xcb-util-renderutil-devel xcb-util-wm-devel libxcb libxcb-devel xcb-util xcb-util-devel libxkbcommon-devel libxkbcommon-x11-devel
+```
+
+If you are running any other OS then search and install QT5 dependencies.
+
 ## Installing Raptor
 
 ### Prerequisites:
