@@ -117,7 +117,7 @@ install( FILES ${RAPTOR_INSTALL_PATH}/Raptor_release.zip
             COMPONENT ${COMPONENT_NAME_MAIN}
         )
 install( FILES ${CMAKE_CURRENT_SOURCE_DIR}/os_dep_install_scripts/unix_dep.sh
-        DESTINATION . 
+        DESTINATION ./share 
         COMPONENT ${COMPONENT_NAME_MAIN}
     )
 
@@ -155,7 +155,7 @@ set (CPACK_IFW_PACKAGE_WIZARD_DEFAULT_HEIGHT "35em")
 set (CPACK_IFW_PACKAGE_WIZARD_DEFAULT_WIDTH "70em")
 set (CPACK_IFW_PACKAGE_STYLE_SHEET ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/style.qss)
 set (CPACK_IFW_PACKAGE_MAINTENANCE_TOOL_NAME "uninstall")
-set (CPACK_IFW_TARGET_DIRECTORY "@ApplicationsDir@/@Publisher@/@ProductName@/@ProductVersion@")
+set (CPACK_IFW_TARGET_DIRECTORY "@ApplicationsDir@/@Publisher@/")
 set (CPACK_IFW_PACKAGE_CONTROL_SCRIPT ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/script.qs)
 set (CPACK_IFW_PACKAGE_PRODUCT_IMAGES ${IMAGES_AT_INSTALL})
 # ------------ ***** ------------------------------
