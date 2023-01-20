@@ -98,30 +98,56 @@ struct simple_netlist_ed {
     f << "Netlist blocks ----: " << std::endl;
     p_print_ed(blocks, f);
   }
-  void b_port_print_json(std::ostream &f) {
-    bool first = true;
-    f << "{\n\t\"inputs\": [";
-    for (auto &in : in_ports) {
-      if ('\\' == in[0])
-        in[0] = ' ';
-      if (!first)
-        f << ",";
-      f << "\n\t\t\"" << in << "\"";
-      first = false;
+  void b_port_print_json(std::ostream &f)
+    {
+        bool first = true;
+        f << "[\n  {\n\t\"ports\": [";
+        for (auto &in : ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
+            if (!first)
+                f << ",";
+            f << "\n\t  {";
+            string s = "output";
+            f << "\n\t\t\"direction\": \"" << ((in_set.find(in)==end(in_set)) ? "output" : "input") << "\",";
+            f << "\n\t\t\"name\": \"" << in << "\",";
+            f << "\n\t\t\"type\": \"WIRE\"";
+            f << "\n\t  }" ;
+            first = false;
+        }
+        f << "\n\t]," << endl;
+        f << "\t\"topModule\": \"" << name << "\"" << endl;
+        f << "  }\n]" << endl;
     }
-    f << "\n\t]," << endl;
-    first = true;
-    f << "\n\t\"outputs\": [";
-    for (auto &in : out_ports) {
-      if ('\\' == in[0])
-        in[0] = ' ';
-      if (!first)
-        f << ",";
-      f << "\n\t\t\"" << in << "\"";
-      first = false;
+
+    void b_port_print_separate_json(std::ostream &f)
+    {
+        bool first = true;
+        f << "{\n\t\"inputs\": [";
+        for (auto &in : in_ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
+            if (!first)
+                f << ",";
+            f << "\n\t\t\"" << in << "\"";
+            first = false;
+        }
+        f << "\n\t]," << endl;
+        first = true;
+        f << "\n\t\"outputs\": [";
+        for (auto &in : out_ports)
+        {
+            if ('\\' == in[0])
+                in[0] = ' ';
+            if (!first)
+                f << ",";
+            f << "\n\t\t\"" << in << "\"";
+            first = false;
+        }
+        f << "\n\t]\n}" << endl;
     }
-    f << "\n\t]\n}" << endl;
-  }
 
   void b_print_ed(std::ostream &f) {
     f << ".model " << name << std::endl;
@@ -166,11 +192,13 @@ struct simple_netlist_ed {
     f << std::endl;
   }
   std::string name;
+   std::vector<std::string> ports;
   std::vector<std::string> in_ports;
   std::vector<std::string> out_ports;
   std::vector<std::string> inout_ports;
   std::vector<std::string> nets;
   std::vector<inst_ed> blocks;
+  std::unordered_set<std::string> in_set;
 };
 
 void get_truth_table(std::string tt_output_str, int width, bool is_hex,
@@ -556,7 +584,37 @@ void edif_blif(const char *InputFile, FILE *edif_bl) {
       }
     }
   }
+
+
+
   sn.b_print_ed(ss);
   fputs(ss.str().c_str(), edif_bl);
+  // section for dumping the ports in the 
+  long unsigned int i;
+  for ( i=0; i<sn.in_ports.size();i++)
+  {
+    sn.ports.push_back(sn.in_ports.at(i));
+     sn.in_set.insert(sn.in_ports.at(i));
+
+  }
+  for ( i=0; i<sn.out_ports.size();i++)
+  {
+    sn.ports.push_back(sn.out_ports.at(i));
+     //sn.in_set.insert(sn.in_ports.at(i));
+
+  }
+
+  string js_port_file(InputFile);
+    while ('.' != js_port_file.back())
+    {
+        js_port_file.pop_back();
+    }
+    js_port_file.pop_back();
+    js_port_file += "_ports.json";
+    ofstream myfile;
+    myfile.open(js_port_file.c_str());
+    sn.b_port_print_json(myfile);
+    myfile.close();
+
   snode_free(node);
 }
