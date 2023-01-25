@@ -22,9 +22,9 @@ project(RaptorInstaller DESCRIPTION "Package install artifacts as single executa
 set(FETCHCONTENT_QUIET FALSE)
 set(RELEASE_VERSION ${RELEASE_YEAR}.${RELEASE_MONTH})
 #set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../RapidSilicon/Raptor/${RELEASE_VERSION})
-set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs_231222.tar.gz)
+set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs_250123.tar.gz)
 set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
-set(expected_size 238344987)
+set(expected_size 54620308)
 
 # list of devices to encrypt.
 list(APPEND RS_DEVICES 
@@ -105,6 +105,7 @@ add_custom_command(TARGET Encryption_method POST_BUILD
 # zip the release folder
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Zip the Release"
+    COMMAND ${CMAKE_COMMAND} -E remove -f  ${RAPTOR_INSTALL_PATH}/Raptor_release.zip
     COMMAND ${CMAKE_COMMAND} -E tar cvf Raptor_release.zip --format=zip ${RAPTOR_INSTALL_PATH}/* ${RAPTOR_INSTALL_PATH}/.raptorenv_lin64.sh                                    
     WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}
 )
@@ -120,6 +121,8 @@ install( FILES ${CMAKE_CURRENT_SOURCE_DIR}/os_dep_install_scripts/unix_dep.sh
         DESTINATION ./share 
         COMPONENT ${COMPONENT_NAME_MAIN}
     )
+
+install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E remove -f  ./Raptor_release.zip)")
 
 # Upon include(InstallRequiredSystemLibraries), install(PROGRAMS) is called.
 # We can specify the install(PROGRAMS) command COMPONENT option.

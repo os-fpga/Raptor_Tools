@@ -8,16 +8,16 @@ then
     for dep in $dep_list_redhat
     do
         echo "$dep"
-        sudo yum install $dep
+        sudo yum install -y $dep
     done
-    sudo yum group install 'Development Tools'
+    sudo yum group install -y 'Development Tools'
 elif [ "$ostype" == "Ubuntu" ]
 then
     [ `which apt` ] && echo "Package manager is apt" || { echo "Fail to find package manager. Manually install below dependencies"; echo "$dep_list_debian Development Tools"; exit 1; }
     for dep in $dep_list_debian
     do
         echo "$dep"
-        sudo apt install $dep
+        sudo apt install -y $dep
     done 
 else
     echo "Unkown OS. Manually install below dependencies."
