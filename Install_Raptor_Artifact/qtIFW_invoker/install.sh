@@ -68,6 +68,9 @@ else
     exit 1
 fi
 
+#set the libs
+[ -d /tmp ] && extract_dir="/tmp" || extract_dir=$(pwd)
+tar -xvzf inst_libs.tar.gz -C $extract_dir && export LD_LIBRARY_PATH=$extract_dir/inst_libs:$LD_LIBRARY_PATH
 
 # install from QtIFW generated .run file
 t_path="RaptorInstaller*.run"

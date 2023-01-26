@@ -22,7 +22,7 @@ project(RaptorInstaller DESCRIPTION "Package install artifacts as single executa
 set(FETCHCONTENT_QUIET FALSE)
 set(RELEASE_VERSION ${RELEASE_YEAR}.${RELEASE_MONTH})
 #set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../RapidSilicon/Raptor/${RELEASE_VERSION})
-set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs_250123.tar.gz)
+set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs_260123.tar.gz)
 set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
 set(expected_size 54620308)
 
