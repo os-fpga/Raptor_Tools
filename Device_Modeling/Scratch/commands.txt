@@ -1,0 +1,69 @@
+
+ric_schema_version <version> string // the version of the Device Modeling Schema (e.g 1.0.2)
+
+device_name <name>   string // Defines the Device name (e.g GEMINI)
+
+device_version <version>  string // Defines the version of the Device (e.g 1.0.2)
+
+define_enum_type
+                    -name <enumerate>
+                    -values { {<name>, value }, …, {<name>, value }, {"default", value } } 
+
+define_block <type>
+                    -ports  <list_of_port_objects> [ {port} ] // Set of ports
+                    -force                         Nill    // Rewrite existing block if  previously any named same 
+
+define_attr 
+                    -block <block_type_name>    string // the name of a defined block to insert the attribute in.
+                    -name <attr_name>           string // The name of the currently defined attribute
+                    -addr <offset_address>      string // Relative address of the attribute in the block config space.
+                    -width <nb_bits>            int // Number of bits enough to code all possible values of this attribute
+                    -enum { {<name>, value }, …, {<name>, value }, {"default", value } }  // Inline Attribute enumerated values
+                    -enum <enumerate_name>           {enum} // Offline Attribute enumerated values
+                    -force                  Nill    // Rewrite existing attribute if any 
+
+define_port 
+                    -block <block_type_name>    string // the name of a defined block to insert the port in
+                    -name <port_name>           string // The name of the currently defined port
+                    -direction <"in"/"out">     string // the direction of the currently defined port "in"/"out"
+                    -source <port_name/"open">  string // the port name driving this port or the string "open" if none.
+                    -force                       Nill  // Rewrite existing port if any 
+
+create_instance 
+                    -block <block_type_name>        string      // the name of a defined block we are instanciating
+                    -name <instance_name>           string      // the currently defined instance name
+                    -id <instance_id>               int         // A per design unique instance id
+                    -logic_location                 {int, int}  // Logic Location (VPR)
+                    -logic_address <logical_address> int        // Logic address in chain
+                    -io_bank <io_bank_name> (optional)  string  // IO bank name
+                    -parent <block_type>    (optional)  string  // Parent block (Creates hierarchy – like Verilog folded model) 
+
+define_constraint 
+                    -block <block_type_name> <sv-like-implication>  // Inner block constraint in the form of SV implication 
+
+define_constraint 
+                    -inst <instance_name> <sv-like-implication>     // Inner instance constraint in the form of SV implication
+
+define_chain        
+                    -type <type>                    string      // The name of the currently created chain
+
+add_block_to_chain_type 
+                    -type <chain_type_name> 
+                    -block <block_type_name>
+
+create_chain_instance 
+                    -type <chain_type_name> string // The name of the instanciated chain
+                    -name <chain_instance_name>  string // The name of the currently defined chain instance
+                    -start_address <START_LOGICAL_ADDRESS>  int        // Logic address 
+                    -end_address <END_LOGICAL_ADDRESS> int        // Logic address 
+
+link_chain 
+                    -inst <block_instance_name> 
+                    -chain <chain_instance_name> 
+
+append_instance_to_chain  
+                    -chain <chain_instance_name> 
+                    -inst <block_instance_name> 
+
+define_constraint  <sv-like-implication with hierarchical path> // Global constraint with hierarchical path 
+
