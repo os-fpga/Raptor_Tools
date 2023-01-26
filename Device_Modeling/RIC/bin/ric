@@ -1,0 +1,4 @@
+#!/usr/bin/env bash
+DIR=$( dirname "$0")
+/usr/bin/env tclsh $DIR/ric.tcl $@
+
