@@ -44,7 +44,7 @@ jobs:
         sudo apt-get install tclsh
 
     - name: RIC_Ubuntu
-      if: matrix.mode == 'simple_test' 
+      if: matrix.mode == 'basic_test' 
       shell: bash
       run: |
         cd Device_Modeling/
