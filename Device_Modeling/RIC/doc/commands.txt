@@ -44,6 +44,10 @@ define_constraint
 define_constraint 
                     -inst <instance_name> <sv-like-implication>     // Inner instance constraint in the form of SV implication
 
+define_constraint  
+                    -glob <sv-like-implication with hierarchical path> // Global constraint with hierarchical path 
+
+
 define_chain        
                     -type <type>                    string      // The name of the currently created chain
 
@@ -52,10 +56,10 @@ add_block_to_chain_type
                     -block <block_type_name>
 
 create_chain_instance 
-                    -type <chain_type_name> string // The name of the instanciated chain
-                    -name <chain_instance_name>  string // The name of the currently defined chain instance
-                    -start_address <START_LOGICAL_ADDRESS>  int        // Logic address 
-                    -end_address <END_LOGICAL_ADDRESS> int        // Logic address 
+                    -type <chain_type_name>                     string // The name of the instanciated chain
+                    -name <chain_instance_name>                 string // The name of the currently defined chain instance
+                    -start_address <START_LOGICAL_ADDRESS>      int    // Logic address 
+                    -end_address <END_LOGICAL_ADDRESS>          int    // Logic address 
 
 link_chain 
                     -inst <block_instance_name> 
@@ -65,5 +69,82 @@ append_instance_to_chain
                     -chain <chain_instance_name> 
                     -inst <block_instance_name> 
 
-define_constraint  <sv-like-implication with hierarchical path> // Global constraint with hierarchical path 
+define_net 
+                    -name <net_name>                string // The name of the currently defined net.
+                    -source <net_name/port_name>    string  // The name of the driver of the currently defined net.
+
+drive_net
+                    -name <net_name>                string  // The name of the currently driven net.
+                    -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
+                                                            // port_name should be in the format instance_name.port_name
+drive_port
+                    -name <port_name>               string  // The name of the currently driven net.
+                    -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
+                                                            // port_name should be in the format instance_name.port_name
+
+get_block_names     
+                    -reg <regular_expression>       string  // The regular expression that the names match, all if empty
+
+get_ports
+                    -reg <regular_expression>       string  // The regular expression that the names match, all if empty
+
+get_instance_names
+                    -reg <regular_expression>       string  // The regular expression that the names match, all if empty
+
+get_instance_id
+                    -instance <instance_name>       string  // 
+
+get_instance_block_name
+                    -instance <instance_name>       string  // 
+
+get_instance_by_id
+                    -id <instance_id>               int     //
+
+get_instance_id_set
+                    -block <block_name>             string  // 
+
+get_instance_name_set
+                    -block <block_name>             string  // 
+
+get_attributes
+                    -block <block_name>             string  // 
+
+get_constraints
+                    -block <block_name>             string  // 
+
+get_attributes
+                    -instance <instance_name>               string  // The name of
+
+get_constraints
+                    -instance <instance_name>               string  // The name of
+
+get_port_connections
+                    -instance <instance_name>               string  // The name of
+
+get_chain_names
+
+get_parent
+                    -instance <instance_name>               string  // The name of
+
+get_port_connection_source
+                    -port_conn <port_conn_name>             string  // The name of the port instance_name::port_name
+
+get_port_connection_sink_set
+                    -port_conn <port_conn_name>             string  // The name of the port instance_name::port_name
+
+get_net_source
+                    -net <net_name>                         string  // The name of the net
+
+get_net_sink_set
+                    -net <net_name>                         string  // The name of the net
+
+get_logic_location
+                    -instance <instance_name>               string  // The name of the instance from which we are reading.
+
+get_logic_address
+                    -instance <instance_name>               string  // The name of the instance from which we are reading.
+
+get_io_bank
+                    -instance <instance_name>               string  // The name of the instance from which we are reading.
+
 
