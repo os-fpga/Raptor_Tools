@@ -49,7 +49,8 @@
     },
     "constraints" : {
         <"constraint_name">: {constraint}>+
-    }
+    },
+    "instances": {}
 }
 
 "instance" : {
@@ -86,6 +87,9 @@
 
 "device" : {
     "ric_schema_version" : string,
-    "device_version" : string
+    "device_version" : string,
+    "blocks" : {},
+    "instance_list" : [],
+    "chains" : {}
 }
 
