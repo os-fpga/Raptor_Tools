@@ -1,6 +1,6 @@
 ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
-dep_list_redhat="gperftools libxcb xcb-util libxkbcommon-devel libxkbcommon-x11-devel xcb-util-image-devel xcb-util-keysyms-devel xcb-util-renderutil-devel xcb-util-wm-devel gtk3 "
-dep_list_debian="libgoogle-perftools-dev qtbase5-dev libgtk-3-0 build-essential"
+dep_list_redhat="gperftools gtk3 "
+dep_list_debian="libgoogle-perftools-dev libgtk-3-0 build-essential"
 #echo "[INFO]    Installing Raptor on $ostype"
 if [ "$ostype" == "CentOS" ]
 then

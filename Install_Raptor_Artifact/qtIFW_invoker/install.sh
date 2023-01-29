@@ -107,3 +107,4 @@ else
     exit 2
 fi 
 echo -e "[INFO]\tDone installing Raptor :)"
+rm -rf $extract_dir/inst_libs

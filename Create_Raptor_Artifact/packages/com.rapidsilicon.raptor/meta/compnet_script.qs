@@ -30,6 +30,9 @@ function Component()
 {
     installer.installationFinished.connect(this, Component.prototype.installationFinishedPageIsShown);
     installer.finishButtonClicked.connect(this, Component.prototype.installationFinished);
+    if (!installer.isCommandLineInstance())
+        gui.pageWidgetByObjectName("LicenseAgreementPage").entered.connect(changeLicenseLabels);
+
 }
 
 Component.prototype.createOperations = function()
@@ -80,4 +83,13 @@ Component.prototype.installationFinished = function()
 Component.prototype.createOperationsForArchive = function(archive)
 {
     component.addOperation("Extract", archive, "@TargetDir@/RapidSilicon/Raptor/@Version@");
+   
 }
+
+changeLicenseLabels = function()
+{
+    page = gui.pageWidgetByObjectName("LicenseAgreementPage");
+    page.AcceptLicenseLabel.setText("<b><font color=\"#AAFF00\" size=4>Click on ME to Accept above License Agreement</font></b>");
+}
+
+
