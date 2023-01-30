@@ -89,7 +89,7 @@ Component.prototype.createOperationsForArchive = function(archive)
 changeLicenseLabels = function()
 {
     page = gui.pageWidgetByObjectName("LicenseAgreementPage");
-    page.AcceptLicenseLabel.setText("<b><font color=\"#AAFF00\" size=4>Click on ME to Accept above License Agreement</font></b>");
+    page.AcceptLicenseLabel.setText("<b><font color=\"#E0115F\" size=4>Click on ME to Accept above License Agreement</font></b>");
 }
 
 
