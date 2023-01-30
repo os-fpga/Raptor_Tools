@@ -134,7 +134,7 @@ proc drive_net { args } {
     set options {-name -source }
 }
 
-proc drive_port{ args } {
+proc drive_port { args } {
     # -name <port_name>               string  // The name of the currently driven net.
     # -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
     # // port_name should be in the format instance_name.port_name
@@ -142,7 +142,7 @@ proc drive_port{ args } {
     set options {-name -source }
 }
 
-proc get_block_names     { args } {
+proc get_block_names { args } {
     # -reg <regular_expression>       string  // The regular expression that the names match, all if empty
     set options {-reg }
 }

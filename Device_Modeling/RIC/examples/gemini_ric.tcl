@@ -62,9 +62,9 @@ define_constraint  {(GBX1_0.MASTER_SLAVE == GBX0_0.Single) -> {GBX0_0.MASTER_SLA
 set GBX_START_ID 0
 set GBX_END_ID 40
 # ids are absolute and unique for the entire model, creating objects with the same is is a fatal error
-for {set gbx_block_id $GBX_START_ID} {$gbx_block_id <= $GBX_END_ID} {incr gbx_block_id} { 
+for {set gbx_instance_id $GBX_START_ID} {$gbx_instance_id <= $GBX_END_ID} {incr gbx_instance_id} { 
 
-    create_instance –block “GEARBOX" –name GBX_$gbx_block_id _Y} -id $gbx_block_id -logic_location  “$gbx_block_id  0” -logic_address 0x[expr $gbx_block_id * 10] –io_bank BANK0 -parent HV_IOBANK
+    create_instance –block “GEARBOX" –name GBX_$gbx_instance_id _Y} -id $gbx_instance_id -logic_location  “$gbx_instance_id  0” -logic_address 0x[expr $gbx_instance_id * 10] –io_bank BANK0 -parent HV_IOBANK
 
    # Create constraints in between blocks 
 
@@ -79,8 +79,8 @@ set START_LOGICAL_ADDRESS 0x00000
 set END_LOGICAL_ADDRESS   0x0F000
 create_chain_instance –type “ICB_CHAIN” -name “GBX_IO_CHAIN” -start_address $START_LOGICAL_ADDRESS” -end_address “$END_LOGICAL_ADDRESS” 
 
-#for {set gbx_block_id $GBX_START_ID} {$gbx_block_id <= $GBX_END_ID} {incr gbx_block_id} { 
-#   append_instance_to_chain –chain “GBX_IO_CHAIN” -inst [get_block_by_id {$gbx_block_id}] 
+#for {set gbx_instance_id $GBX_START_ID} {$gbx_instance_id <= $GBX_END_ID} {incr gbx_instance_id} { 
+#   append_instance_to_chain –chain “GBX_IO_CHAIN” -inst [get_instance_by_id {$gbx_instance_id}] 
 #} 
 
 # Create IO configuration controller definition and instance 
