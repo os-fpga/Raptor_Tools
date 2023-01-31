@@ -45,7 +45,7 @@ Component.prototype.createOperations = function()
 
     try {
         if (result == QMessageBox.Ok && systemInfo.currentCpuArchitecture === "x86_64")  {
-            component.addOperation("Execute", "workingDirectory=@TargetDir@", "errormessage=Need SUDO but can't find it. Either Click Cancel to invoke installer again with SUDO or ignore to let the installer install Raptor only and later connect support@rapidsilicon.com with your OS details to get list of OS related dependencies.", "bash", "RapidSilicon/Raptor/" + installer.value("Version") + "/share/unix_dep.sh");
+            component.addOperation("Execute", "workingDirectory=@TargetDir@", "errormessage=Need SUDO but can't find it. Either Click Cancel to invoke installer again with SUDO or ignore to let the installer install Raptor only and later connect support@rapidsilicon.com with your OS details to get list of OS related dependencies.", "bash", "Raptor/" + installer.value("Version") + "/share/unix_dep.sh");
             } else {
                 var dummy;
                // QMessageBox.information("Raptor.Dependencies", "Install from excuter Raptor OS Dependencies", "Raptor requires Visual Studio 2017 Redistributables. Please follow the steps to install it now.", QMessageBox.OK);
@@ -72,7 +72,7 @@ Component.prototype.installationFinished = function()
         if (installer.isInstaller() && installer.status == QInstaller.Success) {
             var checkboxForm = component.userInterface( "ReadMeCheckBoxForm" );
             if (checkboxForm && checkboxForm.readMeCheckBox.checked) {
-                QDesktopServices.openUrl("file:///" + installer.value("TargetDir") + "/RapidSilicon/Raptor/" + installer.value("Version") +"/README.md");
+                QDesktopServices.openUrl("file:///" + installer.value("TargetDir") + "/Raptor/" + installer.value("Version") +"/README.md");
             }
         }
     } catch(e) {
@@ -82,7 +82,7 @@ Component.prototype.installationFinished = function()
 
 Component.prototype.createOperationsForArchive = function(archive)
 {
-    component.addOperation("Extract", archive, "@TargetDir@/RapidSilicon/Raptor/@Version@");
+    component.addOperation("Extract", archive, "@TargetDir@/Raptor/@Version@");
    
 }
 
