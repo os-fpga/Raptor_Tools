@@ -35,25 +35,25 @@ function Component()
 
 }
 
-Component.prototype.createOperations = function()
-{
-
-    component.createOperations();
-
-    var result = QMessageBox["question"]("Raptor.Dependencies", "Install Raptor OS Dependencies", "Do you want installer do the OS dependecies installation?<br>" +
-        "This needs SUDO or Admin previlages.", QMessageBox.Ok | QMessageBox.No);
-
-    try {
-        if (result == QMessageBox.Ok && systemInfo.currentCpuArchitecture === "x86_64")  {
-            component.addOperation("Execute", "workingDirectory=@TargetDir@", "errormessage=Need SUDO but can't find it. Either Click Cancel to invoke installer again with SUDO or ignore to let the installer install Raptor only and later connect support@rapidsilicon.com with your OS details to get list of OS related dependencies.", "bash", "Raptor/" + installer.value("Version") + "/share/unix_dep.sh");
-            } else {
-                var dummy;
-               // QMessageBox.information("Raptor.Dependencies", "Install from excuter Raptor OS Dependencies", "Raptor requires Visual Studio 2017 Redistributables. Please follow the steps to install it now.", QMessageBox.OK);
-            } 
-        } catch(e) {
-            console.log(e);
-        }
-}
+//Component.prototype.createOperations = function()
+//{
+//
+//    component.createOperations();
+//
+//    var result = QMessageBox["question"]("Raptor.Dependencies", "Install Raptor OS Dependencies", "Do you want installer do the OS dependecies installation?<br>" +
+//        "This needs SUDO or Admin previlages.", QMessageBox.Ok | QMessageBox.No);
+//
+//    try {
+//        if (result == QMessageBox.Ok && systemInfo.currentCpuArchitecture === "x86_64")  {
+//            component.addOperation("Execute", "workingDirectory=@TargetDir@", "errormessage=Need SUDO but can't find it. Either Click Cancel to invoke installer again with SUDO or ignore to let the installer install Raptor only and later connect support@rapidsilicon.com with your OS details to get list of OS related dependencies.", "bash", "Raptor/" + installer.value("Version") + "/share/unix_dep.sh");
+//            } else {
+//                var dummy;
+//               // QMessageBox.information("Raptor.Dependencies", "Install from excuter Raptor OS Dependencies", "Raptor requires Visual Studio 2017 Redistributables. Please follow the steps to install it now.", QMessageBox.OK);
+//            } 
+//        } catch(e) {
+//            console.log(e);
+//        }
+//}
 
 Component.prototype.installationFinishedPageIsShown = function()
 {
@@ -89,7 +89,7 @@ Component.prototype.createOperationsForArchive = function(archive)
 changeLicenseLabels = function()
 {
     page = gui.pageWidgetByObjectName("LicenseAgreementPage");
-    page.AcceptLicenseLabel.setText("<b><font color=\"#EC154E\" size=4>Click Here to Accept above License Agreement</font></b>");
+    page.AcceptLicenseLabel.setText("<b><font color=\"#EC154E\" size=4>Click Here to Accept Above License Agreement</font></b>");
 }
 
 

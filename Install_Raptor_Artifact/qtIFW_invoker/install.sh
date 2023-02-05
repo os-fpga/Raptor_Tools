@@ -98,10 +98,12 @@ fi
 if [ "$bypass_dep" == "yes" ]
 then
     echo "[WARNING]\tNot attempting to install dependencies. But Some features of Raptor will not work"
-    ./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer Raptor.Dependencies=No  --accept-messages in
+    #./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer Raptor.Dependencies=No  --accept-messages in
+    ./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer  --accept-messages in
 elif [ "$dep_install" == "yes" ]
 then
-    ./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer Raptor.Dependencies=Ok --accept-messages in
+    #./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer Raptor.Dependencies=Ok --accept-messages in
+    ./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer --accept-messages in
 else 
     echo -e "[ERROR]\tIt is mandatory to give either --install-dep or --no-dep-install"
     exit 2

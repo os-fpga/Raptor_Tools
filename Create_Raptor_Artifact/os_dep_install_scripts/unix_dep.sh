@@ -1,6 +1,6 @@
 ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
-dep_list_redhat="gperftools gtk3 "
-dep_list_debian="libgoogle-perftools-dev libgtk-3-0 build-essential"
+dep_list_redhat="gtk3 "
+dep_list_debian="libgtk-3-0 build-essential"
 #echo "[INFO]    Installing Raptor on $ostype"
 if [ "$ostype" == "CentOS" ]
 then
@@ -22,6 +22,6 @@ then
 else
     echo "Unkown OS. Manually install below dependencies."
     echo $dep_list_redhat
-    echo "Make sure to find equivalent name of above packages for you OS or contact at support@rapidsilicon.com"
+    echo "Make sure to find equivalent name of above packages for your OS or contact at support@rapidsilicon.com"
     exit 1
 fi
