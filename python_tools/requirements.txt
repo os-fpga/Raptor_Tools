@@ -1,4 +1,5 @@
 meson==0.60.3
+myhdl==0.11
 PyYAML==5.4
 cocotb==1.7.1
 cocotb-bus==0.1.1

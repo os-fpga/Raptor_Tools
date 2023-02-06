@@ -52,22 +52,22 @@ execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${Extraction_dir}
 )
 
-message(STATUS "Download DIR from cmake is ${Destination_Dir}")
-message(STATUS "Extraction DIR from cmake is ${Extraction_dir}")
+message(STATUS "Download DIR from cmake for HDL Sim is ${Destination_Dir}")
+message(STATUS "Extraction DIR from cmake for HDL Sim is ${Extraction_dir}")
 
 #check if file already exist to prevent over download
 if(EXISTS ${Destination_Dir})
     message(STATUS "HDL Simulator downlaod zip already exist.")
     file(SIZE ${Destination_Dir} SIM_Download_Size)
     if(${SIM_Download_Size} EQUAL ${expected_size} )
-        message(STATUS "Already present download zip will be used") 
+        message(STATUS "Already present download HDL Sim zip will be used") 
     else()
-        message(STATUS "Already present download zip is outdated so downloading again")
+        message(STATUS "Already present download HDL Sim zip is outdated so downloading again")
         set(DO_DOWNLOAD 1)
         set(DO_EXTRACTION 1)
     endif()
 else()
-    message(STATUS "Freash Downloading HDL simulator Pre-build Binaries")
+    message(STATUS "Fresh Downloading HDL simulator Pre-build Binaries")
     set(DO_DOWNLOAD 1)
     set(DO_EXTRACTION 1)
 endif()
@@ -77,9 +77,9 @@ if(${DO_DOWNLOAD} EQUAL 1)
     file(DOWNLOAD ${Release_URL} ${Destination_Dir} SHOW_PROGRESS STATUS DOWNLOAD_STATUS)
     list (GET DOWNLOAD_STATUS 0 STATUS_CODE)
     if (NOT ${STATUS_CODE} EQUAL "0")
-        message(FATAL_ERROR "Exit status of download is ${STATUS_CODE}")
+        message(FATAL_ERROR "Exit status of download HDL Sim is ${STATUS_CODE}")
     else()
-        message(STATUS "Successfully Donwloadeded Pre-built verilator with expected size (${SIM_Download_Size})") 
+        message(STATUS "Successfully Donwloadeded Pre-built HDL Sim)") 
     endif()
 endif ()
 
@@ -97,7 +97,7 @@ if(${DO_EXTRACTION} EQUAL 1)
                  WORKING_DIRECTORY ${Extraction_dir}
                  )
  else ()
-      message(STATUS "Extracted Content exist and haven't download new zip so skipping it")
+      message(STATUS "Extracted HDL Sim Content exist and haven't download new zip so skipping it")
  endif()
 
 #install(
