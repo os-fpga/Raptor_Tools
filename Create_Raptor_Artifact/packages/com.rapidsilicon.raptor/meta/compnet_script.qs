@@ -35,11 +35,23 @@ function Component()
 
 }
 
-//Component.prototype.createOperations = function()
-//{
-//
-//    component.createOperations();
-//
+Component.prototype.createOperations = function()
+{
+
+    component.createOperations();
+
+    try {
+      if (systemInfo.currentCpuArchitecture === "x86_64")  {
+               component.addOperation("Execute", "workingDirectory=@TargetDir@", "errormessage=Fail to change the permissions of install folder. Change it manually as needed", "bash", "Raptor/" + installer.value("Version") + "/share/changer_mod.sh");
+               component.addOperation("Delete", "@TargetDir@/Raptor/" + installer.value("Version") + "/share/changer_mod.sh");
+            } else {
+                var dummy;
+               // QMessageBox.information("Raptor.Dependencies", "Install from excuter Raptor OS Dependencies", "Raptor requires Visual Studio 2017 Redistributables. Please follow the steps to install it now.", QMessageBox.OK);
+            } 
+        } catch(e) {
+            console.log(e);
+        }
+
 //    var result = QMessageBox["question"]("Raptor.Dependencies", "Install Raptor OS Dependencies", "Do you want installer do the OS dependecies installation?<br>" +
 //        "This needs SUDO or Admin previlages.", QMessageBox.Ok | QMessageBox.No);
 //
@@ -53,7 +65,7 @@ function Component()
 //        } catch(e) {
 //            console.log(e);
 //        }
-//}
+}
 
 Component.prototype.installationFinishedPageIsShown = function()
 {
@@ -83,7 +95,6 @@ Component.prototype.installationFinished = function()
 Component.prototype.createOperationsForArchive = function(archive)
 {
     component.addOperation("Extract", archive, "@TargetDir@/Raptor/@Version@");
-   
 }
 
 changeLicenseLabels = function()
