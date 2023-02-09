@@ -212,7 +212,7 @@ then
     release=`cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && ls -l | grep *.run | awk '{print $9}'`
     release=`echo $release | sed -r 's/.*-([0-9]*.[0-9]*)\-..*/\1/g'`
     raptor_version=`$w_dir/bin/raptor --version | grep "Version" | awk '{print $3}'`
-    if [ ! -f "$w_dir/inst_libs.tar.gz" ]
+    if [ ! -f "$SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker/inst_libs.tar.gz" ]
     then
     cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && wget https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/inst_libs.tar.gz && cd -
     fi

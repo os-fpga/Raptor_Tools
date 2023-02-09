@@ -121,6 +121,10 @@ install( FILES ${CMAKE_CURRENT_SOURCE_DIR}/os_dep_install_scripts/unix_dep.sh
         DESTINATION ./share 
         COMPONENT ${COMPONENT_NAME_MAIN}
     )
+install( FILES ${CMAKE_CURRENT_SOURCE_DIR}/os_dep_install_scripts/changer_mod.sh
+    DESTINATION ./share 
+    COMPONENT ${COMPONENT_NAME_MAIN}
+)
 
 install(CODE "execute_process(COMMAND ${CMAKE_COMMAND} -E remove -f  ./Raptor_release.zip)")
 
