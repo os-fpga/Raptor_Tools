@@ -18,10 +18,10 @@ define_block -name GEARBOX
 # define its attributes (parameters) 
 
  
-define_attr -block "GEARBOX" -name "RATIO" -addr "0x004" -width 4 -enum {{One 0x1} {Two 0x2} {Tree 0x3} {Ten 0xA}} 
-define_attr -block "GEARBOX" -name "DIFF_OR_SINGLE" -addr “0x009” -width 1 -enum {{Differential 0x0} {SingleEnded 0x1 default}} 
-define_attr -block "GEARBOX" -name "MASTER_SLAVE" -addr "0x012" -width 2 -enum {{Single 0x0 default} {Master 0x1} {Slave 0x2}} 
-define_attr -block "GEARBOX" -name "MODE" -addr "0x017" -width 8 -enum { {Mode_BP_SDR_A_TX 0x012} {Mode_BP_DDR_A_TX 0x013 default} {Mode_RATE_3_A_TX  0x014} } 
+define_attr -block "GEARBOX" -name "RATIO" -addr "0x004" -width 4 -enum {One 0x1} {Two 0x2} {Tree 0x3} {Ten 0xA} -enumname T1
+define_attr -block "GEARBOX" -name "DIFF_OR_SINGLE" -addr 0x009 -width 1 -enum {Differential 0x0} {SingleEnded 0x1 default}  -enumname T2
+define_attr -block "GEARBOX" -name "MASTER_SLAVE" -addr 0x012 -width 2 -enum {Single 0x0 default} {Master 0x1} {Slave 0x2}   -enumname T3
+define_attr -block "GEARBOX" -name "MODE" -addr 0x017 -width 8 -enum {Mode_BP_SDR_A_TX 0x012} {Mode_BP_DDR_A_TX 0x013 default} {Mode_RATE_3_A_TX  0x014}    -enumname T4
 
 # Constraints within block attributes 
 
