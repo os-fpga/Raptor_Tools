@@ -577,6 +577,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
     Array files(1);
     files.Insert(file_name);
     ieee_1735.set_pvt_key(key_file);
+    Message::SetMessageType("VERI-1063", VERIFIC_IGNORE);
 
 #ifdef PRODUCTION_BUILD
     License_Manager license(License_Manager::LicensedProductName::READ_VERILOG);
