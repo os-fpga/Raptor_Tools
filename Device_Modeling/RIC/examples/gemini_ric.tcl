@@ -25,9 +25,9 @@ define_attr -block "GEARBOX" -name "MODE" -addr 0x017 -width 8 -enum {Mode_BP_SD
 
 # Constraints within block attributes 
 
-define_constraint -block “GEARBOX” {(DIFF_OR_SINGLE == Differential) -> {RATIO inside {One Two}}}
-define_constraint -block “GEARBOX” {(DIFF_OR_SINGLE == SingleEnded) -> {Ratio inside {[One:Ten]}} 
-define_constraint -block “GEARBOX” {(MODE == Mode_BP_SDR_A_TX) -> {DIFF_OR_SINGLE == Differential}} 
+define_constraint -block GEARBOX -constraint {(DIFF_OR_SINGLE == Differential) -> {RATIO inside {One Two}}}
+define_constraint -block GEARBOX -constraint {(DIFF_OR_SINGLE == SingleEnded) -> {Ratio inside {[One:Ten]}} 
+define_constraint -block GEARBOX -constraint {(MODE == Mode_BP_SDR_A_TX) -> {DIFF_OR_SINGLE == Differential}} 
 
 
 ######################################
@@ -50,10 +50,10 @@ create_instance -block HV_IOBANK -name HV_IOBANK_TOP_RIGHT
 # Inter block instance constraints using block hierarchical path attributes and values 
 
 # If gearbox is master, next (below) has to be slave 
-define_constraint  {(GBX0_0.MASTER_SLAVE == GBX0_0.Master) -> {GBX1_0.MASTER_SLAVE == GBX1_0.Slave}} 
+define_constraint -block __ROOT__ -constraint {(GBX0_0.MASTER_SLAVE == GBX0_0.Master) -> {GBX1_0.MASTER_SLAVE == GBX1_0.Slave}} 
 
 # If gearbox is single, previous one (above) cannot be master 
-define_constraint  {(GBX1_0.MASTER_SLAVE == GBX0_0.Single) -> {GBX0_0.MASTER_SLAVE == GBX0_0.Single || GBX0_0.MASTER_SLAVE == GBX0_0.Slave}} 
+define_constraint  -block __ROOT__ -constraint {(GBX1_0.MASTER_SLAVE == GBX0_0.Single) -> {GBX0_0.MASTER_SLAVE == GBX0_0.Single || GBX0_0.MASTER_SLAVE == GBX0_0.Slave}} 
 
 
 

@@ -363,6 +363,9 @@ proc define_block  { args } {
     return 0
 }
 
+# We may encapsilate all Global definitions in a __ROOT__ or __DEVICE_NAME__ module to be able to cleanly handle several Desighs 
+define_block -name __ROOT__
+
 proc define_param { args } {
     # A parameter is a generalized attribute, it does not, necessarily, have to get an address neither a predefined size
     # -block <block_type_name> O   string // the name of a defined block to insert the attribute in if None then Global.
@@ -575,9 +578,41 @@ proc define_ports { args } {
 }
 
 proc define_constraint { args } {
-    # -block <block_type_name> <sv-like-implication>  // Inner block constraint in the form of SV implication
+    # -block <block_type_name>          // Inner block constraint in the form of SV implication
+    # -contraint <sv-like-implication>  // Inner block constraint in the form of SV implication
     set options {-block }
+    set pat_constraint [ dict create  -block { 1 simple_id } -constraint { -1 list } ]
+    set paramDict $pat_constraint
+    set actual [ verify_make_params $paramDict $args ]
+    if { ! [ dict exists $actual "-block"] || ! [ dict exists $actual "-constraint"]  } {
+        dict set actual valid 0
+        puts "The options -block and -constraint"
+        puts "are necessary in the command define_constraint : $actual"
+        dict set actual valid 0
+        return 0
+    }
+    set block_name [ dict get $actual "-block" ]
+    set const [ dict get $actual "-constraint" ]
+    if { ! [dict exists  $::block_scope $block_name]} {
+        puts "I could not find the block $block_name for the definition of the constraint $actual"
+        dict set actual valid 0
+        return 0
+    }
+    set key "Constraint0"
+    if { ! [dict exists  $::block_scope $block_name -constraint ] } {
+        dict set ::block_scope $block_name -constraint [dict create ]
+    } else {
+        set idx 1
+        while { [ dict exists $::block_scope $block_name -constraint $key ] } {
+            set key "Constraint$idx"
+            incr idx
+        }
+    }
+    dict set ::block_scope $block_name -constraint $key $const
+    # puts [dict get $::block_scope $block_name]
+    return 1
 }
+
 
 proc define_net { args } {
     # -name <net_name>                string // The name of the currently defined net.
