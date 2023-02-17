@@ -609,23 +609,87 @@ proc define_constraint { args } {
         }
     }
     dict set ::block_scope $block_name -constraint $key $const
-    # puts [dict get $::block_scope $block_name]
     return 1
 }
 
-
 proc define_net { args } {
     # -name <net_name>                string // The name of the currently defined net.
-    # -source <net_name/port_name>    string  // The name of the driver of the currently defined net.
-    set options {-name -source }
+    # -block <block_type_name>        string //
+    # -source <net_name/port_name>    string // The name of the driver of the currently defined net.
+    # examples :
+    # define_net  -block __ROOT__ -name clk -source src -isclock 1
+    # define_net  -block GEARBOX -name clk -source __ROOT__.clk -isclock 1
+    # define_net  -block __ROOT__ -name data\[0\] -source GEARBOX.port1
+
+    set pat_net_def [ dict create  -block { 1 simple_id } -name { 1 simple_id } -source { 1 simple_id hier_id } -isclock { 1 integer } ]
+    set paramDict $pat_net_def
+    set actual [ verify_make_params $paramDict $args ]
+    if { ! [ dict exists $actual "-block"] || ! [ dict exists $actual "-name"]  } {
+        dict set actual valid 0
+        puts "The options -block and -name"
+        puts "are necessary in the command define_net : $actual"
+        dict set actual valid 0
+        return 0
+    }
+    set block_name [ dict get $actual "-block" ]
+    set net_name [ dict get $actual "-name" ]
+    if { ! [dict exists  $::block_scope $block_name]} {
+        puts "I could not find the block $block_name for the definition of the net $actual"
+        dict set actual valid 0
+        return 0
+    }
+    if { [dict exists $actual -source ] } {
+        set src_name [ dict get $actual "-source"]
+        set src_name_type [ dm_type $src_name ]
+        if { "simple_id" == $src_name_type && $block_name != "__ROOT__" &&
+            (   ! [ dict exists  $::block_scope $block_name -nets   $src_name ] &&
+            ! [ dict exists  $::block_scope $block_name -inputs $src_name ] )} {
+            puts "Could not find the driver $src_name of the net $actual"
+            dict set actual valid 0
+            return 0
+
+            } else { # A hierarchical name a.b.c
+
+            }
+        }
+        if { ! [dict exists  $::block_scope $block_name -nets ] } {
+        dict set ::block_scope $block_name -nets [dict create ]
+    }
+    dict set ::block_scope $block_name -nets $net_name $actual
 }
 
 proc drive_net { args } {
+    # -block <block_type_name>        string  // Inner block constraint in the form of SV implication
     # -name <net_name>                string  // The name of the currently driven net.
     # -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
-    // port_name should be in the format instance_name.port_name
-    set options {-name -source }
+    # example : define_net  -block __ROOT__ -name clk -source aaa -isclock 1
+    #           drive_net   -block __ROOT__ -name clk -source aaaTsu -isclock 1
+    set pat_net_def [ dict create  -block { 1 simple_id } -name { 1 simple_id } -source { 1 simple_id hier_id } -isclock { 1 integer } ]
+    set paramDict $pat_net_def
+    set actual [ verify_make_params $paramDict $args ]
+    if { ! [ dict exists $actual "-block"] || ! [ dict exists $actual "-name"] || ! [ dict exists $actual "-source"]  } {
+        dict set actual valid 0
+        puts "The options -block, -source and -name"
+        puts "are necessary in the command define_net : $actual"
+        dict set actual valid 0
+        return 0
+    }
+    set block_name  [ dict get $actual "-block" ]
+    set net_name    [ dict get $actual "-name"  ]
+    set src_name    [ dict get $actual "-source"]
+    # Looking for a local (relatively to the defined net) source
+    if { ! [dict exists  $::block_scope $block_name -nets $net_name ] ||
+        (   ! [ dict exists  $::block_scope $block_name -nets   $src_name ] &&
+        ! [ dict exists  $::block_scope $block_name -inputs $src_name ]  && $block_name != "__ROOT__" ) } {
+        puts "Could not find the block $block_name or the driver $src_name of the net $actual"
+        dict set actual valid 0
+        return 0
+    }
+    # setting the source
+    dict set  ::block_scope $block_name -nets $net_name -source $src_name
+
 }
+
 
 proc drive_port { args } {
     # -name <port_name>               string  // The name of the currently driven net.
