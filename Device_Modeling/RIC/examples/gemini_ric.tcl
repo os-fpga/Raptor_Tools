@@ -86,7 +86,7 @@ create_chain_instance -type “ICB_CHAIN” -name “GBX_IO_CHAIN” -start_addr
 
 define_block -name ICB_CONTROLLER 
 
-create_instance -block “ICB_CONTROLLER” -name “GBX_CONTROLLER_BLOCK” 
+create_instance -block ICB_CONTROLLER -name GBX_CONTROLLER_BLOCK
 
  
 

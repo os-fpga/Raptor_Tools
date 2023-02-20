@@ -14,13 +14,87 @@ set model  [lindex $argv 0]
 
 puts "RIC: Processing model: $model..."
 
+# -- pdict
+#
+# Pretty print a dict similar to parray.
+#
+# USAGE:
+#
+#   pdict d [i [p [s]]]
+#
+# WHERE:
+#  d - dict value or reference to be printed
+#  i - indent level
+#  p - prefix string for one level of indent
+#  s - separator string between key and value
+#
+# EXAMPLE:
+# % set d [dict create a {1 i 2 j 3 k} b {x y z} c {i m j {q w e r} k o}]
+# a {1 i 2 j 3 k} b {x y z} c {i m j {q w e r} k o}
+# % pdict $d
+# a ->
+#   1 -> 'i'
+#   2 -> 'j'
+#   3 -> 'k'
+# b -> 'x y z'
+# c ->
+#   i -> 'm'
+#   j ->
+#     q -> 'w'
+#     e -> 'r'
+#   k -> 'o'
+# % pdict d
+# dict d
+# a ->
+# ...
+proc pdict { d {i 0} {p "  "} {s " -> "} } {
+    set fRepExist [expr {0 < [llength\
+            [info commands tcl::unsupported::representation]]}]
+    if { (![string is list $d] || [llength $d] == 1)
+            && [uplevel 1 [list info exists $d]] } {
+        set dictName $d
+        unset d
+        upvar 1 $dictName d
+        puts "dict $dictName"
+    }
+    if { ! [string is list $d] || [llength $d] % 2 != 0 } {
+        return -code error  "error: pdict - argument is not a dict"
+    }
+    set prefix [string repeat $p $i]
+    set max 0
+    foreach key [dict keys $d] {
+        if { [string length $key] > $max } {
+            set max [string length $key]
+        }
+    }
+    dict for {key val} ${d} {
+        puts -nonewline "${prefix}[format "%-${max}s" $key]$s"
+        if {    $fRepExist && [string match "value is a dict*"\
+                    [tcl::unsupported::representation $val]]
+                || ! $fRepExist && [string is list $val]
+                    && [llength $val] % 2 == 0 } {
+            puts ""
+            pdict $val [expr {$i+1}] $p $s
+        } else {
+            puts "'${val}'"
+        }
+    }
+    return
+}
+
 set ::enum_scope [ dict create ]
 
 set ::param_scope [ dict create ]
 
 set ::block_scope [ dict create ]
 
+set ::instance_list [ list ]
+
+set ::instance_scope [ dict create ]
+
 set ::attribute_scope [ dict create ]
+
+set ::chaine_scope [ dict create ]
 
 # Lookup this scope then ::enum_scope
 set ::param_type_scope [ dict create integer 32 double 64 string 32 ]
@@ -200,6 +274,25 @@ proc verify_make_params { params actuals } {
     return $dictRes
 }
 
+proc add_instance { actual } {
+    set block_name [ dict get $actual "-block"]
+    set inst_name [ dict get $actual "-name"]
+    if { ! [ dict exists $actual "-parent"] } {
+        dict set actual "-parent" "__ROOT__"
+    }
+    set parent_block  [ dict get $actual "-parent"]
+    if { ! [ dict exists $::block_scope $block_name ] } {
+        puts "Could not find $block_name"
+        return -1;
+    }
+    set global_name "$block_name.$inst_name"
+    set id [ llength ::instance_list ]
+    dict set actual -id $id
+    lappend ::instance_list $actual
+    dict set ::instance_scope $global_name $actual
+    return $id
+}
+
 #===================================================================
 #                           RIC Commands
 #===================================================================
@@ -348,7 +441,7 @@ proc define_block  { args } {
                     incr idx
                 }
             } else {
-                puts "Not a Valid specification of ports $port_set, should start with in or out"
+                error "Not a Valid specification of ports $port_set, should start with in or out"
                 return 0
             }
         }
@@ -363,7 +456,7 @@ proc define_block  { args } {
     return 0
 }
 
-# We may encapsilate all Global definitions in a __ROOT__ or __DEVICE_NAME__ module to be able to cleanly handle several Desighs 
+# We may encapsilate all Global definitions in a __ROOT__ or __DEVICE_NAME__ module to be able to cleanly handle several Desighs
 define_block -name __ROOT__
 
 proc define_param { args } {
@@ -377,7 +470,6 @@ proc define_param { args } {
     # define_param -block GEARBOX -name P1 -addr 0x0 -width 0x4 -type integer
     set paramDict $::attribute_pat
     set actual  [ verify_make_params $paramDict $args ]
-    puts $actual
     if { ! [ dict exists $actual "-name"] || ! [ dict exists $actual "-type"]  } {
         dict set actual valid 0
         puts "The options -name and -type"
@@ -400,32 +492,32 @@ proc define_param { args } {
         return 0
     }
     if { [ dict exists  $actual "-width" ] && [ dict get  $actual "-width" ] < 1 } {
-        puts "The width of a parameter can not be less than 1"
+    puts "The width of a parameter can not be less than 1"
+    dict set actual valid 0
+    return 0
+}
+if { [ dict exists  $actual "-addr" ] && [ dict get  $actual "-addr" ] < 0 } {
+    puts "The address of a parameter can not be less than 0"
+    dict set actual valid 0
+    return 0
+}
+if { [ dict exists  $actual "-block" ] } {
+    set block_name  [ dict get  $actual "-block" ]
+    if { ! [dict exists  $::block_scope $block_name]} {
+        puts "I could not find the block $block_name for the definition of the parameter $name"
         dict set actual valid 0
         return 0
-    }
-    if { [ dict exists  $actual "-addr" ] && [ dict get  $actual "-addr" ] < 0 } {
-        puts "The address of a parameter can not be less than 0"
-        dict set actual valid 0
-        return 0
-    }
-    if { [ dict exists  $actual "-block" ] } {
-        set block_name  [ dict get  $actual "-block" ]
-        if { ! [dict exists  $::block_scope $block_name]} {
-            puts "I could not find the block $block_name for the definition of the parameter $name"
-            dict set actual valid 0
-            return 0
-        } else {
-            if { [ dict exists ::block_scope $block_name "-params"  ] } {
-                dict set ::block_scope $block_name -params [ dict create ]
-            }
-            dict set ::block_scope $block_name -params $name $actual
-        }
     } else {
-        dict set ::param_scope $name $actual
+        if { [ dict exists ::block_scope $block_name "-params"  ] } {
+            dict set ::block_scope $block_name -params [ dict create ]
+        }
+        dict set ::block_scope $block_name -params $name $actual
     }
+} else {
+    dict set ::param_scope $name $actual
+}
 
-    return [ dict get $actual valid ]
+return [ dict get $actual valid ]
 }
 
 proc define_attr { args } {
@@ -551,7 +643,7 @@ proc define_ports { args } {
                     incr idx
                 }
             } else {
-                puts "Not a Valid specification of ports $port_set, should start with in or out"
+                error "Not a Valid specification of ports $port_set, should start with in or out"
                 return 0
             }
         }
@@ -563,7 +655,7 @@ proc define_ports { args } {
                 dict set ::block_scope $block_name -inputs $port_name 1
             }
         }
-         if { [llength [dict keys $outputs] ]} {
+        if { [llength [dict keys $outputs] ]} {
             if { ! [ dict exists $::block_scope $block_name -outputs ] } {
                 dict set ::block_scope $block_name -outputs [ dict create ]
             }
@@ -580,7 +672,7 @@ proc define_ports { args } {
 proc define_constraint { args } {
     # -block <block_type_name>          // Inner block constraint in the form of SV implication
     # -contraint <sv-like-implication>  // Inner block constraint in the form of SV implication
-    set options {-block }
+    # set options {-block }
     set pat_constraint [ dict create  -block { 1 simple_id } -constraint { -1 list } ]
     set paramDict $pat_constraint
     set actual [ verify_make_params $paramDict $args ]
@@ -690,15 +782,6 @@ proc drive_net { args } {
 
 }
 
-
-proc drive_port { args } {
-    # -name <port_name>               string  // The name of the currently driven net.
-    # -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
-    # // port_name should be in the format instance_name.port_name
-
-    set options {-name -source }
-}
-
 proc create_instance { args } {
     # -block <block_type_name>        string      // the name of a defined block we are instanciating
     # -name <instance_name>           string      // the currently defined instance name
@@ -707,18 +790,61 @@ proc create_instance { args } {
     # -logic_address <logical_address> int        // Logic address in chain
     # -io_bank <io_bank_name> (optional)  string  // IO bank name
     # -parent <block_type>    (optional)  string  // Parent block (Creates hierarchy – like Verilog folded model)
-    set options {-block -name -logic_location -logic_address -io_bank -parent }
+    # set options {-block -name -logic_location -logic_address -io_bank -parent }
+    set pat_inst_def [ dict create  -block { 1 simple_id } \
+        -name { 1 simple_id } \
+        -logic_location { 1 list } \
+        -id { 1 integer } \
+        -logic_address { 1 integer }  \
+        -io_bank { 1 simple_id } \
+        -parent { 1 simple_id }  ]
+    set paramDict $pat_inst_def
+    set actual [ verify_make_params $paramDict $args ]
+    if { ! [ dict exists $actual "-block"] || ! [ dict exists $actual "-name"]  }  {
+        puts "You have to define the options -block and -name for the command create_instance"
+        dict set actual valid 0
+        return 0
+    }
+    return [ add_instance $actual ]
 }
 
-proc define_chain        { args } {
+proc define_chain { args } {
     # -type <type>                    string      // The name of the currently created chain
-    set options {-type }
+    set pat_chain_def [ dict create -type { 1 simple_id } ]
+    set paramDict $pat_chain_def
+    set actual [ verify_make_params $paramDict $args ]
+    if { ! [ dict exists $actual "-type" ] } {
+        error "Missisn chain type"
+        return 0;
+    }
+    set type [ dict get $actual "-type" ]
+    dict set ::chaine_scope $type  { } 
+    return 1
 }
 
 proc add_block_to_chain_type { args } {
     # -type <chain_type_name>         string      // The name of the currently created chain
     # -block <block_type_name>        string      // The name of the currently created chain
-    set options {-type -block }
+    set pat_add_b_chain_def [ dict create -type { 1 simple_id } -block { 1 simple_id } ]
+    set actual [ verify_make_params $pat_add_b_chain_def $args ]
+     if { ! [ dict exists $actual "-type" ] || ! [ dict exists $actual "-block" ] } {
+        error "Missisn chain type or block type"
+        return 0;
+    }
+    set type [dict get $actual "-type" ]
+    set block [dict get $actual "-block" ]
+    set lst [ dict get $::chaine_scope $type ]
+    lappend lst $block
+    dict set ::chaine_scope $type $lst
+    return 1
+}
+
+proc drive_port { args } {
+    # -name <port_name>               string  // The name of the currently driven net.
+    # -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
+    # // port_name should be in the format instance_name.port_name
+
+    set options {-name -source }
 }
 
 proc create_chain_instance { args } {
