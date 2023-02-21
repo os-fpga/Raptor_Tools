@@ -76,7 +76,7 @@ for {set gbx_instance_id $GBX_START_ID} {$gbx_instance_id <= $GBX_END_ID} {incr 
 # Create IO configuration chain (instance of a chain)
 set START_LOGICAL_ADDRESS 0x00000
 set END_LOGICAL_ADDRESS   0x0F000
-create_chain_instance -type “ICB_CHAIN” -name “GBX_IO_CHAIN” -start_address $START_LOGICAL_ADDRESS” -end_address “$END_LOGICAL_ADDRESS” 
+create_chain_instance -type ICB_CHAIN -name GBX_IO_CHAIN -start_address $START_LOGICAL_ADDRESS -end_address $END_LOGICAL_ADDRESS
 
 #for {set gbx_instance_id $GBX_START_ID} {$gbx_instance_id <= $GBX_END_ID} {incr gbx_instance_id} { 
 #   append_instance_to_chain -chain “GBX_IO_CHAIN” -inst [get_instance_by_id {$gbx_instance_id}] 
@@ -92,7 +92,7 @@ create_instance -block ICB_CONTROLLER -name GBX_CONTROLLER_BLOCK
 
 # Link IO configuration chain to controller instance 
 
-link_chain -inst “GBX_CONTROLLER_BLOCK” -chain “GBX_IO_CHAIN” 
+link_chain -inst GBX_CONTROLLER_BLOCK -chain GBX_IO_CHAIN
 
 # Create PLL blocks 
 

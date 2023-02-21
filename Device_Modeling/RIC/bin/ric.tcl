@@ -49,77 +49,77 @@ puts "RIC: Processing model: $model..."
 # ...
 proc pdict { d {i 0} {p "  "} {s " -> "} } {
     set fRepExist [expr {0 < [llength\
-            [info commands tcl::unsupported::representation]]}]
-    if { (![string is list $d] || [llength $d] == 1)
+        [info commands tcl::unsupported::representation]]}]
+        if { (![string is list $d] || [llength $d] == 1)
             && [uplevel 1 [list info exists $d]] } {
-        set dictName $d
-        unset d
-        upvar 1 $dictName d
-        puts "dict $dictName"
-    }
-    if { ! [string is list $d] || [llength $d] % 2 != 0 } {
-        return -code error  "error: pdict - argument is not a dict"
-    }
-    set prefix [string repeat $p $i]
-    set max 0
-    foreach key [dict keys $d] {
-        if { [string length $key] > $max } {
-            set max [string length $key]
+            set dictName $d
+            unset d
+            upvar 1 $dictName d
+            puts "dict $dictName"
         }
-    }
-    dict for {key val} ${d} {
-        puts -nonewline "${prefix}[format "%-${max}s" $key]$s"
-        if {    $fRepExist && [string match "value is a dict*"\
-                    [tcl::unsupported::representation $val]]
+        if { ! [string is list $d] || [llength $d] % 2 != 0 } {
+            return -code error  "error: pdict - argument is not a dict"
+        }
+        set prefix [string repeat $p $i]
+        set max 0
+        foreach key [dict keys $d] {
+            if { [string length $key] > $max } {
+                set max [string length $key]
+            }
+        }
+        dict for {key val} ${d} {
+            puts -nonewline "${prefix}[format "%-${max}s" $key]$s"
+            if {    $fRepExist && [string match "value is a dict*"\
+                [tcl::unsupported::representation $val]]
                 || ! $fRepExist && [string is list $val]
-                    && [llength $val] % 2 == 0 } {
-            puts ""
-            pdict $val [expr {$i+1}] $p $s
-        } else {
-            puts "'${val}'"
+                && [llength $val] % 2 == 0 } {
+                puts ""
+                pdict $val [expr {$i+1}] $p $s
+            } else {
+                puts "'${val}'"
+            }
         }
+        return
     }
-    return
-}
 
-set ::enum_scope [ dict create ]
+    set ::enum_scope [ dict create ]
 
-set ::param_scope [ dict create ]
+    set ::param_scope [ dict create ]
 
-set ::block_scope [ dict create ]
+    set ::block_scope [ dict create ]
 
-set ::instance_list [ list ]
+    set ::instance_list [ list ]
 
-set ::instance_scope [ dict create ]
+    set ::instance_scope [ dict create ]
 
-set ::attribute_scope [ dict create ]
+    set ::attribute_scope [ dict create ]
 
-set ::chaine_scope [ dict create ]
+    set ::chaine_scope [ dict create ]
 
-# Lookup this scope then ::enum_scope
-set ::param_type_scope [ dict create integer 32 double 64 string 32 ]
+    # Lookup this scope then ::enum_scope
+    set ::param_type_scope [ dict create integer 32 double 64 string 32 ]
 
-set ::optionpat {
-    ^[\-]([a-z]+)?$
-}
+    set ::optionpat {
+        ^[\-]([a-z_]+)?$
+    }
 
-set ::version_pat {
-    ^\d+(\.\d+){2}$
-}
+    set ::version_pat {
+        ^\d+(\.\d+){2}$
+    }
 
-set ::simple_id_pat {
-    ^[a-zA-Z_]([a-zA-Z0-9\[\]_-]+)?$
-}
+    set ::simple_id_pat {
+        ^[a-zA-Z_]([a-zA-Z0-9\[\]_-]+)?$
+    }
 
-set ::hier_id_pat {
-    ^[a-zA-Z_]([a-zA-Z0-9\[\]_-]+)?(\.[a-zA-Z_]([a-zA-Z0-9\[\]_-]+)?)?$
-}
+    set ::hier_id_pat {
+        ^[a-zA-Z_]([a-zA-Z0-9\[\]_-]+)?(\.[a-zA-Z_]([a-zA-Z0-9\[\]_-]+)?)?$
+    }
 
-set ::par_name_ports [ dict create  \
-    -name { 1 simple_id hier_id } \
-    -ports { -1 list } \
-    -force { 0 Nill } \
-]
+    set ::par_name_ports [ dict create  \
+        -name { 1 simple_id hier_id } \
+        -ports { -1 list } \
+        -force { 0 Nill } \
+    ]
 
 set ::pat_block_ports [ dict create  \
     -block { 1 simple_id } \
@@ -818,7 +818,7 @@ proc define_chain { args } {
         return 0;
     }
     set type [ dict get $actual "-type" ]
-    dict set ::chaine_scope $type  { } 
+    dict set ::chaine_scope $type  { }
     return 1
 }
 
@@ -827,7 +827,7 @@ proc add_block_to_chain_type { args } {
     # -block <block_type_name>        string      // The name of the currently created chain
     set pat_add_b_chain_def [ dict create -type { 1 simple_id } -block { 1 simple_id } ]
     set actual [ verify_make_params $pat_add_b_chain_def $args ]
-     if { ! [ dict exists $actual "-type" ] || ! [ dict exists $actual "-block" ] } {
+    if { ! [ dict exists $actual "-type" ] || ! [ dict exists $actual "-block" ] } {
         error "Missisn chain type or block type"
         return 0;
     }
@@ -839,33 +839,62 @@ proc add_block_to_chain_type { args } {
     return 1
 }
 
+proc create_chain_instance { args } {
+    # -type <chain_type_name>                     string // The name of the instanciated chain
+    # -name <chain_instance_name>                 string // The name of the currently defined chain instance
+    # -start_address <START_LOGICAL_ADDRESS>      int    // Logic address
+    # -end_address <END_LOGICAL_ADDRESS>          int    // Logic address
+    #  
+    set pat_chain_inst [ dict create \
+        -type { 1 simple_id } \
+        -name { 1 simple_id } \
+        -start_address { 1 integer } \
+        -end_address { 1 integer } ]
+    set actual [ verify_make_params $pat_chain_inst $args ]
+
+    if { ! [ dict exists $actual "-type" ] || ! [ dict exists $actual "-name" ]  || \
+     ! [ dict exists $actual "-type" ] || ! [ dict exists $actual "-name" ]   } {
+        error "Missisn chain option -type, -name, -start_address or -end_address"
+        return 0;
+    }
+    set type [ dict get $actual "-type" ]
+    set name [ dict get $actual "-name" ]
+    dict set actual -instances {}
+    dict set ::instance_chaine_scope $name  $actual
+    return 1
+}
+
+proc link_chain { args } {
+    # -inst <block_instance_name>          string      // The name of the currently created chain
+    # -chain <chain_instance_name>          string      // The name of the currently created chain
+    set link_chain_pat [ dict create -inst { 1 simple_id } -chain { 1 simple_id } ]
+    set actual [ verify_make_params $link_chain_pat $args ]
+    if { ! [ dict exists $actual "-inst" ] || ! [ dict exists $actual "-chain" ] } {
+        error "Missisn chain or inst in link_chain"
+        return 0;
+    }
+    set inst [ dict get $actual "-inst" ]
+    set chain [ dict get $actual "-chain" ]
+    set lst  [ dict get $::instance_chaine_scope $chain "-instances" ]
+    lappend lst $inst
+    dict set ::instance_chaine_scope $chain "-instances" $lst
+    return 1
+}
+
+proc append_instance_to_chain  { args } {
+    # -chain <chain_instance_name>
+    # -inst <block_instance_name>
+    # set options {-inst -chain }
+
+    # Duolicate of link_chain
+}
+
 proc drive_port { args } {
     # -name <port_name>               string  // The name of the currently driven net.
     # -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
     # // port_name should be in the format instance_name.port_name
 
     set options {-name -source }
-}
-
-proc create_chain_instance { args } {
-    # -type <chain_type_name>                     string // The name of the instanciated chain
-    # -name <chain_instance_name>                 string // The name of the currently defined chain instance
-    # -start_address <START_LOGICAL_ADDRESS>      int    // Logic address
-    # -end_address <END_LOGICAL_ADDRESS>          int    // Logic address
-
-    set options {-type -name -start_address -end_address }
-}
-
-proc link_chain { args } {
-    # -inst <block_instance_name>          string      // The name of the currently created chain
-    # -chain <chain_instance_name>          string      // The name of the currently created chain
-    set options {-inst -chain }
-}
-
-proc append_instance_to_chain  { args } {
-    # -chain <chain_instance_name>
-    # -inst <block_instance_name>
-    set options {-inst -chain }
 }
 
 proc get_block_names { args } {
