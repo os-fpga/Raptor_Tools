@@ -104,10 +104,10 @@ set(expected_req_txt_md5 "4115eaaf76c3f3de0fbd18c959b31159")
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_feb62023.tar.gz")
+set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_march_2_2023.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 83784561)
+set(litex_expected_size 83795781)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
 # calculate md5sum
