@@ -25,7 +25,7 @@ project(Litex)
 message(${PROJECT_SOURCE_DIR})
 # set download fetch URL as per OS
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    set(py_fatch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/python3.8_static_zlib_6feb2023.tar.gz")
+    set(py_fatch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/python3.8_static_zlib_8march_2023.tar.gz")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(py_fatch_url "https://www.python.org/ftp/python/3.8.7/python-3.8.7-embed-amd64.zip")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
@@ -36,7 +36,7 @@ endif()
 # set the name of file and folder to put the download
 set(py_exe_zip ${PROJECT_SOURCE_DIR}/python_3.zip)
 # set the expected size
-set(py_exe_expected_size 106924392)
+set(py_exe_expected_size 122326998)
 set(DO_DOWNLOAD_PY 0)
 set(DO_EXTRACTION_PY 0)
 #set build or debuild directory
@@ -52,6 +52,11 @@ endif()
 # create directory in advance
 execute_process(
     COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}
+)
+# detect Linux Distro
+execute_process (
+    COMMAND bash -c "awk -F= '/^ID=/{print $2}' /etc/os-release |tr -d '\n' | tr -d '\"'"
+    OUTPUT_VARIABLE LINUX_DISTRO
 )
 #check if Python tar already exist to prevent over download
 if(EXISTS ${py_exe_zip})
@@ -101,18 +106,36 @@ endif()
 # requirements.txt file
 set(req_file ${PROJECT_SOURCE_DIR}/requirements.txt)
 set(expected_req_txt_md5 "4115eaaf76c3f3de0fbd18c959b31159")
+# calculated md5sum of requirements.txt
+file(MD5 ${req_file} CalculatedCheckSum)
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_march_3_2023.tar.gz")
+set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_feb62023.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 85880982)
+set(litex_expected_size 83784561)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
-# calculate md5sum
-file(MD5 ${req_file} CalculatedCheckSum)
-set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8) # needed in case building from scratch
+# needed in case building from scratch
+if(${LINUX_DISTRO} STREQUAL "ubuntu")
+    find_package(
+        Python3 3.8 EXACT
+        REQUIRED
+        COMPONENTS Interpreter
+    )
+    execute_process(
+        COMMAND pip show pipenv
+        RESULT_VARIABLE EXIT_CODE
+        OUTPUT_QUIET
+    )
+    if (NOT ${EXIT_CODE} EQUAL 0)
+        message(FATAL_ERROR "The Python3.8 package pipenv is not installed. Please install it using the following command: python3.8 -m pip install pipenv.")
+    endif()
+    set(PYTHON_EXE python3.8)
+else()
+    set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8)
+endif()
 #compare the md5sum
 if("${expected_req_txt_md5}"  STREQUAL  "${CalculatedCheckSum}") #Comapre checksums
     message(STATUS "Checksum is same. Proceeding with Pre-build Litex Env")
@@ -170,14 +193,127 @@ else() # uncomment it and generate , upload the tar again. requirement.txt is al
     )
 endif ()
 
-if(NOT EXISTS ${work_dir}/litex/bin/python3.8)
-    add_custom_command(OUTPUT ${work_dir}/litex/bin/python3.8
-                    COMMENT "   Create Symbolic Link    "
-                    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
-                                    WORKING_DIRECTORY ${work_dir}/litex/bin
-                    DEPENDS [unzip_python unzip_litex]
-                    )
+add_custom_command(TARGET unzip_litex POST_BUILD
+    COMMENT "   Create Symbolic Link    "
+    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
+                    WORKING_DIRECTORY ${work_dir}/litex/bin
+)
+# --------------------------------------------------------------------------------- 
+#                   ChatGPT VENV                                                   |
+#----------------------------------------------------------------------------------
+# fetch URL for pre build ChatGPT virtual env tar
+set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatGPT_7march_2023.tar.gz")
+# set the name of file and folder to put the download
+set(chatgpt_env_zip ${PROJECT_SOURCE_DIR}/chatgpt_env.zip)
+set(chatgpt_expected_size 22547275)
+set(DO_DOWNLOAD_CGT 0)
+set(DO_EXTRACTION_CGT 0)
+# path of python exe, (commenting as it is already set)
+#set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8) # needed in case building from scratch
+# chatgpt-integration github repo path,
+if (NOT CGT_GITHUB_REPO_PATH)
+  set(CGT_GITHUB_REPO_PATH "Empty")
 endif()
+set(fresh_cgt_clone 0) 
+
+if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty") 
+    message(STATUS "Used Pre-Build ChatGPT VENV")
+    #check if ChatGPT tar already exist to prevent over download
+    if(EXISTS ${chatgpt_env_zip})
+        message(STATUS "ChatGPT downlaoded zip already exist.")
+        file(SIZE ${chatgpt_env_zip} EXE_Download_Size_cgt)
+        if(${EXE_Download_Size_cgt} EQUAL ${chatgpt_expected_size} )
+            message(STATUS "Already present download ChatGPT zip will be used") 
+        else()
+            message(STATUS "Already present download ChatGPT zip is outdated so downloading again")
+            set(DO_DOWNLOAD_CGT 1)
+            set(DO_EXTRACTION_CGT 1)
+        endif()
+    else()
+        message(STATUS "Fresh Downloading ChatGPT zip Binaries")
+        set(DO_DOWNLOAD_CGT 1)
+        set(DO_EXTRACTION_CGT 1)
+    endif()
+
+    if(${DO_DOWNLOAD_CGT} EQUAL 1)
+        #message(STATUS "Downloading ChatGPT Zip Binaries")
+        file(DOWNLOAD ${chatgpt_env_fetch_url} ${chatgpt_env_zip} SHOW_PROGRESS STATUS DOWNLOAD_STATUS)
+        list (GET DOWNLOAD_STATUS 0 STATUS_CODE)
+        if (NOT ${STATUS_CODE} EQUAL "0")
+            message(FATAL_ERROR "Exit status of ChatGPT zip download is ${STATUS_CODE}")
+        else()
+            message(STATUS "Successfully Donwloaded ChatGPT zip)") 
+        endif()
+    endif()
+
+#-------------------Unzip ChatGPT zip------------------------
+    if(NOT EXISTS ${work_dir}/chatGPT/bin/openai)
+    set(DO_EXTRACTION_CGT 1)
+    endif()
+
+    if(${DO_EXTRACTION_CGT} EQUAL 1)
+    add_custom_target(unzip_chatgpt ALL
+             COMMENT      "      Extracting ChatGPT zip      "
+             DEPENDS ${chatgpt_env_zip}
+             BYPRODUCTS ${work_dir}/chatGPT
+             COMMAND ${CMAKE_COMMAND} -E tar xvzf ${chatgpt_env_zip}
+                    WORKING_DIRECTORY ${work_dir}
+             )
+    else ()
+      message(STATUS "Extracted ChatGPT zip Content already exist and haven't download new zip so skipping it")
+    endif()
+
+    add_custom_command(TARGET unzip_chatgpt POST_BUILD
+        COMMENT "   Create Symbolic Link    "
+        COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
+        WORKING_DIRECTORY ${work_dir}/chatGPT/bin
+    )
+# update/create the ChatGPT venv from git repo.
+else() 
+    message(STATUS "Updating the ChatGPT package from GitHub Repo")
+    if (NOT EXISTS ${CGT_GITHUB_REPO_PATH}/setup.py)
+        set(CGT_GITHUB_REPO_PATH ${CMAKE_CURRENT_BINARY_DIR}/chatgpt-integration)
+        message(STATUS "Doing Fresh Clone at ${CGT_GITHUB_REPO_PATH}")
+        execute_process(
+            COMMAND git clone git@github.com:RapidSilicon/chatgpt-integration.git
+            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+            RESULT_VARIABLE GIT_RESULT
+            )
+          if  (NOT GIT_RESULT EQUAL "0")
+            message(FATAL_ERROR "Fail to clone git@github.com:RapidSilicon/chatgpt-integration.git")
+          endif()
+    endif()
+
+    add_custom_command(TARGET unzip_python POST_BUILD
+    COMMENT "   Make Directory of ChatGPT    "
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}/chatGPT
+)    
+
+    add_custom_command(TARGET unzip_python POST_BUILD
+    COMMENT "   Create VENV of ChatGPT    "
+    COMMAND ${CMAKE_COMMAND} -E touch ${work_dir}/chatGPT/.venv
+    COMMAND ${CMAKE_COMMAND} -E echo "${work_dir}/chatGPT" > "${work_dir}/chatGPT/.venv"
+    COMMAND ${PYTHON_EXE} -m pipenv install --python 3.8 --no-site-packages
+    COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install pipenv wheel
+    WORKING_DIRECTORY ${work_dir}/chatGPT
+)
+
+    add_custom_command(TARGET unzip_python POST_BUILD
+    COMMENT "   Create Wheel of ChatGPT and Install it    "
+    COMMAND ${work_dir}/chatGPT/bin/python3 setup.py bdist_wheel
+    COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install dist/*.whl 
+    WORKING_DIRECTORY ${CGT_GITHUB_REPO_PATH}
+)
+
+#    add_custom_command(TARGET unzip_python POST_BUILD
+#    COMMENT "   Create Symbolic Link    "
+#    COMMAND ${CMAKE_COMMAND} -E remove ${work_dir}/chatGPT/bin/python
+#    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python
+#    WORKING_DIRECTORY ${work_dir}/chatGPT/bin
+#    )
+endif ()
+
+
 
 if(NOT RAPTOR)
 install(
@@ -185,7 +321,7 @@ install(
       USE_SOURCE_PERMISSIONS
 )
 endif()
-
+# ---------------------------------------------------------------------------------
 #execute script on install time
 #install( CODE 
 #                "
