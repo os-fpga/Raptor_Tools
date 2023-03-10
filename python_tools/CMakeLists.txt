@@ -248,7 +248,7 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
         WORKING_DIRECTORY ${work_dir}/chatGPT/bin
     )
 
-    add_custom_command(TARGET unzip_python POST_BUILD
+    add_custom_command(TARGET unzip_chatgpt POST_BUILD
         COMMENT "   Copy Python Bash to ChatGTP bin    "
         COMMAND ${CMAKE_COMMAND} -E remove -f  ${work_dir}/chatGPT/bin/python3
         COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/bin/python3 python3
@@ -256,11 +256,11 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
         COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libssl.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
         COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libffi.so.6.0.1 ${work_dir}/chatGPT/lib/os_libs
         COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libcrypto.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
-        DEPENDS ${work_dir}/chatGPT/bin/python3
+        DEPENDS ${work_dir}/python3.8/bin/python3
         WORKING_DIRECTORY ${work_dir}/chatGPT/bin
     )
     
-    add_custom_command(TARGET unzip_python POST_BUILD
+    add_custom_command(TARGET unzip_chatgpt POST_BUILD
         COMMENT "   Create OS depends Symbolic Link for ChatGPT Python    "
         COMMAND ${CMAKE_COMMAND} -E create_symlink libssl.so.1.0.2k libssl.so.10
         COMMAND ${CMAKE_COMMAND} -E create_symlink libffi.so.6.0.1 libffi.so.6
@@ -268,7 +268,7 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
         DEPENDS ${work_dir}/chatGPT/bin/python3
         WORKING_DIRECTORY ${work_dir}/chatGPT/lib/os_libs
     )     
-
+    add_dependencies(unzip_chatgpt unzip_python)
     else ()
       message(STATUS "Extracted ChatGPT zip Content already exist and haven't download new zip so skipping it")
     endif()
