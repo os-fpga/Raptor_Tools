@@ -36,7 +36,7 @@ endif()
 # set the name of file and folder to put the download
 set(py_exe_zip ${PROJECT_SOURCE_DIR}/python_3.zip)
 # set the expected size
-set(py_exe_expected_size 122326998)
+set(py_exe_expected_size 123699788)
 set(DO_DOWNLOAD_PY 0)
 set(DO_EXTRACTION_PY 0)
 #set build or debuild directory
@@ -117,7 +117,7 @@ set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
 set(litex_expected_size 83784561)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
-# needed in case building from scratch
+# pyexe needed in case building from scratch
 if(${LINUX_DISTRO} STREQUAL "ubuntu")
     find_package(
         Python3 3.8 EXACT
@@ -136,6 +136,10 @@ if(${LINUX_DISTRO} STREQUAL "ubuntu")
 else()
     set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8)
 endif()
+
+#------------------------------------------------------------------------------------
+#                   Unzip Litex zip and create symbolic link                        |
+#------------------------------------------------------------------------------------
 #compare the md5sum
 if("${expected_req_txt_md5}"  STREQUAL  "${CalculatedCheckSum}") #Comapre checksums
     message(STATUS "Checksum is same. Proceeding with Pre-build Litex Env")
@@ -167,7 +171,6 @@ if("${expected_req_txt_md5}"  STREQUAL  "${CalculatedCheckSum}") #Comapre checks
         endif()
     endif()
 
-#-------------------Unzip Litex zip------------------------
     if(NOT EXISTS ${work_dir}/litex/bin/cocotb-config)
         set(DO_EXTRACTION_LX 1)
     endif()
@@ -180,6 +183,11 @@ if("${expected_req_txt_md5}"  STREQUAL  "${CalculatedCheckSum}") #Comapre checks
                  COMMAND ${CMAKE_COMMAND} -E tar xvzf ${litex_env_zip}
                         WORKING_DIRECTORY ${work_dir}
                  )
+        add_custom_command(TARGET unzip_litex POST_BUILD
+                 COMMENT "   Create Symbolic Link    "
+                 COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
+                                 WORKING_DIRECTORY ${work_dir}/litex/bin
+             )
     else ()
           message(STATUS "Extracted Litex zip Content already exist and haven't download new zip so skipping it")
     endif()
@@ -193,11 +201,6 @@ else() # uncomment it and generate , upload the tar again. requirement.txt is al
     )
 endif ()
 
-add_custom_command(TARGET unzip_litex POST_BUILD
-    COMMENT "   Create Symbolic Link    "
-    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
-                    WORKING_DIRECTORY ${work_dir}/litex/bin
-)
 # --------------------------------------------------------------------------------- 
 #                   ChatGPT VENV                                                   |
 #----------------------------------------------------------------------------------
@@ -253,64 +256,109 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
 
     if(${DO_EXTRACTION_CGT} EQUAL 1)
     add_custom_target(unzip_chatgpt ALL
-             COMMENT      "      Extracting ChatGPT zip      "
-             DEPENDS ${chatgpt_env_zip}
-             BYPRODUCTS ${work_dir}/chatGPT
-             COMMAND ${CMAKE_COMMAND} -E tar xvzf ${chatgpt_env_zip}
+        COMMENT      "      Extracting ChatGPT zip      "
+        DEPENDS ${chatgpt_env_zip}
+        BYPRODUCTS ${work_dir}/chatGPT
+        COMMAND ${CMAKE_COMMAND} -E tar xvzf ${chatgpt_env_zip}
                     WORKING_DIRECTORY ${work_dir}
-             )
-    else ()
-      message(STATUS "Extracted ChatGPT zip Content already exist and haven't download new zip so skipping it")
-    endif()
-
+    )
     add_custom_command(TARGET unzip_chatgpt POST_BUILD
         COMMENT "   Create Symbolic Link    "
         COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
         WORKING_DIRECTORY ${work_dir}/chatGPT/bin
     )
-# update/create the ChatGPT venv from git repo.
-else() 
-    message(STATUS "Updating the ChatGPT package from GitHub Repo")
-    if (NOT EXISTS ${CGT_GITHUB_REPO_PATH}/setup.py)
-        set(CGT_GITHUB_REPO_PATH ${CMAKE_CURRENT_BINARY_DIR}/chatgpt-integration)
-        message(STATUS "Doing Fresh Clone at ${CGT_GITHUB_REPO_PATH}")
-        execute_process(
-            COMMAND git clone git@github.com:RapidSilicon/chatgpt-integration.git
-            WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
-            RESULT_VARIABLE GIT_RESULT
-            )
-          if  (NOT GIT_RESULT EQUAL "0")
-            message(FATAL_ERROR "Fail to clone git@github.com:RapidSilicon/chatgpt-integration.git")
-          endif()
+
+    add_custom_command(TARGET unzip_python POST_BUILD
+        COMMENT "   Copy Python Bash to ChatGTP bin    "
+        COMMAND ${CMAKE_COMMAND} -E remove -f  ${work_dir}/chatGPT/bin/python3
+        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/bin/python3 python3
+        COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}/chatGPT/lib/os_libs
+        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libssl.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
+        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libffi.so.6.0.1 ${work_dir}/chatGPT/lib/os_libs
+        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libcrypto.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
+        DEPENDS ${work_dir}/chatGPT/bin/python3
+        WORKING_DIRECTORY ${work_dir}/chatGPT/bin
+    )
+    
+    add_custom_command(TARGET unzip_python POST_BUILD
+        COMMENT "   Create OS depends Symbolic Link for ChatGPT Python    "
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libssl.so.1.0.2k libssl.so.10
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libffi.so.6.0.1 libffi.so.6
+        COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.0.2k libcrypto.so.10
+        DEPENDS ${work_dir}/chatGPT/bin/python3
+        WORKING_DIRECTORY ${work_dir}/chatGPT/lib/os_libs
+    )     
+
+    else ()
+      message(STATUS "Extracted ChatGPT zip Content already exist and haven't download new zip so skipping it")
     endif()
+# update/create the ChatGPT venv from git repo.
+else()
+    if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/chatGPT/bin/python)
+        message(FATAL_ERROR "Cannot update/create upon existing virtual environment. Kindly clean the build folder and run again")
+    else()
+        message(STATUS "Updating the ChatGPT package from GitHub Repo")
+        if (NOT EXISTS ${CGT_GITHUB_REPO_PATH}/setup.py)
+            set(CGT_GITHUB_REPO_PATH ${CMAKE_CURRENT_BINARY_DIR}/chatgpt-integration)
+            message(STATUS "Doing Fresh Clone at ${CGT_GITHUB_REPO_PATH}")
+            execute_process(
+                COMMAND git clone git@github.com:RapidSilicon/chatgpt-integration.git
+                WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                RESULT_VARIABLE GIT_RESULT
+                )
+              if  (NOT GIT_RESULT EQUAL "0")
+                message(FATAL_ERROR "Fail to clone git@github.com:RapidSilicon/chatgpt-integration.git")
+              endif()
+        endif()
 
-    add_custom_command(TARGET unzip_python POST_BUILD
-    COMMENT "   Make Directory of ChatGPT    "
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}/chatGPT
-)    
+        add_custom_command(TARGET unzip_python POST_BUILD
+            COMMENT "   Make Directory of ChatGPT    "
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}/chatGPT
+        )    
 
-    add_custom_command(TARGET unzip_python POST_BUILD
-    COMMENT "   Create VENV of ChatGPT    "
-    COMMAND ${CMAKE_COMMAND} -E touch ${work_dir}/chatGPT/.venv
-    COMMAND ${CMAKE_COMMAND} -E echo "${work_dir}/chatGPT" > "${work_dir}/chatGPT/.venv"
-    COMMAND ${PYTHON_EXE} -m pipenv install --python 3.8 --no-site-packages
-    COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install pipenv wheel
-    WORKING_DIRECTORY ${work_dir}/chatGPT
-)
+        add_custom_command(TARGET unzip_python POST_BUILD
+            COMMENT "   Create VENV of ChatGPT    "
+            COMMAND ${CMAKE_COMMAND} -E touch ${work_dir}/chatGPT/.venv
+            COMMAND ${CMAKE_COMMAND} -E echo "${work_dir}/chatGPT" > "${work_dir}/chatGPT/.venv"
+            COMMAND ${PYTHON_EXE} -m pipenv install --python 3.8 --no-site-packages
+            COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install pipenv wheel
+            WORKING_DIRECTORY ${work_dir}/chatGPT
+        )
 
-    add_custom_command(TARGET unzip_python POST_BUILD
-    COMMENT "   Create Wheel of ChatGPT and Install it    "
-    COMMAND ${work_dir}/chatGPT/bin/python3 setup.py bdist_wheel
-    COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install dist/*.whl 
-    WORKING_DIRECTORY ${CGT_GITHUB_REPO_PATH}
-)
+        add_custom_command(TARGET unzip_python POST_BUILD
+            COMMENT "   Create Wheel of ChatGPT and Install it    "
+            COMMAND ${work_dir}/chatGPT/bin/python3 setup.py bdist_wheel
+            COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install dist/*.whl 
+            WORKING_DIRECTORY ${CGT_GITHUB_REPO_PATH}
+        )
 
-#    add_custom_command(TARGET unzip_python POST_BUILD
-#    COMMENT "   Create Symbolic Link    "
-#    COMMAND ${CMAKE_COMMAND} -E remove ${work_dir}/chatGPT/bin/python
-#    COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python
-#    WORKING_DIRECTORY ${work_dir}/chatGPT/bin
-#    )
+        add_custom_command(TARGET unzip_python POST_BUILD
+            COMMENT "   Create Symbolic Link    "
+            COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
+            WORKING_DIRECTORY ${work_dir}/chatGPT/bin
+        )
+
+        add_custom_command(TARGET unzip_python POST_BUILD
+            COMMENT "   Copy Python Bash to ChatGTP bin    "
+            COMMAND ${CMAKE_COMMAND} -E remove -f  ${work_dir}/chatGPT/bin/python3
+            COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/bin/python3 python3
+            COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}/chatGPT/lib/os_libs
+            COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libssl.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
+            COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libffi.so.6.0.1 ${work_dir}/chatGPT/lib/os_libs
+            COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libcrypto.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
+            DEPENDS ${work_dir}/chatGPT/bin/python3
+            WORKING_DIRECTORY ${work_dir}/chatGPT/bin
+        )
+
+        add_custom_command(TARGET unzip_python POST_BUILD
+            COMMENT "   Create OS depends Symbolic Link for ChatGPT Python    "
+            COMMAND ${CMAKE_COMMAND} -E create_symlink libssl.so.1.0.2k libssl.so.10
+            COMMAND ${CMAKE_COMMAND} -E create_symlink libffi.so.6.0.1 libffi.so.6
+            COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.0.2k libcrypto.so.10
+            DEPENDS ${work_dir}/chatGPT/bin/python3
+            WORKING_DIRECTORY ${work_dir}/chatGPT/lib/os_libs
+        )
+    endif()
 endif ()
 
 
