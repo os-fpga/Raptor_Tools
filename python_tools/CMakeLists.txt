@@ -117,26 +117,6 @@ set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
 set(litex_expected_size 83784561)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
-# pyexe needed in case building from scratch
-if(${LINUX_DISTRO} STREQUAL "ubuntu")
-    find_package(
-        Python3 3.8 EXACT
-        REQUIRED
-        COMPONENTS Interpreter
-    )
-    execute_process(
-        COMMAND pip show pipenv
-        RESULT_VARIABLE EXIT_CODE
-        OUTPUT_QUIET
-    )
-    if (NOT ${EXIT_CODE} EQUAL 0)
-        message(FATAL_ERROR "The Python3.8 package pipenv is not installed. Please install it using the following command: python3.8 -m pip install pipenv.")
-    endif()
-    set(PYTHON_EXE python3.8)
-else()
-    set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8)
-endif()
-
 #------------------------------------------------------------------------------------
 #                   Unzip Litex zip and create symbolic link                        |
 #------------------------------------------------------------------------------------
@@ -294,6 +274,25 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
     endif()
 # update/create the ChatGPT venv from git repo.
 else()
+    # pyexe needed in case building from scratch
+    if(${LINUX_DISTRO} STREQUAL "ubuntu")
+        find_package(
+            Python3 3.8 EXACT
+            REQUIRED
+            COMPONENTS Interpreter
+        )
+        execute_process(
+            COMMAND pip show pipenv
+            RESULT_VARIABLE EXIT_CODE
+            OUTPUT_QUIET
+        )
+        if (NOT ${EXIT_CODE} EQUAL 0)
+            message(FATAL_ERROR "The Python3.8 package pipenv is not installed. Please install it using the following command: python3.8 -m pip install pipenv.")
+        endif()
+        set(PYTHON_EXE python3.8)
+    else()
+        set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8)
+    endif()
     if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/chatGPT/bin/python)
         message(FATAL_ERROR "Cannot update/create upon existing virtual environment. Kindly clean the build folder and run again")
     else()
