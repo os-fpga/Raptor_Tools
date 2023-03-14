@@ -185,10 +185,10 @@ endif ()
 #                   ChatGPT VENV                                                   |
 #----------------------------------------------------------------------------------
 # fetch URL for pre build ChatGPT virtual env tar
-set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatGPT_7march_2023.tar.gz")
+set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatgpt_14march_2023.tar.gz")
 # set the name of file and folder to put the download
 set(chatgpt_env_zip ${PROJECT_SOURCE_DIR}/chatgpt_env.zip)
-set(chatgpt_expected_size 22547275)
+set(chatgpt_expected_size 23906937)
 set(DO_DOWNLOAD_CGT 0)
 set(DO_EXTRACTION_CGT 0)
 # path of python exe, (commenting as it is already set)
@@ -247,28 +247,6 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
         COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
         WORKING_DIRECTORY ${work_dir}/chatGPT/bin
     )
-
-    add_custom_command(TARGET unzip_chatgpt POST_BUILD
-        COMMENT "   Copy Python Bash to ChatGTP bin    "
-        COMMAND ${CMAKE_COMMAND} -E remove -f  ${work_dir}/chatGPT/bin/python3
-        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/bin/python3 python3
-        COMMAND ${CMAKE_COMMAND} -E make_directory ${work_dir}/chatGPT/lib/os_libs
-        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libssl.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
-        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libffi.so.6.0.1 ${work_dir}/chatGPT/lib/os_libs
-        COMMAND ${CMAKE_COMMAND} -E copy ../../python3.8/lib/os_libs/libcrypto.so.1.0.2k ${work_dir}/chatGPT/lib/os_libs
-        DEPENDS ${work_dir}/python3.8/bin/python3
-        WORKING_DIRECTORY ${work_dir}/chatGPT/bin
-    )
-    
-    add_custom_command(TARGET unzip_chatgpt POST_BUILD
-        COMMENT "   Create OS depends Symbolic Link for ChatGPT Python    "
-        COMMAND ${CMAKE_COMMAND} -E create_symlink libssl.so.1.0.2k libssl.so.10
-        COMMAND ${CMAKE_COMMAND} -E create_symlink libffi.so.6.0.1 libffi.so.6
-        COMMAND ${CMAKE_COMMAND} -E create_symlink libcrypto.so.1.0.2k libcrypto.so.10
-        DEPENDS ${work_dir}/chatGPT/bin/python3
-        WORKING_DIRECTORY ${work_dir}/chatGPT/lib/os_libs
-    )     
-    add_dependencies(unzip_chatgpt unzip_python)
     else ()
       message(STATUS "Extracted ChatGPT zip Content already exist and haven't download new zip so skipping it")
     endif()
