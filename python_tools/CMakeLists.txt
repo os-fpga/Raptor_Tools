@@ -185,7 +185,7 @@ endif ()
 #                   ChatGPT VENV                                                   |
 #----------------------------------------------------------------------------------
 # fetch URL for pre build ChatGPT virtual env tar
-set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatgpt_14march_2023.tar.gz")
+set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatGPT_27march2023.tar.gz")
 # set the name of file and folder to put the download
 set(chatgpt_env_zip ${PROJECT_SOURCE_DIR}/chatgpt_env.zip)
 set(chatgpt_expected_size 23906937)
