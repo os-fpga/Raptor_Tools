@@ -14,7 +14,7 @@ if(NOT CMAKE_BUILD_TYPE)
 endif(NOT CMAKE_BUILD_TYPE)
 
 set(RELEASE_YEAR 2023)
-set(RELEASE_MONTH 01)
+set(RELEASE_MONTH 04)
 set(RELEASE_DAY 23)
 
 project(RaptorInstaller DESCRIPTION "Package install artifacts as single executable installer")
