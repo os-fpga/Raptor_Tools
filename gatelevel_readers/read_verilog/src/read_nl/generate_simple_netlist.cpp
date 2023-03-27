@@ -640,20 +640,28 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
                      netlist->Owner()->Name(), netlist->NumOfRefs(), top->Owner()->Name());
         // Iterate over all ports of this netlist
         const char *current_block_model = netlist->Owner()->Name();
+        VeriModule *im = veri_file::GetModule(current_block_model);
         Port *port;
         FOREACH_PORT_OF_NETLIST(netlist, mi, port)
         {
             PortBus *portb = port->Bus();
-            if (DIR_INOUT == port->GetDir())
-                n_l.inout_ports.push_back(port->Name());
+            if (DIR_INOUT == port->GetDir()) {
+                if(netlist == top) {
+                    n_l.inout_ports.push_back(port->Name());
+                }
+            }
             else if (DIR_OUT == port->GetDir())
             {
-                n_l.out_ports.push_back(port->Name());
+                if(netlist == top) {
+                    n_l.out_ports.push_back(port->Name());
+                }
                 n_l.ports.push_back(port->Name());
             }
             else if (DIR_IN == port->GetDir())
             {
-                n_l.in_ports.push_back(port->Name());
+                if(netlist == top) {
+                    n_l.in_ports.push_back(port->Name());
+                }
                 n_l.ports.push_back(port->Name());
                 n_l.in_set.insert(port->Name());
             }
@@ -675,55 +683,81 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         {
             netBusMap[netbus->Name()] = {netbus->LeftIndex(), netbus->RightIndex()};
         }
-        Instance *instance;
-        // Iterate over all references (Instances) of this netlist
-        FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
-        {
-            // Iterate over all parameters of instance
-            n_l.blocks.push_back(inst());
-            if (instance->IsProtected())
-                n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
-            n_l.blocks.back().name_ = instance->Name();
-            n_l.blocks.back().mod_name_ = current_block_model;
-            char *param_name, *param_value;
-            FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
+        if(!im){
+            Instance *instance;
+            // Iterate over all references (Instances) of this netlist
+            FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
             {
-                // Do what you want with them ...
-                string literal(param_value);
-                vector<string> v;
-                string param_v;
-                bool is_valid = false;
-                try
+                // Iterate over all parameters of instance
+                n_l.blocks.push_back(inst());
+                if (instance->IsProtected())
+                    n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
+                n_l.blocks.back().name_ = instance->Name();
+                n_l.blocks.back().mod_name_ = current_block_model;
+                char *param_name, *param_value;
+                FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
                 {
-                    bits(literal, v, param_v);
-                }
-                catch (...)
-                {
-                    param_v = literal;
-                }
-                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
+                    // Do what you want with them ...
+                    string literal(param_value);
+                    vector<string> v;
+                    string param_v;
+                    bool is_valid = false;
+                    try
+                    {
+                        bits(literal, v, param_v);
+                    }
+                    catch (...)
+                    {
+                        param_v = literal;
+                    }
+                    is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
 
-                if (is_valid)
-                {
-                    n_l.blocks.back().params_[param_name] = param_v;
+                    if (is_valid)
+                    {
+                        n_l.blocks.back().params_[param_name] = param_v;
+                    }
+                    else
+                    {
+                        // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
+                    }
                 }
-                else
+                // Iterate over all portrefs of instance
+                PortRef *portref;
+                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
                 {
-                    // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
+                    // Do what you want with it ...
+                    Net *net_ = portref->GetNet();
+                    Port *port_ = portref->GetPort();
+                    n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                }
+                if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+                {
+                    simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
                 }
             }
-            // Iterate over all portrefs of instance
-            PortRef *portref;
-            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+        } else {
+            Instance *instance;
+            FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
             {
-                // Do what you want with it ...
-                Net *net_ = portref->GetNet();
-                Port *port_ = portref->GetPort();
-                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
-            }
-            if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
-            {
-                simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
+                // Iterate over all parameters of instance
+                if (instance->IsProtected())
+                    n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
+
+                // Iterate over all portrefs of instance
+                PortRef *portref;
+                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                {
+                    // Do what you want with it ...
+                    Net *net_ = portref->GetNet();
+                    Port *port_ = portref->GetPort();
+                    if(strcmp(net_->Name() ,port_->Name())) {
+                        if (DIR_IN == port_->GetDir()) {
+                            n_l.port_conns.insert({net_->Name(), port_->Name()});
+                        } else if (DIR_OUT == port_->GetDir()) {
+                            n_l.port_conns.insert({port_->Name(), net_->Name()});
+                        }
+                    }
+                }
             }
         }
     }

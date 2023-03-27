@@ -6,6 +6,7 @@ echo -e "#######################################################################
 
 base_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 go_batch="no"
+
 # this check is needed as we need to generate raptor_setup.sh
 is_raptor_home_absolute () {
 ok=0
@@ -69,7 +70,14 @@ else
 fi
 
 #set the libs
-[ -d /tmp ] && extract_dir="/tmp" || extract_dir=$(pwd)
+touch $(pwd)/.check
+if [ $? -ne 0 ]
+then
+    echo "[ERROR]   Seems like don't have write permission in current directory. Need write permission to dump temp files"
+    exit 1
+fi
+rm -f $(pwd)/.check
+extract_dir=$(pwd)
 tar -xzf inst_libs.tar.gz -C $extract_dir && export LD_LIBRARY_PATH=$extract_dir/inst_libs:$LD_LIBRARY_PATH
 
 # install from QtIFW generated .run file
@@ -100,14 +108,16 @@ then
     echo "[WARNING]\tNot attempting to install dependencies. But Some features of Raptor will not work"
     #./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer Raptor.Dependencies=No  --accept-messages in
     ./$t_path --root $raptor_h --accept-licenses --confirm-command  --accept-messages in
+    echo -e "[INFO]\tDone installing Raptor :)"
 elif [ "$dep_install" == "yes" ]
 then
     #./$t_path --root $raptor_h --accept-licenses --confirm-command --auto-answer Raptor.Dependencies=Ok --accept-messages in
     ./$t_path --root $raptor_h --accept-licenses --confirm-command  --accept-messages in
+
+    echo -e "[INFO]\tDone installing Raptor :)"
 else 
     #echo -e "[ERROR]\tIt is mandatory to give either --install-dep or --no-dep-install"
     ./$t_path --root $raptor_h --accept-licenses --confirm-command  --accept-messages in
+    echo -e "[INFO]\tDone installing Raptor :)"
     #exit 2
 fi 
-echo -e "[INFO]\tDone installing Raptor :)"
-rm -rf $extract_dir/inst_libs
