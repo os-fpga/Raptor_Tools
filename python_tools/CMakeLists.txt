@@ -188,7 +188,7 @@ endif ()
 set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatGPT_4april2023.tar.gz")
 # set the name of file and folder to put the download
 set(chatgpt_env_zip ${PROJECT_SOURCE_DIR}/chatgpt_env.zip)
-set(chatgpt_expected_size 23906937)
+set(chatgpt_expected_size 24167165)
 set(DO_DOWNLOAD_CGT 0)
 set(DO_EXTRACTION_CGT 0)
 # path of python exe, (commenting as it is already set)
