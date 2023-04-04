@@ -253,6 +253,7 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
 # update/create the ChatGPT venv from git repo.
 else()
     # pyexe needed in case building from scratch
+    # On ubuntu look for system python, on CentOS , go with own compiled one.
     if(${LINUX_DISTRO} STREQUAL "ubuntu")
         find_package(
             Python3 3.8 EXACT
@@ -268,8 +269,10 @@ else()
             message(FATAL_ERROR "The Python3.8 package pipenv is not installed. Please install it using the following command: python3.8 -m pip install pipenv.")
         endif()
         set(PYTHON_EXE python3.8)
+        set(PYTHON_EXE_VERSION 3.8)
     else()
         set(PYTHON_EXE ${work_dir}/python3.8/bin/python3.8)
+        set(PYTHON_EXE_VERSION ${work_dir}/python3.8/bin/python3.8)
     endif()
     if (EXISTS ${CMAKE_CURRENT_BINARY_DIR}/share/envs/chatGPT/bin/python)
         message(FATAL_ERROR "Cannot update/create upon existing virtual environment. Kindly clean the build folder and run again")
@@ -297,7 +300,7 @@ else()
             COMMENT "   Create VENV of ChatGPT    "
             COMMAND ${CMAKE_COMMAND} -E touch ${work_dir}/chatGPT/.venv
             COMMAND ${CMAKE_COMMAND} -E echo "${work_dir}/chatGPT" > "${work_dir}/chatGPT/.venv"
-            COMMAND ${PYTHON_EXE} -m pipenv install --python 3.8 --no-site-packages
+            COMMAND ${PYTHON_EXE} -m pipenv install --python ${PYTHON_EXE_VERSION}  --no-site-packages
             COMMAND ${work_dir}/chatGPT/bin/python3 -m pip install pipenv wheel
             WORKING_DIRECTORY ${work_dir}/chatGPT
         )
@@ -312,6 +315,8 @@ else()
         add_custom_command(TARGET unzip_python POST_BUILD
             COMMENT "   Create Symbolic Link    "
             COMMAND ${CMAKE_COMMAND} -E create_symlink ../../python3.8/bin/python3.8 python3.8
+            COMMAND ${CMAKE_COMMAND} -E remove -f  ${work_dir}/chatGPT/bin/python
+            COMMAND ${CMAKE_COMMAND} -E create_symlink python3 python
             WORKING_DIRECTORY ${work_dir}/chatGPT/bin
         )
 
