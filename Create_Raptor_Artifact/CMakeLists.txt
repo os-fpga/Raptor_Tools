@@ -26,24 +26,29 @@ set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/d
 set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
 set(expected_size 54620308)
 
-# list of devices to encrypt.
-list(APPEND RS_DEVICES 
-        gemini/gemini_vpr.xml 
-        mpw1/TSMC22nm_vpr.xml
-  )
-
 # Raptor Install Path,
 if (NOT RAPTOR_INSTALL_PATH)
   set(RAPTOR_INSTALL_PATH "Empty")
 endif() 
+
+# get all devices vpr.xml file
+file(GLOB RS_DEVICES ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/*/*_vpr.xml)
+
+message(STATUS "---     Following Devices are found ${RS_DEVICES}")
+
+#message(FATAL_ERROR "---    RAPTOR_INSTALL_PATH does not exist. Exiting")
 
 # change the device name in device.xml  
 if (EXISTS ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml)
     message(STATUS "---     Provided Raptor Install Path with is ${RAPTOR_INSTALL_PATH}")
     file(READ ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml FILE_CONTENTS)
     foreach(device IN LISTS RS_DEVICES)
-      message(STATUS "---      Updating ${device} ...")
-      string(REPLACE "${device}" "${device}e" FILE_CONTENTS ${FILE_CONTENTS})  # TODO: this add e each time. Prevent it 
+        get_filename_component(vpr_file "${device}" NAME)
+        get_filename_component(full_dir "${device}" DIRECTORY)
+        get_filename_component(dir_ "${full_dir}" NAME)
+        set(full_device_name ${dir_}/${vpr_file})
+        message(STATUS "---      Updating ${full_device_name} ...")
+        string(REPLACE "${full_device_name}" "${full_device_name}e" FILE_CONTENTS ${FILE_CONTENTS})  # TODO: this add e each time. Prevent it 
     endforeach()
     file(WRITE ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml ${FILE_CONTENTS})
     file(WRITE ${RAPTOR_INSTALL_PATH}/share/envs/litex/.venv "#write absolute path of directory where this file is present" )
@@ -91,13 +96,11 @@ target_link_libraries(Encryption_method OpenSSL::Crypto)
 # encrypt and delete
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Encrypt XML files and copy README to top DIR"
-    # 2 is number of devices and below is the path to xml files
+    # 2nd arg is a list of the path to xml files
 	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/Encryption_method ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key 
-                                                            ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/gemini/gemini_vpr.xml 
-                                                            ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
+                                                            ${RS_DEVICES}
     # below command will delete the files
-    COMMAND ${CMAKE_COMMAND} -E remove -f  ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/gemini/gemini_vpr.xml
-                                           ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/mpw1/TSMC22nm_vpr.xml
+    COMMAND ${CMAKE_COMMAND} -E remove -f  ${RS_DEVICES}
     COMMAND ${CMAKE_COMMAND} -E copy ${RAPTOR_INSTALL_PATH}/share/raptor/doc/README.md ${RAPTOR_INSTALL_PATH}                                   
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
