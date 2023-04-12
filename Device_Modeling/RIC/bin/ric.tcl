@@ -96,6 +96,11 @@ proc pdict { d {i 0} {p "  "} {s " -> "} } {
 
     set ::chaine_scope [ dict create ]
 
+    set ::RTL_To_User_Name_Map [ dict create ]
+
+    set ::User_To_RTL_Name_Map [ dict create ]
+
+
     # Lookup this scope then ::enum_scope
     set ::param_type_scope [ dict create integer 32 double 64 string 32 ]
 
@@ -882,11 +887,65 @@ proc link_chain { args } {
 }
 
 proc append_instance_to_chain  { args } {
-    # -chain <chain_instance_name>
-    # -inst <block_instance_name>
-    # set options {-inst -chain }
+    # -inst <block_instance_name>          string      // The name of the currently created chain
+    # -chain <chain_instance_name>          string      // The name of the currently created chain
+    set link_chain_pat [ dict create -inst { 1 simple_id } -chain { 1 simple_id } ]
+    set actual [ verify_make_params $link_chain_pat $args ]
+    if { ! [ dict exists $actual "-inst" ] || ! [ dict exists $actual "-chain" ] } {
+        error "Missisn chain or inst in link_chain"
+        return 0;
+    }
+    set inst [ dict get $actual "-inst" ]
+    set chain [ dict get $actual "-chain" ]
+    set lst  [ dict get $::instance_chaine_scope $chain "-instances" ]
+    lappend lst $inst
+    dict set ::instance_chaine_scope $chain "-instances" $lst
+    return 1
+}
 
-    # Duolicate of link_chain
+proc map_rtl_user_names  { args } {
+    # -rtl_name  <rtl_sig_name>          string      // The name of the signal in the RTL level
+    # -user_name <rtl_sig_name>          string      // The name of the signal as seen/set by Raptor user
+    # Example : 
+
+    set rtl_user_name_pat [ dict create -rtl_name { 1 simple_id } -user_name { 1 simple_id } ]
+    set actual [ verify_make_params $rtl_user_name_pat $args ]
+    if { ! [ dict exists $actual "-rtl_name" ] || ! [ dict exists $actual "-user_name" ] } {
+        error "Missisn rtl name or user name for rtl/user name association"
+        return 0;
+    }
+    set rtl_name [ dict get $actual "-rtl_name" ]
+    set user_name [ dict get $actual "-user_name" ]
+   # Any call will override previous associations
+    dict set ::RTL_To_User_Name_Map $rtl_name $user_name
+    dict set ::User_To_RTL_Name_Map $user_name $rtl_name
+    return 1
+}
+
+proc get_user_name  { args } {
+    # -rtl_name  <rtl_sig_name>          string      // The name of the signal in the RTL level
+    set get_user_name_pat [ dict create -rtl_name { 1 simple_id } ]
+    set actual [ verify_make_params $get_user_name_pat $args ]
+    if { ! [ dict exists $actual "-rtl_name" ] } {
+        error "Missisn rtl name to retreive associated user name"
+        return 0;
+    }
+    set rtl_name [ dict get $actual "-rtl_name" ]
+    set user_name [ dict get $::RTL_To_User_Name_Map $rtl_name ]
+    return $user_name
+}
+
+proc get_rtl_name  { args } {
+    # -user_name  <rtl_sig_name>          string      // The name of the signal in the RTL level
+    set get_rtl_name_pat [ dict create -user_name { 1 simple_id } ]
+    set actual [ verify_make_params $get_rtl_name_pat $args ]
+    if { ! [ dict exists $actual "-user_name" ] } {
+        error "Missisn user name to retreive associated rtl name"
+        return 0;
+    }
+    set user_name [ dict get $actual "-user_name" ]
+    set rtl_name [ dict get $::User_To_RTL_Name_Map $user_name ]
+    return $rtl_name
 }
 
 proc drive_port { args } {
