@@ -122,13 +122,11 @@ void VeriCaseStmtVisit::VERI_VISIT(VeriCaseStatement, node)
 
 ////////////////////////////////////////////////////////////////////////////
 
-int main(int argc, char **argv)
+int prune_verilog (const char *file_name, const char *out_file_name, const char *file_base)
 {
 #ifndef VERIFIC_LINEFILE_INCLUDES_COLUMNS
     Message::PrintLine("This application example requires the compile-flag VERIFIC_LINEFILE_INCLUDES_COLUMNS (located in util/VerificSystem.h) to be active in order to run!") ;
 #else
-    if (argc < 2) Message::PrintLine("Default input file: example.v, default output file: ex2_out.v, default secure directory: src. Specify command line argument to override") ;
-
     // The following operations will be done by this application on the file:
     // 1 . File specified in the first command line argument will be analyzed.
     // 2 . Handle for file modification utility (TextBasedDesignMod) will be created.
@@ -138,9 +136,6 @@ int main(int argc, char **argv)
     //       (b). Remove the last module item from the first top level module.
     // 4 . Modified file will be written in another file that can be specified as the second
     //     command line argument, if not specified, the original file is overwritten!
-
-    // Get the file name to work on
-    const char *file_name = (argc > 1) ? argv[1] : "example.v" ;
 
     // Analyze the design file(in verilog2k mode), if there is any error, don't proceed further!
 #ifdef USE_COMREAD
@@ -171,7 +166,7 @@ int main(int argc, char **argv)
     // specified as the secure directory here. So we can modify and overwrite the files only
     // under this directory tree. Any other file outside of that tree can be modified but
     // cannot be overwritten!
-    TextBasedDesignMod file_base_comment((argc > 3) ? argv[3] : "src") ;
+    TextBasedDesignMod file_base_comment(file_base) ;
 
     // We will perform the manipulations as said before on the first top level module of the specified file:
 
@@ -231,8 +226,6 @@ int main(int argc, char **argv)
     /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
      *                Write modified source file to a file                *
      * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-
-    const char *out_file_name = (argc > 2) ? argv[2] : "ex2_out.v" ;
     Message::PrintLine("Writing the design to file ", out_file_name) ;
 
     // Write the modified file
