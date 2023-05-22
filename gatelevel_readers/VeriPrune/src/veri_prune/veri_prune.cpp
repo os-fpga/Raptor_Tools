@@ -208,6 +208,29 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     // Get the module item list of module.
     Array *items = mod->GetModuleItems() ;
+    VeriModuleItem *module_item;
+    unsigned i;
+    FOREACH_ARRAY_ITEM(items, i, module_item)
+    {
+        if (!module_item)
+            continue;
+        if(module_item->IsInstantiation()) {
+        	const char *mod_name = module_item->GetModuleName();
+        	std::cout << "Inst name is " << mod_name << std::endl;
+        	for (const std::string& str : gb.gb_mods) {
+        	    if (str == mod_name) {
+        	    	// Get the starting location and ending location of this module item.
+        	    	linefile_type start_linefile = module_item->StartingLinefile() ;
+        	    	linefile_type end_linefile = module_item->EndingLinefile() ;
+
+        	    	// Now we want to remove the sections occupied by the gearbox constructs
+        	    	// from the file. We know the starting location and ending location of
+        	    	// these items. Call 'Replace' routine of 'TextBasedDesignMod' utility for this.
+        	    	file_base_comment.Replace(start_linefile, end_linefile, 0 /* no replace, only remove */) ;
+        	    }
+        	}
+        }
+    }
 
     // Get the last module item, it is the item we want to remove
     VeriModuleItem *mod_item = (items && items->Size()) ? (VeriModuleItem*)items->GetLast() : 0 ;
