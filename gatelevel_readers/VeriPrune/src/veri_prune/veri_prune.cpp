@@ -27,6 +27,7 @@
 #include "VeriModuleItem.h" // Definitions of all verilog module item tree nodes
 #include "VeriStatement.h"  // Make VeriCaseStatement class available
 #include "VeriVisitor.h"    // For visitor patterns
+#include "veri_prune.h" 
 
 #ifdef USE_COMREAD
 #include "Commands.h"
@@ -122,7 +123,7 @@ void VeriCaseStmtVisit::VERI_VISIT(VeriCaseStatement, node)
 
 ////////////////////////////////////////////////////////////////////////////
 
-int prune_verilog (const char *file_name, const char *out_file_name, const char *file_base)
+int prune_verilog (const char *file_name, const char *out_file_name, const char *file_base, gb_constructs &gb)
 {
 #ifndef VERIFIC_LINEFILE_INCLUDES_COLUMNS
     Message::PrintLine("This application example requires the compile-flag VERIFIC_LINEFILE_INCLUDES_COLUMNS (located in util/VerificSystem.h) to be active in order to run!") ;

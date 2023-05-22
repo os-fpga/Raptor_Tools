@@ -1,4 +1,4 @@
-#include "add_and_delete_statements.h"
+#include "veri_prune.h"
 
 int main(int argc, char **argv)
 {
@@ -7,5 +7,7 @@ int main(int argc, char **argv)
 
     const char *out_file_name = (argc > 2) ? argv[2] : "ex2_out.v" ;
     const char *file_base = ((argc > 3) ? argv[3] : "src") ;
-    prune_verilog (file_name, out_file_name, file_base);
+
+    gb_constructs gb;
+    prune_verilog (file_name, out_file_name, file_base, gb);
 }
