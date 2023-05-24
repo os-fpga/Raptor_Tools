@@ -17,10 +17,13 @@
 #include <iostream>
 #include "Array.h"          // Make class Array available
 
+#include "VeriId.h"         // Definitions of all identifier definition tree nodes
+
 #include "Message.h"        // Make message handlers available
 
 #include "TextBasedDesignMod.h"  // Text-Based Design-Modification (TextBasedDesignMod) utility
 
+#include "DataBase.h" // Make (hierarchical netlist) database API available
 #include "veri_file.h"      // Make verilog reader available
 #include "VeriModule.h"     // Definition of a VeriModule and VeriPrimitive
 #include "VeriExpression.h" // Definitions of all verilog expression tree nodes
@@ -225,8 +228,36 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     break;
                 else
                     no_param_name.push_back(k);
-        	for (const std::string& str : gb.gb_mods) {
+        	for (const auto& element : gb.gb_mods) {
+                std::string str = element.first;
         	    if (str == no_param_name) {
+                    VeriIdDef *id ;
+        	        unsigned m ;
+
+        	        Array *insts = module_item->GetInstances();
+        	        FOREACH_ARRAY_ITEM(insts, m, id) {
+        	        	if (!id) cout << "NOT an ID" << endl;
+        	        	else printf("Got an ID\n");
+        	        	const char *inst_name = id->InstName() ;
+        	        	if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
+
+                        VeriIdDef *formal ;
+                        VeriIdDef *actual_id ;
+                        VeriExpression *actual ;
+                        const char *formal_name ;
+                         const char *actual_name ;
+        	        	VeriExpression *expr ;
+        	        	unsigned k ;
+        	        	Array *port_conn_arr = id->GetPortConnects() ;
+        	        	FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
+                            formal_name = expr->NamedFormal() ;
+                            formal = module_item->GetPort(formal_name) ;
+                            actual = expr->GetConnection() ;
+                            actual_id = (actual) ? actual->FullId() : 0 ;
+                            actual_name = actual_id->Name();
+                            std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
+        	        	}
+        	        }
         	    	// Get the starting location and ending location of this module item.
         	    	linefile_type start_linefile = module_item->StartingLinefile() ;
         	    	linefile_type end_linefile = module_item->EndingLinefile() ;
