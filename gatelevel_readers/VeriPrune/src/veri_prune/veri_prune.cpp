@@ -215,10 +215,18 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         if (!module_item)
             continue;
         if(module_item->IsInstantiation()) {
-        	const char *mod_name = module_item->GetModuleName();
+        	std::string mod_name = module_item->GetModuleName();
         	std::cout << "Inst name is " << mod_name << std::endl;
+            std::string no_param_name;
+            // reducing a correctly named parametrized module MyModule(par1=99) to MyModule
+            // discuss with thierry !
+            for (auto k : mod_name)
+                if ('(' == k)
+                    break;
+                else
+                    no_param_name.push_back(k);
         	for (const std::string& str : gb.gb_mods) {
-        	    if (str == mod_name) {
+        	    if (str == no_param_name) {
         	    	// Get the starting location and ending location of this module item.
         	    	linefile_type start_linefile = module_item->StartingLinefile() ;
         	    	linefile_type end_linefile = module_item->EndingLinefile() ;

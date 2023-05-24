@@ -6,6 +6,8 @@
 #include <string>
 #include <vector>
 
+using namespace std;
+
 struct gb_constructs
 {
     std::vector <std::string> gb_mods = {"clkbuf", "ibuf", "ibufds",
