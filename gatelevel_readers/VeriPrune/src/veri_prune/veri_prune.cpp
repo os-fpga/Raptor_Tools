@@ -37,6 +37,10 @@
 #include "ComRead.h"
 #endif
 
+#ifdef VERIFIC_NAMESPACE
+using namespace Verific ;
+#endif
+
 /****************************************************************************************
 
                                 NOTE TO THE READER:
@@ -57,10 +61,6 @@
       we default to hard-coded values.
 
 *****************************************************************************************/
-
-#ifdef VERIFIC_NAMESPACE
-namespace Verific { // start definitions in verific namespace
-#endif
 
 // Visit class to visit all case statements of a module
 class VeriCaseStmtVisit : public VeriVisitor
@@ -91,14 +91,6 @@ private:
     TextBasedDesignMod *_tbdm ;
     VeriModule   *_mod ;
 } ;
-
-#ifdef VERIFIC_NAMESPACE
-} // end definitions in verific namespace
-#endif
-
-#ifdef VERIFIC_NAMESPACE
-using namespace Verific ;
-#endif
 
 ////////////////////////////////////////////////////////////////////////////
 ////////////              VeriCaseStmtVisit class               ////////////
@@ -250,12 +242,34 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	        	unsigned k ;
         	        	Array *port_conn_arr = id->GetPortConnects() ;
         	        	FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
+                            std::cout << "ID_VERIPORTCONNECT" << std::endl;
                             formal_name = expr->NamedFormal() ;
                             formal = module_item->GetPort(formal_name) ;
                             actual = expr->GetConnection() ;
-                            actual_id = (actual) ? actual->FullId() : 0 ;
-                            actual_name = actual_id->Name();
-                            std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
+                            if (actual->GetClassId() == ID_VERICONCAT) {
+                                std::cout << "got the reason" << std::endl;
+                                Array *expr_arr = actual->GetExpressions();
+                                unsigned i;
+                                VeriExpression *pexpr;
+                                FOREACH_ARRAY_ITEM(expr_arr, i, pexpr)
+                                {
+                                    actual_id = (pexpr) ? pexpr->FullId() : 0 ;
+                                    actual_name = actual_id->Name();
+                                    std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
+                                }
+                            } else if (actual->GetClassId() == ID_VERIINDEXEDID) {
+                                VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
+                                unsigned port_dir = indexed_id->PortExpressionDir() ;
+                                unsigned port_size = indexed_id->FindSize();
+                                const char *port_name = indexed_id->GetName() ; // Get port name
+                                Message::Info(indexed_id->Linefile(),"here '", port_name, "' is an indexed id in a port declaration") ;
+                                std::cout << "it is indexed and dir " << port_size << std::endl;
+                            }  
+                            else {
+                                actual_id = (actual) ? actual->FullId() : 0 ;
+                                actual_name = actual_id->Name();
+                                std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
+                            }
         	        	}
         	        }
         	    	// Get the starting location and ending location of this module item.
