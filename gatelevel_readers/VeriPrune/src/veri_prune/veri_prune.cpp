@@ -195,6 +195,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         return 3 ;
     }
 
+    char *mod_str;
+
     VeriModule *moduleg = (VeriModule *)all_top_modules->GetFirst();
     std::string TM = moduleg->GetName();
     std::cout << TM << " is TP" <<std::endl;
@@ -369,7 +371,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         mod->RemovePort(dp.c_str());
     }
 
-    std::cout << mod->GetPrettyPrintedString() << std::endl;
+    mod_str = mod->GetPrettyPrintedString();
     // Get the last module item, it is the item we want to remove
     VeriModuleItem *mod_item = (items && items->Size()) ? (VeriModuleItem*)items->GetLast() : 0 ;
     if (mod_item) {
@@ -391,7 +393,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     Message::PrintLine("Writing the design to file ", out_file_name) ;
 
     // Write the modified file
-    file_base_comment.WriteFile(file_name, out_file_name) ;
+    //file_base_comment.WriteFile(file_name, out_file_name) ;
+    std::ofstream out_file ;
+    out_file.open(out_file_name) ;
+    out_file << mod_str;
 
     // Remove all analyzed modules
     veri_file::RemoveAllModules() ;
