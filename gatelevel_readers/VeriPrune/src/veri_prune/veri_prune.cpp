@@ -18,6 +18,8 @@
 #include "Array.h"          // Make class Array available
 
 #include "VeriId.h"         // Definitions of all identifier definition tree nodes
+#include "VeriCopy.h"       // Make class VeriMapForCopy available
+#include "Map.h"            // Make class Map available
 
 #include "Message.h"        // Make message handlers available
 
@@ -133,6 +135,11 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
 
     char *mod_str;
+
+    //Now copy of the top level module
+    VeriMapForCopy id_map_table(POINTER_HASH) ;
+    char *copy_name = Strings::save("copy_", mod->Name()) ;
+    VeriModuleItem *new_mod = mod->CopyWithName(copy_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
 
     VeriModule *moduleg = (VeriModule *)all_top_modules->GetFirst();
     std::string TM = moduleg->GetName();
@@ -278,6 +285,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
 
     mod_str = mod->GetPrettyPrintedString();
+    std::cout << new_mod->GetPrettyPrintedString() << std::endl;
 
     /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
      *                Write modified source file to a file                *
