@@ -20,6 +20,8 @@ struct gb_constructs
         {"obuft", {{"I", 0}, {"OE", 0}, {"O", 1}}},
         {"oddr", {{"D0",0}, {"D1",0}, {"R",0}, {"E",0}, {"DLY_ADJ",0},{"DLY_LD",0}, {"DLY_INC",0}, {"C",0}, {"Q",1}}}
         };
+    std::vector<std::string> imods = {"clkbuf", "ibuf", "ibufds", "iddr"};
+    std::vector<std::string> omods = {"obuf", "obuftds", "obuft", "oddr"};
     std::vector<std::string> in_ports;
     std::vector<std::string> out_ports;
     std::vector<std::string> inout_ports;

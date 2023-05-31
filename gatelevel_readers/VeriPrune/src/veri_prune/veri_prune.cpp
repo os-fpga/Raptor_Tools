@@ -30,6 +30,7 @@
 #include "VeriModuleItem.h" // Definitions of all verilog module item tree nodes
 #include "VeriStatement.h"  // Make VeriCaseStatement class available
 #include "VeriVisitor.h"    // For visitor patterns
+#include "veri_tokens.h"    // Definition of port direction VERI_OUTPUT, etc ...
 #include "veri_prune.h" 
 
 #ifdef USE_COMREAD
@@ -61,6 +62,19 @@ using namespace Verific ;
       we default to hard-coded values.
 
 *****************************************************************************************/
+
+
+bool isimod(std::string mod)
+{
+    gb_constructs gb;
+    for (const auto& element : gb.imods)
+    {
+        if (mod == element) {
+            std::cout << "Mod is input : Name   " << mod << std::endl;
+            return true; }
+    }
+    return false;
+}
 
 // Visit class to visit all case statements of a module
 class VeriCaseStmtVisit : public VeriVisitor
@@ -223,6 +237,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	for (const auto& element : gb.gb_mods) {
                 std::string str = element.first;
         	    if (str == no_param_name) {
+                    bool imod = isimod(no_param_name);
+                    std::map<std::string, int> m_items = element.second;
                     VeriIdDef *id ;
         	        unsigned m ;
 
@@ -268,8 +284,25 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             else {
                                 actual_id = (actual) ? actual->FullId() : 0 ;
                                 actual_name = actual_id->Name();
-                                std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
-                            }
+                                std::cout << "ACN is : " << actual_name << "   FN is : " << formal_name << std::endl;
+                                std::cout << "ACN DIR: " << actual_id->Dir() << std::endl;
+                                if(actual_id->Dir() == VERI_INPUT) {
+                                    //mod->RemovePort(formal_name);
+                                	std::cout << "ACN : " << actual_name << "   is input  " <<std::endl;
+                                } else if(actual_id->Dir() == VERI_OUTPUT) {
+                                    //mod->RemovePort(formal_name);
+                                	std::cout << "ACN : " << actual_name << "   is output  " <<std::endl;
+                                } else {
+                                	if (imod) {
+                                		// check in gb mods for direction
+                                        for (const auto& pair : m_items) {
+                                            std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
+                                            if(pair.second) mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+                                        }
+
+                                		}
+                                	}
+                                }
         	        	}
         	        }
         	    	// Get the starting location and ending location of this module item.
@@ -285,6 +318,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         }
     }
 
+    std::cout << mod->GetPrettyPrintedString() << std::endl;
     // Get the last module item, it is the item we want to remove
     VeriModuleItem *mod_item = (items && items->Size()) ? (VeriModuleItem*)items->GetLast() : 0 ;
     if (mod_item) {
