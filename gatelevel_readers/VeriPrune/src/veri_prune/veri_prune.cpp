@@ -310,7 +310,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                     //mod->RemovePort(actual_name);
                                 	std::cout << "ACN : " << actual_name << "   is input hurrrraahhh " <<std::endl;
                                 } else if(actual_id->Dir() == VERI_OUTPUT) {
-                                    //gb.del_ports.insert(actual_name);
+                                    gb.del_ports.insert(actual_name);
                                     //mod->RemovePort(actual_name);
                                 	std::cout << "ACN : " << actual_name << "   is output hurrraahhh  " <<std::endl;
                                 } else {
@@ -364,9 +364,9 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         }
     }
 
-    for (const auto& element : gb.del_ports) {
-        std::cout << "DEL PORT : " << element << std::endl;
-        //mod->RemovePort(element.c_str());
+    for (const auto& dp : gb.del_ports) {
+        std::cout << "DEL PORT : " << dp << std::endl;
+        mod->RemovePort(dp.c_str());
     }
 
     std::cout << mod->GetPrettyPrintedString() << std::endl;
