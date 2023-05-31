@@ -1,5 +1,5 @@
-#ifndef ADD_AND_DELETE_STATEMENTS
-#define ADD_AND_DELETE_STATEMENTS
+#ifndef VERI_PRUNE_H
+#define VERI_PRUNE_H
 
 #include <iostream>
 #include <sstream> // std::stringstream, std::stringbuf

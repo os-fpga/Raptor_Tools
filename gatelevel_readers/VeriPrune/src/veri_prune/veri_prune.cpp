@@ -21,8 +21,6 @@
 
 #include "Message.h"        // Make message handlers available
 
-#include "TextBasedDesignMod.h"  // Text-Based Design-Modification (TextBasedDesignMod) utility
-
 #include "DataBase.h" // Make (hierarchical netlist) database API available
 #include "VeriTreeNode.h"   // Definition of VeriTreeNode
 #include "veri_file.h"      // Make verilog reader available
@@ -81,59 +79,6 @@ bool isimod(std::string mod)
     return false;
 }
 
-// Visit class to visit all case statements of a module
-class VeriCaseStmtVisit : public VeriVisitor
-{
-public:
-    VeriCaseStmtVisit(TextBasedDesignMod *file_obj) ;
-    virtual ~VeriCaseStmtVisit() ;
-
-    // Overwrite only the visit routine of case statement
-    virtual void VERI_VISIT(VeriCaseStatement, node) ;
-
-private:
-    TextBasedDesignMod *_tbdm ;
-} ;
-
-// Visit class to visit assignment so that it can be converted
-// to gate instantiation
-class VeriAssignReplace : public VeriVisitor
-{
-public:
-    VeriAssignReplace(TextBasedDesignMod *file_obj, VeriModule *mod) ;
-    virtual ~VeriAssignReplace() ;
-
-    // Overwrite only the visit routine of VeriContinuousAssign
-    virtual void VERI_VISIT(VeriContinuousAssign, node) ;
-
-private:
-    TextBasedDesignMod *_tbdm ;
-    VeriModule   *_mod ;
-} ;
-
-////////////////////////////////////////////////////////////////////////////
-////////////              VeriCaseStmtVisit class               ////////////
-////////////////////////////////////////////////////////////////////////////
-
-VeriCaseStmtVisit::VeriCaseStmtVisit(TextBasedDesignMod *file_obj) :
-    VeriVisitor(),
-    _tbdm(file_obj)
-{
-}
-
-VeriCaseStmtVisit::~VeriCaseStmtVisit()
-{
-}
-
-void VeriCaseStmtVisit::VERI_VISIT(VeriCaseStatement, node)
-{
-    // Get the starting location of the case statement. We will use this information
-    // to put comment before case statement
-    linefile_type start_location = node.StartingLinefile() ;
-
-    // Call InsertBefore routine of 'TextBasedDesignMod' class to insert comment before case statement
-    _tbdm->InsertBefore(start_location, "// synopsys parallel_case\n") ;
-}
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -175,14 +120,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
 #endif
 
-    // Instantiate the class 'TextBasedDesignMod', which is file modification utility.
-    // It takes the directory path in which we can modify the files. If no directory path
-    // is specified, all files can be modified and overwritten. The directory 'src' is
-    // specified as the secure directory here. So we can modify and overwrite the files only
-    // under this directory tree. Any other file outside of that tree can be modified but
-    // cannot be overwritten!
-    TextBasedDesignMod file_base_comment(file_base) ;
-
     // We will perform the manipulations as said before on the first top level module of the specified file:
 
     // Get all the top level modules
@@ -202,25 +139,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     std::cout << TM << " is TP" <<std::endl;
     delete all_top_modules ;
 
-    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
-     *              1.  Make case statements parallel                     *
-     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-
-    // Instantiate visit class object which makes case statement parallel. This visitor class
-    //
-    //
-    // is written to visit every case statement of the module. Please look into
-    // VeriCaseStmtVisit::Visit(VeriCaseStatement &node) function in this file.
-    VeriCaseStmtVisit visit_obj(&file_base_comment) ;
-    mod->Accept(visit_obj) ;
-
-    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
-     *                 2. Remove the last module item                     *
-     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-
-    // We want to remove a specific module item from the module. To remove it we should
-    // know the starting location and ending location of this item in the design file.
-    // We will remove the last module item.
 
     // Get the module item list of module.
     Array *items = mod->GetModuleItems() ;
@@ -345,18 +263,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         //mod->RemoveInstance(inst_name /* instance to be removed*/) ;
                         del_insts.push_back(inst_name);
         	        }
-
-
-
-                    
-        	    	// Get the starting location and ending location of this module item.
-        	    	linefile_type start_linefile = module_item->StartingLinefile() ;
-        	    	linefile_type end_linefile = module_item->EndingLinefile() ;
-
-        	    	// Now we want to remove the sections occupied by the gearbox constructs
-        	    	// from the file. We know the starting location and ending location of
-        	    	// these items. Call 'Replace' routine of 'TextBasedDesignMod' utility for this.
-        	    	file_base_comment.Replace(start_linefile, end_linefile, 0 /* no replace, only remove */) ;
         	    }
         	}
         }
@@ -372,28 +278,12 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
 
     mod_str = mod->GetPrettyPrintedString();
-    // Get the last module item, it is the item we want to remove
-    VeriModuleItem *mod_item = (items && items->Size()) ? (VeriModuleItem*)items->GetLast() : 0 ;
-    if (mod_item) {
-        // Get the starting location and ending location of this module item.
-        linefile_type start_linefile = mod_item->StartingLinefile() ;
-        linefile_type end_linefile = mod_item->EndingLinefile() ;
-
-        // Now we want to remove the section occupied by the last module item
-        // from the file. We know the starting location and ending location of
-        // this item. Call 'Replace' routine of 'TextBasedDesignMod' utility for this.
-        file_base_comment.Replace(start_linefile, end_linefile, 0 /* no replace, only remove */) ;
-    } else {
-        Message::PrintLine("No module item found in module ", mod->Name()) ;
-    }
 
     /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
      *                Write modified source file to a file                *
      * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
     Message::PrintLine("Writing the design to file ", out_file_name) ;
 
-    // Write the modified file
-    //file_base_comment.WriteFile(file_name, out_file_name) ;
     std::ofstream out_file ;
     out_file.open(out_file_name) ;
     out_file << mod_str;
