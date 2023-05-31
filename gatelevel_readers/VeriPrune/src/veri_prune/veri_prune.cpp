@@ -24,13 +24,18 @@
 #include "TextBasedDesignMod.h"  // Text-Based Design-Modification (TextBasedDesignMod) utility
 
 #include "DataBase.h" // Make (hierarchical netlist) database API available
+#include "VeriTreeNode.h"   // Definition of VeriTreeNode
 #include "veri_file.h"      // Make verilog reader available
 #include "VeriModule.h"     // Definition of a VeriModule and VeriPrimitive
 #include "VeriExpression.h" // Definitions of all verilog expression tree nodes
 #include "VeriModuleItem.h" // Definitions of all verilog module item tree nodes
+#include "VeriMisc.h"       // Definitions of all extraneous verilog tree nodes (ie. range, path, strength, etc...)
 #include "VeriStatement.h"  // Make VeriCaseStatement class available
 #include "VeriVisitor.h"    // For visitor patterns
 #include "veri_tokens.h"    // Definition of port direction VERI_OUTPUT, etc ...
+#include "VeriConstVal.h"   // Definitions of all constant expression tree nodes
+#include "VeriScope.h"      // Symbol table of locally declared identifiers
+#include "Strings.h"        // Definition of class to manipulate copy, concatenate, create etc...
 #include "veri_prune.h" 
 
 #ifdef USE_COMREAD
@@ -238,6 +243,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                 std::string str = element.first;
         	    if (str == no_param_name) {
                     bool imod = isimod(no_param_name);
+                    std::vector<std::string> prefs;
                     std::map<std::string, int> m_items = element.second;
                     VeriIdDef *id ;
         	        unsigned m ;
@@ -247,6 +253,13 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	        	if (!id) cout << "NOT an ID" << endl;
         	        	else printf("Got an ID\n");
         	        	const char *inst_name = id->InstName() ;
+                        if (gb.insts_visited.find(inst_name) != gb.insts_visited.end()) {
+                            std::cout << inst_name << " instance visited." << std::endl;
+                            continue;
+                        } else {
+                            std::cout << inst_name << " does not exist in the set." << std::endl;
+                            gb.insts_visited.insert(inst_name);
+                        }
         	        	if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
 
                         VeriIdDef *formal ;
@@ -284,27 +297,51 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             else {
                                 actual_id = (actual) ? actual->FullId() : 0 ;
                                 actual_name = actual_id->Name();
-                                std::cout << "ACN is : " << actual_name << "   FN is : " << formal_name << std::endl;
-                                std::cout << "ACN DIR: " << actual_id->Dir() << std::endl;
+                                std::cout << "ACN is : " << actual_name << "  and FN is : " << formal_name << std::endl;
+                                prefs.push_back(formal_name);
+                                //mod->RemovePortRef(inst_name /* instance name */, formal_name /* formal port name */) ;
                                 if(actual_id->Dir() == VERI_INPUT) {
-                                    //mod->RemovePort(formal_name);
-                                	std::cout << "ACN : " << actual_name << "   is input  " <<std::endl;
+                                    gb.del_ports.insert(actual_name);
+                                    //unsigned is_removed = mod->RemovePort(actual_name /* port to be removed */) ;
+                                    //if (!is_removed) { 
+                                    //    std::cout << "Cannot remove port" << actual_name << " from the module" << std::endl ;
+                                    //}
+                                    //mod->RemovePort(actual_name);
+                                	std::cout << "ACN : " << actual_name << "   is input hurrrraahhh " <<std::endl;
                                 } else if(actual_id->Dir() == VERI_OUTPUT) {
-                                    //mod->RemovePort(formal_name);
-                                	std::cout << "ACN : " << actual_name << "   is output  " <<std::endl;
+                                    //gb.del_ports.insert(actual_name);
+                                    //mod->RemovePort(actual_name);
+                                	std::cout << "ACN : " << actual_name << "   is output hurrraahhh  " <<std::endl;
                                 } else {
                                 	if (imod) {
                                 		// check in gb mods for direction
                                         for (const auto& pair : m_items) {
-                                            std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
+                                            //std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
                                             if(pair.second) mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+                                        }
+
+                                		} else {
+                                		// check in gb mods for direction
+                                        for (const auto& pair : m_items) {
+                                            //std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
+                                            if(!pair.second) {
+                                                mod->AddPort(actual_name /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
+                                                }
                                         }
 
                                 		}
                                 	}
+
+                                    //mod->RemovePortRef(inst_name /* instance name */, formal_name /* formal port name */) ;
                                 }
         	        	}
+                         for (const auto& prf : prefs) {
+                            //std::cout << "DEL PORT : " << element << std::endl;
+                            mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
+                        }
+                        //mod->RemoveInstance(inst_name /* instance to be removed*/) ;
         	        }
+                    
         	    	// Get the starting location and ending location of this module item.
         	    	linefile_type start_linefile = module_item->StartingLinefile() ;
         	    	linefile_type end_linefile = module_item->EndingLinefile() ;
@@ -316,6 +353,11 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	    }
         	}
         }
+    }
+
+    for (const auto& element : gb.del_ports) {
+        std::cout << "DEL PORT : " << element << std::endl;
+        //mod->RemovePort(element.c_str());
     }
 
     std::cout << mod->GetPrettyPrintedString() << std::endl;

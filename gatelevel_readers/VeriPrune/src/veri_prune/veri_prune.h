@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_map>
 #include <map>
+#include <unordered_set>
 using namespace std;
 
 struct gb_constructs
@@ -22,9 +23,12 @@ struct gb_constructs
         };
     std::vector<std::string> imods = {"clkbuf", "ibuf", "ibufds", "iddr"};
     std::vector<std::string> omods = {"obuf", "obuftds", "obuft", "oddr"};
+    std::unordered_set<std::string> insts_visited;
+     std::vector<std::string> prefs;
     std::vector<std::string> in_ports;
     std::vector<std::string> out_ports;
     std::vector<std::string> inout_ports;
+    std::unordered_set<std::string> del_ports;
 };
 int prune_verilog (const char *file_name, const char *out_file_name, const char *file_base, gb_constructs &gb);
 
