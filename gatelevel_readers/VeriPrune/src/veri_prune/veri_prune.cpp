@@ -228,6 +228,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     {
         if (!module_item)
             continue;
+        std::vector<std::string> del_insts;
         if(module_item->IsInstantiation()) {
         	std::string mod_name = module_item->GetModuleName();
         	std::cout << "Inst name is " << mod_name << std::endl;
@@ -340,7 +341,11 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
                         }
                         //mod->RemoveInstance(inst_name /* instance to be removed*/) ;
+                        del_insts.push_back(inst_name);
         	        }
+
+
+
                     
         	    	// Get the starting location and ending location of this module item.
         	    	linefile_type start_linefile = module_item->StartingLinefile() ;
@@ -353,6 +358,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	    }
         	}
         }
+        for (const auto& del_inst : del_insts) {
+                            //std::cout << "DEL PORT : " << element << std::endl;
+                            mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
+                        }
     }
 
     for (const auto& element : gb.del_ports) {
