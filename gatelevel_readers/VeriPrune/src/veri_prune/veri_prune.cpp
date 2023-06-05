@@ -139,7 +139,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     //Now copy of the top level module
     VeriMapForCopy id_map_table(POINTER_HASH) ;
     char *copy_name = Strings::save("copy_", mod->Name()) ;
-    VeriModuleItem *new_mod = mod->CopyWithName(copy_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
+    VeriModuleItem *new_mod_ = mod->CopyWithName(copy_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
+    VeriModule *new_mod = (VeriModule *)new_mod_;
 
     VeriModule *moduleg = (VeriModule *)all_top_modules->GetFirst();
     std::string TM = moduleg->GetName();
@@ -172,10 +173,11 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	    if (str == no_param_name) {
                     bool imod = isimod(no_param_name);
                     std::vector<std::string> prefs;
+                    std::map<std::string, std::string> conn_info ;
+                    std::pair<std::string, std::map<std::string, std::string>> inst_conns;
                     std::map<std::string, int> m_items = element.second;
                     VeriIdDef *id ;
         	        unsigned m ;
-
         	        Array *insts = module_item->GetInstances();
         	        FOREACH_ARRAY_ITEM(insts, m, id) {
         	        	if (!id) cout << "NOT an ID" << endl;
@@ -245,7 +247,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                 		// check in gb mods for direction
                                         for (const auto& pair : m_items) {
                                             //std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
-                                            if(pair.second) mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+                                            if(pair.second) {
+                                                conn_info.insert(std::make_pair(actual_name, formal_name));
+                                                mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+                                            }
                                         }
 
                                 		} else {
@@ -253,6 +258,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                         for (const auto& pair : m_items) {
                                             //std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
                                             if(!pair.second) {
+                                                conn_info.insert(std::make_pair(actual_name, formal_name));
                                                 mod->AddPort(actual_name /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
                                                 }
                                         }
@@ -268,6 +274,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
                         }
                         //mod->RemoveInstance(inst_name /* instance to be removed*/) ;
+                        inst_conns = std::make_pair(inst_name, conn_info);
+                        gb.del_conns.push_back(inst_conns);
                         del_insts.push_back(inst_name);
         	        }
         	    }
@@ -284,8 +292,101 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         mod->RemovePort(dp.c_str());
     }
 
+
+    // Printing the elements
+    for (const auto& pair : gb.del_conns) {
+        std::cout << "instance Name is : " << pair.first << std::endl;
+        for (const auto& mapPair : pair.second) {
+            std::cout << "ACN: " << mapPair.first << ", is connected to FN: " << mapPair.second << std::endl;
+        }
+        std::cout << std::endl;
+    }
+
     mod_str = mod->GetPrettyPrintedString();
+
+     // Get the module item list of module.
+    Array *m_items = new_mod->GetModuleItems() ;
+    unsigned j;
+    VeriModuleItem *m_item;
+    std::unordered_set<std::string> del_insts_;
+
+    FOREACH_ARRAY_ITEM(m_items, i, m_item)
+    {
+        if (!m_item)
+            continue;
+        if(m_item->IsInstantiation()) {
+        	std::string mod_name = m_item->GetModuleName();
+        	std::cout << "Inst name is " << mod_name << std::endl;
+            std::string no_param_name;
+            // reducing a correctly named parametrized module MyModule(par1=99) to MyModule
+            // discuss with thierry !
+            for (auto k : mod_name)
+                if ('(' == k)
+                    break;
+                else
+                    no_param_name.push_back(k);
+            //bool is_gb_cons;
+            //std::string str;
+        	//for (const auto& element : gb.gb_mods) {
+            //    str = element.first;
+        	//    if (str == no_param_name) {
+            //        std::cout << str << "is gb" << std::endl;
+            //        is_gb_cons = true;
+            //    } else {
+            //        is_gb_cons = false;
+            //    }
+            //}
+            //if (is_gb_cons) {
+            //    std::cout << "is a gb const" << std::endl;
+            //} else{ 
+                    VeriIdDef *id ;
+        	        unsigned m ;
+        	        Array *insts = m_item->GetInstances();
+        	        FOREACH_ARRAY_ITEM(insts, m, id) {
+                        bool is_gb_cons;
+                        std::string str;
+        	            for (const auto& element : gb.gb_mods) {
+                            str = element.first;
+        	                if (str == no_param_name) {
+                                std::cout << str << "is gb" << std::endl;
+                                is_gb_cons = true;
+                                break;
+                            } else {
+                                is_gb_cons = false;
+                            }
+                        }
+        	        	if (!id) cout << "NOT an ID" << endl;
+        	        	else printf("Got an ID\n");
+        	        	const char *inst_name = id->InstName() ;
+                        if(!is_gb_cons) {
+                            std::cout << inst_name << " is being deleted" << std::endl;
+                            del_insts_.insert(inst_name);
+                            std::vector<std::string> prefs;
+                            const char *formal_name ;
+                             const char *actual_name ;
+        	        	    VeriExpression *expr ;
+        	        	    unsigned k ;
+        	        	    Array *port_conn_arr = id->GetPortConnects() ;
+        	        	    FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
+                                formal_name = expr->NamedFormal() ;
+                                prefs.push_back(formal_name);
+                            }
+                            for (const auto& prf : prefs) {
+                                //std::cout << "DEL PORT : " << element << std::endl;
+                                new_mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
+                            }
+                        }
+                    }
+                //}
+            }
+        }
+    
+    for (const auto& del_inst : del_insts_) {
+        std::cout << "DEL INST : " << del_inst << std::endl;
+        new_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
+    }
     std::cout << new_mod->GetPrettyPrintedString() << std::endl;
+    //call function to generate wrapper
 
     /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
      *                Write modified source file to a file                *

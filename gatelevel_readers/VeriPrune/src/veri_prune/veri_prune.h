@@ -29,6 +29,7 @@ struct gb_constructs
     std::vector<std::string> out_ports;
     std::vector<std::string> inout_ports;
     std::unordered_set<std::string> del_ports;
+    std::vector<std::pair<std::string, std::map<std::string, std::string>>> del_conns;
 };
 int prune_verilog (const char *file_name, const char *out_file_name, const char *file_base, gb_constructs &gb);
 
