@@ -168,21 +168,33 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     break;
                 else
                     no_param_name.push_back(k);
-        	for (const auto& element : gb.gb_mods) {
-                std::string str = element.first;
-        	    if (str == no_param_name) {
-                    bool imod = isimod(no_param_name);
-                    std::vector<std::string> prefs;
-                    std::map<std::string, std::string> conn_info ;
-                    std::pair<std::string, std::map<std::string, std::string>> inst_conns;
-                    std::map<std::string, int> m_items = element.second;
+
                     VeriIdDef *id ;
         	        unsigned m ;
         	        Array *insts = module_item->GetInstances();
         	        FOREACH_ARRAY_ITEM(insts, m, id) {
         	        	if (!id) cout << "NOT an ID" << endl;
         	        	else printf("Got an ID\n");
+                        bool is_gb_cons;
+                        std::map<std::string, int> m_items;
         	        	const char *inst_name = id->InstName() ;
+                        for (const auto& element : gb.gb_mods) {
+                            std::string str = element.first;
+                            if (str == no_param_name) {
+                                m_items = element.second;
+                                std::cout << str << "is gb" << std::endl;
+                                is_gb_cons = true;
+                                break;
+                            } else {
+                                is_gb_cons = false;
+                            }
+                        }
+        	            if (is_gb_cons) {
+                            bool imod = isimod(no_param_name);
+                            std::vector<std::string> prefs;
+                            std::map<std::string, std::string> conn_info ;
+                            std::pair<std::string, std::map<std::string, std::string>> inst_conns;
+                            //std::map<std::string, int> m_items = element.second;
                         if (gb.insts_visited.find(inst_name) != gb.insts_visited.end()) {
                             std::cout << inst_name << " instance visited." << std::endl;
                             continue;
@@ -278,7 +290,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         gb.del_conns.push_back(inst_conns);
                         del_insts.push_back(inst_name);
         	        }
-        	    }
+        	    //}
         	}
         }
         for (const auto& del_inst : del_insts) {
