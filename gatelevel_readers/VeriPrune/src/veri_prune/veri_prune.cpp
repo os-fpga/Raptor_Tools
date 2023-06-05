@@ -15,11 +15,13 @@
  *
 */
 #include <iostream>
+#include <cstring>
 #include "Array.h"          // Make class Array available
 
 #include "VeriId.h"         // Definitions of all identifier definition tree nodes
 #include "VeriCopy.h"       // Make class VeriMapForCopy available
 #include "Map.h"            // Make class Map available
+#include "VeriTreeNode.h"   // Definition of VeriTreeNode
 
 #include "Message.h"        // Make message handlers available
 
@@ -197,7 +199,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     std::vector<std::string> prefs;
                     std::map<std::string, std::string> conn_info ;
                     std::pair<std::string, std::map<std::string, std::string>> inst_conns;
-                    //std::map<std::string, int> m_items = element.second;
                     if (gb.insts_visited.find(inst_name) != gb.insts_visited.end()) {
                         std::cout << inst_name << " instance visited." << std::endl;
                         continue;
@@ -210,7 +211,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     VeriIdDef *actual_id ;
                     VeriExpression *actual ;
                     const char *formal_name ;
-                     const char *actual_name ;
+                    const char *actual_name ;
         	        VeriExpression *expr ;
         	        unsigned k ;
         	        Array *port_conn_arr = id->GetPortConnects() ;
@@ -297,6 +298,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         }
     }
 
+
     for (const auto& dp : gb.del_ports) {
         std::cout << "DEL PORT : " << dp << std::endl;
         mod->RemovePort(dp.c_str());
@@ -320,11 +322,13 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     VeriModuleItem *m_item;
     std::unordered_set<std::string> del_insts_;
 
+    ///////////////////////////////////////////////////////////////////////
     FOREACH_ARRAY_ITEM(m_items, i, m_item)
     {
         if (!m_item)
             continue;
-        if(m_item->IsInstantiation()) {
+        if(m_item->IsInstantiation()) 
+        {
         	std::string mod_name = m_item->GetModuleName();
         	std::cout << "Inst name is " << mod_name << std::endl;
             std::string no_param_name;
@@ -335,61 +339,139 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     break;
                 else
                     no_param_name.push_back(k);
-            //bool is_gb_cons;
-            //std::string str;
-        	//for (const auto& element : gb.gb_mods) {
-            //    str = element.first;
-        	//    if (str == no_param_name) {
-            //        std::cout << str << "is gb" << std::endl;
-            //        is_gb_cons = true;
-            //    } else {
-            //        is_gb_cons = false;
-            //    }
-            //}
-            //if (is_gb_cons) {
-            //    std::cout << "is a gb const" << std::endl;
-            //} else{ 
-                    VeriIdDef *id ;
-        	        unsigned m ;
-        	        Array *insts = m_item->GetInstances();
-        	        FOREACH_ARRAY_ITEM(insts, m, id) {
-                        bool is_gb_cons;
-                        std::string str;
-        	            for (const auto& element : gb.gb_mods) {
-                            str = element.first;
-        	                if (str == no_param_name) {
-                                std::cout << str << "is gb" << std::endl;
-                                is_gb_cons = true;
-                                break;
-                            } else {
-                                is_gb_cons = false;
-                            }
-                        }
-        	        	if (!id) cout << "NOT an ID" << endl;
-        	        	else printf("Got an ID\n");
-        	        	const char *inst_name = id->InstName() ;
-                        if(!is_gb_cons) {
-                            std::cout << inst_name << " is being deleted" << std::endl;
-                            del_insts_.insert(inst_name);
-                            std::vector<std::string> prefs;
-                            const char *formal_name ;
-                             const char *actual_name ;
-        	        	    VeriExpression *expr ;
-        	        	    unsigned k ;
-        	        	    Array *port_conn_arr = id->GetPortConnects() ;
-        	        	    FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
-                                formal_name = expr->NamedFormal() ;
-                                prefs.push_back(formal_name);
-                            }
-                            for (const auto& prf : prefs) {
-                                //std::cout << "DEL PORT : " << element << std::endl;
-                                new_mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
-                            }
-                        }
+                    
+            VeriIdDef *id ;
+        	unsigned m ;
+        	Array *insts = m_item->GetInstances();
+        	FOREACH_ARRAY_ITEM(insts, m, id) 
+            {
+                bool is_gb_cons;
+                std::string str;
+                std::map<std::string, int> gb_items;
+        	    for (const auto& element : gb.gb_mods) {
+                    str = element.first;
+        	        if (str == no_param_name) {
+                        gb_items = element.second;
+                        std::cout << str << "is gb" << std::endl;
+                        is_gb_cons = true;
+                        break;
+                    } else {
+                        is_gb_cons = false;
                     }
+                }
+        		if (!id) cout << "NOT an ID" << endl;
+        		else printf("Got an ID\n");
+        		const char *inst_name = id->InstName() ;
+                if(!is_gb_cons) 
+                {
+                    std::cout << inst_name << " is being deleted" << std::endl;
+                    del_insts_.insert(inst_name);
+                    std::vector<std::string> prefs;
+                    const char *formal_name ;
+                    const char *actual_name ;
+        		    VeriExpression *expr ;
+        		    unsigned k ;
+        		    Array *port_conn_arr = id->GetPortConnects() ;
+        		    FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
+                        formal_name = expr->NamedFormal() ;
+                        prefs.push_back(formal_name);
+                    }
+                    for (const auto& prf : prefs) {
+                        //std::cout << "DEL PORT : " << element << std::endl;
+                        //new_mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
+                    }
+                } //else
+                //{
+                //    bool imod = isimod(no_param_name);
+                //    ///////////////////////////////////////////
+                //    VeriIdDef *formal ;
+                //    VeriIdDef *actual_id ;
+                //    VeriExpression *actual ;
+                //    const char *formal_name ;
+                //    const char *actual_name ;
+        	    //    VeriExpression *expr ;
+        	    //    unsigned k ;
+        	    //    Array *port_conn_arr = id->GetPortConnects() ;
+        	    //    FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) 
+                //    {
+                //        formal_name = expr->NamedFormal() ;
+                //        formal = m_item->GetPort(formal_name) ;
+                //        actual = expr->GetConnection() ;
+                //        if (actual->GetClassId() == ID_VERICONCAT) {
+                //            std::cout << "got the reason" << std::endl;
+                //            Array *expr_arr = actual->GetExpressions();
+                //            unsigned i;
+                //            VeriExpression *pexpr;
+                //            FOREACH_ARRAY_ITEM(expr_arr, i, pexpr)
+                //            {
+                //                actual_id = (pexpr) ? pexpr->FullId() : 0 ;
+                //                actual_name = actual_id->Name();
+                //                std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
+                //            }
+                //        } else if (actual->GetClassId() == ID_VERIINDEXEDID) 
+                //        {
+                //            VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
+                //            unsigned port_dir = indexed_id->PortExpressionDir() ;
+                //            unsigned port_size = indexed_id->FindSize();
+                //            const char *port_name = indexed_id->GetName() ; // Get port name
+                //            Message::Info(indexed_id->Linefile(),"here '", port_name, "' is an indexed id in a port declaration") ;
+                //            std::cout << "it is indexed and dir " << port_size << std::endl;
+                //        }  
+                //        else 
+                //        {
+                //            actual_id = (actual) ? actual->FullId() : 0 ;
+                //            actual_name = actual_id->Name();
+                //            std::cout << "ACN is : " << actual_name << "  and FN is : " << formal_name << std::endl;
+                //            if (imod)
+                //            {
+                //            	for (const auto& pair : gb_items) 
+                //                {
+                //                    
+                //                    if(pair.second && (std::strcmp((pair.first).c_str(), formal_name) == 0)) {
+                //                        std::cout << pair.first << "  is Formal name Dir is : " << pair.second << std::endl;
+                //                    //    conn_info.insert(std::make_pair(actual_name, formal_name));
+                //                    //    mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+                //                    }
+                //                }
+                //            } //else
+                //            //{
+                //            //	    
+                //            //}
+                //            
+                //            //mod->RemovePortRef(inst_name /* instance name */, formal_name /* formal port name */) ;
+                //        }
+        	    //    }
+//
+//
+                //    ////////////////////////////////////////
+                //        //for (const auto& pair : gb_items) 
+                //        //{
+                //        //    std::cout << pair.first << "  is FN Dir is : " << pair.second << std::endl;
+                //        //    //if(pair.second) {
+                //        //    //    conn_info.insert(std::make_pair(actual_name, formal_name));
+                //        //    //    mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+                //        //    //}
+                //        //}
+//
                 //}
             }
         }
+    }
+
+    // Printing the elements
+    for (const auto& pair : gb.del_conns) {
+        std::cout << "instance Name is : " << pair.first << std::endl;
+        const char *inst_name = (pair.first).c_str() ;
+        for (const auto& mapPair : pair.second) {
+            std::cout << "ACN: " << mapPair.first << ", is connected to FN: " << mapPair.second << std::endl;
+            std::string actual_name = "wrapper_wire_" + mapPair.first;
+            new_mod->RemovePortRef(inst_name /* instance name */, (mapPair.second).c_str() /* formal port name */) ;
+            new_mod->RemoveSignal((mapPair.first).c_str() /* signal to be removed */) ;
+            new_mod->AddSignal(actual_name.c_str() /* signal to be added */, new VeriDataType(VERI_WIRE, 0, 0) /* data type */, 0 /* optional initial value*/) ;
+            new_mod->AddPortRef(inst_name /* instance name */, (mapPair.second).c_str() /* formal port name */, new VeriIdRef(Strings::save(actual_name.c_str())) /* actual */) ;
+        }
+        std::cout << std::endl;
+    }
     
     for (const auto& del_inst : del_insts_) {
         std::cout << "DEL INST : " << del_inst << std::endl;
