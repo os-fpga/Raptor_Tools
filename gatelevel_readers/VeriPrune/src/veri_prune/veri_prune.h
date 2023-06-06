@@ -8,6 +8,7 @@
 #include <unordered_map>
 #include <map>
 #include <unordered_set>
+#include <algorithm>
 using namespace std;
 
 struct gb_constructs
@@ -25,9 +26,8 @@ struct gb_constructs
     std::vector<std::string> omods = {"obuf", "obuftds", "obuft", "oddr"};
     std::unordered_set<std::string> insts_visited;
     std::vector<std::string> prefs;
-    std::vector<std::string> in_ports;
-    std::vector<std::string> out_ports;
-    std::vector<std::string> inout_ports;
+    std::vector<std::string> top_ports;
+    std::vector<std::string> wrapper_conns;
     std::unordered_set<std::string> del_ports;
     std::vector<std::pair<std::string, std::map<std::string, std::string>>> del_conns;
 };
