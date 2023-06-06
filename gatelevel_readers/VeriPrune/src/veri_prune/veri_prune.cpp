@@ -77,7 +77,6 @@ bool isimod(std::string mod)
     for (const auto& element : gb.imods)
     {
         if (mod == element) {
-            std::cout << "Mod is input : Name   " << mod << std::endl;
             return true; }
     }
     return false;
@@ -86,7 +85,7 @@ bool isimod(std::string mod)
 
 ////////////////////////////////////////////////////////////////////////////
 
-int prune_verilog (const char *file_name, const char *out_file_name, const char *file_base, gb_constructs &gb)
+int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name, const char *file_base, gb_constructs &gb)
 {
 #ifndef VERIFIC_LINEFILE_INCLUDES_COLUMNS
     Message::PrintLine("This application example requires the compile-flag VERIFIC_LINEFILE_INCLUDES_COLUMNS (located in util/VerificSystem.h) to be active in order to run!") ;
@@ -146,7 +145,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     VeriModule *moduleg = (VeriModule *)all_top_modules->GetFirst();
     std::string TM = moduleg->GetName();
-    std::cout << TM << " is TP" <<std::endl;
     delete all_top_modules ;
 
 
@@ -162,7 +160,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         if(module_item->IsInstantiation()) 
         {
         	std::string mod_name = module_item->GetModuleName();
-        	std::cout << "Inst name is " << mod_name << std::endl;
             std::string no_param_name;
             // reducing a correctly named parametrized module MyModule(par1=99) to MyModule
             // discuss with thierry !
@@ -177,8 +174,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	Array *insts = module_item->GetInstances();
         	FOREACH_ARRAY_ITEM(insts, m, id) 
             {
-        	    if (!id) cout << "NOT an ID" << endl;
-        	    else printf("Got an ID\n");
                 bool is_gb_cons;
                 std::map<std::string, int> m_items;
         	    const char *inst_name = id->InstName() ;
@@ -186,7 +181,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     std::string str = element.first;
                     if (str == no_param_name) {
                         m_items = element.second;
-                        std::cout << str << "is gb" << std::endl;
                         is_gb_cons = true;
                         break;
                     } else {
@@ -200,10 +194,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     std::map<std::string, std::string> conn_info ;
                     std::pair<std::string, std::map<std::string, std::string>> inst_conns;
                     if (gb.insts_visited.find(inst_name) != gb.insts_visited.end()) {
-                        std::cout << inst_name << " instance visited." << std::endl;
                         continue;
                     } else {
-                        std::cout << inst_name << " does not exist in the set." << std::endl;
                         gb.insts_visited.insert(inst_name);
                     }
         	        if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
@@ -216,12 +208,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	        unsigned k ;
         	        Array *port_conn_arr = id->GetPortConnects() ;
         	        FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
-                        std::cout << "ID_VERIPORTCONNECT" << std::endl;
                         formal_name = expr->NamedFormal() ;
                         formal = module_item->GetPort(formal_name) ;
                         actual = expr->GetConnection() ;
                         if (actual->GetClassId() == ID_VERICONCAT) {
-                            std::cout << "got the reason" << std::endl;
                             Array *expr_arr = actual->GetExpressions();
                             unsigned i;
                             VeriExpression *pexpr;
@@ -229,7 +219,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             {
                                 actual_id = (pexpr) ? pexpr->FullId() : 0 ;
                                 actual_name = actual_id->Name();
-                                std::cout << "ACN : " << actual_name << "   FN : " << formal_name << std::endl;
                             }
                         } else if (actual->GetClassId() == ID_VERIINDEXEDID) {
                             VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
@@ -237,19 +226,15 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             unsigned port_size = indexed_id->FindSize();
                             const char *port_name = indexed_id->GetName() ; // Get port name
                             Message::Info(indexed_id->Linefile(),"here '", port_name, "' is an indexed id in a port declaration") ;
-                            std::cout << "it is indexed and dir " << port_size << std::endl;
                         }  
                         else {
                             actual_id = (actual) ? actual->FullId() : 0 ;
                             actual_name = actual_id->Name();
-                            std::cout << "ACN is : " << actual_name << "  and FN is : " << formal_name << std::endl;
                             prefs.push_back(formal_name);
                             if(actual_id->Dir() == VERI_INPUT) {
                                 gb.del_ports.insert(actual_name);
-                            	std::cout << "ACN : " << actual_name << "   is input " <<std::endl;
                             } else if(actual_id->Dir() == VERI_OUTPUT) {
                                 gb.del_ports.insert(actual_name);
-                            	std::cout << "ACN : " << actual_name << "   is output " <<std::endl;
                             } else {
                             	if (imod) {
                             		// check in gb mods for direction
@@ -287,18 +272,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
 
     for (const auto& dp : gb.del_ports) {
-        std::cout << "DEL PORT : " << dp << std::endl;
         mod->RemovePort(dp.c_str());
-    }
-
-
-    // Printing the elements
-    for (const auto& pair : gb.del_conns) {
-        std::cout << "instance Name is : " << pair.first << std::endl;
-        for (const auto& mapPair : pair.second) {
-            std::cout << "ACN: " << mapPair.first << ", is connected to FN: " << mapPair.second << std::endl;
-        }
-        std::cout << std::endl;
     }
 
     // to check connections of extra ports in wrapper
@@ -327,7 +301,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         if(m_item->IsInstantiation()) 
         {
         	std::string mod_name = m_item->GetModuleName();
-        	std::cout << "Inst name is " << mod_name << std::endl;
             std::string no_param_name;
             // reducing a correctly named parametrized module MyModule(par1=99) to MyModule
             // discuss with thierry !
@@ -349,19 +322,15 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     str = element.first;
         	        if (str == no_param_name) {
                         gb_items = element.second;
-                        std::cout << str << "is gb" << std::endl;
                         is_gb_cons = true;
                         break;
                     } else {
                         is_gb_cons = false;
                     }
                 }
-        		if (!id) cout << "NOT an ID" << endl;
-        		else printf("Got an ID\n");
         		const char *inst_name = id->InstName() ;
                 if(!is_gb_cons) 
                 {
-                    std::cout << inst_name << " is being deleted" << std::endl;
                     del_insts_.insert(inst_name);
                     std::vector<std::string> prefs;
                     const char *formal_name ;
@@ -373,10 +342,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         formal_name = expr->NamedFormal() ;
                         prefs.push_back(formal_name);
                     }
-                    //for (const auto& prf : prefs) {
-                    //    //std::cout << "DEL PORT : " << element << std::endl;
-                    //    //new_mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
-                    //}
                 }
             }
         }
@@ -384,10 +349,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     // Printing the elements
     for (const auto& pair : gb.del_conns) {
-        std::cout << "instance Name is : " << pair.first << std::endl;
         const char *inst_name = (pair.first).c_str() ;
         for (const auto& mapPair : pair.second) {
-            std::cout << "ACN: " << mapPair.first << ", is connected to FN: " << mapPair.second << std::endl;
             std::string actual_name = "wrapper_wire_" + mapPair.first;
             new_mod->RemovePortRef(inst_name /* instance name */, (mapPair.second).c_str() /* formal port name */) ;
             new_mod->RemoveSignal((mapPair.first).c_str() /* signal to be removed */) ;
@@ -398,29 +361,25 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
     
     for (const auto& del_inst : del_insts_) {
-        std::cout << "DEL INST : " << del_inst << std::endl;
         new_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
     }
 
     VeriModuleInstantiation *if1_inst = new_mod->AddInstance("inst1", mod->Name()) ;
 
     for (const auto& inst_prf : gb.top_ports) {
-        std::cout << inst_prf << " is top port now." << std::endl;
         // Check if port exists in the connection
         auto conn = std::find(gb.wrapper_conns.begin(), gb.wrapper_conns.end(), inst_prf);
         if (conn != gb.wrapper_conns.end()) {
-            std::cout << *conn << " found in the vector." << std::endl;
             const char *add_conn = (*conn).c_str();
             std::string actual_name =  std::string("wrapper_wire_") + add_conn;
             new_mod->AddPortRef("inst1" /* instance name */, add_conn /* formal port name */, new VeriIdRef(Strings::save(actual_name.c_str())) /* actual */) ;
         } else {
-            std::cout << inst_prf << " not found in the vector." << std::endl;
             new_mod->AddPortRef("inst1" /* instance name */, inst_prf.c_str() /* formal port name */, new VeriIdRef(Strings::save(inst_prf.c_str())) /* actual */) ;
         }
     }
 
+    char *new_mod_str = new_mod->GetPrettyPrintedString();
 
-    std::cout << new_mod->GetPrettyPrintedString() << std::endl;
     //call function to generate wrapper
 
     /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
@@ -431,6 +390,15 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     std::ofstream out_file ;
     out_file.open(out_file_name) ;
     out_file << mod_str;
+
+    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
+     *                Write modified source file to a file                *
+     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
+    Message::PrintLine("Writing the wrapper to file ", wrapper_file_name) ;
+
+    std::ofstream wrapper_file;
+    wrapper_file.open(wrapper_file_name);
+    wrapper_file << new_mod_str;
 
     // Remove all analyzed modules
     veri_file::RemoveAllModules() ;
