@@ -49,28 +49,6 @@
 using namespace Verific ;
 #endif
 
-/****************************************************************************************
-
-                                NOTE TO THE READER:
-
-    The following is a more advanced example to demonstrate file manipulation utility
-    using APIs of 'TextBasedDesignMod' class. For a simple example, please see the other
-    example application.
-
-    * We will not change the parse tree itself, but will write out modified verilog
-      of the source file using the file manipulation utility.
-
-    * We do the following:
-        1. Add a comment in the file in a specific location.
-        2. Remove a particular construct from the first top level module.
-
-    * The name of the design file and the output file are taken from the command line
-      argument along with the secure directory path. If no arguments are specified,
-      we default to hard-coded values.
-
-*****************************************************************************************/
-
-
 bool isimod(std::string mod)
 {
     gb_constructs gb;
@@ -87,43 +65,8 @@ bool isimod(std::string mod)
 
 int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name, const char *file_base, gb_constructs &gb)
 {
-#ifndef VERIFIC_LINEFILE_INCLUDES_COLUMNS
-    Message::PrintLine("This application example requires the compile-flag VERIFIC_LINEFILE_INCLUDES_COLUMNS (located in util/VerificSystem.h) to be active in order to run!") ;
-#else
-    // The following operations will be done by this application on the file:
-    // 1 . File specified in the first command line argument will be analyzed.
-    // 2 . Handle for file modification utility (TextBasedDesignMod) will be created.
-    // 3 . Using linefile information from analyzed parse tree, file modification utility
-    //     will modify the design file (not the parse tree). We perform these modifications:
-    //       (a). Add a comment attribute before the case statements to make them parallel.
-    //       (b). Remove the last module item from the first top level module.
-    // 4 . Modified file will be written in another file that can be specified as the second
-    //     command line argument, if not specified, the original file is overwritten!
 
-    // Analyze the design file(in verilog2k mode), if there is any error, don't proceed further!
-#ifdef USE_COMREAD
-    const char *def_args[] = {"analyze", file_name, "-verilog_2000"} ;
-    int def_argc = 3 ;
-
-    Command *mainline = new ComAnalyze() ;
-
-    if(!mainline->ParseArgs(def_argc, def_args)) {
-        mainline->Usage() ;
-        delete mainline ;
-        return 1 ;
-    }
-
-    if(!mainline->Process(0)) {
-        mainline->Usage() ;
-        delete mainline ;
-        return 2 ;
-    }
-    delete mainline ;
-#else
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
-#endif
-
-    // We will perform the manipulations as said before on the first top level module of the specified file:
 
     // Get all the top level modules
     Array *all_top_modules = veri_file::GetTopModules() ;
@@ -142,11 +85,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     char *copy_name = Strings::save("copy_", mod->Name()) ;
     VeriModuleItem *new_mod_ = mod->CopyWithName(copy_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
     VeriModule *new_mod = (VeriModule *)new_mod_;
-
-    VeriModule *moduleg = (VeriModule *)all_top_modules->GetFirst();
-    std::string TM = moduleg->GetName();
     delete all_top_modules ;
-
 
     // Get the module item list of module.
     Array *items = mod->GetModuleItems() ;
@@ -402,8 +341,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     // Remove all analyzed modules
     veri_file::RemoveAllModules() ;
-
-#endif // #ifndef VERIFIC_LINEFILE_INCLUDES_COLUMNS
 
     return 0 ; // Status OK
 }
