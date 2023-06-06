@@ -132,11 +132,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                     std::vector<std::string> prefs;
                     std::map<std::string, std::string> conn_info ;
                     std::pair<std::string, std::map<std::string, std::string>> inst_conns;
-                    if (gb.insts_visited.find(inst_name) != gb.insts_visited.end()) {
-                        continue;
-                    } else {
-                        gb.insts_visited.insert(inst_name);
-                    }
         	        if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
                     VeriIdDef *formal ;
                     VeriIdDef *actual_id ;
