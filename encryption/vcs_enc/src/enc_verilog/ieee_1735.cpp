@@ -64,18 +64,49 @@ ieee_1735::encrypt(const char *in_buf, char **out_buf, unsigned in_size)
     char *msg = Strings::save((const char *) &iv, in_buf) ;
 
     // Encrypt data_block
-    unsigned encrypted_len ;
+    unsigned encrypted_len;
     char *out_binary = EncryptAES_128_CBC(msg, (byte *) _session_key, (byte *) iv, &encrypted_len) ;
+    //std::size_t blen = strlen(out_binary);
+    std::string sizeString = std::to_string(encrypted_len);
     Strings::free(msg) ;
     if (!out_binary) return 0 ;
 
     // Encode data using base64
     char *out_b64 = EncodeBase64(out_binary, encrypted_len) ;
+    //std::size_t blen = strlen(out_b64);
+    //std::string sizeString = std::to_string(blen);
     Strings::free(out_binary) ;
 
     // Break long line into 64 character lines
-    *out_buf = InsertNewlines(out_b64, 64) ;
-    Strings::free(out_b64) ;
+    char *new_buf = InsertNewlines(out_b64, 64);
+    //std::size_t blen = strlen(new_buf);
+    //std::string sizeString = std::to_string(blen);
+    Strings::free(out_b64);
+
+    const char *prefix = (IsVhdl()) ? "`protect " : "`pragma protect " ;
+    const std::string additional_string = std::string(prefix)  + "encoding = (enctype = \"base64\", line_length = 64,"
+                                       " bytes = " + sizeString + ")\n" + std::string(prefix)  + "data_block\n";
+
+    // Append additional string at the start of new_buf
+    unsigned additional_len = additional_string.length();
+
+    // Calculate the length of the new buffer
+    unsigned new_buf_len = additional_len + Strings::len(new_buf);
+
+    // Allocate memory for the new buffer
+    char *final_buf = new char[new_buf_len + 1];
+
+    // Copy the additional string to the start of the new buffer
+    strcpy(final_buf, additional_string.c_str());
+
+    // Copy the contents of new_buf to the new buffer, starting from the position after the additional string
+    strcpy(final_buf + additional_len, new_buf);
+
+    // Free the memory allocated for the original new_buf
+    Strings::free(new_buf);
+
+    // Assign the new buffer to out_buf
+    *out_buf = final_buf;
 
     return Strings::len(*out_buf) ;
 }
@@ -141,9 +172,6 @@ ieee_1735::GetEncryptionHeader()
 
     // Add data_block info to encryption header (actual value added by encrypt)
     a.InsertLast(Strings::save("\n", prefix, "data_method=\"aes128-cbc\"")) ;
-    a.InsertLast(Strings::save("\n", prefix, "encoding = (enctype = \"base64\", line_length = 64,"
-                                       " bytes = 128)")) ;
-    a.InsertLast(Strings::save("\n", prefix, "data_block")) ;
 
     char *header = Strings::save(a) ;
     unsigned i ;
