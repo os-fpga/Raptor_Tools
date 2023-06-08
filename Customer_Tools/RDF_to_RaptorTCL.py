@@ -62,10 +62,10 @@ def parseXML(xmlfile):
 
 def convert(name):
     print(f'Hi, {name}')
-    parseXML('63_oc_aquarius_6_pw.rdf')
-    parseXML('3001_oc_or1k_x4.rdf')
-    parseXML('3002_oc_8051_x6.rdf')
-    parseXML('3003_oc_des_x5p.rdf')
+#    parseXML('63_oc_aquarius_6_pw.rdf')
+#    parseXML('3001_oc_or1k_x4.rdf')
+#    parseXML('3002_oc_8051_x6.rdf')
+#    parseXML('3003_oc_des_x5p.rdf')
 
 # Press the green button in the gutter to run the script.
 if __name__ == '__main__':
