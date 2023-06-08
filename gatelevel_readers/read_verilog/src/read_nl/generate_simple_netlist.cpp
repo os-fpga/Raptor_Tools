@@ -654,15 +654,15 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
             {
                 if(netlist == top) {
                     n_l.out_ports.push_back(port->Name());
+                    n_l.ports.push_back(port->Name());
                 }
-                n_l.ports.push_back(port->Name());
             }
             else if (DIR_IN == port->GetDir())
             {
                 if(netlist == top) {
                     n_l.in_ports.push_back(port->Name());
+                    n_l.ports.push_back(port->Name());
                 }
-                n_l.ports.push_back(port->Name());
                 n_l.in_set.insert(port->Name());
             }
         }
