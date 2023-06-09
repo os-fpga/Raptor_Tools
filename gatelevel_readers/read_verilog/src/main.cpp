@@ -47,7 +47,7 @@ int main(int argc, char **argv)
             outfile.close();
         }
     }
-    //else
-    //    n_l.b_print(std::cout);
+    else
+        n_l.b_print(std::cout);
     return 0;
 }
