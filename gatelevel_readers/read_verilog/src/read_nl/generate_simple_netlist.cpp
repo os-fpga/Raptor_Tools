@@ -693,83 +693,56 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         {
             netBusMap[netbus->Name()] = {netbus->LeftIndex(), netbus->RightIndex()};
         }
-        if(!im){
-            Instance *instance;
-            // Iterate over all references (Instances) of this netlist
-            FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+        Instance *instance;
+        // Iterate over all references (Instances) of this netlist
+        FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+        {
+            // Iterate over all parameters of instance
+            n_l.blocks.push_back(inst());
+            if (instance->IsProtected())
+                n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
+            n_l.blocks.back().name_ = instance->Name();
+            n_l.blocks.back().mod_name_ = current_block_model;
+            char *param_name, *param_value;
+            FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
             {
-                // Iterate over all parameters of instance
-                n_l.blocks.push_back(inst());
-                if (instance->IsProtected())
-                    n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
-                n_l.blocks.back().name_ = instance->Name();
-                n_l.blocks.back().mod_name_ = current_block_model;
-                char *param_name, *param_value;
-                FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
+                // Do what you want with them ...
+                string literal(param_value);
+                vector<string> v;
+                string param_v;
+                bool is_valid = false;
+                try
                 {
-                    // Do what you want with them ...
-                    string literal(param_value);
-                    vector<string> v;
-                    string param_v;
-                    bool is_valid = false;
-                    try
-                    {
-                        bits(literal, v, param_v);
-                    }
-                    catch (...)
-                    {
-                        param_v = literal;
-                    }
-                    is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
-
-                    if (is_valid)
-                    {
-                        n_l.blocks.back().params_[param_name] = param_v;
-                    }
-                    else
-                    {
-                        // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
-                    }
+                    bits(literal, v, param_v);
                 }
-                // Iterate over all portrefs of instance
-                PortRef *portref;
-                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                catch (...)
                 {
-                    // Do what you want with it ...
-                    Net *net_ = portref->GetNet();
-                    Port *port_ = portref->GetPort();
-                    n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                    param_v = literal;
                 }
-                if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
+                if (is_valid)
                 {
-                    // Sorting the vector based on the first element of each pair
-                    std::sort(n_l.blocks.back().conns_.begin(), n_l.blocks.back().conns_.end());
-                    simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
+                    n_l.blocks.back().params_[param_name] = param_v;
+                }
+                else
+                {
+                    // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
                 }
             }
-        } else {
-            Instance *instance;
-            FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+            // Iterate over all portrefs of instance
+            PortRef *portref;
+            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
             {
-                // Iterate over all parameters of instance
-                if (instance->IsProtected())
-                    n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
-
-                // Iterate over all portrefs of instance
-                PortRef *portref;
-                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
-                {
-                    // Do what you want with it ...
-                    Net *net_ = portref->GetNet();
-                    Port *port_ = portref->GetPort();
-                    if(strcmp(net_->Name() ,port_->Name())) {
-                        if (DIR_IN == port_->GetDir()) {
-                            n_l.port_conns.insert({net_->Name(), port_->Name()});
-                        } else if (DIR_OUT == port_->GetDir()) {
-                            n_l.port_conns.insert({port_->Name(), net_->Name()});
-                        }
-                    }
-                }
+                // Do what you want with it ...
+                Net *net_ = portref->GetNet();
+                Port *port_ = portref->GetPort();
+                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+            }
+            if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+            {
+                // Sorting the vector based on the first element of each pair
+                std::sort(n_l.blocks.back().conns_.begin(), n_l.blocks.back().conns_.end());
+                simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
             }
         }
     }

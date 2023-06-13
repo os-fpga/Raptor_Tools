@@ -201,14 +201,7 @@ struct simple_netlist
         f << ".names $true\n1" << endl;
         f << ".names $undef" << endl;
         b_print(blocks, f);
-        conn_print(port_conns, f);
         f << ".end" << endl;
-    }
-    void conn_print(std::map<std::string, std::string> port_conns, std::ostream &f) {
-        for (const auto& port_map : port_conns) {
-            f << ".names "<< port_map.first << " " << port_map.second << endl;
-            f << "1 1" << endl;
-        }
     }
     void b_print(std::vector<inst> v, std::ostream &f)
     {
@@ -243,7 +236,6 @@ struct simple_netlist
     std::vector<std::string> inout_ports;
     std::vector<std::string> nets;
     std::vector<inst> blocks;
-    std::map<std::string, std::string> port_conns;
     std::unordered_set<std::string> in_set;
     bool encrypted = false;
 
