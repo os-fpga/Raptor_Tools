@@ -570,7 +570,7 @@ void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<uns
     }
 }
 
-int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file)
+int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file, const char *top_mod)
 {
     //PRIVATE_KEY_FILENAME
     ieee_1735 ieee_1735;
@@ -590,7 +590,15 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         return 1;
     }
     // Get name of top-level module
-    const char *name = veri_file::TopModule();
+    const char *name;
+
+    if(top_mod == nullptr)
+    {
+        // Get name of top-level module
+        name = veri_file::TopModule();
+    } else {
+        name = top_mod;
+    }
 
     // Ok now let's elaborate this module. In case of failure return.
     if (!veri_file::Elaborate(name /*module_name*/, "work" /*work_lib*/, 0 /*parameter_values_map*/))
