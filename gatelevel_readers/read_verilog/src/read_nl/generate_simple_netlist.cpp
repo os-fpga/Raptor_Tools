@@ -730,15 +730,31 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
                 }
                 // Iterate over all portrefs of instance
                 PortRef *portref;
+                std::string port_out_lut;
+                std::string net_out_lut;
                 FOREACH_PORTREF_OF_INST(instance, mi2, portref)
                 {
-                    // Do what you want with it ...
-                    Net *net_ = portref->GetNet();
-                    Port *port_ = portref->GetPort();
-                    n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                    if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+                    {
+                        Net *net_ = portref->GetNet();
+                        Port *port_ = portref->GetPort();
+                        if(strcmp(port_->Name(), "Y") == 0)
+                        {
+                            port_out_lut = port_->Name();
+                            net_out_lut = net_->Name();
+                        } else {
+                            n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                        }
+                    } else {
+                        // Do what you want with it ...
+                        Net *net_ = portref->GetNet();
+                        Port *port_ = portref->GetPort();
+                        n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                    }
                 }
                 if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
                 {
+                    n_l.blocks.back().conns_.push_back({port_out_lut, net_out_lut});
                     simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
                 }
             }
