@@ -129,10 +129,10 @@ ieee_1735::GetEncryptionHeader()
     FOREACH_MAP_ITEM(b, mi, &directive, &value) {
         if (!directive || !value) continue ;
         const char* pub_key = "key_public_key";
-        const char *val = GetDirectiveValue(directive) ;
+        const char *val = value->GetStringValue() ;
         if (strcmp(pub_key, directive) == 0){
             // Get public key from directives
-        char *public_key = FormatPublicKey(GetDirectiveValue("key_public_key")) ;
+        char *public_key = FormatPublicKey(val) ;
         BIO *keybio = BIO_new_mem_buf((byte *) public_key, -1) ;
         VERIFIC_ASSERT(keybio) ;
         RSA *rsa_public  = PEM_read_bio_RSA_PUBKEY(keybio, NULL, NULL, NULL) ;
@@ -165,6 +165,7 @@ ieee_1735::GetEncryptionHeader()
         a.InsertLast(Strings::save(prefix, "encoding = (enctype = \"base64\", line_length = 64,"
                                            " bytes = 128), key_block\n")) ;
         a.InsertLast(key_block_b64_w_newlines) ;
+        a.InsertLast(Strings::save("\n")) ;
             ////////////////////////////////////////
         } else {
             a.InsertLast(Strings::save(prefix, directive, " = ", val, "\n")) ;
