@@ -22,7 +22,7 @@
 ## How to run
 * Simplest way is to run `run.sh`
     * It creates `veri_prune` executable in build directory
-    * Runs th executable and generates two files `nl_to_vpr.v` and `wrapper.v`
+    * Runs th executable and generates two files `nl_to_vpr.v` and `wrapper.v` from example testcase
 
 * After running `run.sh` for the first time, executable generated in the build folder can be run
     * Using command `./veri_prune` to run with default arguments
