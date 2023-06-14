@@ -87,3 +87,55 @@ add_executable(enc_verilog ${EXEC_SOURCE})
 if(NOT PRODUCTION_BUILD)
     target_link_libraries(enc_verilog PRIVATE ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
 endif()
+
+# packaging related stuff
+if(PACKAGING)
+    add_custom_command(TARGET enc_verilog POST_BUILD
+          COMMAND echo "Copy invoker script"
+          COMMAND ${CMAKE_COMMAND} -E copy
+              ${PROJECT_SOURCE_DIR}/src/rs_encrypt
+              ${CMAKE_CURRENT_BINARY_DIR}/bin
+          COMMAND ${CMAKE_COMMAND} -E copy_directory
+              ${PROJECT_SOURCE_DIR}/examples
+              ${CMAKE_CURRENT_BINARY_DIR}/examples
+    )
+
+    set(FETCHCONTENT_QUIET FALSE)
+    set(libs_url https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/encryption_tool_libs.tar.gz)
+    set(Destination_Dir ${CMAKE_CURRENT_BINARY_DIR}/lib.tar.gz)
+    set(DO_DOWNLOAD 0)
+    set(DO_EXTRACTION 0)
+    if(EXISTS ${Destination_Dir})
+        message(STATUS "Libs downlaoded tar already exist.")
+        set(DO_EXTRACTION 1)
+    else()
+        message(STATUS "Fresh Downloading Libs dir")
+        set(DO_DOWNLOAD 1)
+        set(DO_EXTRACTION 1)
+    endif()
+
+    if(${DO_DOWNLOAD} EQUAL 1)
+        file(DOWNLOAD ${libs_url} ${Destination_Dir} SHOW_PROGRESS STATUS DOWNLOAD_STATUS)
+        list (GET DOWNLOAD_STATUS 0 STATUS_CODE)
+        if (NOT ${STATUS_CODE} EQUAL "0")
+            message(FATAL_ERROR "Exit status of download HDL Sim is ${STATUS_CODE}")
+        else()
+            message(STATUS "Successfully Donwloadeded Libs)") 
+        endif()
+    endif ()
+    if(${DO_EXTRACTION} EQUAL 1)
+     add_custom_command(TARGET enc_verilog POST_BUILD
+                     COMMENT      "      Extracting Libs        "
+                     COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
+                     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+                     )
+     else ()
+          message(STATUS "Extracted Libs exist and haven't download new tar so skipping it")
+    endif()
+    add_custom_command(TARGET enc_verilog POST_BUILD
+    COMMENT      "      Creating Final Tar        "
+    COMMAND ${CMAKE_COMMAND} -E tar cvzf rs_encryption_tool.tar.gz lib bin examples
+    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    )
+endif() 
+

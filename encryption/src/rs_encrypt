@@ -34,12 +34,12 @@ case $sysname in
         exit 1
         ;;
 esac
-export LD_LIBRARY_PATH=$ENC_PATH/lib
+export LD_LIBRARY_PATH=$ENC_PATH/../lib
 usage()
 {
   echo -e "Usage:\trs_encrypt\n\t\t\t\t[ -h | --help]\t\t\tshow the help
-                         \t[ -k | --keyfile ]\t\tFIle containing the key if not embeded in HDL file
-			        [ -f | --hdl-files]\t\tSapace separated HDL files with extension .v or .sv"
+                         \t[ -k | --keyfile ]\t\tFile containing the key if not embeded in HDL file
+			        [ -f | --hdl-files]\t\tSpace separated HDL files with extension .v or .sv"
   exit 2
 }
 
@@ -60,9 +60,10 @@ do
   case "$1" in   
     -h | --help)        usage  ;;
     -k | --keyfile)     kf="$2";   shift 2 ;;
-    -f | --help)        hdlf="$2"; shift 2 ;;
+    -f | --hdl-files)        hdlf="$2"; shift 2 ;;
     --) shift; break ;;
     *) break ;;
   esac
 done
-$ENC_PATH/bin/enc_verilog $kf $hdlf $@
+[ -z $hdlf ] && usage
+$ENC_PATH/enc_verilog $kf $hdlf $@
