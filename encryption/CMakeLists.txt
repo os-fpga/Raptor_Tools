@@ -1,17 +1,5 @@
 cmake_minimum_required(VERSION 3.10)
 
-# Detect build type, fallback to release and throw a warning if use didn't
-# specify any
-if(NOT CMAKE_BUILD_TYPE)
-    message(WARNING "Build type not set, falling back to Release mode.
-        To specify build type use:
-        -DCMAKE_BUILD_TYPE=<mode> where <mode> is Debug or Release.")
-    set(CMAKE_BUILD_TYPE
-        "Release"
-        CACHE STRING "Choose the type of build, options are: Debug Release."
-        FORCE)
-endif(NOT CMAKE_BUILD_TYPE)
-
 # set the project name
 project(enc_verilog)
 
@@ -50,17 +38,11 @@ function(files_to_dirs file_list directory_list)
     set(${directory_list} ${dir_list} PARENT_SCOPE)
 endfunction(files_to_dirs)
 
-file(GLOB_RECURSE LIB_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
-
 get_filename_component(VERIFIC_HOME "../verific_rs"
     REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
 message("VERIFIC_HOME: ${VERIFIC_HOME}")
 file(GLOB_RECURSE LIB_HEADERS
     ${VERIFIC_HOME}/*/*.h)
-
-if (NOT RAPTOR AND NOT YOSYS_VERIFIC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_subdirectory(${VERIFIC_HOME} "verific_rs")
-endif()
 
 if (APPLE)
     set(OS "mac")
@@ -78,14 +60,6 @@ list(APPEND VERIFIC_LIBS
     ${VERIFIC_HOME}/hdl_encrypt/hdl_encrypt-linux.a
     )
 
-get_filename_component(BOOST_INCLUDE_DIR "../../libs/external/boost"
-  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-get_filename_component(BOOST_ROOT "../../libs/external/boost"
-  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
-
-set (Boost_NO_BOOST_CMAKE ON)
-find_package (Boost)
-include_directories(${Boost_INCLUDE_DIRS})
 files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS)
 find_package(PkgConfig REQUIRED)
 pkg_search_module(OPENSSL REQUIRED openssl)
@@ -98,8 +72,6 @@ else()
 endif()
 
 include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
-                            ${FLEX_LM_SRC_DIR}
-                            ${FLEX_LM_SRC_DIR}/machind
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/enc_verilog
                             ${CMAKE_CURRENT_BINARY_DIR}/include
 )
@@ -107,28 +79,11 @@ include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
-# Add executable for internal use
+# Add executable
+add_executable(enc_verilog ${EXEC_SOURCE})
+# for internal use
 if(NOT PRODUCTION_BUILD)
-    add_executable(enc_verilog ${EXEC_SOURCE})
-    target_link_libraries(enc_verilog PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
-	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	    add_dependencies(enc_verilog verific)
-	endif()
-endif()
-
-
-
-#suppress Verific warnings
-add_compile_options(-w)
-# Create the library
-add_library(libencver STATIC
-    ${LIB_SOURCE}
-)
-SET_TARGET_PROPERTIES(libencver PROPERTIES PREFIX "")
-target_link_libraries(libencver PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
-set_property(TARGET libencver PROPERTY POSITION_INDEPENDENT_CODE ON)
-message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_dependencies(libencver verific)
+    target_link_libraries(enc_verilog PRIVATE ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES})
 endif()
