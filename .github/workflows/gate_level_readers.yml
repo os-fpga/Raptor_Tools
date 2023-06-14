@@ -54,7 +54,7 @@ jobs:
           [ -L "${d%/}" ] && continue
           echo "${d%/}"
           cd "${d%/}"
-          ../../../build/read_verilog "${d%/}".v "${d%/}"_v.blif
+          ../../../build/read_verilog --vfile "${d%/}".v --out "${d%/}"_v.blif
           python3 ../../../../compare_blif/compare_blif.py "${d%/}".blif "${d%/}"_v.blif ../ || exit
           #rm -rf "${d%/}"_v.blif
           #rm -rf "${d%/}"_ports.json ../report.csv
