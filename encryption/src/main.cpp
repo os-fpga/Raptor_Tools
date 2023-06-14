@@ -21,43 +21,48 @@
 #include <vector>
 #include "enc_ver.h"
 using namespace std;
+
 int main(int argc, char **argv)
 {
-    if (argc < 3)
-    {
-        std::cout << "Usage: program_name <data_file> <input_file1> [<input_file2> ...]" << std::endl;
-        return 1;
-    }
-
     try
     {
-        std::string data_file = argv[1]; // Data to be appended, can be any extension
-        std::vector<std::string> input_files;
+        std::string data_file;
+        int arg_start = 1;
+        if (argc > 2 && std::filesystem::exists(argv[1]))
+        {
+            data_file = argv[1]; // If data file exists, set it and start input files from next arg
+            arg_start = 2;
+        }
 
-        for (int i = 2; i < argc; ++i)
+        std::vector<std::string> input_files;
+        for (int i = arg_start; i < argc; ++i)
         {
             const std::string file_name = argv[i]; // input files
-
-            // Only check for .v and .sv extensions for input files
             if (!isValidFileExtension(file_name))
             {
                 std::cout << ">>> Invalid input file or file extension: " << file_name << "\n NOTE: Only .v and .sv extensions are allowed." << std::endl;
                 return 1;
             }
-
             input_files.push_back(file_name);
         }
 
         for (const auto &file_name : input_files)
         {
             std::string out_file_name_str = getOutputFileName(file_name);
-            std::string base_name = std::filesystem::path(file_name).filename().string(); // Extract base name from file path
-            std::string intermediate_file = base_name;
+            if (!data_file.empty())
+            {
+                std::string base_name = std::filesystem::path(file_name).filename().string();
+                std::string intermediate_file = base_name;
+                appendDataAtStart(file_name, data_file, intermediate_file);
 
-            appendDataAtStart(file_name, data_file, intermediate_file);
-
-            std::cout << ">>> Encrypting file " << intermediate_file << " into " << out_file_name_str << std::endl;
-            enc_ver(intermediate_file.c_str(), out_file_name_str.c_str());
+                std::cout << ">>> Encrypting file " << intermediate_file << " into " << out_file_name_str << std::endl;
+                enc_ver(intermediate_file.c_str(), out_file_name_str.c_str());
+            }
+            else
+            {
+                std::cout << ">>> Encrypting file " << file_name << " into " << out_file_name_str << std::endl;
+                enc_ver(file_name.c_str(), out_file_name_str.c_str());
+            }
         }
     }
     catch (const std::runtime_error &e)
