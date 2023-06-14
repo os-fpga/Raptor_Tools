@@ -27,29 +27,31 @@ int main(int argc, char **argv)
     try
     {
         std::string data_file;
-        int arg_start = 1;
-        if (argc > 2 && std::filesystem::exists(argv[1]))
+        std::vector<std::string> input_files;
+
+        for (int i = 1; i < argc; ++i)
         {
-            data_file = argv[1]; // If data file exists, set it and start input files from next arg
-            arg_start = 2;
+            const std::string file_name = argv[i];
+            if (isValidFileExtension(file_name))
+            {
+                input_files.push_back(file_name);
+            }
+            else
+            {
+                data_file = file_name;
+            }
         }
 
-        std::vector<std::string> input_files;
-        for (int i = arg_start; i < argc; ++i)
+        if (input_files.empty())
         {
-            const std::string file_name = argv[i]; // input files
-            if (!isValidFileExtension(file_name))
-            {
-                std::cout << ">>> Invalid input file or file extension: " << file_name << "\n NOTE: Only .v and .sv extensions are allowed." << std::endl;
-                return 1;
-            }
-            input_files.push_back(file_name);
+            std::cout << ">>> No valid input files provided. Only .v and .sv extensions are allowed." << std::endl;
+            return 1;
         }
 
         for (const auto &file_name : input_files)
         {
             std::string out_file_name_str = getOutputFileName(file_name);
-            if (!data_file.empty())
+            if (!data_file.empty() && !fileContainsPragma(file_name))
             {
                 std::string base_name = std::filesystem::path(file_name).filename().string();
                 std::string intermediate_file = base_name;

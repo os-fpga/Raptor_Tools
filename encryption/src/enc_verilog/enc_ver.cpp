@@ -20,6 +20,21 @@
 using namespace Verific;
 #endif
 using namespace std;
+
+bool fileContainsPragma(const std::string &fileName)
+{
+    std::ifstream file(fileName);
+    std::string str;
+    while (std::getline(file, str))
+    {
+        if (str.find("`pragma protect") != std::string::npos)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 std::string readFile(const std::string &filePath)
 {
     std::ifstream in_stream(filePath);
@@ -75,5 +90,4 @@ int enc_ver(const char *file_name, const char *out_file_name)
         return 1;
     }
 
-    return 0;
-}
+    
