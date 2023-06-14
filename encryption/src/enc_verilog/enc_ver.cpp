@@ -90,4 +90,5 @@ int enc_ver(const char *file_name, const char *out_file_name)
         return 1;
     }
 
-    
+    return 0;
+}
