@@ -33,6 +33,7 @@ int main(int argc, char **argv)
     {
         std::vector<std::string> data_files;
         std::vector<std::string> input_files;
+        std::vector<std::string> intermediate_files;
         std::string output_directory = ""; // Default is current directory
 
         bool help_flag = false;
@@ -69,7 +70,16 @@ int main(int argc, char **argv)
                     ++i;
                     while (i < argc && argv[i][0] != '-')
                     {
-                        input_files.push_back(argv[i]);
+                        std::string file_name = argv[i];
+                        if (isValidFileExtension(file_name))
+                        {
+                            input_files.push_back(file_name);
+                        }
+                        else
+                        {
+                            std::cerr << "Invalid input HDL file extension: " << file_name << " Only .v and .sv extensions are allowed." << std::endl;
+                            return 1;
+                        }
                         ++i;
                     }
                     --i;
@@ -96,24 +106,30 @@ int main(int argc, char **argv)
 
         if (help_flag)
         {
-            std::cout << "Usage:\n"
-                      << "-h | --help\t\tShow help\n"
-                      << "-k | --keyfile\t\tFile(s) containing the key if not embedded in HDL file\n"
-                      << "-f | --hdl-files\tSpace separated HDL files with extension .v or .sv\n"
-                      << "-o | --output-dir\tOutput directory for encrypted files" << std::endl;
+            std::cout << "\n\t\t\t**********************************\n"
+                      << "\t\t\t*  RapidSilicon Encryption Tool *\n"
+                      << "\t\t\t**********************************\n"
+                      << "Usage:\n"
+                      << "\t-h | --help\t\tShow help\n"
+                      << "\t-k | --keyfile\t\tFile(s) containing the key if not embedded in HDL file\n"
+                      << "\t-f | --hdl-files\tSpace separated HDL files with extension .v or .sv\n"
+                      << "\t-o | --output-dir\tOutput directory for encrypted files" << std::endl;
             return 0;
         }
 
-        // Your existing logic here ...
-
         if (input_files.empty())
         {
-            std::cout << ">>> No valid input files provided. Only .v and .sv extensions are allowed." << std::endl;
-            return 1;
+            help_flag = true;
         }
 
         for (const auto &file_name : input_files)
         {
+            if (fileContainsPragmaDataBlock(file_name))
+            {
+                std::cout << ">>> Skipping file " << file_name << " as it is already encrypted." << std::endl;
+                continue;
+            }
+
             std::string out_file_name_str = getOutputFileName(file_name);
             if (!output_directory.empty())
             {
@@ -126,8 +142,10 @@ int main(int argc, char **argv)
                 std::string base_name = std::filesystem::path(file_name).filename().string();
                 std::string intermediate_file = base_name;
                 appendDataAtStart(file_name, data_files, intermediate_file);
-                std::cout << ">>> Encrypting file " << intermediate_file << " into " << out_file_name_str << std::endl;
+                std::cout << "\t The Encrypted file is: " << out_file_name_str << std::endl;
                 enc_ver(intermediate_file.c_str(), out_file_name_str.c_str());
+                // Add intermediate file to the list for deletion
+                intermediate_files.push_back(intermediate_file);
             }
             else
             {
@@ -138,9 +156,14 @@ int main(int argc, char **argv)
                 }
                 else
                 {
-                    std::cout << ">>> Encrypting file " << file_name << " into " << out_file_name_str << std::endl;
+                    std::cout << "\t The Encrypted file is: " << out_file_name_str << std::endl;
                     enc_ver(file_name.c_str(), out_file_name_str.c_str());
                 }
+            }
+
+            for (const auto &intermediate_file : intermediate_files)
+            {
+                std::filesystem::remove(intermediate_file);
             }
         }
     }

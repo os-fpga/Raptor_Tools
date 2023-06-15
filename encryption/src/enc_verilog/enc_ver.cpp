@@ -21,6 +21,20 @@ using namespace Verific;
 #endif
 using namespace std;
 
+bool fileContainsPragmaDataBlock(const std::string& fileName)
+{
+    std::ifstream file(fileName);
+    std::string str;
+    while (std::getline(file, str))
+    {
+        if (str.find("`pragma protect data_block") != std::string::npos)
+        {
+            return true;
+        }
+    }
+    return false;
+}
+
 bool fileContainsPragma(const std::string &fileName)
 {
     std::ifstream file(fileName);
