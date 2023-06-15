@@ -17,7 +17,7 @@ int enc_ver(const char *file_name, const char *out_file_name);
 bool fileContainsPragma(const std::string &fileName);
 std::string readFile(const std::string &filePath);
 void writeFile(const std::string &filePath, const std::string &content);
-void appendDataAtStart(const std::string &input_file, const std::string &data_file, const std::string &output_file);
+void appendDataAtStart(const std::string& input_file, const std::vector<std::string>& data_files, const std::string& output_file);
 bool isValidFileExtension(const std::string &file);
 std::string getOutputFileName(const std::string &input_file_name);
 std::vector<std::string> getFilesWithExtension(const std::string &directory, const std::string &extension);

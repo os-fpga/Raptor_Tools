@@ -55,9 +55,14 @@ void writeFile(const std::string &filePath, const std::string &content)
     out_stream << content;
 }
 
-void appendDataAtStart(const std::string &input_file, const std::string &data_file, const std::string &output_file)
+void appendDataAtStart(const std::string &input_file, const std::vector<std::string> &data_files, const std::string &output_file)
 {
-    std::string data_to_append = readFile(data_file);
+    std::string data_to_append;
+    for (const auto &data_file : data_files)
+    {
+        data_to_append += readFile(data_file) + "\n";
+    }
+
     std::string original_content = readFile(input_file);
 
     std::string new_content = data_to_append + "\n" + "`pragma protect begin" + "\n" + original_content + "\n" + "`pragma protect end";
