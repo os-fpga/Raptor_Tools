@@ -1,9 +1,9 @@
-`pragma protect author = "Verific"
-`pragma protect author_info = "Verific Corporation"
+`pragma protect author = "Rapid Silicon"
+`pragma protect author_info = "RS Corporation"
 `pragma protect key_method = "rsa"
 `pragma protect data_method = "aes128-cbc"
-`pragma protect key_keyowner="Verific"
-`pragma protect key_keyname="key1"
+`pragma protect key_keyowner="Rapid Silicon"
+`pragma protect key_keyname="RS-VERIFIC-RSA"
 `pragma protect key_public_key
 MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkRq28uVJ64yGZqOJrWPHJASe54e31P1ULNIw6
 wa9KiOcrrvH/rTq7wZ9xK3Y0xwmZjOfh/uf89+gwHBQWGMMMmZpPt6A3jR08oM0RmJpwOL4fAsFB

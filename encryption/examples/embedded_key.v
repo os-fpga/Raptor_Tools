@@ -12,6 +12,16 @@ module and2(a, b, c);
   (* src = "./rtl/and2/and2.v:14.13-14.14" *)
   output c;
   wire c;
+`pragma protect author = "Verific"
+`pragma protect author_info = "Verific Corporation"
+`pragma protect key_method = "rsa"
+`pragma protect data_method = "aes128-cbc"
+`pragma protect key_keyowner="Verific"
+`pragma protect key_keyname="key1"
+`pragma protect key_public_key
+MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkRq28uVJ64yGZqOJrWPHJASe54e31P1ULNIw6
+wa9KiOcrrvH/rTq7wZ9xK3Y0xwmZjOfh/uf89+gwHBQWGMMMmZpPt6A3jR08oM0RmJpwOL4fAsFB
+kcgM7BOLt3gppbHQrZryRxXXkyFIoBSJAYTGuu4pfkOzNH7O0zUNwhfMzwIDAQAB
 `pragma protect version=1
 `pragma protect encrypt_agent="VCS"
 `pragma protect encrypt_agent_info="S-2021.09-SP2 Build Date Feb 24 2022 20:42:21"
@@ -23,16 +33,6 @@ MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQC7+yvySxqMMiYXyFldRrNrGr0K
 mqGSHT3aSSS8o6VZYNxtktRQRqpQsTbVBBCS5zPBnD1ND3Ykbz06nL66GRTr19VZ
 MJyxt5FS2e9l2FqxniwVhm0UCQLTNoX3Fy0Zs0igKxVf8FwrfwTDbEscuvmzcNSg
 1AXQBqFttqfTIhjHpwIDAQAB
-`pragma protect author = "Verific"
-`pragma protect author_info = "Verific Corporation"
-`pragma protect key_method = "rsa"
-`pragma protect data_method = "aes128-cbc"
-`pragma protect key_keyowner="Verific"
-`pragma protect key_keyname="key1"
-`pragma protect key_public_key
-MIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDkRq28uVJ64yGZqOJrWPHJASe54e31P1ULNIw6
-wa9KiOcrrvH/rTq7wZ9xK3Y0xwmZjOfh/uf89+gwHBQWGMMMmZpPt6A3jR08oM0RmJpwOL4fAsFB
-kcgM7BOLt3gppbHQrZryRxXXkyFIoBSJAYTGuu4pfkOzNH7O0zUNwhfMzwIDAQAB
 `pragma protect begin
   assign c = 8'hca >> { b, a, 1'h0 };
   `pragma protect end
