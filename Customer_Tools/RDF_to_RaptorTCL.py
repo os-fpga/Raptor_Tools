@@ -1,33 +1,36 @@
-# TODO license file, clean up, add argument to take rdf file as input
+"""
+  Copyright (C) 2022-2023 Rapid Silicon Inc.
+  Authorized use only
+"""
 
 import xml.etree.ElementTree as ET
+import argparse
+import os
 
 
-def parseXML(xmlfile):
-    tree = ET.parse(xmlfile)
+def parse_xml(xml_file):
+    tree = ET.parse(xml_file)
     root = tree.getroot()
-    # print(root.tag)
-    # print(root.attrib['title'])
 
     newline = '\n'
-    tclline = '\\' + newline
-    with open(xmlfile+".tcl", "w") as tclfile:
+    tcl_line = '\\' + newline
+    with open(xml_file + ".tcl", "w") as tcl_file:
         # Create design
-        tclfile.write('create_design' + ' ' + root.attrib['title'] + newline)
+        tcl_file.write('create_design' + ' ' + root.attrib['title'] + newline)
 
         # Target device
-        tclfile.write('target_device "1GE100-ES1"' + newline)
+        tcl_file.write('target_device "1GE100-ES1"' + newline)
 
         for option in root.iter('Option'):
             # print(option.attrib['name'], "  ", option.attrib['value'])
             if option.attrib['name'] == 'include path':
                 # Include path
-                tclfile.write('add_include_path' + ' ' + option.attrib['value'] + newline)
+                tcl_file.write('add_include_path' + ' ' + option.attrib['value'] + newline)
 
         for options in root.iter('Options'):
             if 'top_module' in options.attrib:
                 # Top module
-                tclfile.write("set_top_module" + " " + options.attrib['top_module'] + newline)
+                tcl_file.write("set_top_module" + " " + options.attrib['top_module'] + newline)
 
         constraint_files = []
         design_files = []
@@ -43,32 +46,49 @@ def parseXML(xmlfile):
         once = True
         for design_file in design_files:
             while once:
-                tclfile.write('add_design_file' + ' ')
+                tcl_file.write('add_design_file' + ' ')
                 once = False
                 break
-            tclfile.write(design_file + ' ' + tclline)
+            tcl_file.write(design_file + ' ' + tcl_line)
 
         for constraint_file in constraint_files:
-            tclfile.write('add_constraint_file' + ' ' + constraint_file + newline)
+            tcl_file.write('add_constraint_file' + ' ' + constraint_file + newline)
 
         # Synthesis step
-        tclfile.write('synthesize delay' + newline)
-        tclfile.write('packing' + newline)
-        tclfile.write('place' + newline)
-        tclfile.write('route' + newline)
-        tclfile.write('sta' + newline)
-        tclfile.write('bitstream' + newline)
+        tcl_file.write('synthesize delay' + newline)
+        tcl_file.write('packing' + newline)
+        tcl_file.write('place' + newline)
+        tcl_file.write('route' + newline)
+        tcl_file.write('sta' + newline)
+        tcl_file.write('bitstream' + newline)
+
+        print('Finished conversion to TCL: ', tcl_file.name)
 
 
-def convert(name):
-    print(f'Hi, {name}')
-#    parseXML('63_oc_aquarius_6_pw.rdf')
-#    parseXML('3001_oc_or1k_x4.rdf')
-#    parseXML('3002_oc_8051_x6.rdf')
-#    parseXML('3003_oc_des_x5p.rdf')
+def convert(file_path):
+    parse_xml(file_path)
 
-# Press the green button in the gutter to run the script.
+
+def main():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--path', '-p', help="Path to single RDF project file. Default is current directory.")
+    args = parser.parse_args()
+    target_loc = args.path
+
+    if not os.path.exists(target_loc):
+        print('File not found')
+        raise SystemExit(1)
+    print('Found file: ', os.path.abspath(target_loc))
+    convert(os.path.abspath(target_loc))
+
+
 if __name__ == '__main__':
-    convert('RDF to TCL for Raptor from RapidSilicon Inc.')
+    print("""
+**********************************************************************
+RDF to TCL for Raptor from RapidSilicon Inc., Copyright (C) 2022-2023
+Authorized use only
+**********************************************************************
+    """)
+    main()
 
 

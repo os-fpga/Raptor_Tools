@@ -1,7 +1,7 @@
 #!/bin/bash
 set -e
 echo -e "###############################################################################" 
-echo -e "\tInstalling Raptor, A Rapid Silicon complete Software solution"
+echo -e "\tInstalling Raptor, A Rapid Silicon complete software solution"
 echo -e "###############################################################################"
 
 base_dir=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
@@ -56,18 +56,35 @@ do
   esac
 done
 
-ostype=`egrep '^(NAME)=' /etc/os-release  | grep -o -e Ubuntu -e CentOS`
-#echo "[INFO]    Installing Raptor on $ostype"
-if [ "$ostype" == "CentOS" ]
-then
-    echo -e "\n[INFO]\tYou are installing Raptor on CentOS OS."
-elif [ "$ostype" == "Ubuntu" ]
-then
-    echo -e "\n[INFO]\tYou are installing Raptor for Ubuntu OS."
-else
-    echo "unkown OS"
-    exit 1
-fi
+sysname=$(uname -s)
+case $sysname in
+    Linux)
+        mach=$(uname -m)
+        case $mach in
+            x86_64)
+                glibcVersion=$(ldd --version | awk '/ldd/{print $NF}' \
+                                             | sed -n 's/2\.\([0-9]*\)/\1/p')
+                if [ "$glibcVersion" -gt 12 ]; then
+                    plat="linux64"
+                else
+                    plat="linux-legacy"
+                fi
+                ;;
+            i[3-6]86*)
+                echo "Linux 32 bit is not supported."
+                exit 1
+                ;;
+            *)
+                echo "machine $mach not supported on linux"
+                exit 1
+                ;;
+        esac
+        ;;
+    *)
+        echo "Operating system $sysname not supported."
+        exit 1
+        ;;
+esac
 
 #set the libs
 touch $(pwd)/.check
