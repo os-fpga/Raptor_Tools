@@ -233,11 +233,35 @@ ieee_1735::decrypt(void)
     /////////////////////////////////////////////////////////////////////////
     // Get key_block and use RSA decryption to get the original session_key
     /////////////////////////////////////////////////////////////////////////
-    const char *key_method = GetVerifyDirectiveValue("key_method", "\"rsa\"") ;
-    if (!key_method) return 0 ;
-
-    const char *key_block_b64_newlines = GetVerifyDirectiveValue("key_block") ;
-    if (!key_block_b64_newlines) return 0 ;
+    const char *key_block_b64_newlines;
+    auto b = GetDirectiveMap();
+    bool is_RS_key = false;
+    MapIter mi ;
+    char *directive ;
+    Directive *value ;
+    FOREACH_MAP_ITEM(b, mi, &directive, &value) {
+        if (!directive || !value) continue ;
+        const char* pub_key = "key_block";
+        const char *val = value->GetStringValue() ;
+        if (strcmp("author", directive) == 0) {
+            if ((strcmp("\"Rapid Silicon\"", val) == 0) || (strcmp("\"Verific\"", val) == 0)) {
+                is_RS_key = true;
+            }
+        }
+        if(is_RS_key) {
+            if ((strcmp("key_method", directive) == 0) && !(strcmp("\"rsa\"", val) == 0))
+                throw(std::runtime_error("Invalid key method."));
+            if (strcmp("key_block", directive) == 0) {
+                key_block_b64_newlines = val;
+                is_RS_key = false;
+            }
+        }
+    }
+    //const char *key_block_b64_newlines = GetVerifyDirectiveValue("key_block") ;
+    if (!key_block_b64_newlines) {
+        throw(std::runtime_error("Not a valid key."));
+        return 0 ;
+    }
     char *key_block_b64 = RemoveNewlines(key_block_b64_newlines) ;
     unsigned decoded_len ;
     char *key_block = DecodeBase64(key_block_b64, &decoded_len) ;
