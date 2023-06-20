@@ -843,7 +843,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
     std::string directory = std::filesystem::current_path().string();
     std::string base_name = path.stem().string();
 
-    std::string js_port_file = directory + "/" + base_name + "_ports.json";
+    std::string js_port_file = directory + "/" + "post_synth_ports.json";
     std::ofstream myfile(js_port_file.c_str());
 if (myfile.is_open())
 {
