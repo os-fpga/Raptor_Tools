@@ -19,6 +19,7 @@ public:
 
     typedef unsigned char byte ;
     const char* pvt_key_file;
+    char *dec_str;
 
     // Encryption methods
     virtual unsigned encrypt(const char *in_buf, char **out_buf, unsigned in_size) ;

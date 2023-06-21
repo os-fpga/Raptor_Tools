@@ -17,7 +17,7 @@ set(RELEASE_YEAR 2023)
 set(RELEASE_MONTH 04)
 set(RELEASE_DAY 23)
 
-project(RaptorInstaller DESCRIPTION "Package install artifacts as single executable installer")
+project(RaptorInstaller DESCRIPTION "Raptor installer")
 
 set(FETCHCONTENT_QUIET FALSE)
 set(RELEASE_VERSION ${RELEASE_YEAR}.${RELEASE_MONTH})

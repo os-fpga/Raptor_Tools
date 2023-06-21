@@ -304,6 +304,7 @@ ieee_1735::decrypt(void)
     Strings::free(data_block) ;
     Strings::free(session_key) ;
     if (!rtl) return 0 ;
+    dec_str = rtl;
     char *rtl_w_newline = Strings::save(rtl, "\n") ;
 
     return rtl_w_newline ;
