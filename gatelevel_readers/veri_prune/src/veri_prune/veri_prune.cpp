@@ -34,11 +34,15 @@
 #include "VeriMisc.h"       // Definitions of all extraneous verilog tree nodes (ie. range, path, strength, etc...)
 #include "VeriStatement.h"  // Make VeriCaseStatement class available
 #include "VeriVisitor.h"    // For visitor patterns
-#include "veri_tokens.h"    // Definition of port direction VERI_OUTPUT, etc ...
 #include "VeriConstVal.h"   // Definitions of all constant expression tree nodes
 #include "VeriScope.h"      // Symbol table of locally declared identifiers
 #include "Strings.h"        // Definition of class to manipulate copy, concatenate, create etc...
 #include "veri_prune.h" 
+
+#define VERI_INOUT 329
+#define VERI_INPUT 330
+#define VERI_OUTPUT 346
+#define VERI_WIRE 392
 
 #ifdef USE_COMREAD
 #include "Commands.h"
