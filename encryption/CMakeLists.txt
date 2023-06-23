@@ -79,7 +79,7 @@ include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
-set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/lib)
 
 # Add executable
 add_executable(enc_verilog ${EXEC_SOURCE})
@@ -92,6 +92,7 @@ endif()
 if(PACKAGING)
     add_custom_command(TARGET enc_verilog POST_BUILD
           COMMAND echo "Copy invoker script"
+          COMMAND ${CMAKE_COMMAND} -E make_directory ${CMAKE_CURRENT_BINARY_DIR}/bin
           COMMAND ${CMAKE_COMMAND} -E copy
               ${PROJECT_SOURCE_DIR}/src/rs_encrypt
               ${CMAKE_CURRENT_BINARY_DIR}/bin
