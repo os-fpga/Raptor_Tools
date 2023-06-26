@@ -26,7 +26,7 @@ module adder(a, b, c);
     .A({ a_in, b_in }),
     .Y(c_in)
   );
-  \ibuf(PULL_UP_DOWN="FALSE",REG_EN="FALSE")  #(
+  \I_BUF(PULL_UP_DOWN="FALSE",REG_EN="FALSE")  #(
     .DELAY(1'h0),
     .PULL_UP_DOWN(7'h00),
     .REG_EN(7'h00),
@@ -35,7 +35,7 @@ module adder(a, b, c);
     .I(a),
     .O(a_in)       // Input to fabric
   );
-  \ibuf(PULL_UP_DOWN="FALSE",REG_EN="FALSE")  #(
+  \I_BUF(PULL_UP_DOWN="FALSE",REG_EN="FALSE")  #(
     .DELAY(1'h0),
     .PULL_UP_DOWN(7'h00),
     .REG_EN(7'h00),
@@ -44,7 +44,7 @@ module adder(a, b, c);
     .I(b),
     .O(b_in)       // Input to fabric
   );
-  \obuf(PULL_UP_DOWN="FALSE",REG_EN="FALSE")  #(
+  \O_BUF(PULL_UP_DOWN="FALSE",REG_EN="FALSE")  #(
     .DELAY(1'h0),
     .PULL_UP_DOWN(7'h00),
     .REG_EN(7'h00),
