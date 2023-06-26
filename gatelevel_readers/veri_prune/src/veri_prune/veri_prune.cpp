@@ -43,6 +43,9 @@
 #define VERI_INPUT 330
 #define VERI_OUTPUT 346
 #define VERI_WIRE 392
+#define IN_DIR 0
+#define OUT_DIR 1
+#define INOUT_DIR 2
 
 #ifdef USE_COMREAD
 #include "Commands.h"
@@ -205,7 +208,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             	if (imod) {
                             		// check in gb mods for direction
                                     for (const auto& pair : m_items) {
-                                        if(pair.second) {
+                                        if(pair.second == OUT_DIR) {
                                             conn_info.insert(std::make_pair(actual_name, formal_name));
                                             mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
                                         }
@@ -213,7 +216,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             		} else {
                             		// check in gb mods for direction
                                     for (const auto& pair : m_items) {
-                                        if(!pair.second) {
+                                        if(pair.second == IN_DIR) {
                                             conn_info.insert(std::make_pair(actual_name, formal_name));
                                             mod->AddPort(actual_name /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
                                             }
