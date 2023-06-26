@@ -21,15 +21,14 @@ struct gb_constructs
           {"BITSLIP_ADJ", 0}, {"EN", 0}, {"CLK_IN", 0}, {"PLL_FAST_CLK", 0}, {"FAST_PHASE_CLK", 0}, {"PLL_LOCK", 0},
           {"CLK_OUT", 1}, {"CDR_CORE_CLK", 1}, {"Q", 1}, {"DATA_VALID", 1}, {"DLY_TAP_VALUE", 1}, {"DPA_LOCK", 1}, {"DPA_ERROR", 1}}},
         {"IO_BUF", {{"I", 0}, {"T", 0}, {"IO", 2}, {"O", 1}}},
-        {"IO_BUF_DS", {{"I", 0}, {"T", 0}, {"IOP", 2}, {ION, 2}, {"O", 1}}},
+        {"IO_BUF_DS", {{"I", 0}, {"T", 0}, {"IOP", 2}, {"ION", 2}, {"O", 1}}},
         {"O_BUF", {{"I", 0}, {"C", 0}, {"O", 1}}},
         {"O_BUFT", {{"I", 0}, {"OE", 0}, {"O", 1}}},
         {"O_BUFT_DS", {{"OE",0}, {"I",0}, {"C",0}, {"O_N",1}, {"O_P",1}}},
         {"O_DDR", {{"D",0}, {"R",0}, {"E",0}, {"DLY_ADJ",0},{"DLY_LD",0}, {"DLY_INC",0}, {"C",0}, {"Q",1}}},
         {"O_SERDES", {{"D", 0}, {"RST", 0}, {"LOAD_WORD", 0},{"DLY_LOAD", 0}, {"DLY_ADJ", 0}, {"DLY_INCDEC", 0},
           {"CLK_EN", 0}, {"CLK_IN", 0}, {"PLL_LOCK", 0}, {"PLL_FAST_CLK", 0}, {"FAST_PHASE_CLK", 0}, {"OE", 0},
-          {"CLK_OUT", 1}, {"Q", 1}, {"DLY_TAP_VALUE", 1}, {"CHANNEL_BOND_SYNC_IN", 0}, {"CHANNEL_BOND_SYNC_OUT", 1}}}}
-        };
+          {"CLK_OUT", 1}, {"Q", 1}, {"DLY_TAP_VALUE", 1}, {"CHANNEL_BOND_SYNC_IN", 0}, {"CHANNEL_BOND_SYNC_OUT", 1}}}};
     std::vector<std::string> imods = {"CLK_BUF", "I_BUF", "I_BUF_DS", "I_DDR", "I_SERDES"};
     std::vector<std::string> omods = {"O_BUF", "O_BUFT", "O_BUFT_DS", "O_DDR", "O_SERDES"};
     std::vector<std::string> iomods = {"IO_BUF", "IO_BUF_DS"};
