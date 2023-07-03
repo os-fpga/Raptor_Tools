@@ -32,11 +32,13 @@ struct gb_constructs
     std::vector<std::string> imods = {"CLK_BUF", "I_BUF", "I_BUF_DS", "I_DDR", "I_SERDES"};
     std::vector<std::string> omods = {"O_BUF", "O_BUFT", "O_BUFT_DS", "O_DDR", "O_SERDES"};
     std::vector<std::string> iomods = {"IO_BUF", "IO_BUF_DS"};
-    std::unordered_set<std::string> insts_visited;
-    std::vector<std::string> prefs;
+    std::vector<std::pair<std::string, int>> mod_ios;
+    std::vector<std::pair<std::string, int>> intf_ios;
     std::vector<std::string> top_ports;
-    std::vector<std::string> wrapper_conns;
+    std::vector<std::string> prefs;
     std::unordered_set<std::string> del_ports;
+    std::vector<std::string> gb_insts;
+    std::vector<std::string> normal_insts;
     std::vector<std::pair<std::string, std::map<std::string, std::string>>> del_conns;
 };
 int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name, const char *file_base, gb_constructs &gb);
