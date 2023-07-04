@@ -209,31 +209,35 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             } else if(actual_id->Dir() == VERI_OUTPUT) {
                                 gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
                                 gb.del_ports.insert(actual_name);
+                            } else if(actual_id->Dir() == VERI_INOUT) {
+                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INOUT));
+                                gb.del_ports.insert(actual_name);
                             } else {
                             	if (imod) {
                             		// check in gb mods for direction
                                     for (const auto& pair : m_items) {
-                                        if(pair.second == OUT_DIR) {
-                                            gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
-                                            gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                        if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                            if(pair.second == OUT_DIR) {
+                                                gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                            }
                                         }
                                     }
                             		} else {
                             		// check in gb mods for direction
                                     for (const auto& pair : m_items) {
-                                        if(pair.second == IN_DIR) {
-                                            gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
-                                            gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                        if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                            if(pair.second == IN_DIR) {
+                                                gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                            }
                                         }
                                     }
                             		}
                             	}
                             }
         	        }
-                     for (const auto& pair : gb.mod_ios) {
-                        mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
-                     }
-
+                     
                     for (const auto& prf : prefs) {
                         mod->RemovePortRef(inst_name /* instance name */, prf.c_str() /* formal port name */) ;
                     }
@@ -243,19 +247,65 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                 }
     	    }
         }
-        for (const auto& gb_inst : gb.gb_insts) {
-            mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
+    }
+
+    for (const auto& gb_inst : gb.gb_insts) {
+        mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
+    }
+
+    std::vector<std::string> stringsToRemove;
+
+    // Find strings with multiple occurrences in gb.intf_ios
+    for (const auto& pair : gb.intf_ios) {
+        const std::string& str = pair.first;
+        auto it = std::find_if(stringsToRemove.begin(), stringsToRemove.end(),
+                               [&str](const std::string& s) { return s == str; });
+        if (it != stringsToRemove.end()) {
+            // String is already marked for removal, skip to the next pair
+            continue;
+        }
+
+        auto count = std::count_if(gb.intf_ios.begin(), gb.intf_ios.end(),
+                                   [&str](const std::pair<std::string, int>& p) {
+                                       return p.first == str;
+                                   });
+        if (count > 1) {
+            stringsToRemove.push_back(str);
         }
     }
 
+    // Remove pairs from gb.intf_ios and gb.mod_ios
+    gb.intf_ios.erase(std::remove_if(gb.intf_ios.begin(), gb.intf_ios.end(),
+                                     [&stringsToRemove](const std::pair<std::string, int>& p) {
+                                         return std::find(stringsToRemove.begin(), stringsToRemove.end(),
+                                                          p.first) != stringsToRemove.end();
+                                     }),
+                      gb.intf_ios.end());
+
+    gb.mod_ios.erase(std::remove_if(gb.mod_ios.begin(), gb.mod_ios.end(),
+                                    [&stringsToRemove](const std::pair<std::string, int>& p) {
+                                        return std::find(stringsToRemove.begin(), stringsToRemove.end(),
+                                                         p.first) != stringsToRemove.end();
+                                    }),
+                     gb.mod_ios.end());
+
+    for (const auto& pair : gb.mod_ios) {
+        mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
+    }
 
     for (const auto& dp : gb.del_ports) {
         mod->RemovePort(dp.c_str());
+        mod->RemoveSignal(dp.c_str() /* signal to be removed */) ;
+    }
+
+    for (const auto& rm_sig : stringsToRemove) {
+        mod->RemoveSignal(rm_sig.c_str() /* signal to be removed */) ;
+        top_mod->RemoveSignal(rm_sig.c_str() /* signal to be removed */) ;
     }
 
     // to check connections of extra ports in wrapper
     //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
-
+    
     mod_str = mod->GetPrettyPrintedString();
 
 //
