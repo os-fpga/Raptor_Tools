@@ -34,6 +34,7 @@ struct gb_constructs
     std::vector<std::string> iomods = {"IO_BUF", "IO_BUF_DS"};
     std::vector<std::pair<std::string, int>> mod_ios;
     std::vector<std::pair<std::string, int>> intf_ios;
+    std::vector<std::pair<std::string, int>> intf_inouts;
     std::vector<std::string> top_ports;
     std::vector<std::string> prefs;
     std::unordered_set<std::string> del_ports;

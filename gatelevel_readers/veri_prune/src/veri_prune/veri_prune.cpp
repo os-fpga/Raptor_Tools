@@ -210,7 +210,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                 gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
                                 gb.del_ports.insert(actual_name);
                             } else if(actual_id->Dir() == VERI_INOUT) {
-                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INOUT));
+                                gb.intf_inouts.push_back(std::make_pair(actual_name, VERI_INOUT));
                                 gb.del_ports.insert(actual_name);
                             } else {
                             	if (imod) {
@@ -299,6 +299,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
 
     for (const auto& rm_sig : stringsToRemove) {
+        std::cout << "signals to remove " << rm_sig << std::endl;
         mod->RemoveSignal(rm_sig.c_str() /* signal to be removed */) ;
         top_mod->RemoveSignal(rm_sig.c_str() /* signal to be removed */) ;
     }
@@ -312,6 +313,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     /////////////////////////////////////////////////////////////////////////
     
     for (const auto& pair : gb.intf_ios) {
+        intf_mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
+    }
+
+    for (const auto& pair : gb.intf_inouts) {
         intf_mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
     }
 
@@ -329,6 +334,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     VeriModuleInstantiation *intf_inst = top_mod->AddInstance("intf_inst", intf_name) ;
     for (const auto& pair : gb.intf_ios) {
+        top_mod->AddPortRef("intf_inst" /* instance name */, (pair.first).c_str() /* formal port name */, new VeriIdRef(Strings::save((pair.first).c_str())) /* actual */) ;
+    }
+
+    for (const auto& pair : gb.intf_inouts) {
         top_mod->AddPortRef("intf_inst" /* instance name */, (pair.first).c_str() /* formal port name */, new VeriIdRef(Strings::save((pair.first).c_str())) /* actual */) ;
     }
 
