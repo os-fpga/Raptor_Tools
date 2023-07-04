@@ -92,6 +92,9 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     char *intf_name = Strings::save("intf_", mod->Name()) ;
     VeriModuleItem *intf_mod_ = mod->CopyWithName(intf_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
     VeriModule *intf_mod = (VeriModule *)intf_mod_;
+    char *top_name = Strings::save("top_", mod->Name()) ;
+    VeriModuleItem *top_mod_ = intf_mod->CopyWithName(top_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
+    VeriModule *top_mod = (VeriModule *)top_mod_;
     delete all_top_modules ;
 
     // Get the module item list of module.
@@ -201,8 +204,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             actual_name = actual_id->Name();
                             prefs.push_back(formal_name);
                             if(actual_id->Dir() == VERI_INPUT) {
+                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
                                 gb.del_ports.insert(actual_name);
                             } else if(actual_id->Dir() == VERI_OUTPUT) {
+                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
                                 gb.del_ports.insert(actual_name);
                             } else {
                             	if (imod) {
@@ -253,54 +258,9 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     mod_str = mod->GetPrettyPrintedString();
 
-     // Get the module item list of module.
-    Array *m_items = intf_mod->GetModuleItems() ;
-    unsigned j;
-    VeriModuleItem *m_item;
 //
     /////////////////////////////////////////////////////////////////////////
-    FOREACH_ARRAY_ITEM(m_items, i, m_item)
-    {
-        if (!m_item)
-            continue;
-        if(m_item->IsInstantiation()) 
-        {
-        	std::string mod_name = m_item->GetModuleName();
-            std::string no_param_name;
-            // reducing a correctly named parametrized module MyModule(par1=99) to MyModule
-            // discuss with thierry !
-            for (auto k : mod_name)
-                if ('(' == k)
-                    break;
-                else
-                    no_param_name.push_back(k);
-                    
-            VeriIdDef *id ;
-        	unsigned m ;
-        	Array *insts = m_item->GetInstances();
-        	FOREACH_ARRAY_ITEM(insts, m, id) 
-            {
-                bool is_gb_cons;
-                std::string str;
-                std::map<std::string, int> gb_items;
-        	    for (const auto& element : gb.gb_mods) {
-                    str = element.first;
-        	        if (str == no_param_name) {
-                        gb_items = element.second;
-                        is_gb_cons = true;
-                        break;
-                    } else {
-                        is_gb_cons = false;
-                    }
-                }
-        		const char *inst_name = id->InstName() ;
-                if(!is_gb_cons) 
-                {
-                    gb.normal_insts.push_back(inst_name);
-                }
-            }
-        }
-    }
+    
     for (const auto& pair : gb.intf_ios) {
         intf_mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
     }
@@ -309,7 +269,26 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         intf_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
     }
 
+    for (const auto& del_inst : gb.normal_insts) {
+        top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
+    }
+
+    for (const auto& del_inst : gb.gb_insts) {
+        top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
+    }
+
+    VeriModuleInstantiation *intf_inst = top_mod->AddInstance("intf_inst", intf_name) ;
+    for (const auto& pair : gb.intf_ios) {
+        top_mod->AddPortRef("intf_inst" /* instance name */, (pair.first).c_str() /* formal port name */, new VeriIdRef(Strings::save((pair.first).c_str())) /* actual */) ;
+    }
+
+    VeriModuleInstantiation *mod_inst = top_mod->AddInstance("mod_inst", mod->Name()) ;
+    for (const auto& pair : gb.mod_ios) {
+        top_mod->AddPortRef("mod_inst" /* instance name */, (pair.first).c_str() /* formal port name */, new VeriIdRef(Strings::save((pair.first).c_str())) /* actual */) ;
+    }
+
     char *intf_mod_str = intf_mod->GetPrettyPrintedString();
+    char *top_mod_str = top_mod->GetPrettyPrintedString();
 
     //call function to generate wrapper
 
@@ -330,6 +309,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     std::ofstream wrapper_file;
     wrapper_file.open(wrapper_file_name);
     wrapper_file << intf_mod_str;
+    wrapper_file << top_mod_str;
 
     // Remove all analyzed modules
     veri_file::RemoveAllModules() ;
