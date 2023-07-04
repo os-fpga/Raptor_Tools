@@ -198,7 +198,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                             unsigned port_size = indexed_id->FindSize();
                             const char *port_name = indexed_id->GetName() ; // Get port name
                             Message::Info(indexed_id->Linefile(),"here '", port_name, "' is an indexed id in a port declaration") ;
-                        }  
+                        }  else if (actual->GetClassId() == ID_VERICONSTVAL) {
+                            // Do nothing
+                            ;
+                        }
                         else {
                             actual_id = (actual) ? actual->FullId() : 0 ;
                             actual_name = actual_id->Name();
