@@ -155,51 +155,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         formal_name = expr->NamedFormal() ;
                         formal = module_item->GetPort(formal_name) ;
                         actual = expr->GetConnection() ;
-                        if (actual->GetClassId() == ID_VERICONCAT) {
-                            prefs.push_back(formal_name);
-                            Array *expr_arr = actual->GetExpressions();
-                            unsigned i;
-                            VeriExpression *pexpr;
-                            FOREACH_ARRAY_ITEM(expr_arr, i, pexpr)
-                            {
-                                actual_id = (pexpr) ? pexpr->FullId() : 0 ;
-                                actual_name = actual_id->Name();
-
-                                if(actual_id->Dir() == VERI_INPUT) {
-                                    gb.del_ports.insert(actual_name);
-                                } else if(actual_id->Dir() == VERI_OUTPUT) {
-                                    gb.del_ports.insert(actual_name);
-                                } else {
-                                	if (imod) {
-                                		// check in gb mods for direction
-                                        for (const auto& pair : m_items) {
-                                            if(pair.second) {
-                                                conn_info.insert(std::make_pair(actual_name, formal_name));
-                                                //mod->AddPort(actual_name /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
-                                            }
-                                        }
-                                		} else {
-                                		// check in gb mods for direction
-                                        for (const auto& pair : m_items) {
-                                            if(!pair.second) {
-                                                conn_info.insert(std::make_pair(actual_name, formal_name));
-                                                //mod->AddPort(actual_name /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
-                                                }
-                                        }
-                                		}
-                                	}
-    
-
-
-                            }
-                        } else if (actual->GetClassId() == ID_VERIINDEXEDID) {
-                            //// try using actual->getPrettyPrintedString
-                            VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
-                            unsigned port_dir = indexed_id->PortExpressionDir() ;
-                            unsigned port_size = indexed_id->FindSize();
-                            const char *port_name = indexed_id->GetName() ; // Get port name
-                            Message::Info(indexed_id->Linefile(),"here '", port_name, "' is an indexed id in a port declaration") ;
-                        }  else if (actual->GetClassId() == ID_VERICONSTVAL) {
+                        if (actual->GetClassId() == ID_VERICONSTVAL) {
                             // Do nothing
                             ;
                         }
@@ -308,7 +264,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
     mod_str = mod->GetPrettyPrintedString();
 
-//
     /////////////////////////////////////////////////////////////////////////
     
     for (const auto& pair : gb.intf_ios) {
