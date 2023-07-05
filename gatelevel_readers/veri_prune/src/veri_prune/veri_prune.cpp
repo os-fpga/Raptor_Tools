@@ -193,6 +193,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
                             }
                         } else if (actual->GetClassId() == ID_VERIINDEXEDID) {
+                            //// try using actual->getPrettyPrintedString
                             VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
                             unsigned port_dir = indexed_id->PortExpressionDir() ;
                             unsigned port_size = indexed_id->FindSize();
@@ -204,40 +205,42 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         }
                         else {
                             actual_id = (actual) ? actual->FullId() : 0 ;
-                            actual_name = actual_id->Name();
-                            prefs.push_back(formal_name);
-                            if(actual_id->Dir() == VERI_INPUT) {
-                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
-                                gb.del_ports.insert(actual_name);
-                            } else if(actual_id->Dir() == VERI_OUTPUT) {
-                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
-                                gb.del_ports.insert(actual_name);
-                            } else if(actual_id->Dir() == VERI_INOUT) {
-                                gb.intf_inouts.push_back(std::make_pair(actual_name, VERI_INOUT));
-                                gb.del_ports.insert(actual_name);
-                            } else {
-                            	if (imod) {
-                            		// check in gb mods for direction
-                                    for (const auto& pair : m_items) {
-                                        if (strcmp((pair.first).c_str(), formal_name) == 0) {
-                                            if(pair.second == OUT_DIR) {
-                                                gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
-                                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                            if(actual_id) {
+                                actual_name = actual_id->Name();
+                                prefs.push_back(formal_name);
+                                if(actual_id->Dir() == VERI_INPUT) {
+                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                    gb.del_ports.insert(actual_name);
+                                } else if(actual_id->Dir() == VERI_OUTPUT) {
+                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                    gb.del_ports.insert(actual_name);
+                                } else if(actual_id->Dir() == VERI_INOUT) {
+                                    gb.intf_inouts.push_back(std::make_pair(actual_name, VERI_INOUT));
+                                    gb.del_ports.insert(actual_name);
+                                } else {
+                                	if (imod) {
+                                		// check in gb mods for direction
+                                        for (const auto& pair : m_items) {
+                                            if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                                if(pair.second == OUT_DIR) {
+                                                    gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                }
                                             }
                                         }
-                                    }
-                            		} else {
-                            		// check in gb mods for direction
-                                    for (const auto& pair : m_items) {
-                                        if (strcmp((pair.first).c_str(), formal_name) == 0) {
-                                            if(pair.second == IN_DIR) {
-                                                gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
-                                                gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                	} else {
+                                		// check in gb mods for direction
+                                        for (const auto& pair : m_items) {
+                                            if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                                if(pair.second == IN_DIR) {
+                                                    gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                }
                                             }
                                         }
-                                    }
-                            		}
-                            	}
+                                	}
+                                }
+                            }
                             }
         	        }
                      
@@ -299,17 +302,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     for (const auto& dp : gb.del_ports) {
         mod->RemovePort(dp.c_str());
         mod->RemoveSignal(dp.c_str() /* signal to be removed */) ;
-    }
-
-    for (const auto& rm_sig : stringsToRemove) {
-        std::cout << "signals to remove " << rm_sig << std::endl;
-        mod->RemoveSignal(rm_sig.c_str() /* signal to be removed */) ;
-        top_mod->RemoveSignal(rm_sig.c_str() /* signal to be removed */) ;
-    }
+    } 
 
     // to check connections of extra ports in wrapper
     //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
-    
     mod_str = mod->GetPrettyPrintedString();
 
 //
