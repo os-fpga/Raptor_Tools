@@ -56,6 +56,25 @@
 using namespace Verific ;
 #endif
 
+static char* intf_mod_str = nullptr;
+static char* top_mod_str = nullptr;
+static char* mod_str=nullptr; 
+
+char* GetINTFModString()
+{
+    return intf_mod_str;
+}
+
+char* GetTOPModString()
+{
+    return top_mod_str;
+}
+
+char* GetModString()
+{
+    return mod_str;
+}
+
 bool isimod(std::string mod)
 {
     gb_constructs gb;
