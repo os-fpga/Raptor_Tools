@@ -15,6 +15,7 @@
  *
  */
 
+#include <filesystem>
 #include "Map.h" // Make associated hash table class Map available
 #include "Set.h" // Make associated hash table class Set available
 
@@ -570,7 +571,7 @@ void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<uns
     }
 }
 
-int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file)
+int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file, const char *top_mod)
 {
     //PRIVATE_KEY_FILENAME
     ieee_1735 ieee_1735;
@@ -590,7 +591,15 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         return 1;
     }
     // Get name of top-level module
-    const char *name = veri_file::TopModule();
+    const char *name;
+
+    if(top_mod == nullptr)
+    {
+        // Get name of top-level module
+        name = veri_file::TopModule();
+    } else {
+        name = top_mod;
+    }
 
     // Ok now let's elaborate this module. In case of failure return.
     if (!veri_file::Elaborate(name /*module_name*/, "work" /*work_lib*/, 0 /*parameter_values_map*/))
@@ -612,6 +621,8 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         Message::PrintLine("Cannot find any handle to the top-level netlist");
         return 5;
     }
+    // Flatten down to primitives
+    top->Flatten() ;
     // Lets accumulate all netlist
     Set netlists(POINTER_HASH);
     top->Hierarchy(netlists, 0 /* bottom to top */);
@@ -654,15 +665,15 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
             {
                 if(netlist == top) {
                     n_l.out_ports.push_back(port->Name());
+                    n_l.ports.push_back(port->Name());
                 }
-                n_l.ports.push_back(port->Name());
             }
             else if (DIR_IN == port->GetDir())
             {
                 if(netlist == top) {
                     n_l.in_ports.push_back(port->Name());
+                    n_l.ports.push_back(port->Name());
                 }
-                n_l.ports.push_back(port->Name());
                 n_l.in_set.insert(port->Name());
             }
         }
@@ -683,81 +694,56 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         {
             netBusMap[netbus->Name()] = {netbus->LeftIndex(), netbus->RightIndex()};
         }
-        if(!im){
-            Instance *instance;
-            // Iterate over all references (Instances) of this netlist
-            FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+        Instance *instance;
+        // Iterate over all references (Instances) of this netlist
+        FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+        {
+            // Iterate over all parameters of instance
+            n_l.blocks.push_back(inst());
+            if (instance->IsProtected())
+                n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
+            n_l.blocks.back().name_ = instance->Name();
+            n_l.blocks.back().mod_name_ = current_block_model;
+            char *param_name, *param_value;
+            FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
             {
-                // Iterate over all parameters of instance
-                n_l.blocks.push_back(inst());
-                if (instance->IsProtected())
-                    n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
-                n_l.blocks.back().name_ = instance->Name();
-                n_l.blocks.back().mod_name_ = current_block_model;
-                char *param_name, *param_value;
-                FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
+                // Do what you want with them ...
+                string literal(param_value);
+                vector<string> v;
+                string param_v;
+                bool is_valid = false;
+                try
                 {
-                    // Do what you want with them ...
-                    string literal(param_value);
-                    vector<string> v;
-                    string param_v;
-                    bool is_valid = false;
-                    try
-                    {
-                        bits(literal, v, param_v);
-                    }
-                    catch (...)
-                    {
-                        param_v = literal;
-                    }
-                    is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
-
-                    if (is_valid)
-                    {
-                        n_l.blocks.back().params_[param_name] = param_v;
-                    }
-                    else
-                    {
-                        // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
-                    }
+                    bits(literal, v, param_v);
                 }
-                // Iterate over all portrefs of instance
-                PortRef *portref;
-                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                catch (...)
                 {
-                    // Do what you want with it ...
-                    Net *net_ = portref->GetNet();
-                    Port *port_ = portref->GetPort();
-                    n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                    param_v = literal;
                 }
-                if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
+                if (is_valid)
                 {
-                    simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
+                    n_l.blocks.back().params_[param_name] = param_v;
+                }
+                else
+                {
+                    // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
                 }
             }
-        } else {
-            Instance *instance;
-            FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
+            // Iterate over all portrefs of instance
+            PortRef *portref;
+            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
             {
-                // Iterate over all parameters of instance
-                if (instance->IsProtected())
-                    n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
-
-                // Iterate over all portrefs of instance
-                PortRef *portref;
-                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
-                {
-                    // Do what you want with it ...
-                    Net *net_ = portref->GetNet();
-                    Port *port_ = portref->GetPort();
-                    if(strcmp(net_->Name() ,port_->Name())) {
-                        if (DIR_IN == port_->GetDir()) {
-                            n_l.port_conns.insert({net_->Name(), port_->Name()});
-                        } else if (DIR_OUT == port_->GetDir()) {
-                            n_l.port_conns.insert({port_->Name(), net_->Name()});
-                        }
-                    }
-                }
+                // Do what you want with it ...
+                Net *net_ = portref->GetNet();
+                Port *port_ = portref->GetPort();
+                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+            }
+            if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
+            {
+                // Sorting the vector based on the first element of each pair
+                std::sort(n_l.blocks.back().conns_.begin(), n_l.blocks.back().conns_.end());
+                simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
             }
         }
     }
@@ -852,17 +838,22 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
     }
     veri_file::RemoveAllModules();
 
-    string js_port_file(file_name);
-    while ('.' != js_port_file.back())
-    {
-        js_port_file.pop_back();
-    }
-    js_port_file.pop_back();
-    js_port_file += "_ports.json";
-    ofstream myfile;
-    myfile.open(js_port_file.c_str());
+    
+    std::filesystem::path path(file_name);
+    std::string directory = std::filesystem::current_path().string();
+    std::string base_name = path.stem().string();
+
+    std::string js_port_file = directory + "/" + "post_synth_ports.json";
+    std::ofstream myfile(js_port_file.c_str());
+if (myfile.is_open())
+{
     n_l.b_port_print_json(myfile);
     myfile.close();
-
+    std::cout << "Output file created at: " << js_port_file << std::endl;
+}
+else
+{
+    std::cout << "Failed to create the output file." << std::endl;
+}
     return 0;
 }

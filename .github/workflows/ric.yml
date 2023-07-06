@@ -41,7 +41,7 @@ jobs:
           
     - name: Install dependencies
       run: 
-        sudo apt-get install tclsh
+        sudo apt-get install tclsh cmake
 
     - name: RIC_Ubuntu
       if: matrix.mode == 'basic_test' 
@@ -49,6 +49,8 @@ jobs:
       run: |
         cd Device_Modeling/
         make
+        cd -
+        cd Device_Modeling/src && mkdir build && cd build && cmake .. && make && ./Device_Modeling_test
 
        
 
