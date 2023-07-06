@@ -109,6 +109,31 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     delete all_top_modules ;
 
     // Get the module item list of module.
+    Array *top_items = top_mod->GetModuleItems() ;
+    Array *empty;
+    VeriModuleItem *top_item;
+    unsigned j;
+    FOREACH_ARRAY_ITEM(top_items, j, top_item) {
+        if (!top_item)
+            continue;
+        if (ID_VERICONTINUOUSASSIGN == top_item->GetClassId()) {
+            top_mod->ReplaceChildBy(top_item, empty);
+        }
+    }
+
+    // Get the module item list of module.
+    Array *intf_items = intf_mod->GetModuleItems() ;
+    VeriModuleItem *intf_item;
+    unsigned m;
+    FOREACH_ARRAY_ITEM(intf_items, m, intf_item) {
+        if (!intf_item)
+            continue;
+        if (ID_VERICONTINUOUSASSIGN == intf_item->GetClassId()) {
+            intf_mod->ReplaceChildBy(intf_item, empty);
+        }
+    }
+
+    // Get the module item list of module.
     Array *items = mod->GetModuleItems() ;
     VeriModuleItem *module_item;
     unsigned i;
