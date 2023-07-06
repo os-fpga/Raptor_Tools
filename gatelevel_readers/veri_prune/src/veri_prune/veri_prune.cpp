@@ -324,13 +324,11 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     unsigned k ;
     VeriIdDef *port_id ;
     FOREACH_ARRAY_ITEM(mod_ports, k, port_id) {
-        std::cout << "PORT is  ::: " << port_id->GetName() << std::endl;
         gb.mod_ports.push_back(port_id->GetName());
     }
 
     VeriModuleInstantiation *mod_inst = top_mod->AddInstance("mod_inst", mod->Name()) ;
     for (const auto& port : gb.mod_ports) {
-        std::cout << "ADDED PORT is  ::: " << port_id->GetName() << std::endl;
         top_mod->AddPortRef("mod_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
 
