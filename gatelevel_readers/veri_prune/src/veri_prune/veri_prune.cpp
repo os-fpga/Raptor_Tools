@@ -67,6 +67,17 @@ bool isimod(std::string mod)
     return false;
 }
 
+bool isiomod(std::string mod)
+{
+    gb_constructs gb;
+    for (const auto& element : gb.iomods)
+    {
+        if (mod == element) {
+            return true; }
+    }
+    return false;
+}
+
 
 ////////////////////////////////////////////////////////////////////////////
 
@@ -138,6 +149,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         	    if (is_gb_cons) 
                 {
                     bool imod = isimod(no_param_name);
+                    bool iomod = isiomod(no_param_name);
                     std::vector<std::string> prefs;
                     std::unordered_map<std::string, std::vector<std::string>> del_inst;
                     std::map<std::string, std::string> conn_info ;
@@ -181,6 +193,19 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                 if(pair.second == OUT_DIR) {
                                                     gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
                                                     gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                }
+                                            }
+                                        }
+                                	} else if (iomod) {
+                                		// check in gb mods for direction
+                                        for (const auto& pair : m_items) {
+                                            if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                                if(pair.second == OUT_DIR) {
+                                                    gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                } else if(pair.second == IN_DIR) {
+                                                    gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
                                                 }
                                             }
                                         }
@@ -295,9 +320,18 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         top_mod->AddPortRef("intf_inst" /* instance name */, (pair.first).c_str() /* formal port name */, new VeriIdRef(Strings::save((pair.first).c_str())) /* actual */) ;
     }
 
+    Array *mod_ports = mod->GetPorts() ; // Get the ports
+    unsigned k ;
+    VeriIdDef *port_id ;
+    FOREACH_ARRAY_ITEM(mod_ports, k, port_id) {
+        std::cout << "PORT is  ::: " << port_id->GetName() << std::endl;
+        gb.mod_ports.push_back(port_id->GetName());
+    }
+
     VeriModuleInstantiation *mod_inst = top_mod->AddInstance("mod_inst", mod->Name()) ;
-    for (const auto& pair : gb.mod_ios) {
-        top_mod->AddPortRef("mod_inst" /* instance name */, (pair.first).c_str() /* formal port name */, new VeriIdRef(Strings::save((pair.first).c_str())) /* actual */) ;
+    for (const auto& port : gb.mod_ports) {
+        std::cout << "ADDED PORT is  ::: " << port_id->GetName() << std::endl;
+        top_mod->AddPortRef("mod_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
 
     char *intf_mod_str = intf_mod->GetPrettyPrintedString();
