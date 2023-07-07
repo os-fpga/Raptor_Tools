@@ -37,6 +37,7 @@ module oserdes_4_to_1 (
   wire Q_oserdes_4_inst;
   (* src = "oserdes_4_to_1_rtl.v:9" *)
   wire LOAD_WORD_i_buf;
+  wire pll_fabric_clock;
 
   (* src = "oserdes_4_to_1_rtl.v:6" *)
   I_BUF #(
