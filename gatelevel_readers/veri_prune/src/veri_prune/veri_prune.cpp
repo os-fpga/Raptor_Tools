@@ -56,6 +56,25 @@
 using namespace Verific ;
 #endif
 
+static char* intf_mod_str = nullptr;
+static char* top_mod_str = nullptr;
+static char* mod_str=nullptr; 
+
+char* GetINTFModString()
+{
+    return intf_mod_str;
+}
+
+char* GetTOPModString()
+{
+    return top_mod_str;
+}
+
+char* GetModString()
+{
+    return mod_str;
+}
+
 bool isimod(std::string mod)
 {
     gb_constructs gb;
@@ -81,7 +100,7 @@ bool isiomod(std::string mod)
 
 ////////////////////////////////////////////////////////////////////////////
 
-int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name, const char *file_base, gb_constructs &gb)
+int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name,  gb_constructs &gb)
 {
 
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
@@ -96,7 +115,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         return 3 ;
     }
 
-    char *mod_str;
+ //   char *mod_str;
 
     //Now copy of the top level module
     VeriMapForCopy id_map_table(POINTER_HASH) ;
@@ -428,8 +447,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         top_mod->AddPortRef("mod_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
 
-    char *intf_mod_str = intf_mod->GetPrettyPrintedString();
-    char *top_mod_str = top_mod->GetPrettyPrintedString();
+    intf_mod_str = intf_mod->GetPrettyPrintedString();
+    top_mod_str = top_mod->GetPrettyPrintedString();
 
     //call function to generate wrapper
 

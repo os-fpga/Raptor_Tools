@@ -10,5 +10,5 @@ int main(int argc, char **argv)
     const char *file_base = ((argc > 3) ? argv[3] : "src") ;
 
     gb_constructs gb;
-    prune_verilog (file_name, out_file_name, wrapper_file_name, file_base, gb);
+    prune_verilog (file_name, out_file_name, wrapper_file_name,  gb);
 }
