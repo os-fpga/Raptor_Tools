@@ -362,6 +362,36 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                     }),
                      gb.mod_ios.end());
 
+    std::unordered_set<std::string> intf_uniqueKeys;
+    // Iterate over the vector and remove elements with duplicate keys
+    auto iter_indexed_intf_ios = gb.indexed_intf_ios.begin();
+    while (iter_indexed_intf_ios != gb.indexed_intf_ios.end()) {
+        const std::string& key = iter_indexed_intf_ios->first;
+
+        // Check if the key already exists in the uniqueKeys set
+        if (intf_uniqueKeys.count(key) > 0) {
+            iter_indexed_intf_ios = gb.indexed_intf_ios.erase(iter_indexed_intf_ios);  // Remove the element
+        } else {
+            intf_uniqueKeys.insert(key);  // Add the key to the set
+            ++iter_indexed_intf_ios;
+        }
+    }
+
+    std::unordered_set<std::string> mod_uniqueKeys;
+    // Iterate over the vector and remove elements with duplicate keys
+    auto iter_indexed_mod_ios = gb.indexed_mod_ios.begin();
+    while (iter_indexed_mod_ios != gb.indexed_mod_ios.end()) {
+        const std::string& key = iter_indexed_mod_ios->first;
+
+        // Check if the key already exists in the uniqueKeys set
+        if (mod_uniqueKeys.count(key) > 0) {
+            iter_indexed_mod_ios = gb.indexed_mod_ios.erase(iter_indexed_mod_ios);  // Remove the element
+        } else {
+            mod_uniqueKeys.insert(key);  // Add the key to the set
+            ++iter_indexed_mod_ios;
+        }
+    }
+
     for (const auto& pair : gb.indexed_mod_ios) {
         const auto& values = pair.second;
         unsigned msb;
