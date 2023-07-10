@@ -231,13 +231,13 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                 actual_name = actual_id->Name();
                                 prefs.push_back(formal_name);
                                 if(actual_id->Dir() == VERI_INPUT) {
-                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                    gb.intf_ins.push_back(actual_name);
                                     gb.del_ports.insert(actual_name);
                                 } else if(actual_id->Dir() == VERI_OUTPUT) {
-                                    gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                    gb.intf_outs.push_back(actual_name);
                                     gb.del_ports.insert(actual_name);
                                 } else if(actual_id->Dir() == VERI_INOUT) {
-                                    gb.intf_inouts.push_back(std::make_pair(actual_name, VERI_INOUT));
+                                    gb.intf_inouts.push_back(actual_name);
                                     gb.del_ports.insert(actual_name);
                                 } else {
                                 	if (imod) {
@@ -251,8 +251,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_INPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_OUTPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
                                                             std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
@@ -264,11 +263,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_INPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_OUTPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
                                                         } else {
                                                             gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
-                                                            gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                            gb.intf_outs.push_back(actual_name);
                                                         }
                                                     }
                                                 }
@@ -285,8 +283,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_INPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_OUTPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
                                                             std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
@@ -298,11 +295,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_INPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_OUTPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
                                                         } else {
                                                             gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
-                                                            gb.intf_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                            gb.intf_outs.push_back(actual_name);
                                                         }
                                                     }
                                                 } else if(pair.second == IN_DIR) {
@@ -312,8 +308,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_OUTPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_INPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
                                                             std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
@@ -325,11 +320,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_OUTPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_INPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
                                                         } else {
                                                             gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
-                                                            gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                            gb.intf_ins.push_back(actual_name);
                                                         }
                                                     }
                                                 }
@@ -346,8 +340,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_OUTPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_INPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
                                                             std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
@@ -359,11 +352,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             io_data.push_back(VERI_OUTPUT);
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
-                                                            io_data.push_back(VERI_INPUT);
-                                                            gb.indexed_intf_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
                                                         } else {
                                                             gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
-                                                            gb.intf_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                            gb.intf_ins.push_back(actual_name);
                                                         }
                                                     }
                                                 }
@@ -418,25 +410,38 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     /////////////////////////////////////////////////////////////////////////
     
-    for (const auto& pair : gb.indexed_intf_ios) {
+    for (const auto& pair : gb.indexed_intf_ins) {
         const auto& values = pair.second;
         unsigned msb;
         unsigned lsb;
-        unsigned dir;
-        if (values.size() == 3) {
+        if (values.size() == 2) {
             msb = values.at(0);
             lsb = values.at(1);
-            dir = values.at(2);
         }
-        intf_mod->AddPort((pair.first).c_str(), dir, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+        intf_mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
     }
 
-    for (const auto& pair : gb.intf_ios) {
-        intf_mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
+    for (const auto& pair : gb.indexed_intf_outs) {
+        const auto& values = pair.second;
+        unsigned msb;
+        unsigned lsb;
+        if (values.size() == 2) {
+            msb = values.at(0);
+            lsb = values.at(1);
+        }
+        intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
     }
 
-    for (const auto& pair : gb.intf_inouts) {
-        intf_mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
+    for (const auto& port : gb.intf_ins) {
+        intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+    }
+
+    for (const auto& port : gb.intf_outs) {
+        intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
+    }
+
+    for (const auto& port : gb.intf_inouts) {
+        intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INOUT /* direction*/, 0 /* data type */) ;
     }
 
     for (const auto& del_inst : gb.normal_insts) {
