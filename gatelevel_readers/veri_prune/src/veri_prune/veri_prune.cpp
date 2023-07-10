@@ -440,12 +440,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
 
     for (const auto& dp : gb.del_ports) {
-        std::cout << "deleting port : " << dp << std::endl;
         mod->RemovePort(dp.c_str());
-    }
-
-    for (const auto& pair : io_intf) {
-        std::cout << "port of interface io is : " << pair << "\n";
     }
 
     //for (const auto& dp : io_intf) {
@@ -457,7 +452,47 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     mod_str = mod->GetPrettyPrintedString();
 
     /////////////////////////////////////////////////////////////////////////
+
+    // Iterate over the vector and remove pairs if the first element is found in the set
+    gb.indexed_intf_ins.erase(
+        std::remove_if(gb.indexed_intf_ins.begin(), gb.indexed_intf_ins.end(),
+            [&io_intf](const std::pair<std::string, std::vector<int>>& pair) {
+                return io_intf.find(pair.first) != io_intf.end();
+            }),
+        gb.indexed_intf_ins.end()
+    );
     
+    // Iterate over the vector and remove pairs if the first element is found in the set
+    gb.indexed_intf_outs.erase(
+        std::remove_if(gb.indexed_intf_outs.begin(), gb.indexed_intf_outs.end(),
+            [&io_intf](const std::pair<std::string, std::vector<int>>& pair) {
+                return io_intf.find(pair.first) != io_intf.end();
+            }),
+        gb.indexed_intf_outs.end()
+    );
+
+    // Iterate over the vector
+    for (auto it = gb.intf_outs.begin(); it != gb.intf_outs.end();) {
+        // Check if the element exists in the unordered set
+        if (io_intf.count(*it) > 0) {
+            // Remove the element from the vector
+            it = gb.intf_outs.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
+    // Iterate over the vector
+    for (auto it = gb.intf_ins.begin(); it != gb.intf_ins.end();) {
+        // Check if the element exists in the unordered set
+        if (io_intf.count(*it) > 0) {
+            // Remove the element from the vector
+            it = gb.intf_ins.erase(it);
+        } else {
+            ++it;
+        }
+    }
+
     for (const auto& pair : gb.indexed_intf_ins) {
         const auto& values = pair.second;
         unsigned msb;
