@@ -378,6 +378,46 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         }
     }
 
+    std::unordered_set<std::string> io_intf;
+    for (const std::string& element : gb.intf_outs) {
+        if (std::find(gb.intf_ins.begin(), gb.intf_ins.end(), element) != gb.intf_ins.end()) {
+            io_intf.insert(element);
+        }
+    }
+
+    // Iterate over indexed_intf_outs
+    for (const auto& out_pair : gb.indexed_intf_outs) {
+        const std::string& out_first = out_pair.first;
+
+        // Iterate over indexed_intf_ins
+        for (const auto& in_pair : gb.indexed_intf_ins) {
+            const std::string& in_first = in_pair.first;
+
+            // Compare the first elements of the pairs
+            if (out_first == in_first) {
+                // Push the first element to the set
+                io_intf.insert(out_first);
+                break;  // No need to continue searching for the same out_first
+            }
+        }
+    }
+
+    // Iterate over the vector and check if the first element exists in the set
+    for (auto it = gb.indexed_mod_ios.begin(); it != gb.indexed_mod_ios.end();) {
+        const std::string& firstElement = it->first;
+        if (io_intf.count(firstElement) > 0) {
+            it = gb.indexed_mod_ios.erase(it); // Remove the pair from the vector
+        } else {
+            ++it;
+        }
+    }
+
+    auto remove_if_found = [&io_intf](const std::pair<std::string, int>& pair) {
+        return io_intf.find(pair.first) != io_intf.end();
+    };
+
+    gb.mod_ios.erase(std::remove_if(gb.mod_ios.begin(), gb.mod_ios.end(), remove_if_found), gb.mod_ios.end());
+
     for (const auto& gb_inst : gb.gb_insts) {
         mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
     }
@@ -400,9 +440,17 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     }
 
     for (const auto& dp : gb.del_ports) {
+        std::cout << "deleting port : " << dp << std::endl;
         mod->RemovePort(dp.c_str());
-        mod->RemoveSignal(dp.c_str() /* signal to be removed */) ;
-    } 
+    }
+
+    for (const auto& pair : io_intf) {
+        std::cout << "port of interface io is : " << pair << "\n";
+    }
+
+    //for (const auto& dp : io_intf) {
+    //    mod->RemovePort(dp.c_str());
+    //}
 
     // to check connections of extra ports in wrapper
     //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
@@ -443,6 +491,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     for (const auto& port : gb.intf_inouts) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INOUT /* direction*/, 0 /* data type */) ;
     }
+
+    //for (const auto& dp : io_intf) {
+    //    intf_mod->RemovePort(dp.c_str());
+    //}
 
     for (const auto& del_inst : gb.normal_insts) {
         intf_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
