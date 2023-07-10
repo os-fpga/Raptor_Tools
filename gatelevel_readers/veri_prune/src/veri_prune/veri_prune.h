@@ -33,11 +33,9 @@ struct gb_constructs
     std::vector<std::string> omods = {"O_BUF", "O_BUFT", "O_BUFT_DS", "O_DDR", "O_SERDES"};
     std::vector<std::string> iomods = {"IO_BUF", "IO_BUF_DS"};
     std::vector<std::pair<std::string, int>> mod_ios;
-    std::vector<std::pair<std::string, int>> intf_ios;
     std::vector<std::string> intf_ins;
     std::vector<std::string> intf_outs;
     std::vector<std::pair<std::string, std::vector<int>>> indexed_mod_ios;
-    std::vector<std::pair<std::string, std::vector<int>>> indexed_intf_ios;
     std::vector<std::pair<std::string, std::vector<int>>> indexed_intf_ins;
     std::vector<std::pair<std::string, std::vector<int>>> indexed_intf_outs;
     std::vector<std::string> intf_inouts;
