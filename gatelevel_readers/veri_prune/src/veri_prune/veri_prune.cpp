@@ -103,6 +103,7 @@ bool isiomod(std::string mod)
 int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name,  gb_constructs &gb)
 {
 
+    Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
 
     // Get all the top level modules
@@ -114,8 +115,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         delete all_top_modules ;
         return 3 ;
     }
-
- //   char *mod_str;
 
     //Now copy of the top level module
     VeriMapForCopy id_map_table(POINTER_HASH) ;
@@ -214,8 +213,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                         if (actual->GetClassId() == ID_VERICONSTVAL) {
                             // Do nothing
                             ;
-                        //} else if (actual->GetClassId() == ID_VERIINDEXEDID) {
-                        //    std::cout << "INDEXED : " << actual->GetPrettyPrintedString() << std::endl;
                         } else {
                             if(actual->GetIndexExpr()) { 
                                 actual_id = (actual) ? actual->GetId() : 0 ;
@@ -443,10 +440,6 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         mod->RemovePort(dp.c_str());
     }
 
-    //for (const auto& dp : io_intf) {
-    //    mod->RemovePort(dp.c_str());
-    //}
-
     // to check connections of extra ports in wrapper
     //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
     mod_str = mod->GetPrettyPrintedString();
@@ -493,6 +486,8 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         }
     }
 
+    std::unordered_set<std::string> intf_sig_rem;
+
     for (const auto& pair : gb.indexed_intf_ins) {
         const auto& values = pair.second;
         unsigned msb;
@@ -502,6 +497,9 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
             lsb = values.at(1);
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+        intf_sig_rem.insert(pair.first);
+        //std::cout << "deleting :: " << (pair.first).c_str() << std::endl;
+        //intf_mod->RemoveSignal((pair.first).c_str());
     }
 
     for (const auto& pair : gb.indexed_intf_outs) {
@@ -513,23 +511,25 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
             lsb = values.at(1);
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+        intf_sig_rem.insert(pair.first);
+        //intf_mod->RemoveSignal((pair.first).c_str());
     }
 
     for (const auto& port : gb.intf_ins) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+        intf_sig_rem.insert(port);
+        //intf_mod->RemoveSignal(port.c_str());
     }
 
     for (const auto& port : gb.intf_outs) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
+        intf_sig_rem.insert(port);
+       // intf_mod->RemoveSignal(port.c_str());
     }
 
     for (const auto& port : gb.intf_inouts) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INOUT /* direction*/, 0 /* data type */) ;
     }
-
-    //for (const auto& dp : io_intf) {
-    //    intf_mod->RemovePort(dp.c_str());
-    //}
 
     for (const auto& del_inst : gb.normal_insts) {
         intf_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
@@ -542,6 +542,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
     for (const auto& del_inst : gb.gb_insts) {
         top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
     }
+
+    //for (const auto& dn : intf_sig_rem) {
+    //    std::cout << "REMOVING SIG : " << dn << std::endl;
+    //}
 
     Array *top_ports = intf_mod->GetPorts() ; // Get the ports
     unsigned n ;
