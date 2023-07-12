@@ -55,26 +55,7 @@
 
 #ifdef VERIFIC_NAMESPACE
 using namespace Verific ;
-#endif
-
-static char* intf_mod_str = nullptr;
-static char* top_mod_str = nullptr;
-static char* mod_str=nullptr; 
-
-char* GetINTFModString()
-{
-    return intf_mod_str;
-}
-
-char* GetTOPModString()
-{
-    return top_mod_str;
-}
-
-char* GetModString()
-{
-    return mod_str;
-}
+#endif 
 
 bool isimod(std::string mod)
 {
@@ -101,7 +82,7 @@ bool isiomod(std::string mod)
 
 ////////////////////////////////////////////////////////////////////////////
 
-int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name,  gb_constructs &gb)
+int prune_verilog (const char *file_name, gb_constructs &gb)
 {
 
     Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
@@ -500,7 +481,7 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     // to check connections of extra ports in wrapper
     //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
-    mod_str = mod->GetPrettyPrintedString();
+    gb.mod_str = mod->GetPrettyPrintedString();
 
     /////////////////////////////////////////////////////////////////////////
 
@@ -679,29 +660,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         top_mod->AddPortRef("mod_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
 
-    intf_mod_str = intf_mod->GetPrettyPrintedString();
-    top_mod_str = top_mod->GetPrettyPrintedString();
+    gb.intf_mod_str = intf_mod->GetPrettyPrintedString();
+    gb.top_mod_str = top_mod->GetPrettyPrintedString();
 
     //call function to generate wrapper
-
-    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
-     *                Write modified source file to a file                *
-     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-    Message::PrintLine("Writing the design to file ", out_file_name) ;
-
-    std::ofstream out_file ;
-    out_file.open(out_file_name) ;
-    out_file << mod_str;
-
-    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
-     *                Write modified source file to a file                *
-     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-    //Message::PrintLine("Writing the wrapper to file ", wrapper_file_name) ;
-//
-    std::ofstream wrapper_file;
-    wrapper_file.open(wrapper_file_name);
-    wrapper_file << intf_mod_str;
-    wrapper_file << top_mod_str;
 
     // Remove all analyzed modules
     veri_file::RemoveAllModules() ;

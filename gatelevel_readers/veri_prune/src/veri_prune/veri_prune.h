@@ -50,9 +50,9 @@ struct gb_constructs
     std::vector<std::string> gb_insts;
     std::vector<std::string> normal_insts;
     std::vector<std::pair<std::string, std::map<std::string, std::string>>> del_conns;
+    char *mod_str;
+    char *intf_mod_str;
+    char *top_mod_str;
 };
-int prune_verilog (const char *file_name, const char *out_file_name, const char *wrapper_file_name, gb_constructs &gb);
-char* GetINTFModString();
-char* GetTOPModString();
-char* GetModString();
+int prune_verilog (const char *file_name, gb_constructs &gb);
 #endif

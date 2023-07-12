@@ -1,4 +1,5 @@
 #include "veri_prune.h"
+#include <fstream>
 
 int main(int argc, char **argv)
 {
@@ -10,5 +11,23 @@ int main(int argc, char **argv)
     const char *file_base = ((argc > 3) ? argv[3] : "src") ;
 
     gb_constructs gb;
-    prune_verilog (file_name, out_file_name, wrapper_file_name,  gb);
+    prune_verilog (file_name, gb);
+
+        /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
+     *                Write modified source file to a file                *
+     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
+
+    std::ofstream out_file ;
+    out_file.open(out_file_name) ;
+    out_file << gb.mod_str;
+
+    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
+     *                Write modified source file to a file                *
+     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
+    //Message::PrintLine("Writing the wrapper to file ", wrapper_file_name) ;
+//
+    std::ofstream wrapper_file;
+    wrapper_file.open(wrapper_file_name);
+    wrapper_file << gb.intf_mod_str;
+    wrapper_file << gb.top_mod_str;
 }
