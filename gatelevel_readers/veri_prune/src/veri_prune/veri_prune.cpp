@@ -46,6 +46,7 @@
 #define IN_DIR 0
 #define OUT_DIR 1
 #define INOUT_DIR 2
+#define OUT_CLK 3
 
 #ifdef USE_COMREAD
 #include "Commands.h"
@@ -266,6 +267,23 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
                                                             gb.intf_outs.push_back(actual_name);
                                                         }
                                                     }
+                                                } else if(pair.second == OUT_CLK) {
+                                                    if (port_size > 1) {
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            gb.indexed_mod_clks.push_back(std::make_pair(actual_name, io_data));
+                                                    } else {
+                                                        if(actual->GetIndexExpr()) {
+                                                            VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
+                                                            msb = sig_id->GetMsbOfRange();
+                                                			lsb = sig_id->GetLsbOfRange();
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            gb.indexed_mod_clks.push_back(std::make_pair(actual_name, io_data));
+                                                        } else {
+                                                            gb.mod_clks.push_back(actual_name);
+                                                        }
+                                                    }
                                                 }
                                             }
                                         }
@@ -415,6 +433,31 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
 
     gb.mod_ios.erase(std::remove_if(gb.mod_ios.begin(), gb.mod_ios.end(), remove_if_found), gb.mod_ios.end());
 
+    std::vector<std::string> mod_clks;
+    for (const auto& pair : gb.indexed_mod_clks) {
+        mod_clks.push_back(pair.first);
+    }
+
+    // Remove elements from indexed_mod_ios if their first element matches any in mod_clks
+    gb.indexed_mod_ios.erase(std::remove_if(gb.indexed_mod_ios.begin(), gb.indexed_mod_ios.end(),
+                                         [&mod_clks](const std::pair<std::string, std::vector<int>>& pair) {
+                                             return std::find(mod_clks.begin(), mod_clks.end(), pair.first) != mod_clks.end();
+                                         }),
+                          gb.indexed_mod_ios.end());
+
+    // Iterate over mod_clks
+    for (const auto& clk : gb.mod_clks) {
+        // Find the pair with matching first element in mod_ios
+        auto it = std::find_if(gb.mod_ios.begin(), gb.mod_ios.end(), [&clk](const std::pair<std::string, int>& p) {
+            return p.first == clk;
+    });
+
+        // If a match is found, remove the pair from mod_ios
+        if (it != gb.mod_ios.end()) {
+            gb.mod_ios.erase(it);
+        }
+    }
+
     for (const auto& gb_inst : gb.gb_insts) {
         mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
     }
@@ -432,8 +475,23 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         mod->AddPort((pair.first).c_str(), dir, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
     }
 
+    for (const auto& pair : gb.indexed_mod_clks) {
+        const auto& values = pair.second;
+        unsigned msb;
+        unsigned lsb;
+        if (values.size() == 3) {
+            msb = values.at(0);
+            lsb = values.at(1);
+        }
+        mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+    }
+
     for (const auto& pair : gb.mod_ios) {
         mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
+    }
+
+    for (const auto& port : gb.mod_clks) {
+        mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
     }
 
     for (const auto& dp : gb.del_ports) {
@@ -486,6 +544,41 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         }
     }
 
+    // Get a list of first elements from indexed_mod_clks
+    std::vector<std::string> mod_clks_first_elements;
+    for (const auto& mod_clk : gb.indexed_mod_clks)
+    {
+        mod_clks_first_elements.push_back(mod_clk.first);
+    }
+
+    // Remove matching elements from indexed_intf_ins
+    gb.indexed_intf_ins.erase(std::remove_if(gb.indexed_intf_ins.begin(), gb.indexed_intf_ins.end(),
+        [&mod_clks_first_elements](const std::pair<std::string, std::vector<int>>& intf_ins) {
+            return std::find(mod_clks_first_elements.begin(), mod_clks_first_elements.end(), intf_ins.first) != mod_clks_first_elements.end();
+        }), gb.indexed_intf_ins.end());
+
+    // Remove matching elements from indexed_intf_outs
+    gb.indexed_intf_outs.erase(std::remove_if(gb.indexed_intf_outs.begin(), gb.indexed_intf_outs.end(),
+        [&mod_clks_first_elements](const std::pair<std::string, std::vector<int>>& intf_outs) {
+            return std::find(mod_clks_first_elements.begin(), mod_clks_first_elements.end(), intf_outs.first) != mod_clks_first_elements.end();
+        }), gb.indexed_intf_outs.end());
+
+    // Remove elements from intf_ins
+    for (const auto& clk : gb.mod_clks) {
+        auto it = std::find(gb.intf_ins.begin(), gb.intf_ins.end(), clk);
+        if (it != gb.intf_ins.end()) {
+            gb.intf_ins.erase(it);
+        }
+    }
+
+    // Remove elements from intf_outs
+    for (const auto& clk : gb.mod_clks) {
+        auto it = std::find(gb.intf_outs.begin(), gb.intf_outs.end(), clk);
+        if (it != gb.intf_outs.end()) {
+            gb.intf_outs.erase(it);
+        }
+    }
+
     std::unordered_set<std::string> intf_sig_rem;
 
     for (const auto& pair : gb.indexed_intf_ins) {
@@ -515,6 +608,17 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         //intf_mod->RemoveSignal((pair.first).c_str());
     }
 
+    for (const auto& pair : gb.indexed_mod_clks) {
+        const auto& values = pair.second;
+        unsigned msb;
+        unsigned lsb;
+        if (values.size() == 3) {
+            msb = values.at(0);
+            lsb = values.at(1);
+        }
+        intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+    }
+
     for (const auto& port : gb.intf_ins) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
         intf_sig_rem.insert(port);
@@ -525,6 +629,10 @@ int prune_verilog (const char *file_name, const char *out_file_name, const char 
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
         intf_sig_rem.insert(port);
        // intf_mod->RemoveSignal(port.c_str());
+    }
+
+    for (const auto& port : gb.mod_clks) {
+        intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
     }
 
     for (const auto& port : gb.intf_inouts) {
