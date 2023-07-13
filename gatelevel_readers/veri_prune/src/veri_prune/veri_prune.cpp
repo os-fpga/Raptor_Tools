@@ -47,6 +47,8 @@
 #define OUT_DIR 1
 #define INOUT_DIR 2
 #define OUT_CLK 3
+#define IN_CLK 4
+#define IN_RESET 5
 
 #ifdef USE_COMREAD
 #include "Commands.h"
@@ -211,8 +213,14 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                 actual_name = actual_id->Name();
                                 prefs.push_back(formal_name);
                                 if(actual_id->Dir() == VERI_INPUT) {
+                                    for (const auto& pair : m_items) {
+                                        if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                            if(pair.second != IN_CLK && pair.second != IN_RESET) {
+                                                gb.del_ports.insert(actual_name);
+                                            }
+                                        }
+                                    }
                                     gb.intf_ins.push_back(actual_name);
-                                    gb.del_ports.insert(actual_name);
                                 } else if(actual_id->Dir() == VERI_OUTPUT) {
                                     gb.intf_outs.push_back(actual_name);
                                     gb.del_ports.insert(actual_name);
@@ -232,7 +240,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
                                                             gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
-                                                            std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
@@ -281,7 +288,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
                                                             gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
-                                                            std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
@@ -306,7 +312,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
                                                             gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
-                                                            std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
@@ -338,7 +343,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
                                                             io_data.pop_back();
                                                             gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
-                                                            std::cout << "SIZE OF ID : " << port_size << "  for  " << actual_name << std::endl;
                                                     } else {
                                                         if(actual->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
