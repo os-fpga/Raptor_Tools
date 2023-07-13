@@ -13,21 +13,16 @@ int main(int argc, char **argv)
     gb_constructs gb;
     prune_verilog (file_name, gb);
 
-        /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
-     *                Write modified source file to a file                *
-     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-
-    std::ofstream out_file ;
-    out_file.open(out_file_name) ;
-    out_file << gb.mod_str;
-
-    /* /\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\ *
-     *                Write modified source file to a file                *
-     * \/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/\/ */
-    //Message::PrintLine("Writing the wrapper to file ", wrapper_file_name) ;
-//
-    std::ofstream wrapper_file;
-    wrapper_file.open(wrapper_file_name);
-    wrapper_file << gb.intf_mod_str;
-    wrapper_file << gb.top_mod_str;
+    if (gb.contains_io_prem) {
+        std::ofstream out_file ;
+        out_file.open(out_file_name) ;
+        out_file << gb.mod_str;
+        
+        std::ofstream wrapper_file;
+        wrapper_file.open(wrapper_file_name);
+        wrapper_file << gb.intf_mod_str;
+        wrapper_file << gb.top_mod_str;
+    } else {
+        std::cout << "Design does not contain any IO premitive" << std::endl;
+    }
 }

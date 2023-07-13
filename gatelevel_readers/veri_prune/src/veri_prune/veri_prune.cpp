@@ -166,6 +166,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                     if (str == no_param_name) {
                         m_items = element.second;
                         is_gb_cons = true;
+                        gb.contains_io_prem = true;
                         break;
                     } else {
                         is_gb_cons = false;

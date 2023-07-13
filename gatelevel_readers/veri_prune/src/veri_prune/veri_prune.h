@@ -53,6 +53,7 @@ struct gb_constructs
     char *mod_str;
     char *intf_mod_str;
     char *top_mod_str;
+    bool contains_io_prem = false;
 };
 int prune_verilog (const char *file_name, gb_constructs &gb);
 #endif
