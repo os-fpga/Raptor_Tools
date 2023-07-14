@@ -50,6 +50,7 @@ struct gb_constructs
     std::unordered_set<std::string> assign_nets;
     std::unordered_set<std::string> inst_nets;
     std::unordered_set<std::string> del_ports;
+    std::unordered_set<std::string> intf_ports;
     std::vector<std::string> gb_insts;
     std::vector<std::string> normal_insts;
     std::vector<std::pair<std::string, std::map<std::string, std::string>>> del_conns;

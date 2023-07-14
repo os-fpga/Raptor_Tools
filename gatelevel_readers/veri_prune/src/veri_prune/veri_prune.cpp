@@ -130,6 +130,16 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     FOREACH_ARRAY_ITEM(intf_items, m, intf_item) {
         if (!intf_item)
             continue;
+        if (ID_VERIDATADECL == intf_item->GetClassId()) {
+        	VeriDataDecl *data_decl = static_cast<VeriDataDecl*>(intf_item) ;
+        	VeriIdDef *id ;
+        	unsigned j ;
+        	FOREACH_ARRAY_ITEM(data_decl->GetIds(), j, id) {
+        		if (!id) continue ; // null pointer check
+        		const char *name = id->Name() ;
+        		gb.intf_ports.insert(name);
+        	}
+        }
         if (ID_VERICONTINUOUSASSIGN == intf_item->GetClassId()) {
             intf_mod->ReplaceChildBy(intf_item, empty);
         }
@@ -570,7 +580,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
     }
 
-    std::unordered_set<std::string> intf_sig_rem;
+    std::unordered_set<std::string> ports_intf;
 
     for (const auto& pair : gb.indexed_intf_ins) {
         const auto& values = pair.second;
@@ -581,7 +591,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             lsb = values.at(1);
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
-        intf_sig_rem.insert(pair.first);
+        ports_intf.insert(pair.first);
         //std::cout << "deleting :: " << (pair.first).c_str() << std::endl;
         //intf_mod->RemoveSignal((pair.first).c_str());
     }
@@ -595,7 +605,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             lsb = values.at(1);
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
-        intf_sig_rem.insert(pair.first);
+        ports_intf.insert(pair.first);
         //intf_mod->RemoveSignal((pair.first).c_str());
     }
 
@@ -608,26 +618,33 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             lsb = values.at(1);
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+        ports_intf.insert(pair.first);
     }
 
     for (const auto& port : gb.intf_ins) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
-        intf_sig_rem.insert(port);
+        ports_intf.insert(port);
         //intf_mod->RemoveSignal(port.c_str());
     }
 
     for (const auto& port : gb.intf_outs) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
-        intf_sig_rem.insert(port);
+        ports_intf.insert(port);
        // intf_mod->RemoveSignal(port.c_str());
     }
 
     for (const auto& port : gb.mod_clks) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
+        ports_intf.insert(port);
     }
 
     for (const auto& port : gb.intf_inouts) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INOUT /* direction*/, 0 /* data type */) ;
+        ports_intf.insert(port);
+    }
+
+    for (const auto& port : ports_intf) {
+        gb.intf_ports.erase(port);
     }
 
     for (const auto& del_inst : gb.normal_insts) {
@@ -642,7 +659,11 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
     }
 
-    //for (const auto& dn : intf_sig_rem) {
+    for (const auto& port : gb.intf_ports) {
+         intf_mod->RemovePort(port.c_str() /* port to be removed */) ;
+    }
+
+    //for (const auto& dn : ports_intf) {
     //    std::cout << "REMOVING SIG : " << dn << std::endl;
     //}
 
