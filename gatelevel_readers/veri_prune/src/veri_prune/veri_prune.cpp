@@ -380,7 +380,17 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         	    Array *port_conn_arr = id->GetPortConnects() ;
         	    FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
                     actual = expr->GetConnection() ;
-                    if (actual->GetId()) {
+                    if (actual->GetClassId() == ID_VERICONCAT) {
+                    	VeriConcat *concat = static_cast<VeriConcat*>(actual) ;
+                    	Array *expr_arr = concat->GetExpressions() ;
+                    	unsigned j ;
+                    	// Iterate through all expressions
+                    	VeriExpression *expr ;
+                    	FOREACH_ARRAY_ITEM(expr_arr, j, expr) {
+                    		actual_id = expr ? expr->GetId() : 0 ;
+                            if (actual_id) gb.inst_nets.insert(actual_id->Name());
+                    	}
+                    } else if (actual->GetId()) {
                         actual_name = actual->GetId()->Name();
                         gb.inst_nets.insert(actual_name);
                     }
