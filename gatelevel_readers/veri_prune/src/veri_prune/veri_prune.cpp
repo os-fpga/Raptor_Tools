@@ -143,6 +143,33 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     {
         if (!module_item)
             continue;
+        if (ID_VERICONTINUOUSASSIGN == module_item->GetClassId()) {
+            Array* net_assigns = ((VeriContinuousAssign*)module_item)->GetNetAssigns() ;
+            VeriNetRegAssign *assign ;
+            unsigned j ;
+            FOREACH_ARRAY_ITEM(net_assigns, j, assign) {
+                if (!assign) continue ;
+                if (assign->GetLValExpr()->IsConcat()){ 
+
+                } else {
+                    VeriExpression *lval = assign->GetLValExpr();
+                    if (lval->GetId()) {
+                        const char* lvalname = lval->GetId()->Name();
+                        gb.assign_nets.insert(lvalname);
+                    }
+                    VeriExpression *rval = assign->GetRValExpr();
+                    if (rval->IsConcat()){
+                        unsigned e ;
+                        VeriExpression *expr ;
+                        FOREACH_ARRAY_ITEM(rval->GetExpressions(), e, expr) {
+                            if (expr->GetId()) gb.assign_nets.insert(expr->GetId()->Name());
+                        }
+                    } else {
+                        if (rval->GetId())  gb.assign_nets.insert(rval->GetId()->Name());
+                    }
+                }
+            }
+        }
         if(module_item->IsInstantiation()) 
         {
         	std::string mod_name = module_item->GetModuleName();
@@ -315,6 +342,43 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
     }
 
+    for (const auto& gb_inst : gb.gb_insts) {
+        mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
+    }
+    // Get the module item list of module.
+    Array *updated_items = mod->GetModuleItems() ;
+    VeriModuleItem *updated_item;
+    unsigned u;
+    FOREACH_ARRAY_ITEM(updated_items, u, updated_item) {
+        if (!updated_item)
+            continue;
+        if(updated_item->IsInstantiation()) 
+        {
+            VeriIdDef *id ;
+        	unsigned m ;
+        	Array *insts = updated_item->GetInstances();
+        	FOREACH_ARRAY_ITEM(insts, m, id) 
+            {
+                const char *inst_name = id->InstName() ;
+                VeriIdDef *formal ;
+                VeriIdDef *actual_id ;
+                VeriExpression *actual ;
+                const char *formal_name ;
+                std::string actual_name ;
+        	    VeriExpression *expr ;
+        	    unsigned k ;
+        	    Array *port_conn_arr = id->GetPortConnects() ;
+        	    FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
+                    actual = expr->GetConnection() ;
+                    if (actual->GetId()) {
+                        actual_name = actual->GetId()->Name();
+                        gb.inst_nets.insert(actual_name);
+                    }
+                }
+            }
+        }
+    }
+
     std::unordered_set<std::string> io_intf;
     for (const std::string& element : gb.intf_outs) {
         if (std::find(gb.intf_ins.begin(), gb.intf_ins.end(), element) != gb.intf_ins.end()) {
@@ -380,10 +444,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
     }
 
-    for (const auto& gb_inst : gb.gb_insts) {
-        mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
-    }
-
     for (const auto& pair : gb.indexed_mod_ios) {
         const auto& values = pair.second;
         unsigned msb;
@@ -414,6 +474,15 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
 
     for (const auto& port : gb.mod_clks) {
         mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
+    }
+
+    // Iterate over the elements in del_ports
+    for (const auto& element : gb.del_ports) {
+        // Check if the element is present in inst_nets or assign_nets
+        if (gb.inst_nets.count(element) > 0 || gb.assign_nets.count(element) > 0) {
+            // Element found, remove it from del_ports
+            gb.del_ports.erase(element);
+        }
     }
 
     for (const auto& dp : gb.del_ports) {

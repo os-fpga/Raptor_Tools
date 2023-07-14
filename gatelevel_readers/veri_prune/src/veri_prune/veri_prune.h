@@ -47,6 +47,8 @@ struct gb_constructs
     std::vector<std::string> mod_ports;
     std::vector<std::string> top_ports;
     std::vector<std::string> prefs;
+    std::unordered_set<std::string> assign_nets;
+    std::unordered_set<std::string> inst_nets;
     std::unordered_set<std::string> del_ports;
     std::vector<std::string> gb_insts;
     std::vector<std::string> normal_insts;
