@@ -195,6 +195,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     VeriModule *top_mod = (VeriModule *)top_mod_;
     delete all_top_modules ;
 
+    //////////////////////////// Remove assign statements from interface and wrapper modules /////////////////////
     // Get the module item list of module.
     Array *top_items = top_mod->GetModuleItems() ;
     Array *empty;
@@ -222,14 +223,16 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         	FOREACH_ARRAY_ITEM(data_decl->GetIds(), j, id) {
         		if (!id) continue ; // null pointer check
         		const char *name = id->Name() ;
-        		gb.intf_ports.insert(name);
+        		gb.intf_ports.insert(name);                        // Store interface module's IOs
         	}
         }
         if (ID_VERICONTINUOUSASSIGN == intf_item->GetClassId()) {
             intf_mod->ReplaceChildBy(intf_item, empty);
         }
     }
+    /////////////////////////////////////////// BLOCK END ///////////////////////////////////////////////////////
 
+    //////////////////////////////////////// Get the nets' names used in assign statements /////////////////////
     // Get the module item list of module.
     Array *items = mod->GetModuleItems() ;
     VeriModuleItem *module_item;
@@ -265,6 +268,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                 }
             }
         }
+        ///////////////////////////////////////////// BLOCK END ///////////////////////////////////////////////
         if(module_item->IsInstantiation()) 
         {
         	std::string mod_name = module_item->GetModuleName();
@@ -300,8 +304,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                 {
                     std::vector<std::string> prefs;
                     std::unordered_map<std::string, std::vector<std::string>> del_inst;
-                    std::map<std::string, std::string> conn_info ;
-                    std::pair<std::string, std::map<std::string, std::string>> inst_conns;
         	        if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
                     VeriExpression *actual ;
                     const char *formal_name ;
@@ -339,10 +341,12 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
     }
 
+    ////////////////////////////// Remove gearbox modules' instances from original module ////////////////////////////
     for (const auto& gb_inst : gb.gb_insts) {
         mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/) ;
     }
-    // Get the module item list of module.
+
+    ///////////////////////////// Get the nets connected to the remaining instances //////////////////////////////////
     Array *updated_items = mod->GetModuleItems() ;
     VeriModuleItem *updated_item;
     unsigned u;
@@ -383,8 +387,9 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             }
         }
     }
+    //////////////////////////////// BLOCK END /////////////////////////////////////////////////////////////
 
-    /* Check if an output of the interface module is also an input of the same module */
+    //////////// Check if an output of the interface module is also an input of the same module ////////////
     std::unordered_set<std::string> io_intf;                 // To store duplicate IOs of interface module
     for (const std::string& element : gb.intf_outs) {
         if (std::find(gb.intf_ins.begin(), gb.intf_ins.end(), element) != gb.intf_ins.end()) {
