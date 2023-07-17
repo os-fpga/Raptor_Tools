@@ -384,7 +384,8 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
     }
 
-    std::unordered_set<std::string> io_intf;
+    /* Check if an output of the interface module is also an input of the same module */
+    std::unordered_set<std::string> io_intf;                 // To store duplicate IOs of interface module
     for (const std::string& element : gb.intf_outs) {
         if (std::find(gb.intf_ins.begin(), gb.intf_ins.end(), element) != gb.intf_ins.end()) {
             io_intf.insert(element);
@@ -408,6 +409,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
     }
 
+    /////////////// Remove it from the port list of the original module //////////////////////////////////
     // Iterate over the vector and check if the first element exists in the set
     for (auto it = gb.indexed_mod_ios.begin(); it != gb.indexed_mod_ios.end();) {
         const std::string& firstElement = it->first;
@@ -423,7 +425,9 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     };
 
     gb.mod_ios.erase(std::remove_if(gb.mod_ios.begin(), gb.mod_ios.end(), remove_if_found), gb.mod_ios.end());
+    /////////////////////////////////////////////// BLOCK END ///////////////////////////////////////////////
 
+    //////////////////////// Remove the output of the clock buffer from module IOs ////////////////////////
     std::vector<std::string> mod_clks;
     for (const auto& pair : gb.indexed_mod_clks) {
         mod_clks.push_back(pair.first);
@@ -448,7 +452,9 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             gb.mod_ios.erase(it);
         }
     }
+    ////////////////////////////////// BLOCK END /////////////////////////////////////////////////////////////
 
+    ////////////////////////// Add ports to the original module /////////////////////////////////////////////
     for (const auto& pair : gb.indexed_mod_ios) {
         const auto& values = pair.second;
         unsigned msb;
@@ -466,10 +472,8 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         const auto& values = pair.second;
         unsigned msb;
         unsigned lsb;
-        if (values.size() == 3) {
-            msb = values.at(0);
-            lsb = values.at(1);
-        }
+        msb = values.at(0);
+        lsb = values.at(1);
         mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
     }
 
@@ -480,7 +484,9 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     for (const auto& port : gb.mod_clks) {
         mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
     }
+    ////////////////////////////////////// BLOCK END /////////////////////////////////////////////////////////
 
+    ///////////// Keep the ports still being used in design, and remove unnecessary ports ///////////////////
     // Iterate over the elements in del_ports
     for (const auto& element : gb.del_ports) {
         // Check if the element is present in inst_nets or assign_nets
@@ -493,13 +499,14 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     for (const auto& dp : gb.del_ports) {
         mod->RemovePort(dp.c_str());
     }
+    ////////////////////////////////////// BLOCK END //////////////////////////////////////////////////////
 
-    // to check connections of extra ports in wrapper
-    //mod->AddPort("D" /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
+    //////////////////////////// Get updated module for file writting ////////////////////////////////////
     gb.mod_str = mod->GetPrettyPrintedString();
 
     /////////////////////////////////////////////////////////////////////////
 
+    ////////// Remove if an output of the interface module is also an input of the same module ///////////
     // Iterate over the vector and remove pairs if the first element is found in the set
     gb.indexed_intf_ins.erase(
         std::remove_if(gb.indexed_intf_ins.begin(), gb.indexed_intf_ins.end(),
@@ -539,24 +546,19 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             ++it;
         }
     }
+    //////////////////////////////// BLOCK END ////////////////////////////////////
 
-    // Get a list of first elements from indexed_mod_clks
-    std::vector<std::string> mod_clks_first_elements;
-    for (const auto& mod_clk : gb.indexed_mod_clks)
-    {
-        mod_clks_first_elements.push_back(mod_clk.first);
-    }
-
+    /////////////////// Remove the output of clock buffers from interface IOs //////////////////////
     // Remove matching elements from indexed_intf_ins
     gb.indexed_intf_ins.erase(std::remove_if(gb.indexed_intf_ins.begin(), gb.indexed_intf_ins.end(),
-        [&mod_clks_first_elements](const std::pair<std::string, std::vector<int>>& intf_ins) {
-            return std::find(mod_clks_first_elements.begin(), mod_clks_first_elements.end(), intf_ins.first) != mod_clks_first_elements.end();
+        [&mod_clks](const std::pair<std::string, std::vector<int>>& intf_ins) {
+            return std::find(mod_clks.begin(), mod_clks.end(), intf_ins.first) != mod_clks.end();
         }), gb.indexed_intf_ins.end());
 
     // Remove matching elements from indexed_intf_outs
     gb.indexed_intf_outs.erase(std::remove_if(gb.indexed_intf_outs.begin(), gb.indexed_intf_outs.end(),
-        [&mod_clks_first_elements](const std::pair<std::string, std::vector<int>>& intf_outs) {
-            return std::find(mod_clks_first_elements.begin(), mod_clks_first_elements.end(), intf_outs.first) != mod_clks_first_elements.end();
+        [&mod_clks](const std::pair<std::string, std::vector<int>>& intf_outs) {
+            return std::find(mod_clks.begin(), mod_clks.end(), intf_outs.first) != mod_clks.end();
         }), gb.indexed_intf_outs.end());
 
     // Remove elements from intf_ins
@@ -574,9 +576,11 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
             gb.intf_outs.erase(it);
         }
     }
+    //////////////////////////////////// BLOCK END /////////////////////////////////////////////////////
 
     std::unordered_set<std::string> ports_intf;
 
+    /////////////////////////// Add ports to interface module /////////////////////////////////////////
     for (const auto& pair : gb.indexed_intf_ins) {
         const auto& values = pair.second;
         unsigned msb;
@@ -587,8 +591,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
         ports_intf.insert(pair.first);
-        //std::cout << "deleting :: " << (pair.first).c_str() << std::endl;
-        //intf_mod->RemoveSignal((pair.first).c_str());
     }
 
     for (const auto& pair : gb.indexed_intf_outs) {
@@ -601,17 +603,14 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         }
         intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
         ports_intf.insert(pair.first);
-        //intf_mod->RemoveSignal((pair.first).c_str());
     }
 
     for (const auto& pair : gb.indexed_mod_clks) {
         const auto& values = pair.second;
         unsigned msb;
         unsigned lsb;
-        if (values.size() == 3) {
-            msb = values.at(0);
-            lsb = values.at(1);
-        }
+        msb = values.at(0);
+        lsb = values.at(1);
         intf_mod->AddPort((pair.first).c_str(), VERI_OUTPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
         ports_intf.insert(pair.first);
     }
@@ -619,13 +618,11 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     for (const auto& port : gb.intf_ins) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/, 0 /* data type */) ;
         ports_intf.insert(port);
-        //intf_mod->RemoveSignal(port.c_str());
     }
 
     for (const auto& port : gb.intf_outs) {
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_OUTPUT /* direction*/, 0 /* data type */) ;
         ports_intf.insert(port);
-       // intf_mod->RemoveSignal(port.c_str());
     }
 
     for (const auto& port : gb.mod_clks) {
@@ -637,11 +634,9 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         intf_mod->AddPort(port.c_str() /* port to be added*/, VERI_INOUT /* direction*/, 0 /* data type */) ;
         ports_intf.insert(port);
     }
+    ///////////////////////////////////////// BLOCK END /////////////////////////////////////////////////////////
 
-    for (const auto& port : ports_intf) {
-        gb.intf_ports.erase(port);
-    }
-
+    ///////////////////////// Remove instances from interface and wrapper module ///////////////////////////////
     for (const auto& del_inst : gb.normal_insts) {
         intf_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
     }
@@ -653,15 +648,19 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     for (const auto& del_inst : gb.gb_insts) {
         top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/) ;
     }
+    /////////////////////////////////////// BLOCK END ///////////////////////////////////////////////////////////
+
+    ///////////////////////// Remove unnecessary ports from interface module ////////////////////////////////////
+    for (const auto& port : ports_intf) {
+        gb.intf_ports.erase(port);
+    }
 
     for (const auto& port : gb.intf_ports) {
          intf_mod->RemovePort(port.c_str() /* port to be removed */) ;
     }
+    ////////////////////////////////////////// BLOCK END ////////////////////////////////////////////////////////
 
-    //for (const auto& dn : ports_intf) {
-    //    std::cout << "REMOVING SIG : " << dn << std::endl;
-    //}
-
+    /////////////////////////////// Add interface ports and instance to the wrapper /////////////////////////////
     Array *top_ports = intf_mod->GetPorts() ; // Get the ports
     unsigned n ;
     VeriIdDef *top_port_id ;
@@ -673,7 +672,9 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     for (const auto& port : gb.top_ports) {
         top_mod->AddPortRef("intf_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
+    //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /////////////////////////////// Add original module's ports and instance to the wrapper /////////////////////////////
     Array *mod_ports = mod->GetPorts() ; // Get the ports
     unsigned k ;
     VeriIdDef *port_id ;
@@ -685,11 +686,11 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     for (const auto& port : gb.mod_ports) {
         top_mod->AddPortRef("mod_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
+    /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+    /////////////////////////// Get interface and wrapper modules as strings //////////////////////////////////////////////
     gb.intf_mod_str = intf_mod->GetPrettyPrintedString();
     gb.top_mod_str = top_mod->GetPrettyPrintedString();
-
-    //call function to generate wrapper
 
     // Remove all analyzed modules
     veri_file::RemoveAllModules() ;
