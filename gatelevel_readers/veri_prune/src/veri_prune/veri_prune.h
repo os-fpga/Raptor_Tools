@@ -31,9 +31,6 @@ struct gb_constructs
         {"O_SERDES", {{"D", 0}, {"RST", 5}, {"LOAD_WORD", 0},{"DLY_LOAD", 0}, {"DLY_ADJ", 0}, {"DLY_INCDEC", 0},
           {"CLK_EN", 0}, {"CLK_IN", 4}, {"PLL_LOCK", 0}, {"PLL_FAST_CLK", 0}, {"FAST_PHASE_CLK", 0}, {"OE", 0},
           {"CLK_OUT", 1}, {"Q", 1}, {"DLY_TAP_VALUE", 1}, {"CHANNEL_BOND_SYNC_IN", 0}, {"CHANNEL_BOND_SYNC_OUT", 1}}}};
-    std::vector<std::string> imods = {"CLK_BUF", "I_BUF", "I_BUF_DS", "I_DDR", "I_SERDES", "PLL"};
-    std::vector<std::string> omods = {"O_BUF", "O_BUFT", "O_BUFT_DS", "O_DDR", "O_SERDES"};
-    std::vector<std::string> iomods = {"IO_BUF", "IO_BUF_DS"};
     std::vector<std::pair<std::string, int>> mod_ios;
     std::vector<std::string> mod_clks;
     std::vector<std::string> clk_in;
@@ -53,7 +50,6 @@ struct gb_constructs
     std::unordered_set<std::string> intf_ports;
     std::vector<std::string> gb_insts;
     std::vector<std::string> normal_insts;
-    std::vector<std::pair<std::string, std::map<std::string, std::string>>> del_conns;
     char *mod_str;
     char *intf_mod_str;
     char *top_mod_str;

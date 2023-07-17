@@ -57,29 +57,7 @@
 
 #ifdef VERIFIC_NAMESPACE
 using namespace Verific ;
-#endif 
-
-bool isimod(std::string mod)
-{
-    gb_constructs gb;
-    for (const auto& element : gb.imods)
-    {
-        if (mod == element) {
-            return true; }
-    }
-    return false;
-}
-
-bool isiomod(std::string mod)
-{
-    gb_constructs gb;
-    for (const auto& element : gb.iomods)
-    {
-        if (mod == element) {
-            return true; }
-    }
-    return false;
-}
+#endif
 
 void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,std::map<std::string, int> &m_items, VeriExpression *actual)
 {
@@ -320,8 +298,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                 }
         	    if (is_gb_cons) 
                 {
-                    bool imod = isimod(no_param_name);
-                    bool iomod = isiomod(no_param_name);
                     std::vector<std::string> prefs;
                     std::unordered_map<std::string, std::vector<std::string>> del_inst;
                     std::map<std::string, std::string> conn_info ;
