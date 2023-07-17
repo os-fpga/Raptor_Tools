@@ -59,6 +59,26 @@
 using namespace Verific ;
 #endif
 
+void add_mod_ports (VeriModule *mod, std::vector<std::pair<std::string, std::vector<int>>> &indexed_mod_ios)
+{
+    for (const auto& pair : indexed_mod_ios) {
+        const auto& values = pair.second;
+        unsigned msb;
+        unsigned lsb;
+        unsigned dir;
+        if (values.size() == 3) {
+            msb = values.at(0);
+            lsb = values.at(1);
+            dir = values.at(2);
+        } else {
+            msb = values.at(0);
+            lsb = values.at(1);
+            dir = VERI_INPUT;
+        }
+        mod->AddPort((pair.first).c_str(), dir, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
+    }
+}
+
 void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,std::map<std::string, int> &m_items, VeriExpression *actual)
 {
     std::string actual_name ;
@@ -460,27 +480,8 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     ////////////////////////////////// BLOCK END /////////////////////////////////////////////////////////////
 
     ////////////////////////// Add ports to the original module /////////////////////////////////////////////
-    for (const auto& pair : gb.indexed_mod_ios) {
-        const auto& values = pair.second;
-        unsigned msb;
-        unsigned lsb;
-        unsigned dir;
-        if (values.size() == 3) {
-            msb = values.at(0);
-            lsb = values.at(1);
-            dir = values.at(2);
-        }
-        mod->AddPort((pair.first).c_str(), dir, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
-    }
-
-    for (const auto& pair : gb.indexed_mod_clks) {
-        const auto& values = pair.second;
-        unsigned msb;
-        unsigned lsb;
-        msb = values.at(0);
-        lsb = values.at(1);
-        mod->AddPort((pair.first).c_str(), VERI_INPUT, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
-    }
+    add_mod_ports (mod, gb.indexed_mod_ios);
+    add_mod_ports (mod, gb.indexed_mod_clks);
 
     for (const auto& pair : gb.mod_ios) {
         mod->AddPort((pair.first).c_str() /* port to be added*/, pair.second /* direction*/, 0 /* data type */) ;
