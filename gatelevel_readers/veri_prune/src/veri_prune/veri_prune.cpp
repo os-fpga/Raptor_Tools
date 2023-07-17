@@ -220,7 +220,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                     std::map<std::string, std::string> conn_info ;
                     std::pair<std::string, std::map<std::string, std::string>> inst_conns;
         	        if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
-                    VeriIdDef *formal ;
                     VeriIdDef *actual_id ;
                     VeriExpression *actual ;
                     const char *formal_name ;
@@ -230,28 +229,27 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         	        Array *port_conn_arr = id->GetPortConnects() ;
         	        FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
                         formal_name = expr->NamedFormal() ;
-                        formal = module_item->GetPort(formal_name) ;
+                        prefs.push_back(formal_name);
                         actual = expr->GetConnection() ;
                         if (actual->GetClassId() == ID_VERICONSTVAL) {
                             // Do nothing
                             ;
                         } else if (actual->GetClassId() == ID_VERICONCAT) {
-                            prefs.push_back(formal_name);
                             Array *expr_arr = actual->GetExpressions();
                             unsigned c;
                             VeriExpression *pexpr;
                             FOREACH_ARRAY_ITEM(expr_arr, i, pexpr)
                             {
-                                if(actual->GetIndexExpr()) { 
-                                    actual_id = (actual) ? actual->GetId() : 0 ;
+                                if(pexpr->GetIndexExpr()) { 
+                                    actual_id = (pexpr) ? pexpr->GetId() : 0 ;
                                 } else {
-                                    actual_id = (actual) ? actual->FullId() : 0 ;
+                                    actual_id = (pexpr) ? pexpr->FullId() : 0 ;
                                 }
                                 if(actual_id) {
                                     std::vector<int> io_data;
                                     unsigned msb = actual_id->GetMsbOfRange();
                                     unsigned lsb = actual_id->GetLsbOfRange();
-                                    VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
+                                    VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(pexpr) ;
                                     unsigned port_size = indexed_id->FindSize();
                                     actual_name = actual_id->Name();
                                     if(actual_id->Dir() == VERI_INPUT) {
@@ -282,7 +280,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             io_data.pop_back();
                                                             gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
                                                     } else {
-                                                        if(actual->GetIndexExpr()) {
+                                                        if(pexpr->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
                                                             msb = sig_id->GetMsbOfRange();
                                                 			lsb = sig_id->GetLsbOfRange();
@@ -306,7 +304,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             io_data.pop_back();
                                                             gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
                                                     } else {
-                                                        if(actual->GetIndexExpr()) {
+                                                        if(pexpr->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
                                                             msb = sig_id->GetMsbOfRange();
                                                 			lsb = sig_id->GetLsbOfRange();
@@ -327,7 +325,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                                             io_data.push_back(lsb);
                                                             gb.indexed_mod_clks.push_back(std::make_pair(actual_name, io_data));
                                                     } else {
-                                                        if(actual->GetIndexExpr()) {
+                                                        if(pexpr->GetIndexExpr()) {
                                                             VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
                                                             msb = sig_id->GetMsbOfRange();
                                                 			lsb = sig_id->GetLsbOfRange();
@@ -357,7 +355,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                                 VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
                                 unsigned port_size = indexed_id->FindSize();
                                 actual_name = actual_id->Name();
-                                prefs.push_back(formal_name);
                                 if(actual_id->Dir() == VERI_INPUT) {
                                     for (const auto& pair : m_items) {
                                         if (strcmp((pair.first).c_str(), formal_name) == 0) {
@@ -479,10 +476,8 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         	FOREACH_ARRAY_ITEM(insts, m, id) 
             {
                 const char *inst_name = id->InstName() ;
-                VeriIdDef *formal ;
                 VeriIdDef *actual_id ;
                 VeriExpression *actual ;
-                const char *formal_name ;
                 std::string actual_name ;
         	    VeriExpression *expr ;
         	    unsigned k ;
