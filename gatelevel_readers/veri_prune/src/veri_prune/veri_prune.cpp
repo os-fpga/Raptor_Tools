@@ -235,6 +235,115 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                         if (actual->GetClassId() == ID_VERICONSTVAL) {
                             // Do nothing
                             ;
+                        } else if (actual->GetClassId() == ID_VERICONCAT) {
+                            prefs.push_back(formal_name);
+                            Array *expr_arr = actual->GetExpressions();
+                            unsigned c;
+                            VeriExpression *pexpr;
+                            FOREACH_ARRAY_ITEM(expr_arr, i, pexpr)
+                            {
+                                if(actual->GetIndexExpr()) { 
+                                    actual_id = (actual) ? actual->GetId() : 0 ;
+                                } else {
+                                    actual_id = (actual) ? actual->FullId() : 0 ;
+                                }
+                                if(actual_id) {
+                                    std::vector<int> io_data;
+                                    unsigned msb = actual_id->GetMsbOfRange();
+                                    unsigned lsb = actual_id->GetLsbOfRange();
+                                    VeriIndexedId *indexed_id = static_cast<VeriIndexedId*>(actual) ;
+                                    unsigned port_size = indexed_id->FindSize();
+                                    actual_name = actual_id->Name();
+                                    if(actual_id->Dir() == VERI_INPUT) {
+                                        for (const auto& pair : m_items) {
+                                            if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                                if(pair.second != IN_CLK && pair.second != IN_RESET) {
+                                                    gb.del_ports.insert(actual_name);
+                                                }
+                                            }
+                                        }
+                                        gb.intf_ins.push_back(actual_name);
+                                    } else if(actual_id->Dir() == VERI_OUTPUT) {
+                                        gb.intf_outs.push_back(actual_name);
+                                        gb.del_ports.insert(actual_name);
+                                    } else if(actual_id->Dir() == VERI_INOUT) {
+                                        gb.intf_inouts.push_back(actual_name);
+                                        gb.del_ports.insert(actual_name);
+                                    } else {
+                                    	// check in gb mods for direction
+                                        for (const auto& pair : m_items) {
+                                            if (strcmp((pair.first).c_str(), formal_name) == 0) {
+                                                if(pair.second == OUT_DIR) {
+                                                    if (port_size > 1) {
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            io_data.push_back(VERI_INPUT);
+                                                            gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            io_data.pop_back();
+                                                            gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
+                                                    } else {
+                                                        if(actual->GetIndexExpr()) {
+                                                            VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
+                                                            msb = sig_id->GetMsbOfRange();
+                                                			lsb = sig_id->GetLsbOfRange();
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            io_data.push_back(VERI_INPUT);
+                                                            gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            io_data.pop_back();
+                                                            gb.indexed_intf_outs.push_back(std::make_pair(actual_name, io_data));
+                                                        } else {
+                                                            gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
+                                                            gb.intf_outs.push_back(actual_name);
+                                                        }
+                                                    }
+                                                } else if(pair.second == IN_DIR) {
+                                                    if (port_size > 1) {
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            io_data.push_back(VERI_OUTPUT);
+                                                            gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            io_data.pop_back();
+                                                            gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
+                                                    } else {
+                                                        if(actual->GetIndexExpr()) {
+                                                            VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
+                                                            msb = sig_id->GetMsbOfRange();
+                                                			lsb = sig_id->GetLsbOfRange();
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            io_data.push_back(VERI_OUTPUT);
+                                                            gb.indexed_mod_ios.push_back(std::make_pair(actual_name, io_data));
+                                                            io_data.pop_back();
+                                                            gb.indexed_intf_ins.push_back(std::make_pair(actual_name, io_data));
+                                                        } else {
+                                                            gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
+                                                            gb.intf_ins.push_back(actual_name);
+                                                        }
+                                                    }
+                                                } else if(pair.second == OUT_CLK) {
+                                                    if (port_size > 1) {
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            gb.indexed_mod_clks.push_back(std::make_pair(actual_name, io_data));
+                                                    } else {
+                                                        if(actual->GetIndexExpr()) {
+                                                            VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str()) ;
+                                                            msb = sig_id->GetMsbOfRange();
+                                                			lsb = sig_id->GetLsbOfRange();
+                                                            io_data.push_back(msb);
+                                                            io_data.push_back(lsb);
+                                                            gb.indexed_mod_clks.push_back(std::make_pair(actual_name, io_data));
+                                                        } else {
+                                                            gb.mod_clks.push_back(actual_name);
+                                                        }
+                                                    }
+                                                }
+                                            }
+                                        }
+                                    }
+                                }
+                            }
                         } else {
                             if(actual->GetIndexExpr()) { 
                                 actual_id = (actual) ? actual->GetId() : 0 ;
