@@ -641,6 +641,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     unsigned n ;
     VeriIdDef *top_port_id ;
     FOREACH_ARRAY_ITEM(top_ports, n, top_port_id) {
+        io_intf.insert(top_port_id->GetName());
         gb.top_ports.push_back(top_port_id->GetName());
     }
 
@@ -663,7 +664,35 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
         top_mod->AddPortRef("mod_inst" /* instance name */, port.c_str() /* formal port name */, new VeriIdRef(Strings::save(port.c_str())) /* actual */) ;
     }
     /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+    
+    Array *intf_items_ = intf_mod->GetModuleItems() ;
+    VeriModuleItem *intf_item_;
+    unsigned im;
+    // Get the module item list of module.
+    FOREACH_ARRAY_ITEM(intf_items_, im, intf_item_) {
+        if (!intf_item_)
+            continue;
+        if (ID_VERINETDECL == intf_item_->GetClassId()) {
+            VeriNetDecl *net_decl = static_cast<VeriNetDecl*>(intf_item_) ;
+            VeriIdDef *id ;
+            unsigned j ;
+            FOREACH_ARRAY_ITEM(net_decl->GetIds(), j, id) {
+                if (!id) continue ; // null pointer check
+                const char *name = id->Name() ;
+                std::string nameString(name);
+                if (io_intf.find(nameString) == io_intf.end())
+                {
+                    gb.remove_intf_nets.push_back(nameString);
+                }
+                //std::cout << "INTF ITEM : " << id->Name() << std::endl;
+                // Here you can put more code to get more info about the id ;
+            }
+        }
+    }
 
+    for (const auto& el : gb.remove_intf_nets) {
+        intf_mod->RemoveSignal(el.c_str() /* signal to be removed */) ;
+    }
     /////////////////////////// Get interface and wrapper modules as strings //////////////////////////////////////////////
     gb.intf_mod_str = intf_mod->GetPrettyPrintedString();
     gb.top_mod_str = top_mod->GetPrettyPrintedString();
