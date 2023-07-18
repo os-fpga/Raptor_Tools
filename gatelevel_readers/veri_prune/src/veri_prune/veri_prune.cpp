@@ -68,10 +68,8 @@ void add_idx_intf_ports (VeriModule *intf_mod, std::vector<std::pair<std::string
         const auto& values = pair.second;
         unsigned msb;
         unsigned lsb;
-        if (values.size() == 2) {
-            msb = values.at(0);
-            lsb = values.at(1);
-        }
+        msb = values[0];
+        lsb = values[1];
         intf_mod->AddPort((pair.first).c_str(), dir, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
         ports_intf.insert(pair.first);
     }
@@ -93,12 +91,12 @@ void add_mod_ports (VeriModule *mod, std::vector<std::pair<std::string, std::vec
         unsigned lsb;
         unsigned dir;
         if (values.size() == 3) {
-            msb = values.at(0);
-            lsb = values.at(1);
-            dir = values.at(2);
+            msb = values[0];
+            lsb = values[1];
+            dir = values[2];
         } else {
-            msb = values.at(0);
-            lsb = values.at(1);
+            msb = values[0];
+            lsb = values[1];
             dir = VERI_INPUT;
         }
         mod->AddPort((pair.first).c_str(), dir, new VeriDataType(0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb)))) ;
