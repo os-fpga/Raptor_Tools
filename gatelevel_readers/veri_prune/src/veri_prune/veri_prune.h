@@ -11,26 +11,39 @@
 #include <algorithm>
 using namespace std;
 
+enum Direction : unsigned int {
+    IN_DIR = 0,
+    OUT_DIR = 1,
+    INOUT_DIR = 2,
+    OUT_CLK = 3,
+    IN_CLK = 4,
+    IN_RESET = 5
+};
+
 struct gb_constructs
 {
-    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {{"CLK_BUF", {{"I", 0}, {"O", 3}}}, 
-        {"I_BUF",{{"I", 0}, {"C",4}, {"O", 1}}},
-        {"I_BUF_DS", {{"OE",0}, {"I_N",0}, {"I_P",0}, {"O",1}}},
-        {"I_DDR", {{"D",0}, {"R",5}, {"DLY_ADJ",0}, {"DLY_LD",0},{"DLY_INC",0}, {"C",4}, {"Q",1}}},
-        {"I_SERDES", {{"D", 0}, {"RST", 5}, {"DPA_RST", 0}, {"FIFO_RST", 5}, {"DLY_LOAD", 0}, {"DLY_ADJ", 0}, {"DLY_INCDEC", 0},
-          {"BITSLIP_ADJ", 0}, {"EN", 0}, {"CLK_IN", 4}, {"PLL_FAST_CLK", 0}, {"FAST_PHASE_CLK", 0}, {"PLL_LOCK", 0},
-          {"CLK_OUT", 1}, {"CDR_CORE_CLK", 1}, {"Q", 1}, {"DATA_VALID", 1}, {"DLY_TAP_VALUE", 1}, {"DPA_LOCK", 1}, {"DPA_ERROR", 1}}},
-        {"PLL", {{"PLL_EN", 0}, {"CLK_IN", 4}, {"CLK_OUT0_EN", 0}, {"CLK_OUT1_EN", 0}, {"CLK_OUT2_EN", 0}, {"CLK_OUT3_EN", 0},
-          {"CLK_OUT0", 1}, {"CLK_OUT1", 1}, {"CLK_OUT2", 1}, {"CLK_OUT3", 1}, {"GEARBOX_FAST_CLK", 1}, {"LOCK", 1}}},
-        {"IO_BUF", {{"I", 0}, {"T", 0}, {"IO", 2}, {"O", 1}}},
-        {"IO_BUF_DS", {{"I", 0}, {"T", 0}, {"IOP", 2}, {"ION", 2}, {"O", 1}}},
-        {"O_BUF", {{"I", 0}, {"C",4}, {"O", 1}}},
-        {"O_BUFT", {{"I", 0}, {"OE", 0}, {"O", 1}}},
-        {"O_BUFT_DS", {{"OE",0}, {"I",0}, {"C",4}, {"O_N",1}, {"O_P",1}}},
-        {"O_DDR", {{"D",0}, {"R",5}, {"E",0}, {"DLY_ADJ",0},{"DLY_LD",0}, {"DLY_INC",0}, {"C",4}, {"Q",1}}},
-        {"O_SERDES", {{"D", 0}, {"RST", 5}, {"LOAD_WORD", 0},{"DLY_LOAD", 0}, {"DLY_ADJ", 0}, {"DLY_INCDEC", 0},
-          {"CLK_EN", 0}, {"CLK_IN", 4}, {"PLL_LOCK", 0}, {"PLL_FAST_CLK", 0}, {"FAST_PHASE_CLK", 0}, {"OE", 0},
-          {"CLK_OUT", 1}, {"Q", 1}, {"DLY_TAP_VALUE", 1}, {"CHANNEL_BOND_SYNC_IN", 0}, {"CHANNEL_BOND_SYNC_OUT", 1}}}};
+    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {{"CLK_BUF", {{"I", IN_DIR}, {"O", OUT_CLK}}}, 
+        {"I_BUF",{{"I", IN_DIR}, {"C",IN_CLK}, {"O", OUT_DIR}}},
+        {"I_BUF_DS", {{"OE",IN_DIR}, {"I_N",IN_DIR}, {"I_P",IN_DIR}, {"O",OUT_DIR}}},
+        {"I_DDR", {{"D",IN_DIR}, {"R",IN_RESET}, {"DLY_ADJ",IN_DIR}, {"DLY_LD",IN_DIR},{"DLY_INC",IN_DIR}, {"C",IN_CLK}, {"Q",OUT_DIR}}},
+        {"I_SERDES", {{"D", IN_DIR}, {"RST", IN_RESET}, {"DPA_RST", IN_DIR}, {"FIFO_RST", IN_RESET}, {"DLY_LOAD", IN_DIR}, {"DLY_ADJ", IN_DIR},
+          {"DLY_INCDEC", IN_DIR}, {"BITSLIP_ADJ", IN_DIR}, {"EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"PLL_FAST_CLK", IN_DIR},
+          {"FAST_PHASE_CLK", IN_DIR}, {"PLL_LOCK", IN_DIR}, {"CLK_OUT", OUT_DIR}, {"CDR_CORE_CLK", OUT_DIR}, {"Q", OUT_DIR}, 
+          {"DATA_VALID", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"DPA_LOCK", OUT_DIR}, {"DPA_ERROR", OUT_DIR}}},
+        {"PLL", {{"PLL_EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"CLK_OUTIN_DIR_EN", IN_DIR}, {"CLK_OUTOUT_DIR_EN", IN_DIR}, 
+          {"CLK_OUTINOUT_DIR_EN", IN_DIR}, {"CLK_OUTOUT_CLK_EN", IN_DIR}, {"CLK_OUTIN_DIR", OUT_DIR}, {"CLK_OUTOUT_DIR", OUT_DIR}, 
+          {"CLK_OUTINOUT_DIR", OUT_DIR}, {"CLK_OUTOUT_CLK", OUT_DIR}, {"GEARBOX_FAST_CLK", OUT_DIR}, {"LOCK", OUT_DIR}}},
+        {"IO_BUF", {{"I", IN_DIR}, {"T", IN_DIR}, {"IO", INOUT_DIR}, {"O", OUT_DIR}}},
+        {"IO_BUF_DS", {{"I", IN_DIR}, {"T", IN_DIR}, {"IOP", INOUT_DIR}, {"ION", INOUT_DIR}, {"O", OUT_DIR}}},
+        {"O_BUF", {{"I", IN_DIR}, {"C",IN_CLK}, {"O", OUT_DIR}}},
+        {"O_BUFT", {{"I", IN_DIR}, {"OE", IN_DIR}, {"O", OUT_DIR}}},
+        {"O_BUFT_DS", {{"OE",IN_DIR}, {"I",IN_DIR}, {"C",IN_CLK}, {"O_N",OUT_DIR}, {"O_P",OUT_DIR}}},
+        {"O_DDR", {{"D",IN_DIR}, {"R",IN_RESET}, {"E",IN_DIR}, {"DLY_ADJ",IN_DIR},{"DLY_LD",IN_DIR}, {"DLY_INC",IN_DIR}, {"C",IN_CLK},
+          {"Q",OUT_DIR}}},
+        {"O_SERDES", {{"D", IN_DIR}, {"RST", IN_RESET}, {"LOAD_WORD", IN_DIR},{"DLY_LOAD", IN_DIR}, {"DLY_ADJ", IN_DIR}, {"DLY_INCDEC", IN_DIR},
+          {"CLK_EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"PLL_LOCK", IN_DIR}, {"PLL_FAST_CLK", IN_DIR}, {"FAST_PHASE_CLK", IN_DIR}, {"OE", IN_DIR},
+          {"CLK_OUT", OUT_DIR}, {"Q", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", IN_DIR}, 
+          {"CHANNEL_BOND_SYNC_OUT", OUT_DIR}}}};
     std::vector<std::pair<std::string, int>> mod_ios;
     std::vector<std::string> mod_clks;
     std::vector<std::string> clk_in;

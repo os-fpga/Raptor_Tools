@@ -43,12 +43,6 @@
 #define VERI_INPUT 330
 #define VERI_OUTPUT 346
 #define VERI_WIRE 392
-#define IN_DIR 0
-#define OUT_DIR 1
-#define INOUT_DIR 2
-#define OUT_CLK 3
-#define IN_CLK 4
-#define IN_RESET 5
 
 #ifdef USE_COMREAD
 #include "Commands.h"
