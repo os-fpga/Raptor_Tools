@@ -233,13 +233,16 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
 
     //Now copy of the top level module
     VeriMapForCopy id_map_table(POINTER_HASH) ;
-    char *intf_name = Strings::save("intf_", mod->Name()) ;
+    char *intf_name = Strings::save("interface_to_fabric_", mod->Name()) ;
     VeriModuleItem *intf_mod_ = mod->CopyWithName(intf_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
     VeriModule *intf_mod = (VeriModule *)intf_mod_;
     char *top_name = Strings::save("top_", mod->Name()) ;
     VeriModuleItem *top_mod_ = intf_mod->CopyWithName(top_name, id_map_table, 1 /* add copied module to library containing 'mod'*/) ;
     VeriModule *top_mod = (VeriModule *)top_mod_;
     delete all_top_modules ;
+
+    /////////////////// Rename original module ////////////////////////////
+    mod->Rename(Strings::save("nl_to_fabric_", mod->Name()));
 
     //////////////////////////// Remove assign statements from interface and wrapper modules /////////////////////
     // Get the module item list of module.
