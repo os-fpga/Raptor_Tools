@@ -20,30 +20,32 @@ enum Direction : unsigned int {
     IN_RESET = 5
 };
 
+using Dir = Direction;
+
 struct gb_constructs
 {
-    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {{"CLK_BUF", {{"I", IN_DIR}, {"O", OUT_CLK}}}, 
-        {"I_BUF",{{"I", IN_DIR}, {"C",IN_CLK}, {"O", OUT_DIR}}},
-        {"I_BUF_DS", {{"OE",IN_DIR}, {"I_N",IN_DIR}, {"I_P",IN_DIR}, {"O",OUT_DIR}}},
-        {"I_DDR", {{"D",IN_DIR}, {"R",IN_RESET}, {"DLY_ADJ",IN_DIR}, {"DLY_LD",IN_DIR},{"DLY_INC",IN_DIR}, {"C",IN_CLK}, {"Q",OUT_DIR}}},
-        {"I_SERDES", {{"D", IN_DIR}, {"RST", IN_RESET}, {"DPA_RST", IN_DIR}, {"FIFO_RST", IN_RESET}, {"DLY_LOAD", IN_DIR}, {"DLY_ADJ", IN_DIR},
-          {"DLY_INCDEC", IN_DIR}, {"BITSLIP_ADJ", IN_DIR}, {"EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"PLL_FAST_CLK", IN_DIR},
-          {"FAST_PHASE_CLK", IN_DIR}, {"PLL_LOCK", IN_DIR}, {"CLK_OUT", OUT_DIR}, {"CDR_CORE_CLK", OUT_DIR}, {"Q", OUT_DIR}, 
-          {"DATA_VALID", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"DPA_LOCK", OUT_DIR}, {"DPA_ERROR", OUT_DIR}}},
-        {"PLL", {{"PLL_EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"CLK_OUTIN_DIR_EN", IN_DIR}, {"CLK_OUTOUT_DIR_EN", IN_DIR}, 
-          {"CLK_OUTINOUT_DIR_EN", IN_DIR}, {"CLK_OUTOUT_CLK_EN", IN_DIR}, {"CLK_OUTIN_DIR", OUT_DIR}, {"CLK_OUTOUT_DIR", OUT_DIR}, 
-          {"CLK_OUTINOUT_DIR", OUT_DIR}, {"CLK_OUTOUT_CLK", OUT_DIR}, {"GEARBOX_FAST_CLK", OUT_DIR}, {"LOCK", OUT_DIR}}},
-        {"IO_BUF", {{"I", IN_DIR}, {"T", IN_DIR}, {"IO", INOUT_DIR}, {"O", OUT_DIR}}},
-        {"IO_BUF_DS", {{"I", IN_DIR}, {"T", IN_DIR}, {"IOP", INOUT_DIR}, {"ION", INOUT_DIR}, {"O", OUT_DIR}}},
-        {"O_BUF", {{"I", IN_DIR}, {"C",IN_CLK}, {"O", OUT_DIR}}},
-        {"O_BUFT", {{"I", IN_DIR}, {"OE", IN_DIR}, {"O", OUT_DIR}}},
-        {"O_BUFT_DS", {{"OE",IN_DIR}, {"I",IN_DIR}, {"C",IN_CLK}, {"O_N",OUT_DIR}, {"O_P",OUT_DIR}}},
-        {"O_DDR", {{"D",IN_DIR}, {"R",IN_RESET}, {"E",IN_DIR}, {"DLY_ADJ",IN_DIR},{"DLY_LD",IN_DIR}, {"DLY_INC",IN_DIR}, {"C",IN_CLK},
-          {"Q",OUT_DIR}}},
-        {"O_SERDES", {{"D", IN_DIR}, {"RST", IN_RESET}, {"LOAD_WORD", IN_DIR},{"DLY_LOAD", IN_DIR}, {"DLY_ADJ", IN_DIR}, {"DLY_INCDEC", IN_DIR},
-          {"CLK_EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"PLL_LOCK", IN_DIR}, {"PLL_FAST_CLK", IN_DIR}, {"FAST_PHASE_CLK", IN_DIR}, {"OE", IN_DIR},
-          {"CLK_OUT", OUT_DIR}, {"Q", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", IN_DIR}, 
-          {"CHANNEL_BOND_SYNC_OUT", OUT_DIR}}}};
+    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {{"CLK_BUF", {{"I", Dir::IN_DIR}, {"O", Dir::OUT_CLK}}}, 
+        {"I_BUF",{{"I", Dir::IN_DIR}, {"C",Dir::IN_CLK}, {"O", Dir::OUT_DIR}}},
+        {"I_BUF_DS", {{"OE",Dir::IN_DIR}, {"I_N",Dir::IN_DIR}, {"I_P",Dir::IN_DIR}, {"O",Dir::OUT_DIR}}},
+        {"I_DDR", {{"D",Dir::IN_DIR}, {"R",Dir::IN_RESET}, {"DLY_ADJ",Dir::IN_DIR}, {"DLY_LD",Dir::IN_DIR},{"DLY_INC",Dir::IN_DIR}, {"C",Dir::IN_CLK}, {"Q",Dir::OUT_DIR}}},
+        {"I_SERDES", {{"D", Dir::IN_DIR}, {"RST", Dir::IN_RESET}, {"DPA_RST", Dir::IN_DIR}, {"FIFO_RST", Dir::IN_RESET}, {"DLY_LOAD", Dir::IN_DIR}, {"DLY_ADJ", Dir::IN_DIR},
+          {"DLY_INCDEC", Dir::IN_DIR}, {"BITSLIP_ADJ", Dir::IN_DIR}, {"EN", Dir::IN_DIR}, {"CLK_IN", Dir::IN_CLK}, {"PLL_FAST_CLK", Dir::IN_DIR},
+          {"FAST_PHASE_CLK", Dir::IN_DIR}, {"PLL_LOCK", Dir::IN_DIR}, {"CLK_OUT", Dir::OUT_DIR}, {"CDR_CORE_CLK", Dir::OUT_DIR}, {"Q", Dir::OUT_DIR}, 
+          {"DATA_VALID", Dir::OUT_DIR}, {"DLY_TAP_VALUE", Dir::OUT_DIR}, {"DPA_LOCK", Dir::OUT_DIR}, {"DPA_ERROR", Dir::OUT_DIR}}},
+        {"PLL", {{"PLL_EN", Dir::IN_DIR}, {"CLK_IN", Dir::IN_CLK}, {"CLK_OUTDir::IN_DIR_EN", Dir::IN_DIR}, {"CLK_OUTOUT_DIR_EN", Dir::IN_DIR}, 
+          {"CLK_OUTINOUT_DIR_EN", Dir::IN_DIR}, {"CLK_OUTOUT_CLK_EN", Dir::IN_DIR}, {"CLK_OUTDir::IN_DIR", Dir::OUT_DIR}, {"CLK_OUTOUT_DIR", Dir::OUT_DIR}, 
+          {"CLK_OUTINOUT_DIR", Dir::OUT_DIR}, {"CLK_OUTOUT_CLK", Dir::OUT_DIR}, {"GEARBOX_FAST_CLK", Dir::OUT_DIR}, {"LOCK", Dir::OUT_DIR}}},
+        {"IO_BUF", {{"I", Dir::IN_DIR}, {"T", Dir::IN_DIR}, {"IO", Dir::INOUT_DIR}, {"O", Dir::OUT_DIR}}},
+        {"IO_BUF_DS", {{"I", Dir::IN_DIR}, {"T", Dir::IN_DIR}, {"IOP", Dir::INOUT_DIR}, {"ION", Dir::INOUT_DIR}, {"O", Dir::OUT_DIR}}},
+        {"O_BUF", {{"I", Dir::IN_DIR}, {"C",Dir::IN_CLK}, {"O", Dir::OUT_DIR}}},
+        {"O_BUFT", {{"I", Dir::IN_DIR}, {"OE", Dir::IN_DIR}, {"O", Dir::OUT_DIR}}},
+        {"O_BUFT_DS", {{"OE",Dir::IN_DIR}, {"I",Dir::IN_DIR}, {"C",Dir::IN_CLK}, {"O_N",Dir::OUT_DIR}, {"O_P",Dir::OUT_DIR}}},
+        {"O_DDR", {{"D",Dir::IN_DIR}, {"R",Dir::IN_RESET}, {"E",Dir::IN_DIR}, {"DLY_ADJ",Dir::IN_DIR},{"DLY_LD",Dir::IN_DIR}, {"DLY_INC",Dir::IN_DIR}, {"C",Dir::IN_CLK},
+          {"Q",Dir::OUT_DIR}}},
+        {"O_SERDES", {{"D", Dir::IN_DIR}, {"RST", Dir::IN_RESET}, {"LOAD_WORD", Dir::IN_DIR},{"DLY_LOAD", Dir::IN_DIR}, {"DLY_ADJ", Dir::IN_DIR}, {"DLY_INCDEC", Dir::IN_DIR},
+          {"CLK_EN", Dir::IN_DIR}, {"CLK_IN", Dir::IN_CLK}, {"PLL_LOCK", Dir::IN_DIR}, {"PLL_FAST_CLK", Dir::IN_DIR}, {"FAST_PHASE_CLK", Dir::IN_DIR}, {"OE", Dir::IN_DIR},
+          {"CLK_OUT", Dir::OUT_DIR}, {"Q", Dir::OUT_DIR}, {"DLY_TAP_VALUE", Dir::OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", Dir::IN_DIR}, 
+          {"CHANNEL_BOND_SYNC_OUT", Dir::OUT_DIR}}}};
     std::vector<std::pair<std::string, int>> mod_ios;
     std::vector<std::string> mod_clks;
     std::vector<std::string> clk_in;
