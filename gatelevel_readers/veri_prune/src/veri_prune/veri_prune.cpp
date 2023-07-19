@@ -546,10 +546,18 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
 
     ///////////// Keep the ports still being used in design, and remove unnecessary ports ///////////////////
     // Iterate over the elements in del_ports
+    std::unordered_set<std::string> keep_ports;
     for (const auto& element : gb.del_ports) {
         // Check if the element is present in inst_nets or assign_nets
         if (gb.inst_nets.count(element) > 0 || gb.assign_nets.count(element) > 0) {
             // Element found, remove it from del_ports
+            keep_ports.insert(element);
+        }
+    }
+
+    // Iterate over keep_ports and remove elements found in del_ports
+    for (const auto& element : keep_ports) {
+        if (gb.del_ports.find(element) != gb.del_ports.end()) {
             gb.del_ports.erase(element);
         }
     }
