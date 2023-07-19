@@ -63,6 +63,8 @@ struct gb_constructs
     std::unordered_set<std::string> intf_ports;
     std::vector<std::string> gb_insts;
     std::vector<std::string> normal_insts;
+    std::unordered_set<std::string> intf_ios;
+    std::unordered_set<std::string> top_ios;
     std::vector<std::string> remove_intf_nets;
     std::vector<std::string> remove_top_nets;
     char *mod_str;
