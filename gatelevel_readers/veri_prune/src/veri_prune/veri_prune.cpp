@@ -151,7 +151,7 @@ void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,st
         if(actual_id->Dir() == VERI_INPUT) {
             for (const auto& pair : m_items) {
                 if (strcmp((pair.first).c_str(), formal_name) == 0) {
-                    if(pair.second != Dir::IN_CLK && pair.second != Dir::IN_RESET) {
+                    if(pair.second != IN_CLK && pair.second != IN_RESET) {
                         gb.del_ports.insert(actual_name);
                     }
                 }
@@ -167,7 +167,7 @@ void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,st
         	// check in gb mods for direction
             for (const auto& pair : m_items) {
                 if (strcmp((pair.first).c_str(), formal_name) == 0) {
-                    if(pair.second == Dir::OUT_DIR) {
+                    if(pair.second == OUT_DIR) {
                         if (port_size > 1) {
                                 io_data.push_back(msb);
                                 io_data.push_back(lsb);
@@ -191,7 +191,7 @@ void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,st
                                 gb.intf_outs.push_back(actual_name);
                             }
                         }
-                    } else if(pair.second == Dir::IN_DIR || pair.second == Dir::IN_CLK || pair.second == Dir::IN_RESET) {
+                    } else if(pair.second == IN_DIR || pair.second == IN_CLK || pair.second == IN_RESET) {
                         if (port_size > 1) {
                                 io_data.push_back(msb);
                                 io_data.push_back(lsb);
@@ -215,7 +215,7 @@ void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,st
                                 gb.intf_ins.push_back(actual_name);
                             }
                         }
-                    } else if(pair.second == Dir::OUT_CLK) {
+                    } else if(pair.second == OUT_CLK) {
                         if (port_size > 1) {
                                 io_data.push_back(msb);
                                 io_data.push_back(lsb);
