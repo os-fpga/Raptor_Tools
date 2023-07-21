@@ -416,6 +416,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     	    }
         }
     }
+    if (!gb.contains_io_prem) return 0;
 
     ////////////////////////////// Remove gearbox modules' instances from original module ////////////////////////////
     for (const auto& gb_inst : gb.gb_insts) {
