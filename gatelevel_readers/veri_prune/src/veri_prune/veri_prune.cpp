@@ -246,6 +246,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
 {
 
     Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
+    Message::SetMessageType("VERI-2541", VERIFIC_IGNORE);
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
 
     // Get all the top level modules
@@ -380,7 +381,6 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                 {
                     std::vector<std::string> prefs;
                     std::unordered_map<std::string, std::vector<std::string>> del_inst;
-        	        if (id) Message::Info(id->Linefile(),"here '", inst_name, "' is the name of an instance") ;
                     VeriExpression *actual ;
                     const char *formal_name ;
         	        VeriExpression *expr ;
