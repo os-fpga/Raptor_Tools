@@ -270,7 +270,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     delete all_top_modules ;
 
     /////////////////// Rename original module ////////////////////////////
-    mod->Rename(Strings::save("nl_to_fabric_", mod->Name()));
+    //mod->Rename(Strings::save("nl_to_fabric_", mod->Name()));
 
     //////////////////////////// Remove assign statements from interface and wrapper modules /////////////////////
     // Get the module item list of module.
