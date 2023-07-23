@@ -36,10 +36,7 @@
 
 #include <iostream>
 #include <sstream> // std::stringstream, std::stringbuf
-#include <string>
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
+#include "utilities.h"
 #include <map>
 #include <ctype.h>
 #include <bitset>
@@ -741,12 +738,9 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
             // Support hardcoded lut names like LUT2, LUT3 ...
             std::string str = n_l.blocks.back().mod_name_.substr(0, 4);
             transform(str.begin(), str.end(), str.begin(), ::toupper);
-            std::unordered_map<std::string, unsigned> lut_sel_widths = {{"LUT1", 1}, {"LUT2", 2}, {"LUT3", 3}, {"LUT4", 4}, {"LUT5", 5}, {"LUT6", 6}};
             std::unordered_map<std::string, std::string> lut_sel_width_strs = {{"LUT1", "32'd1"}, {"LUT2", "32'd2"}, {"LUT3", "32'd3"}, {"LUT4", "32'd4"}, {"LUT5", "32'd5"}, {"LUT6", "32'd6"}};
-            if (end(lut_sel_widths) != lut_sel_widths.find(str))
+            if (end(lut_sel_width_strs) != lut_sel_width_strs.find(str))
             {
-                unsigned sel_w = lut_sel_widths[str];
-                unsigned input_w = 1 << sel_w;
                 std::string literal = lut_sel_width_strs[str];
                 vector<string> v;
                 string param_v;
@@ -780,12 +774,34 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
             }
             // Iterate over all portrefs of instance
             PortRef *portref;
-            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+
+            std::string mod_n = n_l.blocks.back().mod_name_;
+            if (end(latch_lut_WIDTH_strs) != latch_lut_WIDTH_strs.find(mod_n))
             {
-                // Do what you want with it ...
-                Net *net_ = portref->GetNet();
-                Port *port_ = portref->GetPort();
-                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                n_l.blocks.back().params_["WIDTH"] = latch_lut_WIDTH_strs[mod_n];
+                n_l.blocks.back().params_["LUT"] = latch_lut_LUT_strs[mod_n];
+                n_l.blocks.back().mod_name_ = "$lut";
+
+                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                {
+                    // Do what you want with it ...
+                    Net *net_ = portref->GetNet();
+                    Port *port_ = portref->GetPort();
+                    if (port_->Name() == std::string("Q")){
+                        n_l.blocks.back().conns_.push_back({"Y", net_->Name()});
+                        }
+                    n_l.blocks.back().conns_.push_back({latch_lut_port_conversion[mod_n][port_->Name()], net_->Name()});
+                }
+            }
+            else
+            {
+                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                {
+                    // Do what you want with it ...
+                    Net *net_ = portref->GetNet();
+                    Port *port_ = portref->GetPort();
+                    n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                }
             }
             if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
             {

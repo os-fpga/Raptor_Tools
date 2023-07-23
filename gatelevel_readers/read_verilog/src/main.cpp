@@ -4,9 +4,9 @@
 #include <map>
 #include "simple_netlist.h"
 
-std::map<std::string, std::string> parseArguments(int argc, char **argv)
+std::map<std::string, const char*> parseArguments(int argc, char **argv)
 {
-    std::map<std::string, std::string> arguments;
+    std::map<std::string, const char*> arguments = {{"vfile", nullptr},{"key", "./private_key.pem"},{"out", nullptr},{"top", nullptr} };
     
     for (int i = 1; i < argc; i += 2)
     {
@@ -26,14 +26,18 @@ std::map<std::string, std::string> parseArguments(int argc, char **argv)
 
 int main(int argc, char **argv)
 {
-    std::map<std::string, std::string> arguments = parseArguments(argc, argv);
-    const char *file_name  = arguments.count("vfile") > 0 ? arguments["vfile"].c_str() : nullptr;
-    const char *key_file = arguments.count("key") > 0 ? arguments["key"].c_str() : "./private_key.pem";
-    const char *out_file = arguments.count("out") >0 ? arguments["out"].c_str() : nullptr;
-    const char *top_mod = arguments.count("top") >0 ? arguments["top"].c_str() : nullptr;
+    std::map<std::string, const char*> arguments = parseArguments(argc, argv);
+    const char *file_name   = arguments["vfile"];
+    const char *key_file    = arguments["key"];
+    const char *out_file    = arguments["out"];
+    const char *top_mod     = arguments["top"];
 
     if(file_name == nullptr) {
-        throw(std::invalid_argument("Give input file name as --vfile"));
+        std::cout << "Usage : read_verilog \t--vfile <file_name> [options]" << std::endl;
+        std::cout << "Options : \t\t--key <encryption private key file> \t// defaults to ./private_key.pem" << std::endl;
+        std::cout << "\t\t\t--out <output file> \t\t\t// defaults to nullptr/std::out" << std::endl;
+        std::cout << "\t\t\t--top <top module> \t\t\t// defaults to nullptr" << std::endl;
+        return -1;
     }
 
     simple_netlist n_l;
