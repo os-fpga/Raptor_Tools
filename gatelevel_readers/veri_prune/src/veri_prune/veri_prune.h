@@ -44,6 +44,7 @@ struct gb_constructs
           {"CLK_EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"PLL_LOCK", IN_DIR}, {"PLL_FAST_CLK", IN_DIR}, {"FAST_PHASE_CLK", IN_DIR}, {"OE", IN_DIR},
           {"CLK_OUT", OUT_DIR}, {"Q", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", IN_DIR}, 
           {"CHANNEL_BOND_SYNC_OUT", OUT_DIR}}}};
+    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods_;
     std::vector<std::pair<std::string, int>> mod_ios;
     std::vector<std::string> mod_clks;
     std::vector<std::string> clk_in;

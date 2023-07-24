@@ -54,6 +54,11 @@ message("VERIFIC_HOME: ${VERIFIC_HOME}")
 file(GLOB_RECURSE LIB_HEADERS
     ${VERIFIC_HOME}/*/*.h)
 
+get_filename_component(PREMITIVES_DIR "./lib_premitives/specs"
+    REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
+set(PRIMITIVES_PATH ${PREMITIVES_DIR})
+add_definitions(-DPRIMITIVES_PATH="${PRIMITIVES_PATH}")
+
 if (NOT RAPTOR AND NOT YOSYS_VERIFIC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(${VERIFIC_HOME} "verific_rs")
 endif()
@@ -97,6 +102,7 @@ include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${FLEX_LM_SRC_DIR}/machind
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune
                             ${CMAKE_CURRENT_BINARY_DIR}/include
+                            ../../libs/external/ryml/
 )
 
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)

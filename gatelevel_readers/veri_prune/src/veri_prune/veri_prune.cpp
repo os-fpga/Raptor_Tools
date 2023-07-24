@@ -37,7 +37,11 @@
 #include "VeriConstVal.h"   // Definitions of all constant expression tree nodes
 #include "VeriScope.h"      // Symbol table of locally declared identifiers
 #include "Strings.h"        // Definition of class to manipulate copy, concatenate, create etc...
-#include "veri_prune.h" 
+#include "veri_prune.h"
+#include <filesystem>
+#include <dirent.h> 
+#define RYML_SINGLE_HDR_DEFINE_NOW
+#include "read_yaml.h"
 
 #define VERI_INOUT 329
 #define VERI_INPUT 330
@@ -52,6 +56,69 @@
 #ifdef VERIFIC_NAMESPACE
 using namespace Verific ;
 #endif
+
+std::vector<char> readFile(const std::string& filename) {
+    std::ifstream file(filename, std::ios::binary);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return std::vector<char>(); // Return an empty vector on error
+    }
+
+    // Get the length of the file
+    file.seekg(0, std::ios::end);
+    unsigned fileSize = static_cast<unsigned>(file.tellg());
+    file.seekg(0, std::ios::beg);
+
+    // Handle the case where the file size is 0
+    if (fileSize == 0) {
+        std::cerr << "Empty file: " << filename << std::endl;
+        return std::vector<char>();
+    }
+
+    // Read the file content into a vector
+    std::vector<char> content(fileSize);
+    file.read(content.data(), fileSize);
+    file.close();
+
+    return content;
+}
+
+int get_gb_data() {
+    const std::string folderPath = PRIMITIVES_PATH;
+
+    DIR* directory = opendir(folderPath.c_str());
+    if (!directory) {
+        std::cerr << "Error opening directory: " << folderPath << std::endl;
+        return 1;
+    }
+
+    // Read files from the directory
+    struct dirent* entry;
+    while ((entry = readdir(directory)) != nullptr) {
+        if (entry->d_type == DT_REG) {
+            std::map<std::string, int> port_info;
+            std::pair<std::string, std::map<std::string, int>> module_info;
+            std::string filename = folderPath + "/" + entry->d_name;
+            std::cout << "FILE : " << filename << std::endl;
+            std::vector<char> fileContent = readFile(filename);
+            if (!fileContent.empty()) {
+                char* contentArray = new char[fileContent.size()];
+                std::copy(fileContent.begin(), fileContent.end(), contentArray);
+                ryml::Tree tree = ryml::parse_in_place(contentArray);
+                ryml::ConstNodeRef root = tree.rootref();
+                if(root.is_map()) {
+                    //std::string name (tree["name"]).str();
+                    std::cout << "Found the data to be parsed" << std::endl;
+                }
+                // Process the parsed data as needed
+                delete[] contentArray; // Remember to deallocate the memory
+            }
+        }
+    }
+
+    closedir(directory);
+    return 0;
+}
 
 void keep_nets (VeriModule *mod, std::unordered_set<std::string> io_intf, gb_constructs &gb, std::vector<std::string> &remove_nets)
 {
@@ -248,6 +315,8 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
     Message::SetMessageType("VERI-2541", VERIFIC_IGNORE);
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
+
+    get_gb_data () ;
 
     // Get all the top level modules
     Array *all_top_modules = veri_file::GetTopModules() ;
