@@ -107,8 +107,30 @@ int get_gb_data() {
                 ryml::Tree tree = ryml::parse_in_place(contentArray);
                 ryml::ConstNodeRef root = tree.rootref();
                 if(root.is_map()) {
-                    //std::string name (tree["name"]).str();
-                    std::cout << "Found the data to be parsed" << std::endl;
+                    c4::csubstr  category_(tree["category"].val());
+                    std::string category(category_.data(), category_.size());
+                    std::string periphery = "periphery";
+                    if (category == periphery) {
+                        c4::csubstr  name_(tree["name"].val());
+                        std::string name(name_.data(), name_.size());
+                        if (tree["ports"].is_map()) {
+                            for(const auto &child : tree["ports"].children()) {
+                                if(child.is_seq()) {
+                                    std::cout << "Child is a sequence " << std::endl;
+                                } else if(child.is_map()) {
+                                    c4::csubstr  port_name_(child.key());
+                                    std::string port_name(port_name_.data(), port_name_.size());
+                                    std::cout << "PORT NAME IS : " << port_name << std::endl;
+                                    c4::csubstr  dir_(child[0].val());
+                                    std::string dir(dir_.data(), dir_.size());
+                                    std::cout << "PORT DIR IS : " << dir << std::endl;
+                                    c4::csubstr  desc_(child[1].val());
+                                    std::string desc(desc_.data(), desc_.size());
+                                    std::cout << "PORT description IS : " << desc << std::endl;
+                                }
+                            }
+                        }
+                    }
                 }
                 // Process the parsed data as needed
                 delete[] contentArray; // Remember to deallocate the memory
