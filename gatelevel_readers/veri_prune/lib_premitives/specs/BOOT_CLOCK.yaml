@@ -47,18 +47,21 @@ name: BOOT_CLOCK
 desc: Internal BOOT_CLK connection
 detailed_desc: Allows connection of BOOT_CLK to any PLL or directly drive clock tree
 category: periphery
-
 ports:
-   O:
-     dir: output
-     desc: Clock output
-     detailed_desc: BOOT_CLK output.  Connect this clock source to a PLL CLK_IN input or clocking network.
-
+  O:
+    dir: output
+    desc: Clock output
+    detailed_desc: >-
+      BOOT_CLK output.  Connect this clock source to a PLL CLK_IN input or
+      clocking network.
 parameters:
-    PERIOD:
-      desc: Clock period for simulation purposes (nS)
-      detailed_desc: Specification of the clock period for clock generation during simulation.  This shoudl generally be 25 nS (40 MHaz)
-      range: 16.0 .. 30.0
-      default: 25.0
-      type: real
+  PERIOD:
+    desc: Clock period for simulation purposes (nS)
+    detailed_desc: >-
+      Specification of the clock period for clock generation during simulation. 
+      This shoudl generally be 25 nS (40 MHaz)
+    range: 16.0 .. 30.0
+    default: 25
+    type: real
+
       
