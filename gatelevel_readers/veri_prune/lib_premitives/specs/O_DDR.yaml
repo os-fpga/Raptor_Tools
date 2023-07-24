@@ -45,20 +45,20 @@
 # primitive name should match the filename root.
 name: O_DDR
 desc: DDR output register
-
+category: periphery
 ports:
-   D[1:0]:
-     dir: input
-     desc: Data input
-   R:
-     dir: input
-     desc: Active-low asynchrnous reset
-   E:
-     dir: input
-     desc: Active-high enable
-   C:
-     dir: input
-     desc: Clock
-   Q:
-     dir: output
-     desc: Data output (connect to output port, buffer or O_DELAY)
+  'D[1:0]':
+    dir: input
+    desc: Data input
+  R:
+    dir: input
+    desc: Active-low asynchrnous reset
+  E:
+    dir: input
+    desc: Active-high enable
+  C:
+    dir: input
+    desc: Clock
+  Q:
+    dir: output
+    desc: 'Data output (connect to output port, buffer or O_DELAY)'
