@@ -13,11 +13,21 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif(NOT CMAKE_BUILD_TYPE)
 
+if(NOT IN_RELEASE_DATE)
+    set(IN_RELEASE_DATE "Empty")
+endif()
 # Get the current date and time as a string
 string(TIMESTAMP CURRENT_DATE "%Y-%m-%d" UTC)
-# Extract the year, month, and day components in required format
-string(SUBSTRING "${CURRENT_DATE}" 0 4 RELEASE_YEAR)
-string(SUBSTRING "${CURRENT_DATE}" 5 2 RELEASE_MONTH)
+# Raptor Install Path,
+if(IN_RELEASE_DATE STREQUAL "Empty")
+    # Extract the year, month, and day components in required format
+    string(SUBSTRING "${CURRENT_DATE}" 0 4 RELEASE_YEAR)
+    string(SUBSTRING "${CURRENT_DATE}" 5 2 RELEASE_MONTH)
+else()
+    string(SUBSTRING "${IN_RELEASE_DATE}" 0 4 RELEASE_YEAR)
+    string(SUBSTRING "${IN_RELEASE_DATE}" 5 2 RELEASE_MONTH)
+endif()
+
 string(SUBSTRING "${CURRENT_DATE}" 8 2 RELEASE_DAY)
 
 project(RaptorInstaller DESCRIPTION "Raptor installer")
