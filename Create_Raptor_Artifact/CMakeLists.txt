@@ -13,9 +13,12 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif(NOT CMAKE_BUILD_TYPE)
 
-set(RELEASE_YEAR 2023)
-set(RELEASE_MONTH 04)
-set(RELEASE_DAY 23)
+# Get the current date and time as a string
+string(TIMESTAMP CURRENT_DATE "%Y-%m-%d" UTC)
+# Extract the year, month, and day components in required format
+string(SUBSTRING "${CURRENT_DATE}" 0 4 RELEASE_YEAR)
+string(SUBSTRING "${CURRENT_DATE}" 5 2 RELEASE_MONTH)
+string(SUBSTRING "${CURRENT_DATE}" 8 2 RELEASE_DAY)
 
 project(RaptorInstaller DESCRIPTION "Raptor installer")
 
