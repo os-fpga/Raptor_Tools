@@ -98,11 +98,11 @@ extract_dir=$(pwd)
 tar -xzf inst_libs.tar.gz -C $extract_dir && export LD_LIBRARY_PATH=$extract_dir/inst_libs:$LD_LIBRARY_PATH
 
 # install from QtIFW generated .run file
-t_path="RaptorInstaller*.run"
+t_path="RaptorInstaller*.run"  
 if [ $go_batch == "no" ] 
 then
     echo -e "[INFO]\tRunning in GUI mode"
-    ./$t_path
+    ./$t_path  > /dev/null
     exit
 fi
 
