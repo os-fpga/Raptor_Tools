@@ -46,7 +46,6 @@
 name: O_BUFT_DS
 desc: Output differential tri-state buffer
 category: periphery
-
 ports:
    I:
      dir: input
@@ -60,7 +59,6 @@ ports:
    O_N:
      dir: output
      desc: Data negative output (connect to top-level port)
-
 parameters:
    WEAK_KEEPER:
       desc: Enable pull-up/pull-down on output (NONE/PULLUP/PULLDOWN)
@@ -69,7 +67,6 @@ parameters:
         - NONE
         - PULLUP
         - PULLDOWN
-
 # set in SDC or by synthesis attribute      
 properties:
     IOSTANDARD:
