@@ -100,9 +100,9 @@ int get_gb_data(gb_constructs &gb) {
             std::cout << "FILE : " << filename << std::endl;
             std::vector<char> fileContent = readFile(filename);
             if (!fileContent.empty()) {
-                char* contentArray = new char[fileContent.size()];
-                std::copy(fileContent.begin(), fileContent.end(), contentArray);
-                ryml::Tree tree = ryml::parse_in_place(contentArray);
+                gb.contentArray = std::make_unique<char[]>(fileContent.size() + 1);
+                std::copy(fileContent.begin(), fileContent.end(), gb.contentArray.get());
+                ryml::Tree tree = ryml::parse_in_place(gb.contentArray.get());
                 ryml::ConstNodeRef root = tree.rootref();
                 if(root.is_map()) {
                     c4::csubstr  category_(tree["category"].val());
@@ -125,7 +125,6 @@ int get_gb_data(gb_constructs &gb) {
                                     std::string dir(dir_.data(), dir_.size());
                                     c4::csubstr  desc_(child[1].val());
                                     std::string desc(desc_.data(), desc_.size());
-                                    std::cout << "DESC is " << desc << std::endl;
                                     if (dir == "input") {
                                         direction = IN_DIR;
                                         if (desc == "Clock input") direction = IN_CLK;
@@ -151,7 +150,7 @@ int get_gb_data(gb_constructs &gb) {
                     }
                 }
                 // Process the parsed data as needed
-                delete[] contentArray; // Remember to deallocate the memory
+                //delete[] contentArray; // Remember to deallocate the memory
             }
         }
     }
