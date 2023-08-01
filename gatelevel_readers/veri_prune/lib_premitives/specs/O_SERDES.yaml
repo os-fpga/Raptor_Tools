@@ -48,7 +48,7 @@ desc: Output Serializer
 category: periphery
 
 ports:
-   D[WIDTH-1:0]:
+   D:
      dir: input
      desc: D input bus
    RST:
@@ -68,7 +68,7 @@ ports:
      desc:  Clock input
    CLK_OUT:
      dir: output
-     desc: Clock output
+     desc: output
    Q:
      dir: output
      desc: Data output (Connect to output port, buffer or O_DELAY)
@@ -84,6 +84,21 @@ ports:
    PLL_FAST_CLK:
      dir: input
      desc: PLL fast clock input
+   FAST_PHASE_CLK:
+     dir: input
+     desc: 
+   DLY_LOAD:
+     dir: input
+     desc: 
+   DLY_ADJ:
+     dir: input
+     desc: 
+   DLY_INCDEC:
+     dir: input
+     desc: 
+   DLY_TAP_VALUE:
+     dir: output
+     desc: 
 
 # set as Verilog parameter in netlist    
 parameters:

@@ -57,6 +57,18 @@ ports:
    FIFO_RST:
      dir: input
      desc: FIFO reset
+   DLY_LOAD:
+     dir: input
+     desc: 
+   DLY_ADJ:
+     dir: input
+     desc: 
+   DLY_TAP_VALUE:
+     dir: output
+     desc: 
+   DLY_INCDEC:
+     dir: input
+     desc: 
    BITSLIP_ADJ:
      dir: input
      desc: BITSLIP_ADJ input
@@ -65,10 +77,13 @@ ports:
      desc: EN input
    CLK_IN: 
      dir: input
-     desc:  CLK_IN input
+     desc:  Clock input
    CLK_OUT:
      dir: output
-     desc: CLK_OUT output
+     desc: output
+   CDR_CORE_CLK:
+     dir: output
+     desc: 
    Q:
      dir: output
      desc: data output
@@ -81,12 +96,18 @@ ports:
    DPA_ERROR:
      dir: output
      desc: DPA_ERROR output
+   DPA_RST:
+     dir:  input
+     desc: DPA re-set
    PLL_LOCK:
      dir: input
      desc: PLL lock input
    PLL_FAST_CLK:
      dir: input
      desc: PLL fast clock input
+   FAST_PHASE_CLK:
+     dir: input
+     desc: 
 
 # set as Verilog parameter in netlist    
 parameters:
