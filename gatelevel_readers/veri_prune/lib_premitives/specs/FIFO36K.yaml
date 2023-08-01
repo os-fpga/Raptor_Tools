@@ -43,53 +43,74 @@
 #          - <enum_name>
 #
 # primitive name should match the filename root.
-name: SOC_FPGA_INTF_AHB_S
-desc: SOC interface connection AHB Slave
-category: periphery
+name: FIFO36K
+desc: 36Kb FIFO
+category: core_fabric
 
 ports:
-   S0_HRESETN_I:
-     dir: output
-     desc: 
-   S0_HADDR:
-     dir: output
-     desc: 
-   S0_HBURST:
-     dir: output
-     desc: 
-   S0_HMASTLOCK:
-     dir: output
-     desc: 
-   S0_HREADY:
+   RESET:
      dir: input
-     desc: 
-   S0_HPROT:
-     dir: output
-     desc: 
-   S0_HRDATA:
+     desc: Asynchrnous FIFO reset
+   WR_CLK:
      dir: input
-     desc: 
-   S0_HRESP:
+     desc: Write clock
+   RD_CLK:
      dir: input
-     desc: 
-   S0_HSEL:
-     dir: output
-     desc: 
-   S0_HSIZE:
-     dir: output
-     desc: 
-   S0_HTRANS:
-     dir: output
-     desc: 
-   S0_HWBE:
-     dir: output
-     desc: 
-   S0_HWDATA:
-     dir: output
-     desc: 
-   S0_HWRITE:
-     dir: output
-     desc: 
-   S0_HCLK:
+     desc: Read clock
+   WR_EN:
      dir: input
-     desc: 
+     desc: Write enable
+   RD_EN:
+     dir: input
+     desc: Read enable
+   WR_DATA:
+     dir: input
+     desc: Write data
+   RD_DATA:
+     dir: output
+     desc: Read data
+   EMPTY:
+     dir: output
+     desc: FIFO empty flag
+   FULL:
+     dir: output
+     desc: FIFO full flag
+   ALMOST_EMPTY:
+     dir: output
+     desc: FIFO almost empty flag
+   ALMOST_FULL:
+     dir: output
+     desc: FIFO almost full flag
+   PROG_EMPTY:
+     dir: output
+     desc: FIFO programmable empty flag
+   PROG_FULL:
+     dir: output
+     desc: FIFO programmable full flag
+   OVERFLOW:
+     dir: output
+     desc: FIFO overflow error flag
+   UNDERFLOW:
+     dir: output
+     desc: FIFO underflow error flag
+
+parameters:
+    DATA_WIDTH:
+      desc: FIFO data width (1-36)
+      type: integer
+      default: 36
+      range: 1 .. 36
+    FIFO_TYPE:
+      desc: Synchronous or Asynchronous data transfer (SYNCHRONOUS/ASYNCHRONOUS)
+      default: SYNCHRONOUS
+      values:
+        - SYNCHRONOUS
+        - ASYNCHRONOUS
+    PROG_EMPTY_THRESH:
+      desc: 12-bit Programmable empty depth
+      default: 12'h004
+      vector: 12
+    PROG_FULL_THRESH:
+      desc: 12-bit Programmable full depth
+      default: 12'hffa
+      vector: 12

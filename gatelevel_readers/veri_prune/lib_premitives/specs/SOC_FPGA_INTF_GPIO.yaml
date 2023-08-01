@@ -47,22 +47,23 @@ name: SOC_FPGA_INTF_GPIO
 desc: SOC GPIO connection
 detailed_desc: Allows use of SOC I/O as general purpose I/O from the FPGA
 category: periphery
+
 ports:
-  GPIO:
-    dir: inout
-    desc: GPIO
-  GPIO_I:
-    dir: output
-    desc: GPIO input
-  GPIO_O:
-    dir: input
-    desc: GPIO output
-  GPIO_T:
-    dir: input
-    desc: GPIO tri-state enable
-  GPIO_CLK:
-    dir: input
-    desc: GPIO clock
-  GPIO_RST_N:
-    dir: input
-    desc: GPIO reset
+   GPIO:
+     dir: inout
+     desc: GPIO (connect to top-level ports)
+   GPIO_I:
+     dir: output
+     desc: GPIO input
+   GPIO_O:
+     dir: input
+     desc: GPIO output
+   GPIO_T:
+     dir: input
+     desc: GPIO tri-state enable
+   GPIO_CLK:
+     dir: input
+     desc: GPIO clock
+   GPIO_RST_N:
+     dir: input
+     desc: GPIO reset

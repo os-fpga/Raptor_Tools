@@ -43,21 +43,25 @@
 #          - <enum_name>
 #
 # primitive name should match the filename root.
-name: SOC_FPGA_INTF_DMA
-desc: SOC DMA interface
-category: periphery
+name: DFFRE
+desc: D flipflop with async reset and enable
+category: core_fabric
 
 ports:
-   DMA_REQ:
+   D:
      dir: input
-     desc: DMA request
-   DMA_ACK:
+     desc: Data Input
+   R:
+     dir:  input
+     desc: Active-low, asynchronous reset
+   E:
+     dir:  input
+     desc: Active-high enable
+   C:
+     dir:  input
+     desc: Clock
+   Q:
      dir: output
-     desc: DMA acknowledge
-   DMA_CLK:
-     dir: input
-     desc: DMA clock
-   DMA_RST_N:
-     dir: input
-     desc: DMA reset
-
+     desc: Data Output
+     type: reg
+     default: 1'b0

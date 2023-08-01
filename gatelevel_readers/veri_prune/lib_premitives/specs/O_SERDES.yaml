@@ -46,61 +46,64 @@
 name: O_SERDES
 desc: Output Serializer
 category: periphery
+
 ports:
-  'D[WIDTH-1:0]':
-    dir: input
-    desc: D input bus
-  RST:
-    dir: input
-    desc: 'Active-low, asynchrnous reset'
-  LOAD_WORD:
-    dir: input
-    desc: Load word input
-  OE:
-    dir: input
-    desc: Output enable
-  CLK_EN:
-    dir: input
-    desc: Clock enable input
-  CLK_IN:
-    dir: input
-    desc: Clock input
-  CLK_OUT:
-    dir: output
-    desc: Clock output
-  Q:
-    dir: output
-    desc: 'Data output (Connect to output port, buffer or O_DELAY)'
-  CHANNEL_BOND_SYNC_IN:
-    dir: input
-    desc: Channel bond sync input
-  CHANNEL_BOND_SYNC_OUT:
-    dir: output
-    desc: channel bond sync output
-  PLL_LOCK:
-    dir: input
-    desc: PLL lock input
-  PLL_FAST_CLK:
-    dir: input
-    desc: PLL fast clock input
+   D[WIDTH-1:0]:
+     dir: input
+     desc: D input bus
+   RST:
+     dir: input
+     desc: Active-low, asynchrnous reset
+   LOAD_WORD:
+     dir: input
+     desc: Load word input
+   OE:
+     dir: input
+     desc: Output enable
+   CLK_EN:
+     dir: input
+     desc: Clock enable input
+   CLK_IN: 
+     dir: input
+     desc:  Clock input
+   CLK_OUT:
+     dir: output
+     desc: Clock output
+   Q:
+     dir: output
+     desc: Data output (Connect to output port, buffer or O_DELAY)
+   CHANNEL_BOND_SYNC_IN:
+     dir: input
+     desc: Channel bond sync input
+   CHANNEL_BOND_SYNC_OUT:
+     dir: output
+     desc: channel bond sync output
+   PLL_LOCK:
+     dir: input
+     desc: PLL lock input
+   PLL_FAST_CLK:
+     dir: input
+     desc: PLL fast clock input
+
+# set as Verilog parameter in netlist    
 parameters:
-  DATA_RATE:
-    desc: Single or double data rate
-    default: SDR
-    values:
-      - SDR
-      - DDR
-  WIDTH:
-    desc: Width of input data to serializer
-    type: integer
-    default: 4
-    range: 3 .. 10
-  CLOCK_PHASE:
-    desc: Clock phase
-    type: integer
-    default: 0
-    values:
-      - 0
-      - 90
-      - 180
-      - 270
+    DATA_RATE:
+      desc: Single or double data rate
+      default: SDR
+      values:
+         - SDR
+         - DDR
+    WIDTH:
+      desc: Width of input data to serializer
+      type: integer
+      default: 4
+      range: 3 .. 10
+    CLOCK_PHASE:
+      desc: Clock phase
+      type: integer
+      default: 0
+      values:
+        - 0
+        - 90
+        - 180
+        - 270

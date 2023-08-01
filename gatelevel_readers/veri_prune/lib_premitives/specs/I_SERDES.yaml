@@ -46,62 +46,65 @@
 name: I_SERDES
 desc: Input Serial Deserializer
 category: periphery
+
 ports:
-  D:
-    dir: input
-    desc: Data input
-  RST:
-    dir: input
-    desc: Active-low asycnhrnous reset
-  FIFO_RST:
-    dir: input
-    desc: FIFO reset
-  BITSLIP_ADJ:
-    dir: input
-    desc: BITSLIP_ADJ input
-  EN:
-    dir: input
-    desc: EN input
-  CLK_IN:
-    dir: input
-    desc: CLK_IN input
-  CLK_OUT:
-    dir: output
-    desc: CLK_OUT output
-  Q:
-    dir: output
-    desc: data output
-  DATA_VALID:
-    dir: output
-    desc: DATA_VALID output
-  DPA_LOCK:
-    dir: output
-    desc: DPA_LOCK output
-  DPA_ERROR:
-    dir: output
-    desc: DPA_ERROR output
-  PLL_LOCK:
-    dir: input
-    desc: PLL lock input
-  PLL_FAST_CLK:
-    dir: input
-    desc: PLL fast clock input
+   D:
+     dir: input
+     desc: Data input (connect to input port, buffer or I_DELAY)
+   RST:
+     dir:  input
+     desc: Active-low asycnhrnous reset
+   FIFO_RST:
+     dir: input
+     desc: FIFO reset
+   BITSLIP_ADJ:
+     dir: input
+     desc: BITSLIP_ADJ input
+   EN:
+     dir: input
+     desc: EN input
+   CLK_IN: 
+     dir: input
+     desc:  CLK_IN input
+   CLK_OUT:
+     dir: output
+     desc: CLK_OUT output
+   Q:
+     dir: output
+     desc: data output
+   DATA_VALID:
+     dir: output
+     desc: DATA_VALID output
+   DPA_LOCK:
+     dir: output
+     desc: DPA_LOCK output
+   DPA_ERROR:
+     dir: output
+     desc: DPA_ERROR output
+   PLL_LOCK:
+     dir: input
+     desc: PLL lock input
+   PLL_FAST_CLK:
+     dir: input
+     desc: PLL fast clock input
+
+# set as Verilog parameter in netlist    
 parameters:
-  DATA_RATE:
-    desc: Single or double data rate
-    default: SDR
-    values:
-      - SDR
-      - DDR
-  WIDTH:
-    desc: Width of Deserialization (3-10)
-    type: integer
-    default: 4
-    range: 3 .. 10
-  DPA_MODE:
-    desc: Select Dynamic Phase Alignment or Clock Data Recovery (NONE/DPA/CDR)
-    default: NONE
-    values:
-      - NONE
-      - DPA
-      - CDR
+    DATA_RATE:
+      desc: Single or double data rate
+      default: SDR
+      values:
+         - SDR
+         - DDR
+    WIDTH:
+      desc: Width of Deserialization (3-10)
+      type: integer
+      default: 4
+      range: 3 .. 10
+    DPA_MODE:
+      desc: Select Dynamic Phase Alignment or Clock Data Recovery (NONE/DPA/CDR) 
+      default: NONE
+      values:
+        - NONE
+        - DPA
+        - CDR

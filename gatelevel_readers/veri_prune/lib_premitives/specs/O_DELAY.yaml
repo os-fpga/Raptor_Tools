@@ -68,6 +68,10 @@ ports:
      dir: output
      desc: Delay tap value output
      detailed_desc: Provides the current value of the tap delay.
+   CLK_IN:
+     dir: input
+     desc: Clock input
+     detailed_desc:  Clock input to component
    O:
      dir: output
      desc: Data output
@@ -76,7 +80,7 @@ ports:
 # set as Verilog parameter in netlist    
 parameters:
     DELAY:
-      desc: TAP delay value
+      desc: TAP delay value (0-63)
       detailed_desc: Specifies initial TAP as well as the TAP value used when DLY_LOAD is asserted.
       type: integer
       default: 0

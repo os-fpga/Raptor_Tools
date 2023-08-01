@@ -45,20 +45,21 @@
 # primitive name should match the filename root.
 name: I_DDR
 desc: DDR input register
-category: periphery
+
 ports:
-  D:
-    dir: input
-    desc: Data input
-  R:
-    dir: input
-    desc: Active-low asynchrnous reset
-  E:
-    dir: input
-    desc: Active-high enable
-  C:
-    dir: input
-    desc: Clock input
-  Q:
-    dir: output
-    desc: Data output
+   D:
+     dir: input
+     desc: Data input (connect to input port, buffer or I_DELAY)
+   R:
+     dir: input
+     desc: Active-low asynchrnous reset
+   E:
+     dir: input
+     desc: Active-high enable
+   C:
+     dir: input
+     desc: Clock input
+   Q:
+     dir: output
+     desc: Data output
+  

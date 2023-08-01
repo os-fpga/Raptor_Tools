@@ -43,21 +43,20 @@
 #          - <enum_name>
 #
 # primitive name should match the filename root.
-name: SOC_FPGA_INTF_DMA
-desc: SOC DMA interface
-category: periphery
+name: LUT4
+desc: 4-input lookup table (LUT)
+category: core_fabric
 
 ports:
-   DMA_REQ:
+   A[3:0]:
      dir: input
-     desc: DMA request
-   DMA_ACK:
+     desc: Data Input
+   Y:
      dir: output
-     desc: DMA acknowledge
-   DMA_CLK:
-     dir: input
-     desc: DMA clock
-   DMA_RST_N:
-     dir: input
-     desc: DMA reset
+     desc: Data Output
 
+parameters:
+    INIT_VALUE:
+      desc: 16-bit LUT logic value
+      default: 16'h0000
+      vector: 16

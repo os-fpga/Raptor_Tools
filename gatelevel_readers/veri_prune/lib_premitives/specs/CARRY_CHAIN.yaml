@@ -43,21 +43,23 @@
 #          - <enum_name>
 #
 # primitive name should match the filename root.
-name: SOC_FPGA_INTF_DMA
-desc: SOC DMA interface
-category: periphery
+name: CARRY_CHAIN
+desc: FLE carry logic
+category: core_fabric
 
 ports:
-   DMA_REQ:
+   P:
      dir: input
-     desc: DMA request
-   DMA_ACK:
+     desc: Partial data input
+   G:
+     dir: input
+     desc: Partial data input
+   CIN:
+     dir: input
+     desc: Carry in
+   O:
      dir: output
-     desc: DMA acknowledge
-   DMA_CLK:
-     dir: input
-     desc: DMA clock
-   DMA_RST_N:
-     dir: input
-     desc: DMA reset
-
+     desc: Data Output
+   COUT:
+     dir: output
+     desc: Carry out

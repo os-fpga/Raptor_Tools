@@ -46,115 +46,116 @@
 name: SOC_FPGA_INTF_AXI_M1
 desc: SOC interface connection AXI Master 1
 category: periphery
+
 ports:
-  M1_ARADDR:
-    dir: input
-    desc: null
-  M1_ARBURST:
-    dir: input
-    desc: null
-  M1_ARCACHE:
-    dir: input
-    desc: null
-  M1_ARID:
-    dir: input
-    desc: null
-  M1_ARLEN:
-    dir: input
-    desc: null
-  M1_ARLOCK:
-    dir: input
-    desc: null
-  M1_ARPROT:
-    dir: input
-    desc: null
-  M1_ARREADY:
-    dir: output
-    desc: null
-  M1_ARSIZE:
-    dir: input
-    desc: null
-  M1_ARVALID:
-    dir: input
-    desc: null
-  M1_AWADDR:
-    dir: input
-    desc: null
-  M1_AWBURST:
-    dir: input
-    desc: null
-  M1_AWCACHE:
-    dir: input
-    desc: null
-  M1_AWID:
-    dir: input
-    desc: null
-  M1_AWLEN:
-    dir: input
-    desc: null
-  M1_AWLOCK:
-    dir: input
-    desc: null
-  M1_AWPROT:
-    dir: input
-    desc: null
-  M1_AWREADY:
-    dir: output
-    desc: null
-  M1_AWSIZE:
-    dir: input
-    desc: null
-  M1_AWVALID:
-    dir: input
-    desc: null
-  M1_BID:
-    dir: output
-    desc: null
-  M1_BREADY:
-    dir: input
-    desc: null
-  M1_BRESP:
-    dir: output
-    desc: null
-  M1_BVALID:
-    dir: output
-    desc: null
-  M1_RDATA:
-    dir: output
-    desc: null
-  M1_RID:
-    dir: output
-    desc: null
-  M1_RLAST:
-    dir: output
-    desc: null
-  M1_RREADY:
-    dir: input
-    desc: null
-  M1_RRESP:
-    dir: output
-    desc: null
-  M1_RVALID:
-    dir: output
-    desc: null
-  M1_WDATA:
-    dir: input
-    desc: null
-  M1_WLAST:
-    dir: input
-    desc: null
-  M1_WREADY:
-    dir: output
-    desc: null
-  M1_WSTRB:
-    dir: input
-    desc: null
-  M1_WVALID:
-    dir: input
-    desc: null
-  M1_ACLK:
-    dir: input
-    desc: null
-  M1_ARESETN_I:
-    dir: output
-    desc: null
+   M1_ARADDR:
+     dir: input
+     desc: 
+   M1_ARBURST:
+     dir: input
+     desc: 
+   M1_ARCACHE:
+     dir: input
+     desc: 
+   M1_ARID:
+     dir: input
+     desc: 
+   M1_ARLEN:
+     dir: input
+     desc: 
+   M1_ARLOCK:
+     dir: input
+     desc: 
+   M1_ARPROT:
+     dir: input
+     desc: 
+   M1_ARREADY:
+     dir: output
+     desc: 
+   M1_ARSIZE:
+     dir: input
+     desc: 
+   M1_ARVALID:
+     dir: input
+     desc: 
+   M1_AWADDR:
+     dir: input
+     desc: 
+   M1_AWBURST:
+     dir: input
+     desc: 
+   M1_AWCACHE:
+     dir: input
+     desc: 
+   M1_AWID:
+     dir: input
+     desc: 
+   M1_AWLEN:
+     dir: input
+     desc: 
+   M1_AWLOCK:
+     dir: input
+     desc: 
+   M1_AWPROT:
+     dir: input
+     desc: 
+   M1_AWREADY:
+     dir: output
+     desc: 
+   M1_AWSIZE:
+     dir: input
+     desc: 
+   M1_AWVALID:
+     dir: input
+     desc: 
+   M1_BID:
+     dir: output
+     desc: 
+   M1_BREADY:
+     dir: input
+     desc: 
+   M1_BRESP:
+     dir: output
+     desc: 
+   M1_BVALID:
+     dir: output
+     desc: 
+   M1_RDATA:
+     dir: output
+     desc: 
+   M1_RID:
+     dir: output
+     desc: 
+   M1_RLAST:
+     dir: output
+     desc: 
+   M1_RREADY:
+     dir: input
+     desc: 
+   M1_RRESP:
+     dir: output
+     desc: 
+   M1_RVALID:
+     dir: output
+     desc: 
+   M1_WDATA:
+     dir: input
+     desc: 
+   M1_WLAST:
+     dir: input
+     desc: 
+   M1_WREADY:
+     dir: output
+     desc: 
+   M1_WSTRB:
+     dir: input
+     desc: 
+   M1_WVALID:
+     dir: input
+     desc: 
+   M1_ACLK:
+     dir: input
+     desc: 
+   M1_ARESETN_I:
+     dir: output
+     desc: 

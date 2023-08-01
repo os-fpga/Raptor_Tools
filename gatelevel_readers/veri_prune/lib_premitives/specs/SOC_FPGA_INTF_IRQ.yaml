@@ -46,16 +46,17 @@
 name: SOC_FPGA_INTF_IRQ
 desc: SOC Interupt connection
 category: periphery
+
 ports:
-  IRQ_SRC:
-    dir: input
-    desc: Interupt source
-  IRQ_SET:
-    dir: output
-    desc: Interupt set
-  IRQ_CLK:
-    dir: input
-    desc: interupt clock
-  IRQ_RST_N:
-    dir: input
-    desc: Interupt reset
+   IRQ_SRC:
+     dir: input
+     desc: Interupt source
+   IRQ_SET:
+     dir: output
+     desc: Interupt set
+   IRQ_CLK:
+     dir: input
+     desc: interupt clock
+   IRQ_RST_N:
+     dir: input
+     desc: Interupt reset

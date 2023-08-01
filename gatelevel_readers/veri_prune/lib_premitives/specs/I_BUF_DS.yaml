@@ -59,6 +59,7 @@ ports:
      desc: Enable the input
    O:
      dir: output
+     type: reg
      desc: Data output
   
 
