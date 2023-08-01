@@ -57,6 +57,56 @@
 using namespace Verific ;
 #endif
 
+std::string getDirectionName(int direction) {
+    static const std::unordered_map<int, std::string> directionNames = {
+        {IN_DIR, "IN_DIR"},
+        {OUT_DIR, "OUT_DIR"},
+        {INOUT_DIR, "INOUT_DIR"},
+        {OUT_CLK, "OUT_CLK"},
+        {IN_CLK, "IN_CLK"},
+        {IN_RESET, "IN_RESET"}
+    };
+
+    auto it = directionNames.find(direction);
+    return (it != directionNames.end()) ? it->second : "UNKNOWN";
+}
+
+int write_map(gb_constructs &gb) {
+    // ... (unchanged)
+
+    // Create a new file to write the gb_mods data
+    std::ofstream outputFile("gb_mods_data.h");
+    if (!outputFile.is_open()) {
+        std::cerr << "Error opening output file for writing." << std::endl;
+        return 1;
+    }
+
+    outputFile << "#ifndef GB_MODS_DATA_H" << std::endl;
+    outputFile << "#define GB_MODS_DATA_H" << std::endl << std::endl;
+
+    outputFile << "struct gb_constructs_data {" << std::endl;
+    outputFile << "    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {" << std::endl;
+
+    for (const auto& module_info : gb.gb_mods) {
+        outputFile << "        { \"" << module_info.first << "\", {" << std::endl;
+        for (const auto& port_info : module_info.second) {
+            outputFile << "            { \"" << port_info.first << "\", " << getDirectionName(port_info.second) << " }," << std::endl;
+        }
+        outputFile << "        } }," << std::endl;
+    }
+
+    outputFile << "    };" << std::endl;
+    outputFile << "};" << std::endl << std::endl;
+
+    outputFile << "#endif // GB_MODS_DATA_H" << std::endl;
+
+    outputFile.close();
+
+    // ... (unchanged)
+
+    return 0;
+}
+
 std::vector<char> readFile(const std::string& filename) {
     std::ifstream file(filename, std::ios::binary);
     if (!file.is_open()) {
@@ -156,6 +206,7 @@ int get_gb_data(gb_constructs &gb) {
     }
 
     closedir(directory);
+    write_map(gb);
     return 0;
 }
 
