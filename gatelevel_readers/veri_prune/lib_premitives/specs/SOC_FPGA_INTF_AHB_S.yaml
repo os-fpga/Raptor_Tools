@@ -46,7 +46,6 @@
 name: SOC_FPGA_INTF_AHB_S
 desc: SOC interface connection AHB Slave
 category: periphery
-
 ports:
    S0_HRESETN_I:
      dir: output
@@ -92,4 +91,4 @@ ports:
      desc: 
    S0_HCLK:
      dir: input
-     desc:
+     desc: 

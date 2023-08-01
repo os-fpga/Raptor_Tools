@@ -83,7 +83,7 @@ std::vector<char> readFile(const std::string& filename) {
     return content;
 }
 
-int get_gb_data() {
+int get_gb_data(gb_constructs &gb) {
     const std::string folderPath = PRIMITIVES_PATH;
 
     DIR* directory = opendir(folderPath.c_str());
@@ -96,8 +96,6 @@ int get_gb_data() {
     struct dirent* entry;
     while ((entry = readdir(directory)) != nullptr) {
         if (entry->d_type == DT_REG) {
-            std::map<std::string, int> port_info;
-            std::pair<std::string, std::map<std::string, int>> module_info;
             std::string filename = folderPath + "/" + entry->d_name;
             std::cout << "FILE : " << filename << std::endl;
             std::vector<char> fileContent = readFile(filename);
@@ -111,6 +109,8 @@ int get_gb_data() {
                     std::string category(category_.data(), category_.size());
                     std::string periphery = "periphery";
                     if (category == periphery) {
+                        std::map<std::string, int> port_info;
+                        std::pair<std::string, std::map<std::string, int>> module_info;
                         c4::csubstr  name_(tree["name"].val());
                         std::string name(name_.data(), name_.size());
                         if (tree["ports"].is_map()) {
@@ -118,18 +118,36 @@ int get_gb_data() {
                                 if(child.is_seq()) {
                                     std::cout << "Child is a sequence " << std::endl;
                                 } else if(child.is_map()) {
+                                    int direction;
                                     c4::csubstr  port_name_(child.key());
                                     std::string port_name(port_name_.data(), port_name_.size());
-                                    std::cout << "PORT NAME IS : " << port_name << std::endl;
                                     c4::csubstr  dir_(child[0].val());
                                     std::string dir(dir_.data(), dir_.size());
-                                    std::cout << "PORT DIR IS : " << dir << std::endl;
                                     c4::csubstr  desc_(child[1].val());
                                     std::string desc(desc_.data(), desc_.size());
-                                    std::cout << "PORT description IS : " << desc << std::endl;
+                                    std::cout << "DESC is " << desc << std::endl;
+                                    if (dir == "input") {
+                                        direction = IN_DIR;
+                                        if (desc == "Clock input") direction = IN_CLK;
+                                        if (desc.find("reset") != std::string::npos) direction = IN_RESET;
+                                    } else if (dir == "output") {
+                                        direction = OUT_DIR;
+                                        if (desc == "Clock output") direction = OUT_CLK;
+                                    } else if (dir == "inout") {
+                                        direction = INOUT_DIR;
+                                    } else {
+                                        throw std::runtime_error("Port direction is incorrect.");
+                                    }
+                                    port_info.insert(std::make_pair(port_name, direction));
                                 }
                             }
                         }
+                        module_info.first = name;
+                        module_info.second = port_info;
+                        port_info.clear();
+                        gb.gb_mods.push_back(module_info);
+                    } else {
+
                     }
                 }
                 // Process the parsed data as needed
@@ -338,7 +356,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
     Message::SetMessageType("VERI-2541", VERIFIC_IGNORE);
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
 
-    get_gb_data () ;
+    get_gb_data (gb) ;
 
     // Get all the top level modules
     Array *all_top_modules = veri_file::GetTopModules() ;
@@ -815,4 +833,3 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
 
     return 0 ; // Status OK
 }
-
