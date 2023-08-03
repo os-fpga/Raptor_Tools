@@ -54,11 +54,6 @@ message("VERIFIC_HOME: ${VERIFIC_HOME}")
 file(GLOB_RECURSE LIB_HEADERS
     ${VERIFIC_HOME}/*/*.h)
 
-get_filename_component(PREMITIVES_DIR "./lib_premitives/specs"
-    REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
-set(PRIMITIVES_PATH ${PREMITIVES_DIR})
-add_definitions(-DPRIMITIVES_PATH="${PRIMITIVES_PATH}")
-
 if (NOT RAPTOR AND NOT YOSYS_VERIFIC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
     add_subdirectory(${VERIFIC_HOME} "verific_rs")
 endif()
@@ -97,15 +92,16 @@ else()
     # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
 endif()
 
+add_subdirectory(gen_map)
+
 include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${FLEX_LM_SRC_DIR}
                             ${FLEX_LM_SRC_DIR}/machind
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune
                             ${CMAKE_CURRENT_BINARY_DIR}/include
-                            ../../libs/external/ryml/
 )
 
-file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
+file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 
 
@@ -114,7 +110,9 @@ if(NOT PRODUCTION_BUILD)
     add_executable(veri_prune ${EXEC_SOURCE})
     target_link_libraries(veri_prune PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	    add_dependencies(veri_prune verific)
+	    add_dependencies(veri_prune verific generate_map_target)
+    else()
+        add_dependencies(veri_prune generate_map_target)
 	endif()
 endif()
 
@@ -131,5 +129,7 @@ target_link_libraries(libveriprune PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
 set_property(TARGET libveriprune PROPERTY POSITION_INDEPENDENT_CODE ON)
 message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_dependencies(libveriprune verific)
+    add_dependencies(libveriprune verific generate_map_target)
+else()
+    add_dependencies(libveriprune generate_map_target)
 endif()

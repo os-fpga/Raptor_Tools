@@ -9,7 +9,6 @@
 #include <map>
 #include <unordered_set>
 #include <algorithm>
-#include <memory>
 using namespace std;
 
 
@@ -23,7 +22,7 @@ using namespace std;
 
 struct gb_constructs
 {
-    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods_ = {{"CLK_BUF", {{"I", IN_DIR}, {"O", OUT_CLK}}}, 
+    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {{"CLK_BUF", {{"I", IN_DIR}, {"O", OUT_CLK}}}, 
         {"I_BUF",{{"I", IN_DIR}, {"C",IN_CLK}, {"O", OUT_DIR}}},
         {"I_BUF_DS", {{"OE",IN_DIR}, {"I_N",IN_DIR}, {"I_P",IN_DIR}, {"O",OUT_DIR}}},
         {"I_DDR", {{"D",IN_DIR}, {"R",IN_RESET}, {"DLY_ADJ",IN_DIR}, {"DLY_LD",IN_DIR},{"DLY_INC",IN_DIR}, {"C",IN_CLK}, {"Q",OUT_DIR}}},
@@ -45,8 +44,6 @@ struct gb_constructs
           {"CLK_EN", IN_DIR}, {"CLK_IN", IN_CLK}, {"PLL_LOCK", IN_DIR}, {"PLL_FAST_CLK", IN_DIR}, {"FAST_PHASE_CLK", IN_DIR}, {"OE", IN_DIR},
           {"CLK_OUT", OUT_DIR}, {"Q", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", IN_DIR}, 
           {"CHANNEL_BOND_SYNC_OUT", OUT_DIR}}}};
-    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods;
-    std::unique_ptr<char[]> contentArray;
     std::vector<std::pair<std::string, int>> mod_ios;
     std::vector<std::string> mod_clks;
     std::vector<std::string> clk_in;
@@ -74,10 +71,6 @@ struct gb_constructs
     char *intf_mod_str;
     char *top_mod_str;
     bool contains_io_prem = false;
-    ~gb_constructs()
-    {
-        contentArray.reset();
-    }
 };
 int prune_verilog (const char *file_name, gb_constructs &gb);
 #endif
