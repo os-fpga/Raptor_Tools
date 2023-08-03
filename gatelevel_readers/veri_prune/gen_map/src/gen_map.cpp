@@ -1,4 +1,6 @@
-#include <cstring>
+#include "gen_map.h"
+#define RYML_SINGLE_HDR_DEFINE_NOW
+#include "read_yaml.h"
 
 std::string getDirectionName(int direction) {
     static const std::unordered_map<int, std::string> directionNames = {
@@ -14,11 +16,11 @@ std::string getDirectionName(int direction) {
     return (it != directionNames.end()) ? it->second : "UNKNOWN";
 }
 
-int write_map(gb_constructs &gb_mods) {
+int write_map(gb_map &gb) {
     // ... (unchanged)
 
     // Create a new file to write the gb_mods data
-    std::ofstream outputFile("gb_mods_data.h");
+    std::ofstream outputFile(OUT_PATH);
     if (!outputFile.is_open()) {
         std::cerr << "Error opening output file for writing." << std::endl;
         return 1;
@@ -30,7 +32,7 @@ int write_map(gb_constructs &gb_mods) {
     outputFile << "struct gb_constructs_data {" << std::endl;
     outputFile << "    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {" << std::endl;
 
-    for (const auto& module_info : gb_mods) {
+    for (const auto& module_info : gb.gb_mods) {
         outputFile << "        { \"" << module_info.first << "\", {" << std::endl;
         for (const auto& port_info : module_info.second) {
             outputFile << "            { \"" << port_info.first << "\", " << getDirectionName(port_info.second) << " }," << std::endl;
@@ -76,8 +78,7 @@ std::vector<char> readFile(const std::string& filename) {
     return content;
 }
 
-int get_gb_data() {
-    std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods;
+int get_gb_data(gb_map &gb) {
     const std::string folderPath = PRIMITIVES_PATH;
 
     DIR* directory = opendir(folderPath.c_str());
@@ -138,7 +139,7 @@ int get_gb_data() {
                         module_info.first = name;
                         module_info.second = port_info;
                         port_info.clear();
-                        gb_mods.push_back(module_info);
+                        gb.gb_mods.push_back(module_info);
                     } else {
 
                     }
@@ -150,12 +151,13 @@ int get_gb_data() {
     }
 
     closedir(directory);
-    write_map(gb_mods);
+    write_map(gb);
     return 0;
 }
 
 int main(int argc, char **argv)
 {
-    get_gb_data();
+    gb_map gb;
+    get_gb_data(gb);
     return 0;
 }
