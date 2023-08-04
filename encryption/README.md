@@ -58,5 +58,10 @@ export PATH=$(pwd):$PATH
 ```
 which rs_encrypt
 ```
-
 If above command prints the path of install directory then tool is installed successfully. 
+
+7. For running a simple example use this command 
+
+```
+rs_encrypt  -k  -k examples/vcs_pragmas_public examples/RS_Key -f  examples/simple_rtl.v
+```

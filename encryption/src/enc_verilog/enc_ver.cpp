@@ -87,7 +87,7 @@ void appendDataAtStart(const std::string &input_file, const std::vector<std::str
 bool isValidFileExtension(const std::string &file)
 {
     std::string extension = std::filesystem::path(file).extension().string();
-    return extension == ".v" || extension == ".sv";
+    return extension == ".v" || extension == ".sv" ;
 }
 
 std::string getOutputFileName(const std::string &input_file_name)
