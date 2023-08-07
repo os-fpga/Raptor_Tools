@@ -3,10 +3,19 @@ cmake_minimum_required(VERSION 3.10)
 # set the project name
 project(gen_map)
 
-get_filename_component(PREMITIVES_DIR "../lib_premitives/specs"
-    REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
-set(PRIMITIVES_PATH ${PREMITIVES_DIR})
-add_definitions(-DPRIMITIVES_PATH="${PRIMITIVES_PATH}")
+if(RAPTOR)
+    get_filename_component(DEVICES_DIR "../../../../etc/devices"
+          REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+    set(DEVICES_PATH ${DEVICES_DIR})
+    add_definitions(-DDEVICES_PATH="${DEVICES_PATH}")
+    message("DP: "  ${DEVICES_PATH})
+else()
+    get_filename_component(DEVICES_DIR "../devices"
+        REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
+    set(DEVICES_PATH ${DEVICES_DIR})
+    add_definitions(-DDEVICES_PATH="${DEVICES_PATH}")
+    message("DP: "  ${DEVICES_PATH})
+endif()
 
 get_filename_component(OUT_DIR "../src/veri_prune/gb_map.h"
     REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)

@@ -8,10 +8,10 @@ int main(int argc, char **argv)
 
     const char *out_file_name = (argc > 2) ? argv[2] : "nl_to_vpr.v" ;
     const char *wrapper_file_name = (argc > 3) ? argv[3] : "wrapper.v" ;
-    const char *file_base = ((argc > 3) ? argv[3] : "src") ;
+    std::string device_name = ((argc > 4) ? argv[4] : "gemini") ;
 
     gb_constructs gb;
-    prune_verilog (file_name, gb);
+    prune_verilog (file_name, gb, device_name);
 
     if (gb.contains_io_prem) {
         std::ofstream out_file ;

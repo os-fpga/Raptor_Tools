@@ -21,6 +21,7 @@ using namespace std;
 struct gb_map
 {
     std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods;
+    std::map<std::string, std::vector<std::pair<std::string, std::map<std::string, int>>>> device_premitives;
     std::unique_ptr<char[]> contentArray;
 
     ~gb_map()

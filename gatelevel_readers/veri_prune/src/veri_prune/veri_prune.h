@@ -72,5 +72,5 @@ struct gb_constructs
     char *top_mod_str;
     bool contains_io_prem = false;
 };
-int prune_verilog (const char *file_name, gb_constructs &gb);
+int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name);
 #endif

@@ -243,7 +243,7 @@ void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,st
 
 ////////////////////////////////////////////////////////////////////////////
 
-int prune_verilog (const char *file_name, gb_constructs &gb)
+int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name)
 {
 
     Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
@@ -370,15 +370,20 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                 bool is_gb_cons;
                 std::map<std::string, int> m_items;
         	    const char *inst_name = id->InstName() ;
-                for (const auto& element : gb_mods_data.gb_mods) {
-                    std::string str = element.first;
-                    if (str == no_param_name) {
-                        m_items = element.second;
-                        is_gb_cons = true;
-                        gb.contains_io_prem = true;
-                        break;
-                    } else {
-                        is_gb_cons = false;
+                for (const auto& element_ : gb_mods_data.device_premitives) { // Will update the code once I find out how to check which device to use
+                    std::string device_name_ = element_.first;
+                    if (device_name_ == device_name) {
+                        for (const auto& element: element_.second) {
+                            std::string str = element.first;
+                            if (str == no_param_name) {
+                                m_items = element.second;
+                                is_gb_cons = true;
+                                gb.contains_io_prem = true;
+                                break;
+                            } else {
+                                is_gb_cons = false;
+                            }
+                        }
                     }
                 }
         	    if (is_gb_cons) 
