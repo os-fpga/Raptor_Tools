@@ -18,15 +18,38 @@ std::string getDirectionName(int direction) {
 
 int write_map(gb_map &gb) {
 
-    // Create a new file to write the gb_mods data
+     std::ifstream inputFile(OUT_PATH);
+     if (!inputFile.is_open()) {
+        std::cerr << "Error opening input file for reading." << std::endl;
+        return 1;
+    }
+
+    std::stringstream buffer;
+    buffer << inputFile.rdbuf();
+    inputFile.close();
+
+    // Check if the contentToAppend is already present in the file
+    if (buffer.str().find("gb_constructs_data") != std::string::npos) {
+        std::cout << "Content is already present in the file." << std::endl;
+        return 0;
+    }
+
+    // Find the position of the last #endif
+    size_t endPos = buffer.str().rfind("#endif // DEVICE_PRIMITIVES_DATA_H");
+    if (endPos == std::string::npos) {
+        std::cerr << "Error: Could not find the last #endif in the input file." << std::endl;
+        return 1;
+    }
+
+    // Append the new content just before the last #endif
     std::ofstream outputFile(OUT_PATH);
     if (!outputFile.is_open()) {
         std::cerr << "Error opening output file for writing." << std::endl;
         return 1;
     }
 
-    outputFile << "#ifndef DEVICE_PRIMITIVES_DATA_H" << std::endl;
-    outputFile << "#define DEVICE_PRIMITIVES_DATA_H" << std::endl << std::endl;
+    outputFile << buffer.str().substr(0, endPos);
+    outputFile << "#define GB_CONSTRUCTS_DATA" << std::endl;
 
     outputFile << "struct gb_constructs_data {" << std::endl;
     outputFile << "    std::map<std::string, std::vector<std::pair<std::string, std::map<std::string, int>>>> device_premitives = {" << std::endl;
