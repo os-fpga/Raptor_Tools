@@ -60,6 +60,7 @@ def parse_xml(xml_file):
         tcl_file.write('place' + newline)
         tcl_file.write('route' + newline)
         tcl_file.write('sta' + newline)
+        tcl_file.write('power' + newline)
         tcl_file.write('bitstream' + newline)
 
         print('Finished conversion to TCL: ', tcl_file.name)
