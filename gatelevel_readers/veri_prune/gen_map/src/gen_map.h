@@ -8,6 +8,7 @@
 #include <vector>
 #include <map>
 #include <string>
+#include <unordered_map>
 
 #define IN_DIR  0
 #define OUT_DIR  1
