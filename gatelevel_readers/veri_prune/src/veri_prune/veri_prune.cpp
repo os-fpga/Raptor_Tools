@@ -37,7 +37,8 @@
 #include "VeriConstVal.h"   // Definitions of all constant expression tree nodes
 #include "VeriScope.h"      // Symbol table of locally declared identifiers
 #include "Strings.h"        // Definition of class to manipulate copy, concatenate, create etc...
-#include "veri_prune.h" 
+#include "veri_prune.h"
+#include "gb_map.h"
 
 #define VERI_INOUT 329
 #define VERI_INPUT 330
@@ -242,12 +243,16 @@ void gather_data (VeriModule *mod, gb_constructs &gb, const char *formal_name,st
 
 ////////////////////////////////////////////////////////////////////////////
 
-int prune_verilog (const char *file_name, gb_constructs &gb)
+int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name)
 {
 
     Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
     Message::SetMessageType("VERI-2541", VERIFIC_IGNORE);
     if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/)) return 1 ;
+    gb_mods_default default_mods;
+    #ifdef GB_CONSTRUCTS_DATA
+        gb_constructs_data gb_mods_data;
+    #endif
 
     // Get all the top level modules
     Array *all_top_modules = veri_file::GetTopModules() ;
@@ -366,7 +371,25 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                 bool is_gb_cons;
                 std::map<std::string, int> m_items;
         	    const char *inst_name = id->InstName() ;
-                for (const auto& element : gb.gb_mods) {
+                #ifdef GB_CONSTRUCTS_DATA
+                    for (const auto& element_ : gb_mods_data.device_premitives) { // Will update the code once I find out how to check which device to use
+                        std::string device_name_ = element_.first;
+                        if (device_name_ == device_name) {
+                            for (const auto& element: element_.second) {
+                                std::string str = element.first;
+                                if (str == no_param_name) {
+                                    m_items = element.second;
+                                    is_gb_cons = true;
+                                    gb.contains_io_prem = true;
+                                    break;
+                                } else {
+                                    is_gb_cons = false;
+                                }
+                            }
+                        }
+                    }
+                #else
+                for (const auto& element : default_mods.gb_mods) {
                     std::string str = element.first;
                     if (str == no_param_name) {
                         m_items = element.second;
@@ -377,6 +400,7 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
                         is_gb_cons = false;
                     }
                 }
+                #endif
         	    if (is_gb_cons) 
                 {
                     std::vector<std::string> prefs;
@@ -724,4 +748,3 @@ int prune_verilog (const char *file_name, gb_constructs &gb)
 
     return 0 ; // Status OK
 }
-
