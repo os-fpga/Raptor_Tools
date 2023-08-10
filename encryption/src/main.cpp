@@ -112,7 +112,7 @@ int main(int argc, char **argv)
                       << "Usage:\n"
                       << "\t-h | --help\t\tShow help\n"
                       << "\t-k | --keyfile\t\tFile(s) containing the key if not embedded in HDL file\n"
-                      << "\t-f | --hdl-files\tSpace separated HDL files with extension .v or .sv\n"
+                      << "\t-f | --hdl-files\t HDL files with extension .v or .sv\n"
                       << "\t-o | --output-dir\tOutput directory for encrypted files" << std::endl;
             return 0;
         }
