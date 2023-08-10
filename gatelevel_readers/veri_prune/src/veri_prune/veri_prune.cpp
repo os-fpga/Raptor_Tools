@@ -372,19 +372,33 @@ int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& 
                 std::map<std::string, int> m_items;
         	    const char *inst_name = id->InstName() ;
                 #ifdef GB_CONSTRUCTS_DATA
-                    for (const auto& element_ : gb_mods_data.device_premitives) { // Will update the code once I find out how to check which device to use
-                        std::string device_name_ = element_.first;
-                        if (device_name_ == device_name) {
-                            for (const auto& element: element_.second) {
-                                std::string str = element.first;
-                                if (str == no_param_name) {
-                                    m_items = element.second;
-                                    is_gb_cons = true;
-                                    gb.contains_io_prem = true;
-                                    break;
-                                } else {
-                                    is_gb_cons = false;
+                    if (!gb_mods_data.device_premitives.empty() && gb_mods_data.device_premitives.find(device_name) != gb_mods_data.device_premitives.end()) {
+                        for (const auto& element_ : gb_mods_data.device_premitives) { // Will update the code once I find out how to check which device to use
+                            std::string device_name_ = element_.first;
+                            if (device_name_ == device_name) {
+                                for (const auto& element: element_.second) {
+                                    std::string str = element.first;
+                                    if (str == no_param_name) {
+                                        m_items = element.second;
+                                        is_gb_cons = true;
+                                        gb.contains_io_prem = true;
+                                        break;
+                                    } else {
+                                        is_gb_cons = false;
+                                    }
                                 }
+                            }
+                        }
+                    } else {
+                        for (const auto& element : default_mods.gb_mods) {
+                            std::string str = element.first;
+                            if (str == no_param_name) {
+                                m_items = element.second;
+                                is_gb_cons = true;
+                                gb.contains_io_prem = true;
+                                break;
+                            } else {
+                                is_gb_cons = false;
                             }
                         }
                     }
