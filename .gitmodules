@@ -10,3 +10,6 @@
 [submodule "Device_Modeling/external/exprtk"]
 	path = Device_Modeling/external/exprtk
 	url = git@github.com:ArashPartow/exprtk.git
+[submodule "graph_parttion/mt-kahypar"]
+	path = graph_parttion/mt-kahypar
+	url = https://github.com/kahypar/mt-kahypar.git
