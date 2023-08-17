@@ -1,4 +1,8 @@
-set(unzip_tbb_dir ${CMAKE_CURRENT_BINARY_DIR}/external_tools/tbb)
+if(RAPTOR)
+set(unzip_tbb_dir ${CMAKE_CURRENT_BINARY_DIR}/Raptor_Tools/graph_partition/mt-kahypar/external_tools/tbb)
+else()
+set(unzip_tbb_dir ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar/external_tools/tbb)
+endif()
 include(FetchContent)
 FetchContent_Populate(
   tbb

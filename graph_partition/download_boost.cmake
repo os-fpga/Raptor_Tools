@@ -1,4 +1,8 @@
-set(unzip_boost_dir ${CMAKE_CURRENT_BINARY_DIR}/external_tools/boost)
+if(RAPTOR)
+set(unzip_boost_dir ${CMAKE_CURRENT_BINARY_DIR}/Raptor_Tools/graph_partition/mt-kahypar/external_tools/boost)
+else()
+set(unzip_boost_dir ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar/external_tools/boost)
+endif()
 include(FetchContent)
 FetchContent_Populate(
   boost-src
