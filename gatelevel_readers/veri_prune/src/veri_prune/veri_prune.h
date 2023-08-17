@@ -40,6 +40,7 @@ struct gb_constructs
     char *mod_str;
     char *intf_mod_str;
     char *top_mod_str;
+    std::string interface_data_dump;
     bool contains_io_prem = false;
 };
 int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name);
