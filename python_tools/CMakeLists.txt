@@ -96,7 +96,7 @@ if(${DO_EXTRACTION_PY} EQUAL 1)
                  COMMENT      "      Extracting Python zip      "
                  DEPENDS ${py_exe_zip}
                  BYPRODUCTS ${work_dir}/python3.8
-                 COMMAND ${CMAKE_COMMAND} -E tar xvzf ${py_exe_zip}
+                 COMMAND ${CMAKE_COMMAND} -E tar xzf ${py_exe_zip}
                  WORKING_DIRECTORY ${work_dir}
                  )
 else ()
@@ -160,7 +160,7 @@ if("${expected_req_txt_md5}"  STREQUAL  "${CalculatedCheckSum}") #Comapre checks
                  COMMENT      "      Extracting Litex zip      "
                  DEPENDS ${litex_env_zip}
                  BYPRODUCTS ${work_dir}/litex
-                 COMMAND ${CMAKE_COMMAND} -E tar xvzf ${litex_env_zip}
+                 COMMAND ${CMAKE_COMMAND} -E tar xzf ${litex_env_zip}
                         WORKING_DIRECTORY ${work_dir}
                  )
         add_custom_command(TARGET unzip_litex POST_BUILD
@@ -239,7 +239,7 @@ if(${CGT_GITHUB_REPO_PATH}  STREQUAL  "Empty")
         COMMENT      "      Extracting ChatGPT zip      "
         DEPENDS ${chatgpt_env_zip}
         BYPRODUCTS ${work_dir}/chatGPT
-        COMMAND ${CMAKE_COMMAND} -E tar xvzf ${chatgpt_env_zip}
+        COMMAND ${CMAKE_COMMAND} -E tar xzf ${chatgpt_env_zip}
                     WORKING_DIRECTORY ${work_dir}
     )
     add_custom_command(TARGET unzip_chatgpt POST_BUILD
