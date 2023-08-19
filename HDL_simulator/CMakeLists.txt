@@ -93,7 +93,7 @@ if(${DO_EXTRACTION} EQUAL 1)
                  COMMENT      "      Extracting HDL Simulator        "
                  DEPENDS ${Destination_Dir}
                  BYPRODUCTS ${Extraction_dir}/HDL_simulator
-                 COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
+                 COMMAND ${CMAKE_COMMAND} -E tar xzf ${Destination_Dir}
                  WORKING_DIRECTORY ${Extraction_dir}
                  )
  else ()
