@@ -67,6 +67,12 @@ add_custom_target(build_mtkahypar ALL
 
 add_dependencies(build_mtkahypar MtKaHyPar)
 
+install(
+  TARGETS MtKaHyPar
+  RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR})
 
+install (
+    DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar/external_tools/tbb/lib/intel64/gcc4.8/
+        DESTINATION ${CMAKE_INSTALL_LIBDIR}/tbb)
 
 
