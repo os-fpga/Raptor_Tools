@@ -4,7 +4,7 @@
 #include "json.hpp"
 #include <fstream>
 #include <set>
-
+#include <exception>
 
 int compare_ports(const char* rtlPortInfo, const char* nlPortInfo);
 #endif

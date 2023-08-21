@@ -3,21 +3,25 @@
 using namespace std;
 #include <typeinfo>
 
+class PortComparisonException : public std::exception {
+public:
+    PortComparisonException(const std::string& message) : message(message) {}
+    const char* what() const noexcept override {
+        return message.c_str();
+    }
+
+private:
+    std::string message;
+};
 
 stringstream rtlBuffer;
 stringstream nlBuffer;
-
-std::set<std::map<std::string, std::string>> portsInfo;
 
 void readJsonFile(const char* fileName, stringstream& buffer) {
     ifstream fJson(fileName);
     buffer.str(""); // Clear the stringstream
     buffer << fJson.rdbuf();
     fJson.close(); // Close the file stream
-}
-
-void clearPortsInfo() {
-    portsInfo.clear();
 }
 
 void print_ports(const std::set<std::map<std::string, std::string>>& portsSet, const std::string& setName) {
@@ -33,7 +37,7 @@ void print_ports(const std::set<std::map<std::string, std::string>>& portsSet, c
 }
 
 std::set<std::map<std::string, std::string>> process_ports(stringstream& buffer) {
-    clearPortsInfo();
+    std::set<std::map<std::string, std::string>> portsInfo;
     auto json = nlohmann::json::parse(buffer.str());
     for (auto port : json[0]["ports"]) {
         string pName = port["name"];
@@ -92,17 +96,25 @@ int compare_ports(const char* rtlPortInfo, const char* nlPortInfo) {
     rtlPorts = process_ports(rtlBuffer) ;
     nlPorts = process_ports(nlBuffer) ;
 
-    print_ports(rtlPorts, "rtlPorts");
-    print_ports(nlPorts, "nlPorts");
-
     if(rtlPorts == nlPorts){
         printf("Pre and Post synthesis ports are same\n");
         return 0;
     }
     // Check for missing ports from rtlPorts in nlPorts
     for (const auto& rtlPortMap : rtlPorts) {
-        if (nlPorts.find(rtlPortMap) == nlPorts.end()) {
-            std::cerr << "Error: Port missing after synthesis\n";
+        try {
+             if (!rtlPortMap.empty()) {
+                auto firstElement = rtlPortMap.rbegin();
+                std::string key = firstElement->first;
+                std::string value = firstElement->second;
+                if (nlPorts.find(rtlPortMap) == nlPorts.end()) {
+                    std::string errorMsg = "Error: Port '" + value + "' missing after synthesis";
+                    throw PortComparisonException(errorMsg);
+                }
+            }
+        } catch (const PortComparisonException& e) {
+            std::cerr << e.what() << std::endl;
+            clearBuffers();
             return 1;
         }
     }
