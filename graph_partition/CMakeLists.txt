@@ -3,7 +3,7 @@ cmake_minimum_required(VERSION 3.15)
 project("graph_partition")
 
 set(ShoulbeBoostMDsum 18e91cd48013ac7b5f670cb5c9d215f9)
-set(RSShoulbeBoostMDsum f34c5c7b7467c2613629ce4f3b1f691b)
+set(RSShoulbeBoostMDsum 1ff19ebfc5c0db58cb164d7e9dd6edf3)
 file(MD5  ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts/download_boost.cmake presentBoostMDsum)
 set(Boost_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_boost.cmake)
 
@@ -57,6 +57,7 @@ endif()
 
 set(ENV{BUILD_TYPE} ${CMAKE_BUILD_TYPE})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/../libs/external/boost)
 # Sub-project
 add_subdirectory(mt-kahypar ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar EXCLUDE_FROM_ALL)
 
