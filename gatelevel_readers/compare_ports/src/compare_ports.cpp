@@ -11,10 +11,29 @@ std::set<std::map<std::string, std::string>> portsInfo;
 
 void readJsonFile(const char* fileName, stringstream& buffer) {
     ifstream fJson(fileName);
+    buffer.str(""); // Clear the stringstream
     buffer << fJson.rdbuf();
+    fJson.close(); // Close the file stream
+}
+
+void clearPortsInfo() {
+    portsInfo.clear();
+}
+
+void print_ports(const std::set<std::map<std::string, std::string>>& portsSet, const std::string& setName) {
+    std::cout << setName << " Ports:\n";
+    for (const auto& portMap : portsSet) {
+        std::cout << "{ ";
+        for (const auto& pair : portMap) {
+            std::cout << pair.first << ": " << pair.second << ", ";
+        }
+        std::cout << "}\n";
+    }
+    std::cout << "\n";
 }
 
 std::set<std::map<std::string, std::string>> process_ports(stringstream& buffer) {
+    clearPortsInfo();
     auto json = nlohmann::json::parse(buffer.str());
     for (auto port : json[0]["ports"]) {
         string pName = port["name"];
@@ -59,18 +78,48 @@ std::set<std::map<std::string, std::string>> process_ports(stringstream& buffer)
     return portsInfo;
 }
 
+void clearBuffers() {
+    rtlBuffer.str(""); // Clear the stringstream
+    nlBuffer.str("");  // Clear the stringstream
+}
+
 int compare_ports(const char* rtlPortInfo, const char* nlPortInfo) {
     readJsonFile(rtlPortInfo, rtlBuffer);
     readJsonFile(nlPortInfo, nlBuffer);
     std::set<std::map<std::string, std::string>> rtlPorts;
     std::set<std::map<std::string, std::string>> nlPorts;
+    bool hasAdditionalPorts = false;
     rtlPorts = process_ports(rtlBuffer) ;
     nlPorts = process_ports(nlBuffer) ;
+
+    print_ports(rtlPorts, "rtlPorts");
+    print_ports(nlPorts, "nlPorts");
+
     if(rtlPorts == nlPorts){
         printf("Pre and Post synthesis ports are same\n");
         return 0;
-    } else {
-        throw std::runtime_error("Error: Ports are different\n");
-        return 1;
     }
+    // Check for missing ports from rtlPorts in nlPorts
+    for (const auto& rtlPortMap : rtlPorts) {
+        if (nlPorts.find(rtlPortMap) == nlPorts.end()) {
+            std::cerr << "Error: Port missing after synthesis\n";
+            return 1;
+        }
+    }
+
+    // Check for additional ports in nlPorts and generate a warning
+    for (const auto& nlPortMap : nlPorts) {
+        if (rtlPorts.find(nlPortMap) == rtlPorts.end()) {
+            hasAdditionalPorts = true;
+            break;
+        }
+    }
+
+    if (hasAdditionalPorts) {
+        std::cerr << "Warning: Additional ports after synthesis\n";
+    }
+
+    clearBuffers(); // Clear the buffers after processing
+
+    return 0;
 }
