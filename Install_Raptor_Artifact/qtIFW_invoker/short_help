@@ -1,0 +1,33 @@
+############################################################################### 
+                Raptor, A Rapid Silicon complete Software solution 
+                            Installation Help
+###############################################################################
+
+Print this Help message:
+
+    ./Raptor_x.x.run --help
+
+=> Make sure to provide empty directory for the installation as installer wipe the directory before doing installation 
+
+GUI Mode:>
+^^^^^^^^^^^^^^^^^
+1): With SUDO/Admin privileges, click next on installation path selection screen to accept default path. 
+
+        sudo ./Raptor_x.x.run 
+
+2): Without SUDO/Admin privileges, choose custom writeable path when installer ask for installation location
+
+                    ./Raptor_x.x.run 
+
+Batch Mode (No GUI):>
+^^^^^^^^^^^^^^^^^^^^^
+1): Install Raptor at desired path, then execute the installer with command 
+
+            ./Raptor_x.x.run  --batch --accept -r <absolute path where Raptor will be installed>
+
+2): Install Raptor at Admin writable path, then execute with SUDO/Admin privileges
+
+          sudo ./Raptor_x.x.run --batch --accept -r /opt/raptor
+
+NOTE:> For details of command line options and license setup, see the README.md
+^^^^

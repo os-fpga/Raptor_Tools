@@ -7,85 +7,89 @@ A brief guide to install Raptor.
 The downloaded *.tar.gz file from FTP site contains following files:
 
 1. README.md (this file)
-2. Raptor exe like Raptor_x.x.x.run
+2. Raptor exe like Raptor_x.x.run
 
 ## Installing Raptor
 
-### Prerequisites:
+Installer has 2 modes. 
 
-Raptor depends upon many OS dependecies. These dependecies can be installed by running the installer with SUDO privileges or as root user.
+1): GUI mode
 
-### Install Raptor
+2): Batch mode
 
-Upon executing the downloaded executable, it will create a folder named as {provided path or /opt}/RapidSilicon/Raptor/{release} and install binaries inside it.
+Provide empty directory to installer for installation as installer wipe the directory before doing installation
+Upon executing the downloaded executable, it will create a folder named as {provided path or /opt/RapidSilicon}/Raptor/{release} and install binaries inside it.
 
-#### Installing without any command line options
+#### In GUI mode
 
-1): With SUDO/Admin privileges, say yes to dependencies installation and default path when installer prompt for questions. 
-
-```
-sudo ./Raptor_x.x.run 
-```
-
-2): Without SUDO/Admin privileges, say no to dependencies installation and default path when installer prompt for questions
+1): Install Raptor without SUDO:
 
 ```
-./Raptor_x.x.run 
+         ./Raptor_x.x.run 
 ```
 
-Kindly replace `Raptor_x.x.run` with the version of Raptor exe file you have received.
+2): Install Raptor at Admin writable location. Invoke installer with SUOD like below: 
 
-#### Installing with personal choices (With SUDO/Admin privileges)
+```
+                sudo    ./Raptor_x.x.run 
+```
+
+#### In Batch mode
 
 You have following command line options available:
 
-sudo ./Raptor_x.x.run <options>
-
-* --accept            -> Grant acceptance of license on command line. It will still print the license. Please read it. 
-* -r | --raptor-home  -> Giving the absolute path of directory where Raptor will be installed
-* -i | --install-dep  -> Turn on the OS dependecies installation. This will need SUDO/Admin privileges
-* -v | --verbose      -> Increase the installer verbosity.
-
-#### Installing with personal choices (Without SUDO/Admin privileges)
-
-You have following command line options available:
-
-./Raptor_x.x.run <options>
-
-* --accept               -> Grant acceptance of license on command line. It will still print the license. Please read it. 
-* -b | --no-dep-install  -> By pass the OS related dependencies installation
-* -r | --raptor-home     -> Giving the absolute path of directory where Raptor will be installed
-* -v | --verbose         -> Increase the installer verbosity.
+* --batch                   -> [Mandatory] Run in batch mode.
+* --accept                  -> [Mandatory] Grant acceptance of license on command line. 
+* -r | --raptor-home        -> [Mandatory] Giving the absolute path of directory where Raptor will be installed. 
 
 
+Above options can be used in following combinations
 
-**Note**: When using -i or --install-dep SUDO/Admin privileges are required.      
-
-Go to the directory where you have extracted the Raptor executable after downloading and execute it with any or with all above mentioned options like below.
+1): Without SUDO/Admin privileges, Installing at desired path:
 
 ```
-./Raptor_x.x.run -r <absolute path where Raptor will be installed>
-``` 
+     ./Raptor_x.x.run  --batch --accept -r <absolute path where Raptor will be installed>
+```
 
-You can add --accept option as well to accept the EULA license. Like
+2): With SUDO/Admin privileges, click next to accept the default path on installation screen. 
 
 ```
-./Raptor_x.x.run --accept -v -r <absolute path where Raptor will be installed>
-``` 
+    sudo ./Raptor_x.x.run --batch --accept -r /opt/RapidSilicon
+```
 
-And if you want to install dependencies as well which needs SUDO/Admin privileges, you can execute the installer as:
+Kindly replace `Raptor_x.x.run` with the version of Raptor run file you have received.
+
+### Post Installation
+
+After doing the installation, you can run the Raptor. But for HDL simulator to function properly, you need to install the below dependencies.
+#### For Unix:
+
+Follow the below steps to configure the Raptor HDL simulator:
+
+* Open Terminal
+
+* Change directory to Raptor installation folder:
 
 ```
-sudo ./Raptor_x.x.run --accept -v -i -r <absolute path where Raptor will be installed>
-``` 
+        cd <Raptor install path>/Raptor/<release>/share
+```
 
-Kindly replace `Raptor_x.x.run` with the version of Raptor executable file you have received.
+Where Raptor install path is the directory where you have intalled Raptor
+release is like 2023.01
+
+* Execute the script with admin privileges "unix_dep.sh" in this directory.
+
+```
+        bash sudo unix_dep.sh
+```
+
+This will prompt for password. Enter Admin/root password. 
 
 ### Starting Raptor
 
-Once the installation is done, go to {provided installation path}/RapidSilicon/Raptor/{release} and source the environment setup script "raptorenv_lin64.sh". For bash shell you can do:
+Once the installation is done, go to {provided installation path or /opt/RapidSilicon}/Raptor/{release} and source the environment setup script "raptorenv_lin64.sh". For bash shell you can do:
 
-source {provided installation path}/RapidSilicon/Raptor/{release}/raptorenv_lin64.sh
+source {provided installation path}/Raptor/{release}/raptorenv_lin64.sh
 
 Then on same command line, writing
 
@@ -100,7 +104,7 @@ Rapid Silicon use FlexLM based license technology to license its product. The Fl
 #### To start a node locked license just simply set the below environment variable
 
 ```
-export LM_LICENSE_FILE=<path to license file.lic>
+export LM_LICENSE_FILE=<absolute path to license file.lic>
 ```
 
 #### To start the floating type license file:
@@ -111,7 +115,7 @@ export LM_LICENSE_FILE=<path to license file.lic>
 4. Now start the FlexLM daemon like below
 
 ```
-${Raptor install directory}/bin/Flex_LM/lmgrd -c <path of license file> -l <path to save the log file>
+${Raptor install directory}/bin/Flex_LM/lmgrd -c <path of license file> -l <path to save the debug log file>
 ```
 
 Now go to the machine where you have installed the Raptor and set the below variable:

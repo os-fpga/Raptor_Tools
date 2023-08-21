@@ -1,0 +1,344 @@
+
+ric_schema_version
+                    -version <version> string // the version of the Device Modeling Schema (e.g 1.0.2)
+
+device_name 
+                    -name <name>   string // Defines the Device name (e.g GEMINI)
+
+device_version 
+                    -version <version>  string // Defines the version of the Device (e.g 1.0.2)
+
+define_enum_type
+                    -name <enumerate>
+                    -values { {<name>, value }, …, {<name>, value }, {"default", value } } 
+
+define_block <type>
+                    -ports  <list_of_port_objects> [ {port} ] // Set of ports
+                    -force                         Nill    // Rewrite existing block if  previously any named same 
+
+define_attr 
+                    -block <block_type_name>    string // the name of a defined block to insert the attribute in.
+                    -name <attr_name>           string // The name of the currently defined attribute
+                    -addr <offset_address>      string // Relative address of the attribute in the block config space.
+                    -width <nb_bits>            int // Number of bits enough to code all possible values of this attribute
+                    -enum { {<name>, value }, …, {<name>, value }, {"default", value } }  // Inline Attribute enumerated values
+                    -enum <enumerate_name>           {enum} // Offline Attribute enumerated values
+                    -force                  Nill    // Rewrite existing attribute if any 
+
+define_port 
+                    -block <block_type_name>    string // the name of a defined block to insert the port in
+                    -name <port_name>           string // The name of the currently defined port
+                    -direction <"in"/"out">     string // the direction of the currently defined port "in"/"out"
+                    -source <port_name/"open">  string // the port name driving this port or the string "open" if none.
+                    -force                       Nill  // Rewrite existing port if any 
+
+create_instance 
+                    -block <block_type_name>        string      // the name of a defined block we are instanciating
+                    -name <instance_name>           string      // the currently defined instance name
+                    -id <instance_id>               int         // A per design unique instance id (Should be automatic)
+                    -logic_location                 {int, int}  // Logic Location (VPR)
+                    -logic_address <logical_address> int        // Logic address in chain
+                    -io_bank <io_bank_name> (optional)  string  // IO bank name
+                    -parent <block_type>    (optional)  string  // Parent block (Creates hierarchy – like Verilog folded model) 
+
+define_constraint 
+                    -block <block_type_name> <sv-like-implication>  // Inner block constraint in the form of SV implication 
+
+define_constraint 
+                    -inst <instance_name> <sv-like-implication>     // Inner instance constraint in the form of SV implication
+
+define_constraint  
+                    -glob <sv-like-implication with hierarchical path> // Global constraint with hierarchical path 
+
+
+define_chain        
+                    -type <type>                    string      // The name of the currently created chain
+
+add_block_to_chain_type 
+                    -type <chain_type_name> 
+                    -block <block_type_name>
+
+create_chain_instance 
+                    -type <chain_type_name>                     string // The name of the instanciated chain
+                    -name <chain_instance_name>                 string // The name of the currently defined chain instance
+                    -start_address <START_LOGICAL_ADDRESS>      int    // Logic address 
+                    -end_address <END_LOGICAL_ADDRESS>          int    // Logic address 
+
+link_chain 
+                    -inst <block_instance_name> 
+                    -chain <chain_instance_name> 
+
+append_instance_to_chain  
+                    -chain <chain_instance_name> 
+                    -inst <block_instance_name> 
+
+define_net 
+                    -name <net_name>                string // The name of the currently defined net.
+                    -source <net_name/port_name>    string  // The name of the driver of the currently defined net.
+
+drive_net
+                    -name <net_name>                string  // The name of the currently driven net.
+                    -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
+                                                            // port_name should be in the format instance_name.port_name
+drive_port
+                    -name <port_name>               string  // The name of the currently driven net.
+                    -source <net_name/port_name>    string  // The name of the driver of the currently driven net.
+                                                            // port_name should be in the format instance_name.port_name
+
+get_block_names     
+                    -reg <regular_expression>       string  // The regular expression that the names match, all if empty
+
+get_ports
+                    -reg <regular_expression>       string  // The regular expression that the names match, all if empty
+
+get_instance_names
+                    -reg <regular_expression>       string  // The regular expression that the names match, all if empty
+
+get_instance_id
+                    -instance <instance_name>       string  // 
+
+get_instance_block_name
+                    -instance <instance_name>       string  // 
+
+get_instance_by_id
+                    -id <instance_id>               int     //
+
+get_instance_id_set
+                    -block <block_name>             string  // 
+
+get_instance_name_set
+                    -block <block_name>             string  // 
+
+get_attributes
+                    -block <block_name>             string  // 
+
+get_constraints
+                    -block <block_name>             string  // 
+
+get_attributes
+                    -instance <instance_name>               string  // The name of
+
+get_constraints
+                    -instance <instance_name>               string  // The name of
+
+get_port_connections
+                    -instance <instance_name>               string  // The name of
+
+get_chain_names
+                    -device <device_name>               string  // The name of
+
+get_parent
+                    -instance <instance_name>               string  // The name of
+
+get_port_connection_source
+                    -port_conn <port_conn_name>             string  // The name of the port instance_name::port_name
+
+get_port_connection_sink_set
+                    -port_conn <port_conn_name>             string  // The name of the port instance_name::port_name
+
+get_net_source
+                    -net <net_name>                         string  // The name of the net
+
+get_net_sink_set
+                    -net <net_name>                         string  // The name of the net
+
+get_logic_location
+                    -instance <instance_name>  |            string  // The name of the instance from which we are reading.
+                    -id <id>                                int     // 
+
+set_logic_location 
+                    -instance <instance_name>   |           string  // The name of the instance from which we are reading.
+                    -id <id>                                 int     // 
+                    -location <liocation>                   {int, int} //
+
+get_logic_address
+                    -instance <instance_name>               string  // The name of the instance from which we are reading.
+
+get_io_bank
+                    -instance <instance_name>   |           string  // The name of the instance from which we are reading.
+                    -id <id>
+
+set_io_bank 
+                    -instance <instance_name>   |           string  // The name of the instance from which we are reading.
+                    -id <id>
+                    –io_bank {$IO_BANK} 
+
+
+get_phy_address 
+                    -instance <instance_name>  |            string  // The name of the instance from which we are reading.
+                    -id <id>                                int     // 
+
+set_phy_address 
+                    -instance <instance_name>   |           string  // The name of the instance from which we are reading.
+                    -id <id>                                int     // 
+                    -address <ph_address>            int     // 
+
+
+----------------------------------------------------------------------------------------------------------
+
+
+check_chain 
+        –chain {$CHAIN_NAME} 
+        # Check a given configuration chain. Check points: Type, over constraint, redundant blocks, address range .etc. 
+        #return a list of error strings, success if empty list
+
+
+
+check_block 
+        -block {$BLOCK_NAME} 
+        # Check a given block. Check if it’s attribute is legal and with propery constraint. 
+
+
+check_configuration
+        -log {$LOG_FILE} 
+        # Check a given configuration. It includes checks of chain, block, constraints, and other device relative issue (compatibility for instance).  
+
+ 
+
+Commands to query/set attribute 
+
+ 
+
+get_type 
+        -block {$BLOCK_NAME} 
+
+set_type 
+        -block {$BLOCK_NAME} 
+        -type {$BLOCK_TYPE} 
+
+
+get_name 
+        -block {$BLOCK_ID} | -chain {$CHAIN_ID} 
+
+set_name 
+        -block {$BLOCK_ID} -name {$NAME} |
+        -chain {$CHAIN_ID} -name {$NAME} 
+
+
+
+get_id 
+        -name {$NAME} 
+
+set_id 
+        -name {$NAME} 
+
+        
+
+get_mode_list 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+set_mode_list 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+        -mode_list {$LIST_OF_AVAILABLE_MODES} 
+
+ 
+
+ 
+
+get_logic_location 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+set_logic_location 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+        -location {$X_LOC $Y_LOC} 
+
+ 
+
+get_phy_address 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+set_phy_address 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+        -address {$PHYSICAL_ADDRESS} 
+
+ 
+
+get_io_bank 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+set_io_bank 
+
+        -block {$BLOCK_NAME} | 
+
+        -id {$BLOCK_ID} 
+
+        –io_bank {$IO_BANK} 
+
+ 
+
+Routines to do attribute set and query. 
+
+get_constraint 
+
+        -name {$CONSTRAINT_NAME} 
+
+get_block 
+
+       –constraint {$CONSTRAINT_NAME} 
+
+        -master | -slave 
+
+ 
+
+get_chain 
+
+        -name {$CHAIN_NAME} 
+
+get_chain 
+
+        -name {$CHAIN_NAME} 
+
+ 
+
+get_address 
+
+        -name {$CHAIN_NAME} 
+
+        -start_address | -end_address 
+
+set_address 
+
+        -name {$CHAIN_NAME} 
+
+        -start_address {$START_ADDRESS} | -end_address {$END_ADDRESS} 
+
+ 
+
+ 
+
+get_chain 
+
+        -block {$CONGROLLER_BLOCK_NAME} 
+
+set_chain 
+
+        -block {$CONGROLLER_BLOCK_NAME} 
+
+        -chain {$CHAIN_NAME} 
+
+ 
+

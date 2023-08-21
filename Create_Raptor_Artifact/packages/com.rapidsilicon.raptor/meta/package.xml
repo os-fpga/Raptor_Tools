@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<Package>
+    <DisplayName>Raptor</DisplayName>
+    <Description>Install Raptor.</Description>
+    <Version>2022.12</Version>
+    <ReleaseDate>2023-01-21</ReleaseDate>
+    <Licenses>
+        <License name="Beer Public License Agreement" file="license.txt" />
+    </Licenses>
+    <Script>compnet_script.qs</Script>
+    <UserInterfaces>
+        <UserInterface>readmecheckboxform.ui</UserInterface>
+    </UserInterfaces>
+    <Default>true</Default>
+</Package>

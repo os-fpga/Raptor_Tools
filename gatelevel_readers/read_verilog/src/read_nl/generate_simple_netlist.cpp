@@ -15,6 +15,7 @@
  *
  */
 
+#include <filesystem>
 #include "Map.h" // Make associated hash table class Map available
 #include "Set.h" // Make associated hash table class Set available
 
@@ -35,10 +36,7 @@
 
 #include <iostream>
 #include <sstream> // std::stringstream, std::stringbuf
-#include <string>
-#include <vector>
-#include <unordered_set>
-#include <unordered_map>
+#include "utilities.h"
 #include <map>
 #include <ctype.h>
 #include <bitset>
@@ -216,9 +214,10 @@ string bitsOfHexaDecimal(string &s)
     {
         throw(std::invalid_argument("Can't generate an hexadecimal number out of an empty string"));
     }
-    for (auto& d : s)
+    for (auto &d : s)
     {
-        if(d == 'z' || d == 'Z') d = 'x';
+        if (d == 'z' || d == 'Z')
+            d = 'x';
         if (!isxdigit(d) && d != 'x' && d != 'X')
             throw(std::invalid_argument("Non hexadigit in hexadecimal string" + s));
     }
@@ -276,7 +275,7 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
     if (exp.size() < 4)
         throw(std::invalid_argument("Not a valid expression, should be of size more than 3 " + exp));
     if (!isdigit(exp[0]))
-        throw(std::invalid_argument("Not a valid expression (i.e 4'h0A9 ) " + exp));
+        throw(std::invalid_argument("Not a valid expression (i.e 4'h0A9 ) at line " + std::to_string(__LINE__) + " " + exp));
     stringstream ss(exp);
     string rad_and_value;
 
@@ -288,9 +287,10 @@ void bits(const string &exp, std::vector<std::string> &vec_, string &strRes)
     if (rad_and_value[1] == 'b' || rad_and_value[1] == 'B')
     {
         bit_value = value;
-        for (auto& d : bit_value)
+        for (auto &d : bit_value)
         {
-            if(d == 'z' || d == 'Z') d = 'x';
+            if (d == 'z' || d == 'Z')
+                d = 'x';
             if ('1' != d && '0' != d && 'x' != d)
                 throw(std::invalid_argument("Not valid bit value " + string(1, d) + " in " + exp));
         }
@@ -513,7 +513,7 @@ bool bitBlast(VeriExpression *port_expr, vector<string> &res)
 unsigned long long veriValue(const string &exp)
 {
     if (!isdigit(exp[0]))
-        throw(std::invalid_argument("Not a valid expression (i.e 4'h0A9 ) " + exp));
+        throw(std::invalid_argument("Not a valid expression (i.e 4'h0A9 ) at line " + std::to_string(__LINE__) + " " + exp));
     stringstream ss(exp);
     string dd;
     char *str, *stops;
@@ -570,13 +570,14 @@ void simpleTruthTable(std::string tr, std::string w, std::vector<std::vector<uns
     }
 }
 
-int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file)
+int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file, const char *top_mod)
 {
-    //PRIVATE_KEY_FILENAME
+    // PRIVATE_KEY_FILENAME
     ieee_1735 ieee_1735;
     Array files(1);
     files.Insert(file_name);
     ieee_1735.set_pvt_key(key_file);
+    Message::SetMessageType("VERI-1063", VERIFIC_IGNORE);
 
 #ifdef PRODUCTION_BUILD
     License_Manager license(License_Manager::LicensedProductName::READ_VERILOG);
@@ -589,7 +590,17 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         return 1;
     }
     // Get name of top-level module
-    const char *name = veri_file::TopModule();
+    const char *name;
+
+    if (top_mod == nullptr)
+    {
+        // Get name of top-level module
+        name = veri_file::TopModule();
+    }
+    else
+    {
+        name = top_mod;
+    }
 
     // Ok now let's elaborate this module. In case of failure return.
     if (!veri_file::Elaborate(name /*module_name*/, "work" /*work_lib*/, 0 /*parameter_values_map*/))
@@ -611,6 +622,8 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
         Message::PrintLine("Cannot find any handle to the top-level netlist");
         return 5;
     }
+    // Flatten down to primitives
+    top->Flatten();
     // Lets accumulate all netlist
     Set netlists(POINTER_HASH);
     top->Hierarchy(netlists, 0 /* bottom to top */);
@@ -639,21 +652,33 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
                      netlist->Owner()->Name(), netlist->NumOfRefs(), top->Owner()->Name());
         // Iterate over all ports of this netlist
         const char *current_block_model = netlist->Owner()->Name();
+        VeriModule *im = veri_file::GetModule(current_block_model);
         Port *port;
         FOREACH_PORT_OF_NETLIST(netlist, mi, port)
         {
             PortBus *portb = port->Bus();
             if (DIR_INOUT == port->GetDir())
-                n_l.inout_ports.push_back(port->Name());
+            {
+                if (netlist == top)
+                {
+                    n_l.inout_ports.push_back(port->Name());
+                }
+            }
             else if (DIR_OUT == port->GetDir())
             {
-                n_l.out_ports.push_back(port->Name());
-                n_l.ports.push_back(port->Name());
+                if (netlist == top)
+                {
+                    n_l.out_ports.push_back(port->Name());
+                    n_l.ports.push_back(port->Name());
+                }
             }
             else if (DIR_IN == port->GetDir())
             {
-                n_l.in_ports.push_back(port->Name());
-                n_l.ports.push_back(port->Name());
+                if (netlist == top)
+                {
+                    n_l.in_ports.push_back(port->Name());
+                    n_l.ports.push_back(port->Name());
+                }
                 n_l.in_set.insert(port->Name());
             }
         }
@@ -701,7 +726,6 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
                     param_v = literal;
                 }
                 is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
-
                 if (is_valid)
                 {
                     n_l.blocks.back().params_[param_name] = param_v;
@@ -711,17 +735,78 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
                     // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
                 }
             }
+            // Support hardcoded lut names like LUT2, LUT3 ...
+            std::string str = n_l.blocks.back().mod_name_.substr(0, 4);
+            transform(str.begin(), str.end(), str.begin(), ::toupper);
+            std::unordered_map<std::string, std::string> lut_sel_width_strs = {{"LUT1", "32'd1"}, {"LUT2", "32'd2"}, {"LUT3", "32'd3"}, {"LUT4", "32'd4"}, {"LUT5", "32'd5"}, {"LUT6", "32'd6"}};
+            if (end(lut_sel_width_strs) != lut_sel_width_strs.find(str))
+            {
+                std::string literal = lut_sel_width_strs[str];
+                vector<string> v;
+                string param_v;
+                bool is_valid = false;
+                try
+                {
+                    bits(literal, v, param_v);
+                }
+                catch (...)
+                {
+                    param_v = literal;
+                }
+                is_valid = is_string_param_(param_v) || is_binary_param_(param_v) || is_real_param_(param_v);
+                if (is_valid)
+                {
+                    n_l.blocks.back().params_["WIDTH"] = param_v;
+                }
+                else
+                {
+                    // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not Supported as eblif parameter  %s ", param_value);
+                }
+                if (n_l.blocks.back().params_.find("INIT_VALUE") != end(n_l.blocks.back().params_))
+                {
+                    n_l.blocks.back().params_["LUT"] = n_l.blocks.back().params_["INIT_VALUE"];
+                }
+                else
+                {
+                    // Message::Msg(VERIFIC_INFO, 0, netlist->Linefile(), "V2B:: Not provided Initial value of LUT parameter  %s ", str);
+                }
+                n_l.blocks.back().mod_name_ = "$lut";
+            }
             // Iterate over all portrefs of instance
             PortRef *portref;
-            FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+
+            std::string mod_n = n_l.blocks.back().mod_name_;
+            if (end(latch_lut_WIDTH_strs) != latch_lut_WIDTH_strs.find(mod_n))
             {
-                // Do what you want with it ...
-                Net *net_ = portref->GetNet();
-                Port *port_ = portref->GetPort();
-                n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                n_l.blocks.back().params_["WIDTH"] = latch_lut_WIDTH_strs[mod_n];
+                n_l.blocks.back().params_["LUT"] = latch_lut_LUT_strs[mod_n];
+                n_l.blocks.back().mod_name_ = "$lut";
+
+                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                {
+                    // Do what you want with it ...
+                    Net *net_ = portref->GetNet();
+                    Port *port_ = portref->GetPort();
+                    if (port_->Name() == std::string("Q")){
+                        n_l.blocks.back().conns_.push_back({"Y", net_->Name()});
+                        }
+                    n_l.blocks.back().conns_.push_back({latch_lut_port_conversion[mod_n][port_->Name()], net_->Name()});
+                }
+            }
+            else
+            {
+                FOREACH_PORTREF_OF_INST(instance, mi2, portref)
+                {
+                    // Do what you want with it ...
+                    Net *net_ = portref->GetNet();
+                    Port *port_ = portref->GetPort();
+                    n_l.blocks.back().conns_.push_back({port_->Name(), net_->Name()});
+                }
             }
             if (n_l.blocks.back().params_.find("LUT") != end(n_l.blocks.back().params_))
             {
+                // Sorting the vector based on the first element of each pair
+                std::sort(n_l.blocks.back().conns_.begin(), n_l.blocks.back().conns_.end());
                 simpleTruthTable(n_l.blocks.back().params_["LUT"], n_l.blocks.back().params_["WIDTH"], n_l.blocks.back().truthTable_);
             }
         }
@@ -817,17 +902,21 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
     }
     veri_file::RemoveAllModules();
 
-    string js_port_file(file_name);
-    while ('.' != js_port_file.back())
-    {
-        js_port_file.pop_back();
-    }
-    js_port_file.pop_back();
-    js_port_file += "_ports.json";
-    ofstream myfile;
-    myfile.open(js_port_file.c_str());
-    n_l.b_port_print_json(myfile);
-    myfile.close();
+    std::filesystem::path path(file_name);
+    std::string directory = std::filesystem::current_path().string();
+    std::string base_name = path.stem().string();
 
+    std::string js_port_file = directory + "/" + "post_synth_ports.json";
+    std::ofstream myfile(js_port_file.c_str());
+    if (myfile.is_open())
+    {
+        n_l.b_port_print_json(myfile);
+        myfile.close();
+        std::cout << "Output file created at: " << js_port_file << std::endl;
+    }
+    else
+    {
+        std::cout << "Failed to create the output file." << std::endl;
+    }
     return 0;
 }

@@ -60,14 +60,16 @@ void encrypt ( char* p_key,char *input_message){
     RSA *keypair = RSA_new();
     char *public_key_pem  = p_key;
     public_key  = read_RSA(keypair, PUBLIC_KEY_PEM, public_key_pem);
-    encrypt = (char*)malloc(RSA_size(public_key));
+    encrypt = new char [RSA_size(public_key)];
+    //encrypt = (char*)malloc(RSA_size(public_key));
     int encrypt_length = public_encrypt(strlen(message) + 1, (unsigned char*)message, (unsigned char*)encrypt, public_key, RSA_PKCS1_OAEP_PADDING);
     if(encrypt_length == -1) {
         LOG("An error occurred in public_encrypt() method");
     }
     else{
-        LOG("Data has been encrypted.");
+        //LOG("Data has been encrypted.");
         create_encrypted_file(encrypt, public_key);
-        LOG("Encrypted file has been created.");
+        //delete [] encrypt;
+        //LOG("Encrypted file has been created.");
     }
 }

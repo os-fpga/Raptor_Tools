@@ -7,6 +7,7 @@
 #include <vector>
 #include <unordered_set>
 #include <unordered_map>
+#include <map>
 #include <ctype.h>
 #include <cstring> // strchr ...
 #include <cctype>  // isalpha, etc ...
@@ -240,6 +241,6 @@ struct simple_netlist
 
 };
 
-int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file);
+int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file, const char *top_mod);
 
 #endif

@@ -1,0 +1,95 @@
+
+"port" : {
+    "name" : string, 
+    "direction" : string,
+    "source" : string
+    }
+
+"enum_elem" : {
+    "name" : string,
+    "value" : string
+}
+
+"enum_type" : {
+    <"default" : string>?,
+    <"name" :  string >+
+}
+
+"attribute" : {
+    "name" : string
+    "address":string,
+    "width" : int,
+    "enum" : {enum_type::enum_elem}
+}
+
+"operation" : {
+    "operand_left"  : {simple_expression},
+    "operand_right" : {simple_expression},
+    "operation" : string; 
+}
+
+"simple_expression" : {
+    "reference" : string,
+    "operation_obj" : {operation}
+}
+
+"constraint" : {
+    "name" : string,
+    "cause"  : {simple_expression},
+    "consequence" : {simple_expression}
+}
+
+"block" : {
+    "name" : string,
+    "ports" : {
+        <"port_name" : {port}>+
+    },
+    "attributes" : {
+        <"attribute_name" : {attribute}>+
+    },
+    "constraints" : {
+        <"constraint_name">: {constraint}>+
+    },
+    "instances": {}
+}
+
+"instance" : {
+    "name" : string,
+    "id" : int,
+    "block" : string,
+    "parent" : string,
+    "logic_location" : [int],
+    "logic_address" : int,
+    "io_bank" : string,
+    "port_connections" : {
+        <"port_name" : {port}>+
+    },
+    "attributes" : {
+        <"attribute_name" : {attribute}>+
+    },
+    "constraints" : {
+        <"constraint_name">: {constraint}>+
+    }
+}
+
+"chain" : {
+    "name" : string,
+    "blocks" : [ string ]
+}
+
+"chain_instance" : {
+    "name" : string,
+    "chain" : string,
+    "start_address" : int,
+    "end_address" : int,
+    "block_instances" : [ string ]
+}
+
+"device" : {
+    "ric_schema_version" : string,
+    "device_version" : string,
+    "blocks" : {},
+    "instance_list" : [],
+    "chains" : {}
+}
+

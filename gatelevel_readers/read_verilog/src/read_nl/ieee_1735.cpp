@@ -19,6 +19,7 @@
 #include <fstream>
 #include <cstring> // For memset and memcpy
 #include <sstream> // For istringstream
+#include "Map.h" // Make associated hash table class Map available
 
 #include "Strings.h"
 #include "Array.h"
@@ -26,6 +27,7 @@
 
 #include "ieee_1735.h"
 #include "obfuscate.h"
+using namespace std;
 
 #define PADDING RSA_PKCS1_PADDING
 
@@ -64,8 +66,9 @@ ieee_1735::encrypt(const char *in_buf, char **out_buf, unsigned in_size)
     char *msg = Strings::save((const char *) &iv, in_buf) ;
 
     // Encrypt data_block
-    unsigned encrypted_len ;
+    unsigned encrypted_len;
     char *out_binary = EncryptAES_128_CBC(msg, (byte *) _session_key, (byte *) iv, &encrypted_len) ;
+    std::string sizeString = std::to_string(encrypted_len);
     Strings::free(msg) ;
     if (!out_binary) return 0 ;
 
@@ -74,8 +77,33 @@ ieee_1735::encrypt(const char *in_buf, char **out_buf, unsigned in_size)
     Strings::free(out_binary) ;
 
     // Break long line into 64 character lines
-    *out_buf = InsertNewlines(out_b64, 64) ;
-    Strings::free(out_b64) ;
+    char *new_buf = InsertNewlines(out_b64, 64);
+    Strings::free(out_b64);
+
+    const char *prefix = (IsVhdl()) ? "`protect " : "`pragma protect " ;
+    const std::string additional_string = std::string(prefix) + "data_method=\"aes128-cbc\"\n" + std::string(prefix)  + "encoding = (enctype = \"base64\", line_length = 64,"
+                                       " bytes = " + sizeString + ")\n" + std::string(prefix)  + "data_block\n";
+
+    // Append additional string at the start of new_buf
+    unsigned additional_len = additional_string.length();
+
+    // Calculate the length of the new buffer
+    unsigned new_buf_len = additional_len + Strings::len(new_buf);
+
+    // Allocate memory for the new buffer
+    char *final_buf = new char[new_buf_len + 1];
+
+    // Copy the additional string to the start of the new buffer
+    strcpy(final_buf, additional_string.c_str());
+
+    // Copy the contents of new_buf to the new buffer, starting from the position after the additional string
+    strcpy(final_buf + additional_len, new_buf);
+
+    // Free the memory allocated for the original new_buf
+    Strings::free(new_buf);
+
+    // Assign the new buffer to out_buf
+    *out_buf = final_buf;
 
     return Strings::len(*out_buf) ;
 }
@@ -85,62 +113,65 @@ ieee_1735::GetEncryptionHeader()
 {
     // Return the encryption header that will be writen before the encrypted text.
     Array a(0) ;
-
     if (IsVhdl()) {
         a.InsertLast(Strings::save("`protect begin_protected\n")) ;
     } else {
         a.InsertLast(Strings::save("`pragma protect begin_protected\n")) ;
     }
 
-    const char * const directives[] = {
-        "verision", "encrypt_agent", "encrypt_agent_info", "author", "author_info",
-        "data_method", "key_keyowner", "key_keyname", "key_method"} ;
-
     const char *prefix = (IsVhdl()) ? "`protect " : "`pragma protect " ;
-    for (unsigned i=0 ; i<9 ; i++) {
-        const char *value = GetDirectiveValue(directives[i]) ;
-        if (!value) continue ;
-        a.InsertLast(Strings::save(prefix, directives[i], " = ", value, "\n")) ;
+
+    // Add directives to the respective headers
+    auto b = GetDirectiveMap();
+    MapIter mi ;
+    char *directive ;
+    Directive *value ;
+    FOREACH_MAP_ITEM(b, mi, &directive, &value) {
+        if (!directive || !value) continue ;
+        const char* pub_key = "key_public_key";
+        const char *val = value->GetStringValue() ;
+        if (strcmp(pub_key, directive) == 0){
+            // Get public key from directives
+        char *public_key = FormatPublicKey(val) ;
+        BIO *keybio = BIO_new_mem_buf((byte *) public_key, -1) ;
+        VERIFIC_ASSERT(keybio) ;
+        RSA *rsa_public  = PEM_read_bio_RSA_PUBKEY(keybio, NULL, NULL, NULL) ;
+        if (!rsa_public) {
+            std::cerr << "Error: unable to load public key" << std::endl ;
+            return 0 ;
+        }
+
+        // Encrypt session key using RSA
+        char *key_block_binary = Strings::allocate(RSA_size(rsa_public)) ;
+        unsigned encrypted_len = \
+            RSA_public_encrypt(BLOCK_SIZE, (const byte *) _session_key, (byte *) key_block_binary,
+                               rsa_public, PADDING) ;
+        if (encrypted_len <= 0) {
+            std::cerr << "Error: unable to encrypt key block (length=" << encrypted_len
+                      << ")" << std::endl ;
+            return 0 ;
+        }
+        RSA_free(rsa_public);
+        BIO_free(keybio);
+        Strings::free(public_key);
+
+        // Base64 encode encrypted session key
+        char *key_block_b64 = EncodeBase64(key_block_binary, encrypted_len) ;
+        Strings::free(key_block_binary) ;
+        char *key_block_b64_w_newlines = InsertNewlines(key_block_b64, 64) ;
+        Strings::free(key_block_b64) ;
+
+        // Add key_block info and actual value to encryption header
+        a.InsertLast(Strings::save(prefix, "encoding = (enctype = \"base64\", line_length = 64,"
+                                           " bytes = 128), key_block\n")) ;
+        a.InsertLast(key_block_b64_w_newlines) ;
+        a.InsertLast(Strings::save("\n")) ;
+            ////////////////////////////////////////
+        } else {
+            a.InsertLast(Strings::save(prefix, directive, " = ", val, "\n")) ;
+        }
+        //std::printf("    Value    : \"%s\"\n\n", value->GetStringValue()) ;
     }
-
-    // Get public key from directives
-    char *public_key = FormatPublicKey(GetDirectiveValue("key_public_key")) ;
-    BIO *keybio = BIO_new_mem_buf((byte *) public_key, -1) ;
-    VERIFIC_ASSERT(keybio) ;
-    RSA *rsa_public  = PEM_read_bio_RSA_PUBKEY(keybio, NULL, NULL, NULL) ;
-    if (!rsa_public) {
-        std::cerr << "Error: unable to load public key" << std::endl ;
-        return 0 ;
-    }
-
-    // Encrypt session key using RSA
-    char *key_block_binary = Strings::allocate(RSA_size(rsa_public)) ;
-    unsigned encrypted_len = \
-        RSA_public_encrypt(BLOCK_SIZE, (const byte *) _session_key, (byte *) key_block_binary,
-                           rsa_public, PADDING) ;
-    if (encrypted_len <= 0) {
-        std::cerr << "Error: unable to encrypt key block (length=" << encrypted_len
-                  << ")" << std::endl ;
-        return 0 ;
-    }
-    RSA_free(rsa_public);
-    BIO_free(keybio);
-    Strings::free(public_key);
-
-    // Base64 encode encrypted session key
-    char *key_block_b64 = EncodeBase64(key_block_binary, encrypted_len) ;
-    Strings::free(key_block_binary) ;
-    char *key_block_b64_w_newlines = InsertNewlines(key_block_b64, 64) ;
-    Strings::free(key_block_b64) ;
-
-    // Add key_block info and actual value to encryption header
-    a.InsertLast(Strings::save(prefix, "encoding = (enctype = \"base64\", line_length = 64,"
-                                       " bytes = 128), key_block\n")) ;
-    a.InsertLast(key_block_b64_w_newlines) ;
-
-    // Add data_block info to encryption header (actual value added by encrypt)
-    a.InsertLast(Strings::save("\n", prefix, "encoding = (enctype = \"base64\", line_length = 64,"
-                                       " bytes = 128), data_block")) ;
 
     char *header = Strings::save(a) ;
     unsigned i ;
@@ -202,11 +233,35 @@ ieee_1735::decrypt(void)
     /////////////////////////////////////////////////////////////////////////
     // Get key_block and use RSA decryption to get the original session_key
     /////////////////////////////////////////////////////////////////////////
-    const char *key_method = GetVerifyDirectiveValue("key_method", "\"rsa\"") ;
-    if (!key_method) return 0 ;
-
-    const char *key_block_b64_newlines = GetVerifyDirectiveValue("key_block") ;
-    if (!key_block_b64_newlines) return 0 ;
+    const char *key_block_b64_newlines;
+    auto b = GetDirectiveMap();
+    bool is_RS_key = false;
+    MapIter mi ;
+    char *directive ;
+    Directive *value ;
+    FOREACH_MAP_ITEM(b, mi, &directive, &value) {
+        if (!directive || !value) continue ;
+        const char* pub_key = "key_block";
+        const char *val = value->GetStringValue() ;
+        if (strcmp("author", directive) == 0) {
+            if ((strcmp("\"Rapid Silicon\"", val) == 0) || (strcmp("\"Verific\"", val) == 0)) {
+                is_RS_key = true;
+            }
+        }
+        if(is_RS_key) {
+            if ((strcmp("key_method", directive) == 0) && !(strcmp("\"rsa\"", val) == 0))
+                throw(std::runtime_error("Invalid key method."));
+            if (strcmp("key_block", directive) == 0) {
+                key_block_b64_newlines = val;
+                is_RS_key = false;
+            }
+        }
+    }
+    //const char *key_block_b64_newlines = GetVerifyDirectiveValue("key_block") ;
+    if (!key_block_b64_newlines) {
+        throw(std::runtime_error("Not a valid key."));
+        return 0 ;
+    }
     char *key_block_b64 = RemoveNewlines(key_block_b64_newlines) ;
     unsigned decoded_len ;
     char *key_block = DecodeBase64(key_block_b64, &decoded_len) ;
@@ -249,9 +304,7 @@ ieee_1735::decrypt(void)
     Strings::free(data_block) ;
     Strings::free(session_key) ;
     if (!rtl) return 0 ;
-
     char *rtl_w_newline = Strings::save(rtl, "\n") ;
-    Strings::free(rtl) ;
 
     return rtl_w_newline ;
 }
