@@ -40,11 +40,6 @@
 #include "veri_file.h" // Make verilog reader available
 #include "veri_prune.h"
 
-#define VERI_INOUT 329
-#define VERI_INPUT 330
-#define VERI_OUTPUT 346
-#define VERI_WIRE 392
-
 #ifdef USE_COMREAD
 #include "ComRead.h"
 #include "Commands.h"
@@ -53,6 +48,18 @@
 #ifdef VERIFIC_NAMESPACE
 using namespace Verific;
 #endif
+
+#define VERI_INOUT 329
+#define VERI_INPUT 330
+#define VERI_OUTPUT 346
+#define VERI_WIRE 392
+
+std::unordered_map<int, std::string> directions = {
+  {VERI_INPUT, "Input"},
+  {VERI_OUTPUT, "Output"},
+  {VERI_INOUT, "Inout"}
+};
+
 std::vector<std::string> direction_print_outs = {
     "IN_DIR", "OUT_DIR", "INOUT_DIR", "OUT_CLK", "IN_CLK", "IN_RESET"};
 std::unordered_map<std::string, std::map<std::string, int>>
@@ -431,6 +438,22 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
     Message::PrintLine("Cannot find a top level module");
     delete all_top_modules;
     return 3;
+  }
+
+  json j_module;
+  j_module["topModule"] = mod->Name();
+  Array *module_ports = mod->GetPorts(); // Get the ports
+  unsigned q;
+  VeriIdDef *port_id_;
+  FOREACH_ARRAY_ITEM(module_ports, q, port_id_) {
+    if (!port_id_)
+      continue;
+    json range;
+    range["msb"] = port_id_->LeftRangeBound();
+    range["lsb"] = port_id_->RightRangeBound();
+    j_module["ports"].push_back({{"name", port_id_->GetName()}, 
+            {"direction", directions[port_id_->Dir()]}, 
+            {"range", range}});
   }
 
   // Now copy of the top level module
@@ -957,6 +980,8 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   unsigned k;
   VeriIdDef *port_id;
   FOREACH_ARRAY_ITEM(mod_ports, k, port_id) {
+    if (!port_id)
+      continue;
     gb.top_ios.insert(port_id->GetName());
     gb.mod_ports.push_back(port_id->GetName());
   }
@@ -990,6 +1015,21 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
+
+  std::filesystem::path path(file_name);
+  std::string directory = std::filesystem::current_path().string();
+  std::string js_port_file = directory + "/" + "post_synth_ports.json";
+  std::ofstream myfile(js_port_file.c_str());
+  if (myfile.is_open())
+  {
+      myfile << std::setw(4) << j_module << std::endl;
+      myfile.close();
+      std::cout << "Output file created at: " << js_port_file << std::endl;
+  }
+  else
+  {
+      std::cout << "Failed to create the output file." << std::endl;
+  }
 
   return 0; // Status OK
 }

@@ -9,8 +9,10 @@
 #include <map>
 #include <unordered_set>
 #include <algorithm>
-using namespace std;
+#include <json.hpp>
 
+using namespace std;
+using json = nlohmann::json;
 
 struct gb_constructs
 {
