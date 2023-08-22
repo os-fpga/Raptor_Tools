@@ -39,6 +39,8 @@
 #include "gb_map.h"
 #include "veri_file.h" // Make verilog reader available
 #include "veri_prune.h"
+#include <json.hpp>
+using json = nlohmann::json;
 
 #ifdef USE_COMREAD
 #include "ComRead.h"
