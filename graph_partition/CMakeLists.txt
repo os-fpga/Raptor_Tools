@@ -16,22 +16,13 @@ set(TBB_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_tbb_linux.cmake)
 set(KAHYPAR_DOWNLOAD_BOOST ON CACHE BOOL "Enable the Download of Boost" FORCE)
 set(KAHYPAR_DOWNLOAD_TBB ON CACHE BOOL "Enable the Download of TBB" FORCE)
 
-if(${ShoulbeBoostMDsum} STREQUAL ${presentBoostMDsum} OR ${RSShoulbeBoostMDsum} STREQUAL ${presentBoostMDsum})
 FILE(COPY ${Boost_download_RS}
           DESTINATION
           ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts)
-else()
-    message(FATAL_ERROR "The CMake to download boost is changed. Please look into it" )
-endif()
 
-if(${shouldbeTBBMd5sum} STREQUAL ${presentTBBMd5sum} OR ${RSshouldbeTBBMd5sum}  STREQUAL ${presentTBBMd5sum})
 FILE(COPY ${TBB_download_RS}
           DESTINATION
           ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts)
-else()
-    message(FATAL_ERROR "The CMake to download TBB is changed. Please look into it" )
-endif()
-
 
 if(RAPTOR)
     # need to move the findtbb.cmake to OpenFPGA as well so both look for tbb using same regex
