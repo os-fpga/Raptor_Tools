@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.15)
 project("graph_partition")
 
 set(ShoulbeBoostMDsum 18e91cd48013ac7b5f670cb5c9d215f9)
-set(RSShoulbeBoostMDsum 1ff19ebfc5c0db58cb164d7e9dd6edf3)
+set(RSShoulbeBoostMDsum 7e0e948ae3e8616e1c39772a21d98009)
 file(MD5  ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts/download_boost.cmake presentBoostMDsum)
 set(Boost_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_boost.cmake)
 
 set(shouldbeTBBMd5sum 44b642420d30c5cec546a8db802d19a6)
-set(RSshouldbeTBBMd5sum dee20b877c387f1550825107f2cc3875)
+set(RSshouldbeTBBMd5sum 2d1de2df440c2c4710704d8187087aab)
 file(MD5  ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts/download_tbb_linux.cmake presentTBBMd5sum)
 set(TBB_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_tbb_linux.cmake)
 

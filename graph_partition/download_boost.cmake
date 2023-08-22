@@ -17,6 +17,7 @@ FetchContent_Populate(
   URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/boost_1_69_0_minimum.tar.bz2
   #URL_HASH MD5=a1332494397bf48332cb152abfefcec2
   SOURCE_DIR ${unzip_boost_dir}
+  SUBBUILD_DIR ${CMAKE_CURRENT_BINARY_DIR}/${build_dir}/boost_download
 )
-file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/boost-src-subbuild)
-file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/boost-src-build)
+#file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/boost-src-subbuild)
+#file(REMOVE_RECURSE ${CMAKE_CURRENT_BINARY_DIR}/boost-src-build)
