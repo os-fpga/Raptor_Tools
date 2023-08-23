@@ -238,7 +238,7 @@ struct simple_netlist
     std::vector<inst> blocks;
     std::unordered_set<std::string> in_set;
     bool encrypted = false;
-
+    bool create_ps_json = true;
 };
 
 int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_file, const char *top_mod);
