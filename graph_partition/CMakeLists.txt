@@ -68,7 +68,8 @@ install (
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/tbb)
 
 
-# Set MtKaHyPar_BINARY_FILE_PATH
-# set(MtKaHyPar_BINARY_FILE_PATH "${CMAKE_CURRENT_BINARY_DIR}/bin/MtKaHyPar" CACHE INTERNAL "")
-set(MtKaHyPar_BINARY_FILE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MtKaHyPar" CACHE INTERNAL "")
-configure_file(config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/vpr/src/pack/config.h")
+if(RAPTOR)
+    # Set MtKaHyPar_BINARY_FILE_PATH
+    set(MtKaHyPar_BINARY_FILE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MtKaHyPar" CACHE INTERNAL "")
+    configure_file(config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/vpr/src/pack/config.h")
+endif()
