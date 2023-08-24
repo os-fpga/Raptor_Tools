@@ -19,6 +19,10 @@ stringstream nlBuffer;
 
 void readJsonFile(const char* fileName, stringstream& buffer) {
     ifstream fJson(fileName);
+    if (!fJson.is_open()) {
+        std::string errorMessage = "Error: Unable to open file '" + std::string(fileName) + "'";
+        throw std::runtime_error(errorMessage);
+    }
     buffer.str(""); // Clear the stringstream
     buffer << fJson.rdbuf();
     fJson.close(); // Close the file stream
