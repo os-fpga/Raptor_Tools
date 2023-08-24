@@ -1024,7 +1024,8 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   std::ofstream myfile(js_port_file.c_str());
   if (myfile.is_open())
   {
-      myfile << std::setw(4) << j_module << std::endl;
+      json output_array = { j_module };
+      myfile << std::setw(4) << output_array << std::endl;
       myfile.close();
       std::cout << "Output file created at: " << js_port_file << std::endl;
   }
