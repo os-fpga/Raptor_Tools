@@ -15,7 +15,7 @@ print_prefix:
 	@echo "Prefix is $(PREFIX)"
 
 build: print_prefix
-	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DKAHYPAR_DOWNLOAD_TBB=On -DKAHYPAR_DOWNLOAD_BOOST=On -S . -B build 
+	cmake -DCMAKE_BUILD_TYPE=Release -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DENFORCE_STANDALONE=ON -DKAHYPAR_DOWNLOAD_TBB=On -DKAHYPAR_DOWNLOAD_BOOST=On -S . -B build 
 	cmake --build build -j40
 
 install: build

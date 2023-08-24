@@ -3,12 +3,12 @@ cmake_minimum_required(VERSION 3.15)
 project("graph_partition")
 
 set(ShoulbeBoostMDsum 18e91cd48013ac7b5f670cb5c9d215f9)
-set(RSShoulbeBoostMDsum f34c5c7b7467c2613629ce4f3b1f691b)
+set(RSShoulbeBoostMDsum 7e0e948ae3e8616e1c39772a21d98009)
 file(MD5  ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts/download_boost.cmake presentBoostMDsum)
 set(Boost_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_boost.cmake)
 
 set(shouldbeTBBMd5sum 44b642420d30c5cec546a8db802d19a6)
-set(RSshouldbeTBBMd5sum dee20b877c387f1550825107f2cc3875)
+set(RSshouldbeTBBMd5sum 2d1de2df440c2c4710704d8187087aab)
 file(MD5  ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts/download_tbb_linux.cmake presentTBBMd5sum)
 set(TBB_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_tbb_linux.cmake)
 
@@ -16,47 +16,49 @@ set(TBB_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_tbb_linux.cmake)
 set(KAHYPAR_DOWNLOAD_BOOST ON CACHE BOOL "Enable the Download of Boost" FORCE)
 set(KAHYPAR_DOWNLOAD_TBB ON CACHE BOOL "Enable the Download of TBB" FORCE)
 
-if(${ShoulbeBoostMDsum} STREQUAL ${presentBoostMDsum} OR ${RSShoulbeBoostMDsum} STREQUAL ${presentBoostMDsum})
 FILE(COPY ${Boost_download_RS}
           DESTINATION
           ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts)
-else()
-    message(FATAL_ERROR "The CMake to download boost is changed. Please look into it" )
-endif()
 
-if(${shouldbeTBBMd5sum} STREQUAL ${presentTBBMd5sum} OR ${RSshouldbeTBBMd5sum}  STREQUAL ${presentTBBMd5sum})
 FILE(COPY ${TBB_download_RS}
           DESTINATION
           ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts)
-else()
-    message(FATAL_ERROR "The CMake to download TBB is changed. Please look into it" )
-endif()
 
+option(ENFORCE_STANDALONE
+          "Build only MtKahPar as top project" OFF)          
 
 if(RAPTOR)
+    set(mid_path "Backend")
+else()
+    set(mid_path "")
+endif()
+
+if(NOT ENFORCE_STANDALONE)
     # need to move the findtbb.cmake to OpenFPGA as well so both look for tbb using same regex
     FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/cmake/modules/FindTBB.cmake
               DESTINATION
-                ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/cmake/modules)
+                ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/cmake/modules)
 
     # need to insert a line in vpr/tatum so that it can know the tbb header files location and link libs, do same for vpr cmake as well
     FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/libtatutum.cmake
             DESTINATION
-            ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum)
-    FILE(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/libtatutum.cmake
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/CMakeLists.txt)
-
-    # turn off googletest in mt-kahypar as FOEDAG will provide it
-    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt FILE_CONTENT)
-    if(NOT "${FILE_CONTENT}" MATCHES "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)")
-        # Comment out the line
-        string(REPLACE "add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" MODIFIED_CONTENT "${FILE_CONTENT}")
-        file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt "${MODIFIED_CONTENT}")
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum)
+    FILE(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/libtatutum.cmake
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/CMakeLists.txt)
+    if(RAPTOR)
+        # turn off googletest in mt-kahypar as FOEDAG will provide it
+        file(READ ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt FILE_CONTENT)
+        if(NOT "${FILE_CONTENT}" MATCHES "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)")
+            # Comment out the line
+            string(REPLACE "add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" MODIFIED_CONTENT "${FILE_CONTENT}")
+            file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt "${MODIFIED_CONTENT}")
+        endif()
     endif()
 endif()
 
 set(ENV{BUILD_TYPE} ${CMAKE_BUILD_TYPE})
 set(CMAKE_RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+include_directories(SYSTEM ${CMAKE_CURRENT_SOURCE_DIR}/../libs/external/boost)
 # Sub-project
 add_subdirectory(mt-kahypar ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar EXCLUDE_FROM_ALL)
 
@@ -75,4 +77,8 @@ install (
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar/external_tools/tbb/lib/intel64/gcc4.8/
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/tbb)
 
-
+set(MtKaHyPar_BINARY_FILE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MtKaHyPar" CACHE INTERNAL "")
+if(NOT ENFORCE_STANDALONE)
+    # Set MtKaHyPar_BINARY_FILE_PATH
+    configure_file(config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/vpr/src/pack/config.h")
+endif()
