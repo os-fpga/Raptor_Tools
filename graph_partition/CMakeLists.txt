@@ -24,25 +24,35 @@ FILE(COPY ${TBB_download_RS}
           DESTINATION
           ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/scripts)
 
+option(ENFORCE_STANDALONE
+          "Build only MtKahPar as top project" OFF)          
+
 if(RAPTOR)
+    set(mid_path "Backend")
+else()
+    set(mid_path "")
+endif()
+
+if(NOT ENFORCE_STANDALONE)
     # need to move the findtbb.cmake to OpenFPGA as well so both look for tbb using same regex
     FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/cmake/modules/FindTBB.cmake
               DESTINATION
-                ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/cmake/modules)
+                ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/cmake/modules)
 
     # need to insert a line in vpr/tatum so that it can know the tbb header files location and link libs, do same for vpr cmake as well
     FILE(COPY ${CMAKE_CURRENT_SOURCE_DIR}/libtatutum.cmake
             DESTINATION
-            ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum)
-    FILE(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/libtatutum.cmake
-             ${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/CMakeLists.txt)
-
-    # turn off googletest in mt-kahypar as FOEDAG will provide it
-    file(READ ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt FILE_CONTENT)
-    if(NOT "${FILE_CONTENT}" MATCHES "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)")
-        # Comment out the line
-        string(REPLACE "add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" MODIFIED_CONTENT "${FILE_CONTENT}")
-        file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt "${MODIFIED_CONTENT}")
+            ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum)
+    FILE(RENAME ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/libtatutum.cmake
+             ${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/libs/EXTERNAL/libtatum/libtatum/CMakeLists.txt)
+    if(RAPTOR)
+        # turn off googletest in mt-kahypar as FOEDAG will provide it
+        file(READ ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt FILE_CONTENT)
+        if(NOT "${FILE_CONTENT}" MATCHES "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)")
+            # Comment out the line
+            string(REPLACE "add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" "#add_subdirectory(external_tools/googletest EXCLUDE_FROM_ALL)" MODIFIED_CONTENT "${FILE_CONTENT}")
+            file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/CMakeLists.txt "${MODIFIED_CONTENT}")
+        endif()
     endif()
 endif()
 
@@ -67,9 +77,8 @@ install (
     DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/mt-kahypar/external_tools/tbb/lib/intel64/gcc4.8/
         DESTINATION ${CMAKE_INSTALL_LIBDIR}/tbb)
 
-
-if(RAPTOR)
+set(MtKaHyPar_BINARY_FILE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MtKaHyPar" CACHE INTERNAL "")
+if(NOT ENFORCE_STANDALONE)
     # Set MtKaHyPar_BINARY_FILE_PATH
-    set(MtKaHyPar_BINARY_FILE_PATH "${CMAKE_RUNTIME_OUTPUT_DIRECTORY}/MtKaHyPar" CACHE INTERNAL "")
-    configure_file(config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/../../Backend/OpenFPGA/vtr-verilog-to-routing/vpr/src/pack/config.h")
+    configure_file(config.h.in "${CMAKE_CURRENT_SOURCE_DIR}/../../${mid_path}/OpenFPGA/vtr-verilog-to-routing/vpr/src/pack/config.h")
 endif()
