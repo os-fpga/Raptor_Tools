@@ -24,20 +24,21 @@ ADDITIONAL_CMAKE_OPTIONS ?=
 # to detect actual warnings and errors  in the build output.
 RULE_MESSAGES ?= on
 
-
-release: run-cmake-release
-
-debug: run-cmake-debug
-
 mkfile_path := $(abspath $(lastword $(MAKEFILE_LIST)))
 current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 
 INSTALL_PATH:= ${current_dir}
 
+release: run-cmake-release
+
+debug: run-cmake-debug
+
+surelog:
+	cd Surelog ; make ; make install PREFIX=${INSTALL_PATH}/dinstall ; cd ..
+
 run-cmake-release:
 	cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
 	cmake --build build
-
 run-cmake-debug:
 	cd Surelog ; make debug ; make debug install PREFIX=${INSTALL_PATH}/dinstall ; cd ..
 	export UHDM_INSTALL_DIR=${INSTALL_PATH}/dinstall; make -C ${current_dir}/yosys-f4pga-plugins/ install PLUGIN_LIST=systemverilog  -j$(nproc)
