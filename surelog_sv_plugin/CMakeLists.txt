@@ -50,7 +50,7 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
 add_custom_target(sv_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/build/systemverilog.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/build/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
-    COMMAND make install UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog 
+    COMMAND make install YOSYS_PATH=${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/ UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog 
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins"
     DEPENDS ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/UhdmAst.cc
   )
