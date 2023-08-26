@@ -33,6 +33,17 @@ jobs:
         ssh-private-key: |
           ${{ secrets.SSH_PRIVATE_KEY_VERIFIC_RS }}
 
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+        architecture: x64
+
+    - name: Setup Python Packages
+      run: |
+        pip3 install orderedmultidict
+        pip3 install psutil
+
     - name: Checkout code
       uses: actions/checkout@v3.2.0
       with:
