@@ -1,0 +1,63 @@
+name: Surelog Workflow
+
+on:
+  push:
+  pull_request:
+
+jobs:
+  linux-gcc:
+    name: ${{ matrix.mode }}
+
+    runs-on: ubuntu-20.04
+    defaults:
+      run:
+        shell: bash
+    strategy:
+      fail-fast: false
+      matrix:
+        mode:
+        - basic_test
+    env:
+      MODE: ${{ matrix.mode }}
+
+    steps:
+
+    - name: Cancel previous
+      uses: styfle/cancel-workflow-action@0.11.0
+      with:
+        access_token: ${{ github.token }}
+        
+    - name: ssh-agent
+      uses: webfactory/ssh-agent@v0.5.4
+      with: 
+        ssh-private-key: |
+          ${{ secrets.SSH_PRIVATE_KEY_VERIFIC_RS }}
+
+    - name: Setup Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: 3.8
+        architecture: x64
+
+    - name: Setup Python Packages
+      run: |
+        pip3 install orderedmultidict
+        pip3 install psutil
+
+    - name: Checkout code
+      uses: actions/checkout@v3.2.0
+      with:
+        submodules: recursive
+        fetch-depth: 0
+  
+    - name: Install dependencies
+      run: 
+        sudo apt-get install tclsh cmake yosys
+
+    - name: Surelog_Plugin_Ubuntu
+      if: matrix.mode == 'basic_test' 
+      shell: bash
+      run: |
+        cd surelog_sv_plugin
+        make surelog
+
