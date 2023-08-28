@@ -60,3 +60,6 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilo
   
 add_dependencies(dummy_lib surelog_build sv_plugin_build)
 add_dependencies(sv_plugin_build surelog_build)
+if (RAPTOR)
+   add_dependencies(sv_plugin_build yosys)
+endif()
