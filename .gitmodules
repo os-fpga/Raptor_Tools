@@ -13,3 +13,9 @@
 [submodule "graph_parttion/mt-kahypar"]
 	path = graph_partition/mt-kahypar
 	url = https://github.com/kahypar/mt-kahypar.git
+[submodule "surelog_sv_plugin/Surelog"]
+	path = surelog_sv_plugin/Surelog
+	url = https://github.com/chipsalliance/Surelog.git
+[submodule "surelog_sv_plugin/yosys-f4pga-plugins"]
+	path = surelog_sv_plugin/yosys-f4pga-plugins
+	url = https://github.com/chipsalliance/yosys-f4pga-plugins.git
