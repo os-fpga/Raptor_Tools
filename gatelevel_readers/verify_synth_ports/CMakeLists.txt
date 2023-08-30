@@ -22,6 +22,6 @@ file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/compare_ports.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/main.cpp)
 
 # create executable
-add_executable(compare_info
+add_executable(verify_synth_ports
     ${EXEC_SOURCE}
 )
