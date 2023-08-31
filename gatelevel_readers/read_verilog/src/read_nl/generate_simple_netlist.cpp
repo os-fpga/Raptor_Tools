@@ -902,21 +902,22 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
     }
     veri_file::RemoveAllModules();
 
-    std::filesystem::path path(file_name);
-    std::string directory = std::filesystem::current_path().string();
-    std::string base_name = path.stem().string();
-
-    std::string js_port_file = directory + "/" + "post_synth_ports.json";
-    std::ofstream myfile(js_port_file.c_str());
-    if (myfile.is_open())
-    {
-        n_l.b_port_print_json(myfile);
-        myfile.close();
-        std::cout << "Output file created at: " << js_port_file << std::endl;
-    }
-    else
-    {
-        std::cout << "Failed to create the output file." << std::endl;
+    if (n_l.create_ps_json) {
+        std::filesystem::path path(file_name);
+        std::string directory = std::filesystem::current_path().string();
+        std::string base_name = path.stem().string();
+        std::string js_port_file = directory + "/" + "post_synth_ports.json";
+        std::ofstream myfile(js_port_file.c_str());
+        if (myfile.is_open())
+        {
+            n_l.b_port_print_json(myfile);
+            myfile.close();
+            std::cout << "Output file created at: " << js_port_file << std::endl;
+        }
+        else
+        {
+            std::cout << "Failed to create the output file." << std::endl;
+        }
     }
     return 0;
 }
