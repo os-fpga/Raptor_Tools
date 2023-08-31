@@ -10,7 +10,7 @@ SCRIPT_DIR=$( cd -- "$( dirname -- "${BASH_SOURCE[0]}" )" &> /dev/null && pwd )
 
 run_cmake () {
     [ -d "$SCRIPT_DIR/build" ] && rm -rf $SCRIPT_DIR/build
-    cmake -DRAPTOR_INSTALL_PATH=$1 -DCMAKE_INSTALL_PREFIX=$SCRIPT_DIR/packages/com.rapidsilicon.raptor/data -DIN_RELEASE_DATE=$2 -S . -B build
+    cmake -DRAPTOR_INSTALL_PATH=$1 -DCMAKE_INSTALL_PREFIX=$SCRIPT_DIR/packages/com.rapidsilicon.raptor/data -S . -B build
     [ $? -eq 0 ] && cmake --build build || exit 1 
     [ $? -eq 0 ] && cmake --install build || exit 1
     cd $SCRIPT_DIR/build && make package && mv *.run $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker
@@ -211,7 +211,7 @@ then
     run_cmake $w_dir $release
     release=`cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && ls -l | grep *.run | awk '{print $9}'`
     release=`echo $release | sed -r 's/.*-([0-9]*.[0-9]*)\-..*/\1/g'`
-    raptor_version=`$w_dir/bin/raptor --version | grep "Version" | awk '{print $3}'`
+    raptor_version=`$w_dir/bin/raptor --version | grep "Build" | awk '{print $3}'`
     if [ ! -f "$SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker/inst_libs.tar.gz" ]
     then
     cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && wget https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/inst_libs.tar.gz && cd -

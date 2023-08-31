@@ -13,27 +13,25 @@ if(NOT CMAKE_BUILD_TYPE)
     set(CMAKE_BUILD_TYPE "Release")
 endif(NOT CMAKE_BUILD_TYPE)
 
-if(NOT IN_RELEASE_DATE)
-    set(IN_RELEASE_DATE "Empty")
-endif()
-# Get the current date and time as a string
-string(TIMESTAMP CURRENT_DATE "%Y-%m-%d" UTC)
-# Raptor Install Path,
-if(IN_RELEASE_DATE STREQUAL "Empty")
-    # Extract the year, month, and day components in required format
-    string(SUBSTRING "${CURRENT_DATE}" 0 4 RELEASE_YEAR)
-    string(SUBSTRING "${CURRENT_DATE}" 5 2 RELEASE_MONTH)
-else()
-    string(SUBSTRING "${IN_RELEASE_DATE}" 0 4 RELEASE_YEAR)
-    string(SUBSTRING "${IN_RELEASE_DATE}" 5 2 RELEASE_MONTH)
-endif()
-
-string(SUBSTRING "${CURRENT_DATE}" 8 2 RELEASE_DAY)
+#if(NOT IN_RELEASE_DATE)
+#    set(IN_RELEASE_DATE "Empty")
+#endif()
+## Get the current date and time as a string
+#string(TIMESTAMP CURRENT_DATE "%Y-%m-%d" UTC)
+#if(IN_RELEASE_DATE STREQUAL "Empty")
+#    # Extract the year, month, and day components in required format
+#    string(SUBSTRING "${CURRENT_DATE}" 0 4 RELEASE_YEAR)
+#    string(SUBSTRING "${CURRENT_DATE}" 5 2 RELEASE_MONTH)
+#else()
+#    string(SUBSTRING "${IN_RELEASE_DATE}" 0 4 RELEASE_YEAR)
+#    string(SUBSTRING "${IN_RELEASE_DATE}" 5 2 RELEASE_MONTH)
+#endif()
+#string(SUBSTRING "${CURRENT_DATE}" 8 2 RELEASE_DAY)
+#set(RELEASE_VERSION ${RELEASE_YEAR}.${RELEASE_MONTH})
 
 project(RaptorInstaller DESCRIPTION "Raptor installer")
 
 set(FETCHCONTENT_QUIET FALSE)
-set(RELEASE_VERSION ${RELEASE_YEAR}.${RELEASE_MONTH})
 #set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../RapidSilicon/Raptor/${RELEASE_VERSION})
 set(EXT_LIBS_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs_21Aug2023.tar.gz)
 set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
@@ -44,12 +42,23 @@ if (NOT RAPTOR_INSTALL_PATH)
   set(RAPTOR_INSTALL_PATH "Empty")
 endif() 
 
+if(${RAPTOR_INSTALL_PATH} STREQUAL "Empty")
+    message(FATAL_ERROR "---    RAPTOR_INSTALL_PATH does not exist. Exiting")
+else()
+    execute_process(COMMAND ${RAPTOR_INSTALL_PATH}/bin/raptor --version OUTPUT_VARIABLE COMMAND_OUTPUT)
+    string(REGEX MATCH "Version[ ]+:[ ]+([0-9]+\\.[0-9]+)" VERSION_MATCH "${COMMAND_OUTPUT}")
+    set(VERSION_NUMBER ${CMAKE_MATCH_1})
+    message(STATUS "Extracted Version Number: ${VERSION_NUMBER}")
+    string(SUBSTRING "${VERSION_NUMBER}" 0 4 RELEASE_YEAR)
+    string(SUBSTRING "${VERSION_NUMBER}" 5 2 RELEASE_MONTH)
+    set(RELEASE_DAY 01)
+    message(STATUS "so release yyyy.mm.dd is ${RELEASE_YEAR}.${RELEASE_MONTH}.${RELEASE_DAY}")
+endif()
+
 # get all devices vpr.xml file
 file(GLOB RS_DEVICES ${RAPTOR_INSTALL_PATH}/share/raptor/etc/devices/*/*_vpr.xml)
 
 message(STATUS "---     Following Devices are found ${RS_DEVICES}")
-
-#message(FATAL_ERROR "---    RAPTOR_INSTALL_PATH does not exist. Exiting")
 
 # change the device name in device.xml  
 if (EXISTS ${RAPTOR_INSTALL_PATH}/share/raptor/etc/device.xml)
