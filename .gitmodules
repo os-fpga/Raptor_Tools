@@ -19,3 +19,6 @@
 [submodule "surelog_sv_plugin/yosys-f4pga-plugins"]
 	path = surelog_sv_plugin/yosys-f4pga-plugins
 	url = https://github.com/chipsalliance/yosys-f4pga-plugins.git
+[submodule "surelog_sv_plugin/ghdl-yosys-plugin"]
+	path = surelog_sv_plugin/ghdl-yosys-plugin
+	url = https://github.com/ghdl/ghdl-yosys-plugin.git
