@@ -74,5 +74,6 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
 add_dependencies(dummy_lib surelog_build sv_plugin_build ghdl_plugin_build)
 add_dependencies(sv_plugin_build surelog_build)
 if (RAPTOR)
+   add_dependencies(ghdl_plugin_build yosys)
    add_dependencies(sv_plugin_build yosys)
 endif()
