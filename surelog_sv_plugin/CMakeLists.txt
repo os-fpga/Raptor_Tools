@@ -59,10 +59,16 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilo
     DEPENDS ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/UhdmAst.cc
   )
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+   set (BUILD_DIR dbuild)
+else()
+   set (BUILD_DIR build)
+endif()
+
 add_custom_target(ghdl_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     COMMAND echo "       Compiling GHDL plugin"
-    COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${PROJECT_SOURCE_DIR}/../../${PROJECT_BINARY_DIR}/bin/HDL_simulator/GHDL/bin/ghdl
+    COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/src/ghdl.cc
