@@ -54,6 +54,7 @@ add_custom_target(sv_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/yosys-f4pga-plug
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/build/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
     COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/build/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins"
     DEPENDS ${PROJECT_SOURCE_DIR}/yosys-f4pga-plugins/systemverilog-plugin/UhdmAst.cc
@@ -69,6 +70,7 @@ add_custom_target(ghdl_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plu
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     COMMAND echo "       Compiling GHDL plugin"
     COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/src/ghdl.cc
