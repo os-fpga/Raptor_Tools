@@ -137,7 +137,6 @@ int get_gb_data(gb_map &gb) {
                 while ((entry = readdir(directory)) != nullptr) {
                     if (entry->d_type == DT_REG) {
                         std::string filename = primitivesFolderPath + "/" + entry->d_name;
-                        std::cout << "FILE : " << filename << std::endl;
                         std::vector<char> fileContent = readFile(filename);
                         if (!fileContent.empty()) {
                             gb.contentArray = std::make_unique<char[]>(fileContent.size() + 1);
