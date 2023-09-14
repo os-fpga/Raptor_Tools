@@ -700,6 +700,7 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
             netBusMap[netbus->Name()] = {netbus->LeftIndex(), netbus->RightIndex()};
         }
         Instance *instance;
+        const std::regex dffregexp{"(DFF)"};
         // Iterate over all references (Instances) of this netlist
         FOREACH_REFERENCE_OF_NETLIST(netlist, si2, instance)
         {
@@ -709,6 +710,9 @@ int parse_verilog(const char *file_name, simple_netlist &n_l, const char *key_fi
                 n_l.encrypted = true; // If any instance is protected the whole netlist is marked protected
             n_l.blocks.back().name_ = instance->Name();
             n_l.blocks.back().mod_name_ = current_block_model;
+            // Lowercase the DFFRE, DFFNRE...
+            if (std::regex_search(n_l.blocks.back().mod_name_, dffregexp))
+              transform(n_l.blocks.back().mod_name_.begin(), n_l.blocks.back().mod_name_.end(), n_l.blocks.back().mod_name_.begin(), ::tolower);
             char *param_name, *param_value;
             FOREACH_PARAMETER_OF_INST(instance, mi2, param_name, param_value)
             {
