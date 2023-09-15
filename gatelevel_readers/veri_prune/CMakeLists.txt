@@ -28,6 +28,8 @@ if (PRODUCTION_BUILD)
     message("FLEX: "  ${FLEX_LM_SRC_DIR})
 endif(PRODUCTION_BUILD)
 
+set(CMAKE_CXX_STANDARD 17)
+
 function(files_to_dirs file_list directory_list)
     # Extract the directories for each header file
     foreach(file ${${file_list}})
