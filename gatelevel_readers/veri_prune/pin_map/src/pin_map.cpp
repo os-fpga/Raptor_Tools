@@ -62,13 +62,14 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                     std::cout << "Found :: " << actualSignal << "   in mod ::  " << modName <<std::endl;
                     bool found = std::find(complexPrim.begin(), complexPrim.end(), modName) != complexPrim.end();
                     if (found) {
+                        std::string tempSig;
                         if (conn.signal.empty()) {
                             conn.signal = actualSignal;
                         } else {
-                            actualSignal = conn.signal;
+                            tempSig = conn.signal;
                             if (conn.module == "I_BUF") {
                                 conn = Connection();
-                                conn.signal = actualSignal;
+                                conn.signal = tempSig;
                             }
                             else{ std::cout << signalName << "  is alsooo in   " << modName << std::endl;}
                         }
