@@ -42,6 +42,7 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         conn.ports["O"] = ports["O"]["Actual"];
                         conn.module = modName;
                         conn.instance = instanceName;
+                        connections.push_back(conn);
                     }
                 }
             }
@@ -68,6 +69,7 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         } else {
                             tempSig = conn.signal;
                             if (conn.module == "I_BUF") {
+                                connections.pop_back();
                                 conn = Connection();
                                 conn.signal = tempSig;
                             }
@@ -77,18 +79,19 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         //std::cout << "now sig is :: " << portName << std::endl;
                         conn.module = modName;
                         conn.instance = instanceName;
+                        connections.push_back(conn);
                     }
                 }
             }
         }
     }
-    connections.push_back(conn);
+    
 }
 
 int main() {
     //std::string signalNameToFind = "D";
     std::map<std::string, std::string> orig_ios = {{"D", "Input"}, 
-    {"clk", "Input"}, {"clk_select", "Input"}, {"rst", "Input"}, {"Q", "Output"}};
+    {"clk", "Input"}, {"abc", "Input"}, {"clk_select", "Input"}, {"rst", "Input"}, {"Q", "Output"}};
 
     try {
         // Read the JSON data from the "interface.json" file
