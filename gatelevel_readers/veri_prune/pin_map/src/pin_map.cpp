@@ -59,16 +59,18 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                 bool inputSignal;
                 if(sigDir == "IN_DIR" || sigDir == "IN_CLK" || sigDir == "IN_RESET") inputSignal = true;
                 if (dir == "Input" && inputSignal && actualSignal == signalName) {
+                    std::cout << "Found :: " << actualSignal << "   in mod ::  " << modName <<std::endl;
                     bool found = std::find(complexPrim.begin(), complexPrim.end(), modName) != complexPrim.end();
                     if (found) {
                         if (conn.signal.empty()) {
                             conn.signal = actualSignal;
                         } else {
-                            signalName = conn.signal;
+                            actualSignal = conn.signal;
                             if (conn.module == "I_BUF") {
                                 conn = Connection();
-                                conn.signal = signalName;
+                                conn.signal = actualSignal;
                             }
+                            else{ std::cout << signalName << "  is alsooo in   " << modName << std::endl;}
                         }
                         conn.ports[portName] = actualSignal;
                         //std::cout << "now sig is :: " << portName << std::endl;
