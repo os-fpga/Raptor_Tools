@@ -54,6 +54,18 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         firstInst = instanceName;
                         instConns[instanceName].push_back(conn);
                     }
+                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
+                    if (modName == "O_BUFT" && portName == "O") {
+                        std::string inPort = ports["I"]["Actual"];
+                        signalName = inPort;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        }
+                        conn.ports["I"] = ports["I"]["Actual"];
+                        conn.module = modName;
+                        firstInst = instanceName;
+                        instConns[instanceName].push_back(conn);
+                    }
                 }
             }
         }
@@ -90,6 +102,26 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         conn.module = modName;
                         instConns[instanceName].push_back(conn);
                     }
+                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
+                    bool found = std::find(complexPrim.begin(), complexPrim.end(), modName) != complexPrim.end();
+                    if (found) {
+                        std::string tempSig;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        } else {
+                            tempSig = conn.signal;
+                            if (conn.module == "O_BUFT") {
+                                instConns[firstInst].pop_back();
+                                conn = Connection();
+                                conn.signal = tempSig;
+                            }
+                            else{ std::cout << signalName << "  is alsooo in   " << modName << std::endl;}
+                        }
+                        conn.ports[portName] = actualSignal;
+                        //std::cout << "now sig is :: " << portName << std::endl;
+                        conn.module = modName;
+                        instConns[instanceName].push_back(conn);
+                    }
                 }
             }
         }
@@ -100,7 +132,7 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
 int main() {
     //std::string signalNameToFind = "D";
     std::map<std::string, std::string> orig_ios = {{"D", "Input"}, 
-    {"clk", "Input"}, {"abc", "Input"}, {"clk_select", "Input"}, {"rst", "Input"}, {"Q", "Output"}};
+    {"clk", "Input"}, {"abc", "Input"}, {"clk_select", "Input"}, {"rst", "Input"}, {"Q", "Output"}, {"hh", "Output"}};
 
     try {
         // Read the JSON data from the "interface.json" file
@@ -131,7 +163,7 @@ int main() {
                 std::cout << pair.first << " is an input" << std::endl;
                 map_inputs(jsonData, pair.first, "Input");
             } else if (pair.second == "Output") {
-                std::cout << pair.first << " is an output" << std::endl;
+                 map_inputs(jsonData, pair.first, "Output");
             }
         }
     } catch (const std::exception& e) {
