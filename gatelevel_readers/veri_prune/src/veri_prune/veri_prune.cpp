@@ -344,7 +344,7 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
         out_stream << "        ";
         firstInst = false;
         out_stream << "\"" << inst_name << "\": {" << std::endl;
-        out_stream << "            \"module\": \"" << no_param_name << "\"";
+        out_stream << "            \"module\": \"" << no_param_name << "\",";
 
         Array *param_items = prim_item->GetParamValues();
         VeriExpression *param_assign;
@@ -378,7 +378,7 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
         unsigned k;
         if (port_conn_arr) {
           bool firstPort = true;
-          out_stream << "            \"ports\": {" << std::endl;
+          out_stream << "\n            \"ports\": {" << std::endl;
           FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
             if (!firstPort) {
               out_stream << ",\n";
