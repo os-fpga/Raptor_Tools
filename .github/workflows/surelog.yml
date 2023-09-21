@@ -58,6 +58,6 @@ jobs:
       if: matrix.mode == 'basic_test' 
       shell: bash
       run: |
-        cd surelog_sv_plugin
+        cd parser_plugins
         make surelog
 
