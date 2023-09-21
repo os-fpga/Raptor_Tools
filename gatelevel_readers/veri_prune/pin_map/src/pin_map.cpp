@@ -13,15 +13,24 @@ struct Connection {
     std::map<std::string, std::string> ports;
     std::string module;
     std::string instance;
-    bool isInput;
+};
+
+struct ioInfo {
+    std::string ioName;
+    std::string actualName;
+    std::string ioDir;
 };
 
 std::vector<Connection> connections;
+std::map<std::string, std::vector<Connection>> instConns;
+std::map<std::string, std::vector<ioInfo>> instIOs;
 std::vector<std::string> complexPrim = {"I_DDR", "I_SERDES", "PLL", "O_DDR", "O_SERDES"};
 
 void map_inputs (const json& data, std::string signalName, const std::string& dir)
 {
     Connection conn;
+    
+    std::string firstInst;
     /////////////////// check input connection
     for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
     {
@@ -31,6 +40,7 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
             std::string actualSignal = portInfo["Actual"];
             if (portInfo.contains("FUNC")) {
                 std::string sigDir = portInfo["FUNC"];
+                std::cout << "ACtual name is  :: " << actualSignal << std::endl;
                 if (dir == "Input" && sigDir == "IN_DIR" && actualSignal == signalName) {
                     if (modName == "I_BUF" && portName == "I") {
                         std::string outPort = ports["O"]["Actual"];
@@ -41,8 +51,8 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         }
                         conn.ports["O"] = ports["O"]["Actual"];
                         conn.module = modName;
-                        conn.instance = instanceName;
-                        connections.push_back(conn);
+                        firstInst = instanceName;
+                        instConns[instanceName].push_back(conn);
                     }
                 }
             }
@@ -69,7 +79,7 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         } else {
                             tempSig = conn.signal;
                             if (conn.module == "I_BUF") {
-                                connections.pop_back();
+                                instConns[firstInst].pop_back();
                                 conn = Connection();
                                 conn.signal = tempSig;
                             }
@@ -78,8 +88,7 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
                         conn.ports[portName] = actualSignal;
                         //std::cout << "now sig is :: " << portName << std::endl;
                         conn.module = modName;
-                        conn.instance = instanceName;
-                        connections.push_back(conn);
+                        instConns[instanceName].push_back(conn);
                     }
                 }
             }
@@ -98,6 +107,25 @@ int main() {
         std::ifstream ifs("/home/users/behzad.mahmood/Raptor_Tools/gatelevel_readers/veri_prune/pin_map/src/interface.json");
         json jsonData = json::parse(ifs);
 
+        // Iterate through instances and their ports
+    /////////////////// check input connection
+    for (const auto& [instanceName, instanceInfo] : jsonData["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                ioInfo pInfo;
+                pInfo.actualName = actualSignal;
+                pInfo.ioName = portName;
+                pInfo.ioDir = sigDir;
+                instIOs[instanceName].push_back(pInfo);
+            }
+        }
+    }
+
         for (const auto& pair : orig_ios) {
             if (pair.second == "Input") {
                 std::cout << pair.first << " is an input" << std::endl;
@@ -111,16 +139,42 @@ int main() {
     }
 
     std::cout << "////////////// vector //////////" << std::endl;
-    for (const Connection& conn : connections) {
-        std::cout << "Signal: " << conn.signal << std::endl;
-        std::cout << "Ports:" << std::endl;
-        for (const auto& port : conn.ports) {
-            std::cout << "  " << port.first << ": " << port.second << std::endl;
+    //for (const Connection& conn : connections) {
+    //    std::cout << "Signal: " << conn.signal << std::endl;
+    //    std::cout << "Ports:" << std::endl;
+    //    for (const auto& port : conn.ports) {
+    //        std::cout << "  " << port.first << ": " << port.second << std::endl;
+    //    }
+    //    std::cout << "Module: " << conn.module << std::endl;
+    //    std::cout << "Instance: " << conn.instance << std::endl;
+    //    std::cout << "Is Input: " << (conn.isInput ? "true" : "false") << std::endl;
+    //    std::cout << "--------------------------------------" << std::endl;
+    //}
+//
+    // Example: Printing connections by instance
+    for (const auto& entry : instConns) {
+        const std::string& instance = entry.first;
+        const std::vector<Connection>& instanceConnections = entry.second;
+
+        std::cout << "Instance: " << instance << std::endl;
+        for (const auto& conn : instanceConnections) {
+            std::cout << "Signal: " << conn.signal << std::endl;
+            std::cout << "Module: " << conn.module << std::endl;
+            // Print other fields as needed
+            for (const auto& port : conn.ports) {
+                std::cout << "  " << port.first << ": " << port.second << std::endl;
         }
-        std::cout << "Module: " << conn.module << std::endl;
-        std::cout << "Instance: " << conn.instance << std::endl;
-        std::cout << "Is Input: " << (conn.isInput ? "true" : "false") << std::endl;
-        std::cout << "--------------------------------------" << std::endl;
+        }
+    }
+
+    // Accessing and printing the data
+    for (const auto& entry : instIOs) {
+        std::cout << "Instance: " << entry.first << std::endl;
+        for (const auto& io : entry.second) {
+            std::cout << "  Port Name: " << io.ioName << std::endl;
+            std::cout << "  Actual Name: " << io.actualName << std::endl;
+            std::cout << "  IO Direction: " << io.ioDir << std::endl;
+        }
     }
 
     return 0;
