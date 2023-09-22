@@ -64,6 +64,45 @@ std::unordered_map<int, std::string> directions = {
   {VERI_INOUT, "Inout"}
 };
 
+struct ioInfo {
+    std::string ioName;
+    std::string actualName;
+    std::string ioDir;
+};
+std::map<std::string, std::vector<ioInfo>> instIOs;
+
+void getInstIos (const json& jsonData)
+{
+  for (const auto& [instanceName, instanceInfo] : jsonData["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                ioInfo pInfo;
+                pInfo.actualName = actualSignal;
+                pInfo.ioName = portName;
+                pInfo.ioDir = sigDir;
+                instIOs[instanceName].push_back(pInfo);
+            }
+        }
+    }
+}
+
+void printInstIos()
+{
+    for (const auto& entry : instIOs) {
+        std::cout << "Instance: " << entry.first << std::endl;
+        for (const auto& io : entry.second) {
+            std::cout << "  Port Name: " << io.ioName << std::endl;
+            std::cout << "  Actual Name: " << io.actualName << std::endl;
+            std::cout << "  IO Direction: " << io.ioDir << std::endl;
+        }
+    }
+}
+
 std::vector<std::string> direction_print_outs = {
     "IN_DIR", "OUT_DIR", "INOUT_DIR", "OUT_CLK", "IN_CLK", "IN_RESET"};
 std::unordered_map<std::string, std::map<std::string, int>>
@@ -1063,6 +1102,9 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
     std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
     return 1;
   }
+
+  getInstIos(json_object);
+  printInstIos();
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
