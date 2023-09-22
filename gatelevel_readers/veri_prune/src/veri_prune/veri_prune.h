@@ -11,6 +11,13 @@
 #include <algorithm>
 
 using namespace std;
+struct orig_io
+{
+    std::string io_name;
+    int         lsb;
+    int         msb;
+    std::string dir;
+};
 
 struct gb_constructs
 {
