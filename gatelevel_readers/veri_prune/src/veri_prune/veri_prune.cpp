@@ -374,20 +374,15 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
           }
           out_stream << "\n            }," << std::endl;
         }
-
-        ///////////////////////////////////////////////////////
         Array *port_conn_arr = id->GetPortConnects();
         VeriExpression *expr;
         unsigned k;
         if (port_conn_arr) {
           bool firstPort = true;
           out_stream << "\n            \"ports\": {" << std::endl;
-          ///////88888888888888888888888888888888888888888888888888888
           FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
             const char *formal_name = expr->NamedFormal();
             VeriExpression *actual = expr->GetConnection();
-            /////////77777777777777777777777777777777777777777777
-            //6666666666666666666666666666666666666666666666
             if (actual->GetClassId() == ID_VERICONCAT) {
               VeriConcat *concat = static_cast<VeriConcat *>(actual);
               Array *expr_arr = concat->GetExpressions();
@@ -444,38 +439,9 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
               out_stream << "\"" << std::endl;
               out_stream << "                }";
             }
-            ///666666666666666666666666666666666666666666666
-            //if (!firstPort) {
-            //  out_stream << ",\n";
-            //}
-            //out_stream << "                \"";
-            //firstPort = false;
-            //out_stream << formal_name << "\": {" << std::endl;
-            //if (current_primitive_spec_map.count(no_param_name) > 0 &&
-            //    current_primitive_spec_map[no_param_name].count(formal_name) >
-            //        0 &&
-            //    current_primitive_spec_map[no_param_name][formal_name] <
-            //        direction_print_outs.size()) {
-            //  out_stream
-            //      << "                    \"FUNC\": \""
-            //      << direction_print_outs[current_primitive_spec_map
-            //                                  [no_param_name][formal_name]]
-            //      << "\"," << std::endl;
-            //}
-            //if (actual) {
-            //  out_stream << "                    \"Actual\": \"";
-            //  out_stream << actual_name;
-            //  out_stream << "\"" << std::endl;
-            //}
-            //out_stream << "                }";
-            ///777777777777777777777777777777777777777777
           }
-          ////8888888888888888888888888888888888888888888888888888888888888
           out_stream << "\n            }\n";
         }
-
-
-        /////////////////////////////////////////////
         out_stream << "        }";
       }
     }
