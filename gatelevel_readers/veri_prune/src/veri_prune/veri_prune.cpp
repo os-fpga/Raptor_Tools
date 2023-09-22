@@ -56,6 +56,8 @@ using namespace Verific;
 #define VERI_OUTPUT 346
 #define VERI_WIRE 392
 
+std::vector<orig_io> orig_ios;
+
 std::unordered_map<int, std::string> directions = {
   {VERI_INPUT, "Input"},
   {VERI_OUTPUT, "Output"},
@@ -351,7 +353,7 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
         unsigned yy;
         if (param_items) {
           bool firstParam = true;
-          out_stream << ",\n            \"params\": {" << std::endl;
+          out_stream << "\n            \"params\": {" << std::endl;
           FOREACH_ARRAY_ITEM(param_items, yy, param_assign) {
             std::stringstream ss;
             if (param_assign) {
@@ -399,6 +401,7 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
                   << "\"," << std::endl;
             }
             VeriExpression *actual = expr->GetConnection();
+            
             if (actual) {
               out_stream << "                    \"Actual\": \"";
               actual->PrettyPrint(out_stream, 0);
@@ -450,12 +453,18 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   FOREACH_ARRAY_ITEM(module_ports, q, port_id_) {
     if (!port_id_)
       continue;
+    orig_io io_info;
     json range;
     range["msb"] = port_id_->LeftRangeBound();
     range["lsb"] = port_id_->RightRangeBound();
     j_module["ports"].push_back({{"name", port_id_->GetName()}, 
             {"direction", directions[port_id_->Dir()]}, 
             {"range", range}});
+    io_info.dir = port_id_->Dir();
+    io_info.io_name = port_id_->GetName();
+    io_info.lsb = port_id_->RightRangeBound();
+    io_info.msb = port_id_->LeftRangeBound();
+    orig_ios.push_back(io_info);
   }
 
   // Now copy of the top level module
@@ -1014,6 +1023,15 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
 
   // Generate Interface data base
   print_out_io_primitives(intf_mod, gb);
+
+  // Parse the contents of gb.interface_data_dump as JSON
+  nlohmann::json json_object;
+  try {
+    json_object = nlohmann::json::parse(gb.interface_data_dump);
+  } catch (const nlohmann::json::parse_error& e) {
+    std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
+    return 1;
+  }
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
