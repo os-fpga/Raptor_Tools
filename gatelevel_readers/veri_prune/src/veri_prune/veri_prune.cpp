@@ -615,6 +615,24 @@ void map_inputs (const json& data, std::string signalName, const std::string& di
     
 }
 
+void printPinMap ()
+{
+	for (const auto& entry : instConns) {
+        const std::string& instance = entry.first;
+        const std::vector<Connection>& instanceConnections = entry.second;
+
+        std::cout << "Instance: " << instance << std::endl;
+        for (const auto& conn : instanceConnections) {
+            std::cout << "Signal: " << conn.signal << std::endl;
+            std::cout << "Module: " << conn.module << std::endl;
+            // Print other fields as needed
+            for (const auto& port : conn.ports) {
+                std::cout << "  " << port.first << ": " << port.second << std::endl;
+        }
+        }
+    }
+}
+
 ////////////////////////////////////////////////////////////////////////////
 
 int prune_verilog(const char *file_name, gb_constructs &gb,
@@ -1245,22 +1263,7 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
     }
   }
 
-  //////////////////////
-  for (const auto& entry : instConns) {
-        const std::string& instance = entry.first;
-        const std::vector<Connection>& instanceConnections = entry.second;
-
-        std::cout << "Instance: " << instance << std::endl;
-        for (const auto& conn : instanceConnections) {
-            std::cout << "Signal: " << conn.signal << std::endl;
-            std::cout << "Module: " << conn.module << std::endl;
-            // Print other fields as needed
-            for (const auto& port : conn.ports) {
-                std::cout << "  " << port.first << ": " << port.second << std::endl;
-        }
-        }
-    }
-	///////////////////////
+  printPinMap();
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
