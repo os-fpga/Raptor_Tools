@@ -450,12 +450,20 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
                   }
                   out_stream << "                    \"Actual\": \"";
                   out_stream << actual_id->Name();
+                  out_stream << "\"," << std::endl;
+                  out_stream << "                    \"lsb\": \"";
+                  out_stream << actual_id->GetLsbOfRange();
+                  out_stream << "\"," << std::endl;
+                  out_stream << "                    \"msb\": \"";
+                  out_stream << actual_id->GetMsbOfRange();
                   out_stream << "\"" << std::endl;
                   out_stream << "                }";
                 }
               }
             } else if (actual->GetId()) {
               std::string actual_name = actual->GetId()->Name();
+              unsigned msb = actual->GetId()->GetMsbOfRange();
+              unsigned lsb = actual->GetId()->GetLsbOfRange();
               if (!firstPort) {
                 out_stream << ",\n";
               }
@@ -475,6 +483,12 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
               }
               out_stream << "                    \"Actual\": \"";
               out_stream << actual_name;
+              out_stream << "\"," << std::endl;
+              out_stream << "                    \"lsb\": \"";
+              out_stream << lsb;
+              out_stream << "\"," << std::endl;
+              out_stream << "                    \"msb\": \"";
+              out_stream << msb;
               out_stream << "\"" << std::endl;
               out_stream << "                }";
             }
@@ -1105,6 +1119,15 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
 
   getInstIos(json_object);
   printInstIos();
+
+
+  for (const orig_io& entry : orig_ios)
+  {
+    std::string io_name = entry.io_name;
+    int lsb = entry.lsb;
+    int msb = entry.msb;
+    std::string dir = entry.dir;
+  }
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
