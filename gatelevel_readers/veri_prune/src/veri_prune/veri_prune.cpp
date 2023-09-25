@@ -68,6 +68,8 @@ struct ioInfo {
     std::string ioName;
     std::string actualName;
     std::string ioDir;
+    unsigned lsb;
+    unsigned msb;
 };
 std::map<std::string, std::vector<ioInfo>> instIOs;
 
@@ -81,10 +83,14 @@ void getInstIos (const json& jsonData)
             std::string actualSignal = portInfo["Actual"];
             if (portInfo.contains("FUNC")) {
                 std::string sigDir = portInfo["FUNC"];
+                unsigned lsb = portInfo["lsb"];
+                unsigned msb = portInfo["msb"];
                 ioInfo pInfo;
                 pInfo.actualName = actualSignal;
                 pInfo.ioName = portName;
                 pInfo.ioDir = sigDir;
+                pInfo.lsb = lsb;
+                pInfo.msb = msb;
                 instIOs[instanceName].push_back(pInfo);
             }
         }
@@ -99,6 +105,8 @@ void printInstIos()
             std::cout << "  Port Name: " << io.ioName << std::endl;
             std::cout << "  Actual Name: " << io.actualName << std::endl;
             std::cout << "  IO Direction: " << io.ioDir << std::endl;
+            std::cout << "  LSB :  " << io.lsb << std::endl;
+            std::cout << "  MSB :  " << io.msb << std::endl;
         }
     }
 }
@@ -451,12 +459,11 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
                   out_stream << "                    \"Actual\": \"";
                   out_stream << actual_id->Name();
                   out_stream << "\"," << std::endl;
-                  out_stream << "                    \"lsb\": \"";
+                  out_stream << "                    \"lsb\": ";
                   out_stream << actual_id->GetLsbOfRange();
-                  out_stream << "\"," << std::endl;
-                  out_stream << "                    \"msb\": \"";
+                  out_stream << "," << std::endl;
+                  out_stream << "                    \"msb\": ";
                   out_stream << actual_id->GetMsbOfRange();
-                  out_stream << "\"" << std::endl;
                   out_stream << "                }";
                 }
               }
@@ -484,12 +491,11 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
               out_stream << "                    \"Actual\": \"";
               out_stream << actual_name;
               out_stream << "\"," << std::endl;
-              out_stream << "                    \"lsb\": \"";
+              out_stream << "                    \"lsb\": ";
               out_stream << lsb;
-              out_stream << "\"," << std::endl;
-              out_stream << "                    \"msb\": \"";
+              out_stream << "," << std::endl;
+              out_stream << "                    \"msb\": ";
               out_stream << msb;
-              out_stream << "\"" << std::endl;
               out_stream << "                }";
             }
           }
@@ -1124,8 +1130,8 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   for (const orig_io& entry : orig_ios)
   {
     std::string io_name = entry.io_name;
-    int lsb = entry.lsb;
-    int msb = entry.msb;
+    unsigned lsb = entry.lsb;
+    unsigned msb = entry.msb;
     std::string dir = entry.dir;
   }
 
