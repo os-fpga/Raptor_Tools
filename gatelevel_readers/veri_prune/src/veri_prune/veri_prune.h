@@ -11,12 +11,20 @@
 #include <algorithm>
 
 using namespace std;
+
+struct Connection {
+    std::string signal;
+    std::map<std::string, std::string> ports;
+    std::string module;
+    std::string instance;
+};
+
 struct orig_io
 {
     std::string io_name;
     int         lsb;
     int         msb;
-    std::string dir;
+    unsigned dir;
 };
 
 struct gb_constructs
@@ -51,4 +59,5 @@ struct gb_constructs
     bool contains_io_prem = false;
 };
 int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name);
+
 #endif

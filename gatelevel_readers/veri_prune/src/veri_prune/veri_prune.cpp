@@ -40,6 +40,7 @@
 #include "veri_file.h" // Make verilog reader available
 #include "veri_prune.h"
 #include <json.hpp>
+#include <ostream>
 using json = nlohmann::json;
 
 #ifdef USE_COMREAD
@@ -57,6 +58,7 @@ using namespace Verific;
 #define VERI_WIRE 392
 
 std::vector<orig_io> orig_ios;
+std::map<std::string, std::vector<Connection>> instConns;
 
 std::unordered_map<int, std::string> directions = {
   {VERI_INPUT, "Input"},
@@ -507,6 +509,110 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
   }
   out_stream << "\n    }\n}" << std::endl;
   gb.interface_data_dump = out_stream.str();
+}
+
+void map_inputs (const json& data, std::string signalName, const std::string& dir)
+{
+    Connection conn;
+    
+    std::string firstInst;
+    /////////////////// check input connection
+    for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                if (dir == "Input" && sigDir == "IN_DIR" && actualSignal == signalName) {
+					bool input_buf = false;
+					if(modName == "I_BUF" || modName == "CLK_BUF") input_buf = true;
+                    if (input_buf && portName == "I") {
+                        std::string outPort = ports["O"]["Actual"];
+                        signalName = outPort;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        }
+                        conn.ports["O"] = ports["O"]["Actual"];
+                        conn.module = modName;
+                        firstInst = instanceName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
+					bool output_buf = false;
+					if(modName == "O_BUF" || modName == "O_BUFT") output_buf = true;
+                    if (output_buf && portName == "O") {
+                       std::string inPort = ports["I"]["Actual"];
+                        signalName = inPort;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        }
+                        conn.ports["I"] = ports["I"]["Actual"];
+                        conn.module = modName;
+                        firstInst = instanceName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                }
+            }
+        }
+    }
+
+    for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                bool inputSignal;
+                if(sigDir == "IN_DIR" || sigDir == "IN_CLK" || sigDir == "IN_RESET") inputSignal = true;
+                if (dir == "Input" && inputSignal && actualSignal == signalName) {
+                    bool complexPrim = true;
+					if (modName.find("BUF") != std::string::npos) complexPrim = false;
+                    if (complexPrim) {
+                        std::string tempSig;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        } else {
+                            tempSig = conn.signal;
+                            if (conn.module == "I_BUF") {
+                                instConns[firstInst].pop_back();
+                                conn = Connection();
+                                conn.signal = tempSig;
+                            }
+                        }
+                        conn.ports[portName] = actualSignal;
+                        conn.module = modName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
+                    bool complexPrim = true;
+					if (modName.find("BUF") != std::string::npos) complexPrim = false;
+                    if (complexPrim) {
+                        std::string tempSig;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        } else {
+                            tempSig = conn.signal;
+							bool output_buf = false;
+							if(conn.module == "O_BUF" || conn.module == "O_BUFT") output_buf = true;
+                            if (output_buf) {
+                                instConns[firstInst].pop_back();
+                                conn = Connection();
+                                conn.signal = tempSig;
+                            }
+                        }
+                        conn.ports[portName] = actualSignal;
+                        conn.module = modName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                }
+            }
+        }
+    }
+    
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -1126,14 +1232,35 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   getInstIos(json_object);
   printInstIos();
 
-
   for (const orig_io& entry : orig_ios)
   {
     std::string io_name = entry.io_name;
     unsigned lsb = entry.lsb;
     unsigned msb = entry.msb;
-    std::string dir = entry.dir;
+    unsigned dir = entry.dir;
+	if (dir == VERI_INPUT) {
+        map_inputs(json_object, io_name, "Input");
+    } else if (dir == VERI_OUTPUT) {
+         map_inputs(json_object, io_name, "Output");
+    }
   }
+
+  //////////////////////
+  for (const auto& entry : instConns) {
+        const std::string& instance = entry.first;
+        const std::vector<Connection>& instanceConnections = entry.second;
+
+        std::cout << "Instance: " << instance << std::endl;
+        for (const auto& conn : instanceConnections) {
+            std::cout << "Signal: " << conn.signal << std::endl;
+            std::cout << "Module: " << conn.module << std::endl;
+            // Print other fields as needed
+            for (const auto& port : conn.ports) {
+                std::cout << "  " << port.first << ": " << port.second << std::endl;
+        }
+        }
+    }
+	///////////////////////
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
