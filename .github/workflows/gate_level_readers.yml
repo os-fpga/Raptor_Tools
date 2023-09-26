@@ -16,7 +16,7 @@ jobs:
       fail-fast: false
       matrix:
         mode:
-#        - verilog
+        - verilog
         - edif
     env:
       MODE: ${{ matrix.mode }}
