@@ -38,26 +38,31 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(dummy_parser_plugins_lib STATIC ${PROJECT_SOURCE_DIR}/dummy.cpp)
 
-set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/)
-set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
+if (RAPTOR) 
+  set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/)
+  set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
+else()
+  set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/)
+  set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/install/bin/yosys-config)
+endif()
 
 add_custom_target(surelog_build DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/surelog)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
     COMMAND echo "       Compiling Surelog"
     COMMAND make
     COMMAND make install PREFIX=${PROJECT_SOURCE_DIR}/install
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/Surelog"
-    DEPENDS ${PROJECT_SOURCE_DIR}/Surelog/src/main.cpp
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog"
+    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog/src/main.cpp
   )
 
-add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig/build/systemverilog-plugin/systemverilog.so)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig/build/systemverilog-plugin/systemverilog.so
+add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/systemverilog-plugin/systemverilog.so)
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
     COMMAND make -C frontends/systemverilog install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/build/systemverilog-plugin/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig"
-    DEPENDS ${PROJECT_SOURCE_DIR}/synlig/frontends/systemverilog/uhdm_ast.cc
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/systemverilog-plugin/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
+    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/frontends/systemverilog/uhdm_ast.cc
   )
 
 if (CMAKE_BUILD_TYPE STREQUAL "Debug")
@@ -76,12 +81,20 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/src/ghdl.cc
   )
 
+if (RAPTOR)
+else()
+  add_custom_target(yosys DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/yosys)
+  add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/yosys
+    COMMAND echo "       Compiling Yosys"
+    COMMAND make CONFIG=gcc PREFIX=${PROJECT_SOURCE_DIR}/install install -j
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
+    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/kernel/yosys.cc
+  )
+endif()
 
 
   
 add_dependencies(dummy_parser_plugins_lib surelog_build synlig_build ghdl_plugin_build)
 add_dependencies(synlig_build surelog_build)
-if (RAPTOR)
-   add_dependencies(ghdl_plugin_build yosys)
-   add_dependencies(synlig_build yosys)
-endif()
+add_dependencies(ghdl_plugin_build yosys)
+add_dependencies(synlig_build yosys)
