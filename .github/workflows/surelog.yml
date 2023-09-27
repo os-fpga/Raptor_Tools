@@ -58,5 +58,5 @@ jobs:
       shell: bash
       run: |
         cd parser_plugins
-        make 
+        make surelog
 
