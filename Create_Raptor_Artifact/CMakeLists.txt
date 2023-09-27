@@ -103,7 +103,7 @@ else()
     message(STATUS "---     Extracted Content present so skipping it")
 endif()
 
-# compile encryption exe
+# compile encryption exe (This is now absolute and we are using the encryption exe from Backend directly) 
 file(GLOB SOURCES "${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/src/*.cpp")
 find_package(OpenSSL REQUIRED)
 add_executable(Encryption_method
@@ -119,7 +119,7 @@ target_link_libraries(Encryption_method OpenSSL::Crypto)
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Encrypt XML files and copy README to top DIR"
     # 2nd arg is a list of the path to xml files
-	COMMAND ${CMAKE_CURRENT_BINARY_DIR}/Encryption_method ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key 
+	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/encrypt ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key.pem 
                                                             ${RS_DEVICES}
     # below command will delete the files
     COMMAND ${CMAKE_COMMAND} -E remove -f  ${RS_DEVICES}
