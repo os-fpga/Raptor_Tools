@@ -52,8 +52,7 @@ jobs:
   
     - name: Install dependencies
       run: 
-        sudo apt-get install tclsh cmake yosys
-
+        sudo apt-get install tclsh tcl-dev tcllib cmake yosys
     - name: Surelog_Plugin_Ubuntu
       if: matrix.mode == 'basic_test' 
       shell: bash
