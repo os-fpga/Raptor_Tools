@@ -1,4 +1,4 @@
-name: Surelog Workflow
+name: Surelog Synlig GHDL Workflow
 
 on:
   push:
@@ -52,8 +52,8 @@ jobs:
   
     - name: Install dependencies
       run: 
-        sudo apt-get install tclsh tcl-dev tcllib cmake yosys
-    - name: Surelog_Plugin_Ubuntu
+        sudo apt-get install cmake build-essential g++-11 gcc-11 tclsh tcl-dev tcllib cmake 
+    - name: Synlig_GHDL_Plugins_Ubuntu
       if: matrix.mode == 'basic_test' 
       shell: bash
       run: |
