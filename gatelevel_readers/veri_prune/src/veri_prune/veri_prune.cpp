@@ -466,7 +466,7 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
                   out_stream << "," << std::endl;
                   out_stream << "                    \"msb\": ";
                   out_stream << actual_id->GetMsbOfRange();
-                  out_stream << "                }";
+                  out_stream << "\n                }";
                 }
               }
             } else if (actual->GetId()) {
@@ -498,7 +498,7 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
               out_stream << "," << std::endl;
               out_stream << "                    \"msb\": ";
               out_stream << msb;
-              out_stream << "                }";
+              out_stream << "\n                }";
             }
           }
           out_stream << "\n            }\n";
