@@ -7,7 +7,11 @@ int main(int argc, char **argv) {
 
   const char *out_file_name = (argc > 2) ? argv[2] : "nl_to_vpr.v";
   const char *wrapper_file_name = (argc > 3) ? argv[3] : "wrapper.v";
-  std::string device_name = ((argc > 4) ? argv[4] : "gemini");
+  std::string device_name = ((argc > 7) ? argv[7] : "gemini");
+  std::string user_sdc= ((argc > 4) ? argv[4] : "example_1.txt");
+  std::string pin_table=((argc > 5) ? argv[5] : "pin_table.csv");
+  std::string output_sdc=((argc > 6) ? argv[6] : "output.sdc");
+
   std::string interface_data_dump_file(out_file_name);
   if (interface_data_dump_file.size() > 2 &&
       'v' == interface_data_dump_file.back() &&
@@ -18,7 +22,7 @@ int main(int argc, char **argv) {
   interface_data_dump_file += "_interface.json";
   gb_constructs gb;
   prune_verilog(file_name, gb, device_name);
-
+  write_sdc(user_sdc, pin_table, output_sdc ,gb );
   if (gb.contains_io_prem) {
     std::ofstream out_file;
     out_file.open(out_file_name);

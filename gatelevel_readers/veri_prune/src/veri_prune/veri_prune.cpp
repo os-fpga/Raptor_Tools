@@ -17,7 +17,7 @@
 #include "Array.h" // Make class Array available
 #include <cstring>
 #include <iostream>
-
+#include <regex>
 #include "Map.h"          // Make class Map available
 #include "VeriCopy.h"     // Make class VeriMapForCopy available
 #include "VeriId.h"       // Definitions of all identifier definition tree nodes
@@ -1247,8 +1247,8 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
     return 1;
   }
 
-  getInstIos(json_object);
-  printInstIos();
+  // getInstIos(json_object);
+  // printInstIos();
 
   for (const orig_io& entry : orig_ios)
   {
@@ -1263,7 +1263,7 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
     }
   }
 
-  printPinMap();
+ // printPinMap();
 
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
@@ -1285,4 +1285,167 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   }
 
   return 0; // Status OK
+}
+
+///##################################################################################
+// Function to map Ball ID to Customer Name
+std::map<std::string, std::string> BallID_to_CustomerName(const std::string& arg2) {
+    // Create a map to store the mapping of Ball ID to Customer Name
+    std::map<std::string, std::string> ballIdToCustomer;
+
+    // Open the CSV file
+    std::ifstream file(arg2);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open the CSV file." << std::endl;
+        return ballIdToCustomer; // Return an empty map on error
+    }
+
+    // Read the CSV file line by line
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string token;
+        std::string ballId;
+        std::string customerName;
+
+        // Split the line into tokens using a comma as the delimiter
+        std::getline(iss, token, ','); // Bump/Pin Name
+        std::getline(iss, token, ','); // Customer Name
+        std::getline(iss, token, ','); // Customer Name
+        customerName = token;
+        std::getline(iss, token, ','); // Ball ID
+        ballId = token;
+        // Store the mapping of Ball ID to Customer Name in the map
+        ballIdToCustomer[ballId] = customerName;
+    }
+
+    return ballIdToCustomer;
+}
+
+
+int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs& gb) {
+    std::map<std::string, std::string> myMap = {
+        {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
+        {"FIFO_RST", "f2g_rx_sfifo_reset_A"},
+        {"RST", "f2g_trx_reset_n_A"},
+        {"DLY_ADJ", "f2g_trx_dly_adj"},
+        {"DLY_INCDEC", "f2g_trx_dly_inc"},
+        {"DLY_LOAD", "f2g_trx_dly_ld"},
+        {"DATA_VALID", "g2f_rx_dvalid_A"},
+        {"DPA_ERROR", "g2f_rx_dpa_error"},
+        {"DPA_LOCK", "g2f_rx_dpa_lock"},
+        {"CLK_IN", "fast_clk"},	
+        {"CLK_OUT", "f2g_rx_core_clk"},
+    };
+
+    nlohmann::json json_object;
+    try {
+        json_object = nlohmann::json::parse(gb.interface_data_dump);
+    } catch (const nlohmann::json::parse_error& e) {
+        std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
+        return 1;
+    }
+
+    getInstIos(json_object);
+
+    // Open the file for reading
+    std::ifstream file(example_file);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening the file." << std::endl;
+        return 1;
+    }
+
+    // Read the file contents into a string
+    std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+
+    // Define a regular expression pattern
+    std::regex pattern(R"(\bPIN_LOC\s+(\S+)\s+\[get_ports\s+(\S+)\])");
+
+    // Create a regex iterator
+    std::sregex_iterator iter(text.begin(), text.end(), pattern);
+    std::sregex_iterator end;
+
+    // Get the mapping of Ball ID to Customer Name
+    std::map<std::string, std::string> ballIdToCustomer = BallID_to_CustomerName(arg2);
+
+    // Open the output SDC file for appending
+    std::ofstream sdcFile(arg3);
+
+    if (!sdcFile.is_open()) {
+        std::cerr << "Error opening the SDC file." << std::endl;
+        return 1;
+    }
+
+    // Iterate through the matches and append the SDC lines to the file
+    while (iter != end) {
+        std::smatch match = *iter;
+        std::string pin_loc = match[1].str();
+        std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
+        std::string get_ports = match[2].str();
+        std::cout << "ports: " << get_ports << std::endl;
+        auto it = ballIdToCustomer.find(ball_id);
+
+        // Your code to iterate over instConns
+        for (const auto& entry : instConns) {
+            const std::string& instance = entry.first;
+            const std::vector<Connection>& instanceConnections = entry.second;
+
+            for (const auto& conn : instanceConnections) {
+                if (get_ports == conn.signal) {
+                    // Your code to print details if needed
+                    std::cout << "Module: " << conn.module << std::endl;
+                    std::cout << "  Instance: " << instance << std::endl;
+
+                    // Find the corresponding instance IOs
+                    if (instIOs.find(instance) != instIOs.end()) {
+                        for (const auto& io : instIOs[instance]) {
+                            std::cout << "    Port Name: " << io.ioName << std::endl;
+                            std::cout << "    Actual Name: " << io.actualName << std::endl;
+                            std::cout << "    IO Direction: " << io.ioDir << std::endl;
+                            std::cout << "    LSB: " << io.lsb << std::endl;
+                            std::cout << "    MSB: " << io.msb << std::endl;
+                            if (it != ballIdToCustomer.end()) {
+                                std::string customerName = it->second;
+                                if (conn.module == "I_SERDES") {
+                                    if (get_ports != io.ioName  && io.ioDir == "OUT_DIR") {
+                                        if (io.ioName == "Q") {
+                                            for (int i = 0; i <= io.msb; ++i) {
+                                                sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
+                                                sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << "g2f_rx_in[" << i << "]" << std::endl;
+                                            }
+                                        } else {
+                                            sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
+                                            sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
+                                        }
+                                    }
+                                } else if (conn.module == "O_SERDES") {
+                                    if (get_ports != io.ioName  && io.ioDir == "IN_DIR") {
+                                        if (io.ioName == "D") {
+                                            for (int i = 0; i <= io.msb; ++i) {
+                                                sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
+                                                sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << "g2f_rx_in[" << i << "]" << std::endl;
+                                            }
+                                        } else {
+                                            sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
+                                            sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        ++iter; // Move to the next match
+    }
+
+    // Close the SDC file
+    sdcFile.close();
+    file.close(); // Close the file
+
+    return 0;
 }
