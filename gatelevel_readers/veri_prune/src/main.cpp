@@ -1,16 +1,56 @@
 #include "veri_prune.h"
 #include <fstream>
 
-int main(int argc, char **argv) {
+int main(int argc, char* argv[]) {
   // Get the file name to work on
-  const char *file_name = (argc > 1) ? argv[1] : "../example/example.v";
+const char* file_name = "../example/example.v";
+    const char* out_file_name = "nl_to_vpr.v";
+    const char* wrapper_file_name = "wrapper.v";
+    std::string device_name = "gemini";
+    std::string user_sdc = "example_1.txt";
+    std::string pin_table = "pin_table.csv";
+    std::string output_sdc = "output.sdc";
 
-  const char *out_file_name = (argc > 2) ? argv[2] : "nl_to_vpr.v";
-  const char *wrapper_file_name = (argc > 3) ? argv[3] : "wrapper.v";
-  std::string device_name = ((argc > 7) ? argv[7] : "gemini");
-  std::string user_sdc= ((argc > 4) ? argv[4] : "example_1.txt");
-  std::string pin_table=((argc > 5) ? argv[5] : "pin_table.csv");
-  std::string output_sdc=((argc > 6) ? argv[6] : "output.sdc");
+    for (int i = 1; i < argc; ++i) {
+        std::string arg = argv[i];
+
+        if (arg == "-f" || arg == "--file") {
+            if (i + 1 < argc) {
+                file_name = argv[i + 1];
+                i++;
+            }
+        } else if (arg == "-o" || arg == "--out") {
+            if (i + 1 < argc) {
+                out_file_name = argv[i + 1];
+                i++;
+            }
+        } else if (arg == "-w" || arg == "--wrapper") {
+            if (i + 1 < argc) {
+                wrapper_file_name = argv[i + 1];
+                i++;
+            }
+        } else if (arg == "-d" || arg == "--device") {
+            if (i + 1 < argc) {
+                device_name = argv[i + 1];
+                i++;
+            }
+        } else if (arg == "-u" || arg == "--user_sdc") {
+            if (i + 1 < argc) {
+                user_sdc = argv[i + 1];
+                i++;
+            }
+        } else if (arg == "-p" || arg == "--pin_table") {
+            if (i + 1 < argc) {
+                pin_table = argv[i + 1];
+                i++;
+            }
+        } else if (arg == "-os" || arg == "--output_sdc") {
+            if (i + 1 < argc) {
+                output_sdc = argv[i + 1];
+                i++;
+            }
+        }
+    }
 
   std::string interface_data_dump_file(out_file_name);
   if (interface_data_dump_file.size() > 2 &&
