@@ -65,7 +65,8 @@ std::unordered_map<int, std::string> directions = {
   {VERI_OUTPUT, "Output"},
   {VERI_INOUT, "Inout"}
 };
-
+std::map<std::string, std::string> myMap; // Define myMap at a global scope
+std::string get_ports; // Define get_ports at a global scope
 struct ioInfo {
     std::string ioName;
     std::string actualName;
@@ -1324,8 +1325,28 @@ std::map<std::string, std::string> BallID_to_CustomerName(const std::string& arg
 }
 
 
+void processSerdesModule(const std::string& customerName, const std::string& module, const std::string& ioName, const std::string& actualName, const std::string& ioDir, int msb, std::ofstream& sdcFile) {
+    if (ioName == "PLL_FAST_CLK" || ioName == "PLL_LOCK") {
+        return; // Skip this iteration and move to the next one
+    }
+
+    if (get_ports != ioName && ((module == "I_SERDES" && ioDir == "OUT_DIR") || (module == "O_SERDES" && ioDir == "IN_DIR"))) {
+        std::string mode = (module == "I_SERDES") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
+
+        if (ioName == "D" || ioName == "Q") {
+            for (int i = 0; i <= msb; ++i) {
+                sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                sdcFile << "set_pin_loc " << actualName << " " << customerName << " " << ((module == "I_SERDES") ? "g2f_rx_in[" : "f2g_tx_out[") << i << "]" << std::endl;
+            }
+        } else {
+            sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+            sdcFile << "set_pin_loc " << actualName << " " << customerName << " " << myMap[ioName] << std::endl;
+        }
+    }
+}
+
 int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs& gb) {
-    std::map<std::string, std::string> myMap = {
+    myMap = {
         {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
         {"FIFO_RST", "f2g_rx_sfifo_reset_A"},
         {"RST", "f2g_trx_reset_n_A"},
@@ -1335,8 +1356,10 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
         {"DATA_VALID", "g2f_rx_dvalid_A"},
         {"DPA_ERROR", "g2f_rx_dpa_error"},
         {"DPA_LOCK", "g2f_rx_dpa_lock"},
-        {"CLK_IN", "fast_clk"},	
+        {"CLK_IN", "fast_clk"},
         {"CLK_OUT", "f2g_rx_core_clk"},
+        {"LOAD_WORD", "f2g_tx_dvalid_A"},
+        {"OE", "f2g_tx_oe_A"},
     };
 
     nlohmann::json json_object;
@@ -1348,6 +1371,26 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
     }
 
     getInstIos(json_object);
+    // std::string dir_str;
+    // for (const orig_io& entry : orig_ios) {
+    //     std::string io_name = entry.io_name;
+    //     unsigned lsb = entry.lsb;
+    //     unsigned msb = entry.msb;
+    //     unsigned dir = entry.dir;
+
+    //     if (dir == VERI_INPUT) {
+    //         map_inputs(json_object, io_name, "Input");
+    //     } else if (dir == VERI_OUTPUT) {
+    //         map_inputs(json_object, io_name, "Output");
+    //     }
+    //     if (dir == 330) {
+    //         dir_str = "Input";
+    //     } else if (dir == 346) {
+    //         dir_str = "Output";
+    //     }
+    //     // Print the orig_io information
+    //     std::cout << "io_name: " << io_name << ", lsb: " << lsb << ", msb: " << msb << ", dir: " << dir_str << std::endl;
+    // }
 
     // Open the file for reading
     std::ifstream file(example_file);
@@ -1383,18 +1426,19 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
         std::smatch match = *iter;
         std::string pin_loc = match[1].str();
         std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
-        std::string get_ports = match[2].str();
-        std::cout << "ports: " << get_ports << std::endl;
+        get_ports = match[2].str(); // Assign get_ports here
         auto it = ballIdToCustomer.find(ball_id);
-
-        // Your code to iterate over instConns
+  std::cout << "PORTS: " << get_ports << std::endl;
+        // Iterate over instConns
         for (const auto& entry : instConns) {
             const std::string& instance = entry.first;
             const std::vector<Connection>& instanceConnections = entry.second;
+             std::cout << "  Instance==================: " << instance << std::endl;
 
             for (const auto& conn : instanceConnections) {
+               std::cout << "  conn.signal: " << conn.signal << std::endl;
                 if (get_ports == conn.signal) {
-                    // Your code to print details if needed
+                    // Print details
                     std::cout << "Module: " << conn.module << std::endl;
                     std::cout << "  Instance: " << instance << std::endl;
 
@@ -1406,33 +1450,14 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
                             std::cout << "    IO Direction: " << io.ioDir << std::endl;
                             std::cout << "    LSB: " << io.lsb << std::endl;
                             std::cout << "    MSB: " << io.msb << std::endl;
+
+                            if (io.ioName == "PLL_FAST_CLK" || io.ioName == "PLL_LOCK") {
+                                continue; // Skip this iteration and move to the next one
+                            }
+
                             if (it != ballIdToCustomer.end()) {
                                 std::string customerName = it->second;
-                                if (conn.module == "I_SERDES") {
-                                    if (get_ports != io.ioName  && io.ioDir == "OUT_DIR") {
-                                        if (io.ioName == "Q") {
-                                            for (int i = 0; i <= io.msb; ++i) {
-                                                sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
-                                                sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << "g2f_rx_in[" << i << "]" << std::endl;
-                                            }
-                                        } else {
-                                            sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
-                                            sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
-                                        }
-                                    }
-                                } else if (conn.module == "O_SERDES") {
-                                    if (get_ports != io.ioName  && io.ioDir == "IN_DIR") {
-                                        if (io.ioName == "D") {
-                                            for (int i = 0; i <= io.msb; ++i) {
-                                                sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
-                                                sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << "g2f_rx_in[" << i << "]" << std::endl;
-                                            }
-                                        } else {
-                                            sdcFile << "set_property mode " << "Mode_RATE_10_A_RX " << customerName << std::endl;
-                                            sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
-                                        }
-                                    }
-                                }
+                                processSerdesModule(customerName, conn.module, io.ioName, io.actualName, io.ioDir, io.msb, sdcFile);
                             }
                         }
                     }
@@ -1440,8 +1465,11 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
             }
         }
 
-        ++iter; // Move to the next match
+        iter++; // Move to the next match
     }
+
+       // Move to the next match
+    
 
     // Close the SDC file
     sdcFile.close();
