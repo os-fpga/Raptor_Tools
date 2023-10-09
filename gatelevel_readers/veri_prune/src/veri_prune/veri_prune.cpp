@@ -22,7 +22,7 @@
 #include "VeriCopy.h"     // Make class VeriMapForCopy available
 #include "VeriId.h"       // Definitions of all identifier definition tree nodes
 #include "VeriTreeNode.h" // Definition of VeriTreeNode
-
+#include <set>
 #include "Message.h" // Make message handlers available
 
 #include "DataBase.h" // Make (hierarchical netlist) database API available
@@ -1330,17 +1330,30 @@ void processSerdesModule(const std::string& customerName, const std::string& mod
         return; // Skip this iteration and move to the next one
     }
 
-    if (get_ports != ioName && ((module == "I_SERDES" && ioDir == "OUT_DIR") || (module == "O_SERDES" && ioDir == "IN_DIR"))) {
+    // Create a set of signals to which you want to apply the replacement
+    std::set<std::string> signalsToReplace = {"FIFO_RST", "RST", "DATA_VALID", "LOAD_WORD"};
+
+    // Check if ioName is in the set of signals to replace and if customerName ends with "N"
+    if (signalsToReplace.count(ioName) && customerName.back() == 'N') {
+        // Replace the mapping values with "_B" suffix
+        if (myMap.find(ioName) != myMap.end()) {
+            myMap[ioName] = myMap[ioName] + "_B";
+        }
+    }
+
+    if (get_ports != ioName && ((module == "I_SERDES" && ioDir == "OUT_DIR" || ioDir == "IN_RESET" ) || (module == "O_SERDES" && ioDir == "IN_DIR") || (module == "I_BUF" && ioDir == "OUT_DIR"))) {
         std::string mode = (module == "I_SERDES") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
 
         if (ioName == "D" || ioName == "Q") {
             for (int i = 0; i <= msb; ++i) {
                 sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                sdcFile << "set_pin_loc " << actualName << " " << customerName << " " << ((module == "I_SERDES") ? "g2f_rx_in[" : "f2g_tx_out[") << i << "]" << std::endl;
+                sdcFile << "set_pin_loc " << actualName<<"["<<i<<"]"<< " " << customerName << " " << ((module == "I_SERDES") ? "g2f_rx_in[" : "f2g_tx_out[") << i << "]" << std::endl;
+                sdcFile<< std::endl;
             }
         } else {
             sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
             sdcFile << "set_pin_loc " << actualName << " " << customerName << " " << myMap[ioName] << std::endl;
+            sdcFile<< std::endl;
         }
     }
 }
@@ -1360,6 +1373,7 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
         {"CLK_OUT", "f2g_rx_core_clk"},
         {"LOAD_WORD", "f2g_tx_dvalid_A"},
         {"OE", "f2g_tx_oe_A"},
+        {"O", "f2g_tx_clk_en_A"}
     };
 
     nlohmann::json json_object;
@@ -1400,8 +1414,14 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
         return 1;
     }
 
-    // Read the file contents into a string
-    std::string text((std::istreambuf_iterator<char>(file)), std::istreambuf_iterator<char>());
+   std::string text;
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == '#') {
+            continue; // Skip empty lines and lines starting with '#'
+        }
+        text += line + "\n";
+    }
 
     // Define a regular expression pattern
     std::regex pattern(R"(\bPIN_LOC\s+(\S+)\s+\[get_ports\s+(\S+)\])");
