@@ -1428,42 +1428,37 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
         std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
         get_ports = match[2].str(); // Assign get_ports here
         auto it = ballIdToCustomer.find(ball_id);
-  std::cout << "PORTS: " << get_ports << std::endl;
+        std::string customerName = it->second;
+        std::cout << "PORTS: " << get_ports << std::endl;
         // Iterate over instConns
         for (const auto& entry : instConns) {
-            const std::string& instance = entry.first;
-            const std::vector<Connection>& instanceConnections = entry.second;
-             std::cout << "  Instance==================: " << instance << std::endl;
-
-            for (const auto& conn : instanceConnections) {
-               std::cout << "  conn.signal: " << conn.signal << std::endl;
-                if (get_ports == conn.signal) {
-                    // Print details
-                    std::cout << "Module: " << conn.module << std::endl;
-                    std::cout << "  Instance: " << instance << std::endl;
-
-                    // Find the corresponding instance IOs
-                    if (instIOs.find(instance) != instIOs.end()) {
-                        for (const auto& io : instIOs[instance]) {
-                            std::cout << "    Port Name: " << io.ioName << std::endl;
-                            std::cout << "    Actual Name: " << io.actualName << std::endl;
-                            std::cout << "    IO Direction: " << io.ioDir << std::endl;
-                            std::cout << "    LSB: " << io.lsb << std::endl;
-                            std::cout << "    MSB: " << io.msb << std::endl;
-
-                            if (io.ioName == "PLL_FAST_CLK" || io.ioName == "PLL_LOCK") {
-                                continue; // Skip this iteration and move to the next one
-                            }
-
-                            if (it != ballIdToCustomer.end()) {
-                                std::string customerName = it->second;
-                                processSerdesModule(customerName, conn.module, io.ioName, io.actualName, io.ioDir, io.msb, sdcFile);
-                            }
-                        }
-                    }
+          const std::string& instance = entry.first;
+          const std::vector<Connection>& instanceConnections = entry.second;
+          //std::cout << "Instance: " << instance << std::endl;
+          for (const auto& conn : instanceConnections) {
+              std::string mode = conn.module.find("I_") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
+              //std::cout << "Signal: " << conn.signal << std::endl;
+              //std::cout << "Module: " << conn.module << std::endl;
+              if (conn.signal == get_ports) {
+                std::cout << "Instance: " << instance << std::endl;
+                if (conn.module.find("BUF") != std::string::npos) {
+                // Print other fields as needed
+                  for (const auto& port : conn.ports) {
+                      std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
+                      if(port.first == "O") {
+                        std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
+                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[]" << std::endl;
+                      } else if(port.first == "I") {
+                        std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
+                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[]" << std::endl;
+                      }
+                  }
                 }
-            }
-        }
+              }
+          }
+      }
 
         iter++; // Move to the next match
     }
