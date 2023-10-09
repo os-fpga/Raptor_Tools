@@ -297,7 +297,8 @@ public:
       if (tokens[0] == ".subckt") {
         std::string name = tokens[1];
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        if (name.find("dff") != std::string::npos) {
+        if (name.find("dff") != std::string::npos ||
+            name == std::string("adder_carry")) {
           tokens[1] = name;
           for (auto &t : tokens) {
             ofs << t << " ";
@@ -392,17 +393,17 @@ public:
               if (s == "Q")
                 names.Y = port_conn; // output of the latch
               uint idx = latch_lut_port_conversion.at(tokens[1]).at(s)[2] - '0';
-              bool flipped = false;
+              // bool flipped = false;
               int w_pos = -1;
-              const char *value =
-                  std::getenv("FLIP_TRANSFORMED_EBLIF_INPUT_ORDER");
-              if (value) {
-                std::cout << "FLIP_TRANSFORMED_EBLIF_INPUT_ORDER is set"
-                          << std::endl;
-                w_pos = sz - 1 - idx;
-              } else {
-                w_pos = idx;
-              }
+              // const char *value =
+              //     std::getenv("FLIP_TRANSFORMED_EBLIF_INPUT_ORDER");
+              // if (value) {
+              //   std::cout << "FLIP_TRANSFORMED_EBLIF_INPUT_ORDER is set"
+              //             << std::endl;
+              //   w_pos = sz - 1 - idx;
+              // } else {
+              w_pos = idx;
+              // }
               names.A.at(w_pos) = port_conn;
             }
             names.INIT_VALUE = latch_lut_LUT_strs.at(tokens[1]);
