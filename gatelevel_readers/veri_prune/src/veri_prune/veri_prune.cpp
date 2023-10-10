@@ -1412,13 +1412,29 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
                   for (const auto& port : conn.ports) {
                       std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
                       if(port.first == "O") {
+                        if (rx_count.find(ball_id) != rx_count.end()) {
+                            // Key exists, so increment its value
+                            rx_count[ball_id]++;
+                        } else {
+                            // Key doesn't exist, so create it with a value of 1
+                            rx_count[ball_id] = 1;
+                        }
+                        unsigned rx_index = rx_count[ball_id] - 1;
                         std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                         sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[TBD]" << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[" << rx_index << "]" << std::endl;
                       } else if(port.first == "I") {
+                        if (tx_count.find(ball_id) != tx_count.end()) {
+                            // Key exists, so increment its value
+                            tx_count[ball_id]++;
+                        } else {
+                            // Key doesn't exist, so create it with a value of 1
+                            tx_count[ball_id] = 1;
+                        }
+                        unsigned tx_index = tx_count[ball_id] - 1;
                         std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                         sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[TBD]" << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[" << tx_index << "]" << std::endl;
                       }
                   }
                 } else {
@@ -1434,16 +1450,25 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
                                 unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
                                 unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
                                 if(j!=0) {
+                                  if (tx_count.find(ball_id) != tx_count.end()) {
+                                      // Key exists, so increment its value
+                                      tx_count[ball_id]++;
+                                  } else {
+                                      // Key doesn't exist, so create it with a value of 1
+                                      tx_count[ball_id] = 1;
+                                  }
                                   for (unsigned k = i; k <= j; k++) {
+                                    unsigned tx_index = tx_count[ball_id] - 1;
                                     std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
                                     std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                     if(io.ioName == "D") {
                                       sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << k << "]" << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << tx_index << "]" << std::endl;
                                     } else {
                                       sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << k << "]" << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << tx_index << "]" << std::endl;
                                     }
+                                    tx_count[ball_id]++;
                                   }
                                 } else {
                                   sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
@@ -1468,16 +1493,25 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
                                 unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
                                 unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
                                 if(j!=0) {
+                                  if (rx_count.find(ball_id) != rx_count.end()) {
+                                      // Key exists, so increment its value
+                                      rx_count[ball_id]++;
+                                  } else {
+                                      // Key doesn't exist, so create it with a value of 1
+                                      rx_count[ball_id] = 1;
+                                  }
                                   for (unsigned k = i; k <= j; k++) {
+                                    unsigned rx_index = rx_count[ball_id] - 1;
                                     std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
                                     std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                     if(io.ioName == "Q") {
                                       sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << k << "]" << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << rx_index << "]" << std::endl;
                                     } else {
                                       sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << k << "]" << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << rx_index << "]" << std::endl;
                                     }
+                                    rx_count[ball_id]++;
                                   }
                                 } else {
                                   sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
