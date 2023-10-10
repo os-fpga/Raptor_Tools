@@ -1324,40 +1324,6 @@ std::map<std::string, std::string> BallID_to_CustomerName(const std::string& arg
     return ballIdToCustomer;
 }
 
-
-void processSerdesModule(const std::string& customerName, const std::string& module, const std::string& ioName, const std::string& actualName, const std::string& ioDir, int msb, std::ofstream& sdcFile) {
-    if (ioName == "PLL_FAST_CLK" || ioName == "PLL_LOCK") {
-        return; // Skip this iteration and move to the next one
-    }
-
-    // Create a set of signals to which you want to apply the replacement
-    std::set<std::string> signalsToReplace = {"FIFO_RST", "RST", "DATA_VALID", "LOAD_WORD"};
-
-    // Check if ioName is in the set of signals to replace and if customerName ends with "N"
-    if (signalsToReplace.count(ioName) && customerName.back() == 'N') {
-        // Replace the mapping values with "_B" suffix
-        if (myMap.find(ioName) != myMap.end()) {
-            myMap[ioName] = myMap[ioName] + "_B";
-        }
-    }
-
-    if (get_ports != ioName && ((module == "I_SERDES" && ioDir == "OUT_DIR" || ioDir == "IN_RESET" ) || (module == "O_SERDES" && ioDir == "IN_DIR") || (module == "I_BUF" && ioDir == "OUT_DIR"))) {
-        std::string mode = (module == "I_SERDES") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
-
-        if (ioName == "D" || ioName == "Q") {
-            for (int i = 0; i <= msb; ++i) {
-                sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                sdcFile << "set_pin_loc " << actualName<<"["<<i<<"]"<< " " << customerName << " " << ((module == "I_SERDES") ? "g2f_rx_in[" : "f2g_tx_out[") << i << "]" << std::endl;
-                sdcFile<< std::endl;
-            }
-        } else {
-            sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-            sdcFile << "set_pin_loc " << actualName << " " << customerName << " " << myMap[ioName] << std::endl;
-            sdcFile<< std::endl;
-        }
-    }
-}
-
 int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs& gb) {
     myMap = {
         {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
@@ -1369,7 +1335,7 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
         {"DATA_VALID", "g2f_rx_dvalid_A"},
         {"DPA_ERROR", "g2f_rx_dpa_error"},
         {"DPA_LOCK", "g2f_rx_dpa_lock"},
-        {"CLK_IN", "fast_clk"},
+        {"PLL_FAST_CLK", "fast_clk"},
         {"CLK_OUT", "f2g_rx_core_clk"},
         {"LOAD_WORD", "f2g_tx_dvalid_A"},
         {"OE", "f2g_tx_oe_A"},
@@ -1385,26 +1351,6 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
     }
 
     getInstIos(json_object);
-    // std::string dir_str;
-    // for (const orig_io& entry : orig_ios) {
-    //     std::string io_name = entry.io_name;
-    //     unsigned lsb = entry.lsb;
-    //     unsigned msb = entry.msb;
-    //     unsigned dir = entry.dir;
-
-    //     if (dir == VERI_INPUT) {
-    //         map_inputs(json_object, io_name, "Input");
-    //     } else if (dir == VERI_OUTPUT) {
-    //         map_inputs(json_object, io_name, "Output");
-    //     }
-    //     if (dir == 330) {
-    //         dir_str = "Input";
-    //     } else if (dir == 346) {
-    //         dir_str = "Output";
-    //     }
-    //     // Print the orig_io information
-    //     std::cout << "io_name: " << io_name << ", lsb: " << lsb << ", msb: " << msb << ", dir: " << dir_str << std::endl;
-    // }
 
     // Open the file for reading
     std::ifstream file(example_file);
@@ -1468,12 +1414,83 @@ int write_sdc(const std::string& example_file, const std::string& arg2, const st
                       if(port.first == "O") {
                         std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                         sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[]" << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[TBD]" << std::endl;
                       } else if(port.first == "I") {
                         std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                         sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[]" << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[TBD]" << std::endl;
                       }
+                  }
+                } else {
+                    for (const auto& port : conn.ports) {
+                      if(conn.module.find("O_") != std::string::npos) {
+                        if(port.first == "Q") {
+                          if (!instIOs[instance].empty()) {
+                            std::vector<ioInfo> iosInfo = instIOs[instance];
+                            for (const auto& io : iosInfo) {
+                              if (io.ioDir == "IN_DIR"){
+                                std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
+                                std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
+                                unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
+                                unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
+                                if(j!=0) {
+                                  for (unsigned k = i; k <= j; k++) {
+                                    std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
+                                    std::cout << "PIN NAME ::::  " << pin_name << std::endl;
+                                    if(io.ioName == "D") {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << k << "]" << std::endl;
+                                    } else {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << k << "]" << std::endl;
+                                    }
+                                  }
+                                } else {
+                                  sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                  sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
+                                }
+                              }
+                            }
+                          }
+                          std::cout << "Inst isss :::: " << instance << std::endl;
+                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
+                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
+                        }
+                     } else //if(conn.module.find("I_") != std::string::npos) 
+                       {
+                        if(port.first == "D") {
+                          if (!instIOs[instance].empty()) {
+                            std::vector<ioInfo> iosInfo = instIOs[instance];
+                            for (const auto& io : iosInfo) {
+                              if (io.ioDir == "OUT_DIR"){
+                                std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
+                                std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
+                                unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
+                                unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
+                                if(j!=0) {
+                                  for (unsigned k = i; k <= j; k++) {
+                                    std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
+                                    std::cout << "PIN NAME ::::  " << pin_name << std::endl;
+                                    if(io.ioName == "Q") {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << k << "]" << std::endl;
+                                    } else {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << k << "]" << std::endl;
+                                    }
+                                  }
+                                } else {
+                                  sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                  sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
+                                }
+                              }
+                            }
+                          }
+                          std::cout << "Inst isss :::: " << instance << std::endl;
+                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
+                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
+                        }
+                    }
                   }
                 }
               }
