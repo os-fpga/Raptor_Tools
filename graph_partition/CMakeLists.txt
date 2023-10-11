@@ -15,6 +15,9 @@ set(TBB_download_RS ${CMAKE_CURRENT_SOURCE_DIR}/download_tbb_linux.cmake)
 # Set mt-kahypar options ON or OFF
 set(KAHYPAR_DOWNLOAD_BOOST ON CACHE BOOL "Enable the Download of Boost" FORCE)
 set(KAHYPAR_DOWNLOAD_TBB ON CACHE BOOL "Enable the Download of TBB" FORCE)
+set(KAHYPAR_ENABLE_THREAD_PINNING OFF CACHE BOOL "Enables thread pinning in Mt-KaHyPar." FORCE)
+set(KAHYPAR_ENABLE_ARCH_COMPILE_OPTIMIZATIONS OFF CACHE BOOL "Disable -mtune=native in KaHyPar" FORCE)
+set(KAHYPAR_ADD_ADDRESS_SANITIZER OFF CACHE BOOL "Disable ASAN in KaHyPar" FORCE)
 
 
 FILE(COPY ${Boost_download_RS}
