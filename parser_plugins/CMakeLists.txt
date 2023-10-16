@@ -46,21 +46,24 @@ else()
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/install/bin/yosys-config)
 endif()
 
+FILE(COPY include/simplify.cc
+          DESTINATION synlig_plugin/third_party/yosys_mod/simplify.cc)
+
 add_custom_target(surelog_build DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/surelog)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
     COMMAND echo "       Compiling Surelog"
-    COMMAND make
-    COMMAND make install PREFIX=${PROJECT_SOURCE_DIR}/install
+    COMMAND make -j
+    COMMAND make -j install PREFIX=${PROJECT_SOURCE_DIR}/install
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog/src/main.cpp
   )
 
-add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/systemverilog-plugin/systemverilog.so)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/systemverilog-plugin/systemverilog.so
+add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
-    COMMAND make -C frontends/systemverilog install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog
+    COMMAND make build YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/systemverilog-plugin/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/frontends/systemverilog/uhdm_ast.cc
   )
