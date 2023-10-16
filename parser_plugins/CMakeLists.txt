@@ -38,16 +38,22 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 add_library(dummy_parser_plugins_lib STATIC ${PROJECT_SOURCE_DIR}/dummy.cpp)
 
-if (RAPTOR) 
+if (RAPTOR)
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/)
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
+  message("YOSYS_PATH:" ${YOSYS_PATH})
+  message("YOSYS_CONFIG:" ${YOSYS_CONFIG})
 else()
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/)
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/install/bin/yosys-config)
 endif()
 
-FILE(COPY include/simplify.cc
-          DESTINATION synlig_plugin/third_party/yosys_mod/simplify.cc)
+if (RAPTOR)
+  FILE(COPY include/simplify.cc
+       DESTINATION synlig_plugin/third_party/yosys_mod/simplify.cc)
+  FILE(REMOVE_RECURSE synlig_plugin/third_party/yosys)
+  FILE(CREATE_LINK ${YOSYS_PATH} ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys SYMBOLIC)
+endif()
 
 add_custom_target(surelog_build DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/surelog)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
@@ -56,6 +62,15 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
     COMMAND make -j install PREFIX=${PROJECT_SOURCE_DIR}/install
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog/src/main.cpp
+  )
+
+
+add_custom_target(synlig_yosys_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys)
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys
+    COMMAND echo "       Compiling Yosys for Synlig plugin"
+    COMMAND make CONFIG=gcc PREFIX=${YOSYS_PATH} install -j 
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
+    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/simplify.cc
   )
 
 add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
@@ -99,5 +114,6 @@ endif()
   
 add_dependencies(dummy_parser_plugins_lib surelog_build synlig_build ghdl_plugin_build)
 add_dependencies(synlig_build surelog_build)
+add_dependencies(synlig_build synlig_yosys_build)
 add_dependencies(ghdl_plugin_build yosys)
 add_dependencies(synlig_build yosys)
