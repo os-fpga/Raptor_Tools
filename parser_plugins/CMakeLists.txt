@@ -49,20 +49,12 @@ else()
 endif()
 
 if (RAPTOR)
-  FILE(COPY include/simplify.cc
-       DESTINATION synlig_plugin/third_party/yosys_mod/simplify.cc)
+  FILE(COPY ${PROJECT_SOURCE_DIR}/include/simplify.cc
+       DESTINATION ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/)
 endif()
 
-add_custom_target(surelog_build DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/surelog)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
-    COMMAND echo "       Compiling Surelog"
-    COMMAND make -j
-    COMMAND make -j install PREFIX=${PROJECT_SOURCE_DIR}/install
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog"
-    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog/src/main.cpp
-  )
-
 # We have an old Yosys version, we need to selectively copy its source code under the plugin yosys until we update our own yosys.
+if (RAPTOR)
 add_custom_target(synlig_yosys_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys
     COMMAND echo "       Compiling Yosys for Synlig plugin"
@@ -72,15 +64,16 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yo
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/libs ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/libs
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/misc ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/misc
     COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/passes ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/passes
-    COMMAND make CONFIG=gcc PREFIX=${YOSYS_PATH} install -j 
+    COMMAND make CONFIG=gcc PREFIX=${YOSYS_PATH} install -j ${CPU_CORES}
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/simplify.cc
   )
+endif()
 
 add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
-    COMMAND make build YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install PLUGIN_LIST=systemverilog
+    COMMAND make build YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install -j ${CPU_CORES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
@@ -108,7 +101,7 @@ else()
   add_custom_target(yosys DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/yosys)
   add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/yosys
     COMMAND echo "       Compiling Yosys"
-    COMMAND make CONFIG=gcc PREFIX=${PROJECT_SOURCE_DIR}/install install -j
+    COMMAND make CONFIG=gcc PREFIX=${PROJECT_SOURCE_DIR}/install install -j ${CPU_CORES}
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/kernel/yosys.cc
   )
@@ -116,8 +109,9 @@ endif()
 
 
   
-add_dependencies(dummy_parser_plugins_lib surelog_build synlig_build ghdl_plugin_build)
-add_dependencies(synlig_build surelog_build)
-add_dependencies(synlig_build synlig_yosys_build)
+add_dependencies(dummy_parser_plugins_lib synlig_build ghdl_plugin_build)
+if (RAPTOR)
+  add_dependencies(synlig_build synlig_yosys_build)
+endif()
 add_dependencies(ghdl_plugin_build yosys)
 add_dependencies(synlig_build yosys)
