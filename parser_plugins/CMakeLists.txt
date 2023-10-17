@@ -51,8 +51,6 @@ endif()
 if (RAPTOR)
   FILE(COPY include/simplify.cc
        DESTINATION synlig_plugin/third_party/yosys_mod/simplify.cc)
-  FILE(REMOVE_RECURSE synlig_plugin/third_party/yosys)
-  FILE(CREATE_LINK ${YOSYS_PATH} ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys SYMBOLIC)
 endif()
 
 add_custom_target(surelog_build DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/surelog)
@@ -68,6 +66,8 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
 add_custom_target(synlig_yosys_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys
     COMMAND echo "       Compiling Yosys for Synlig plugin"
+    COMMAND ${CMAKE_COMMAND} -E remove_directory synlig_plugin/third_party/yosys
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH} ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys
     COMMAND make CONFIG=gcc PREFIX=${YOSYS_PATH} install -j 
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/simplify.cc
