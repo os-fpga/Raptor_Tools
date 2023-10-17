@@ -74,8 +74,8 @@ add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
     COMMAND make build YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install -j ${CPU_CORES}
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/frontends/systemverilog/uhdm_ast.cc
   )
@@ -86,12 +86,20 @@ else()
    set (BUILD_DIR build)
 endif()
 
+add_custom_target(ghdl_install DEPENDS ${PROJECT_SOURCE_DIR}/../HDL_simulator/GHDL/bin/ghdl)
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/../HDL_simulator/GHDL/bin/ghdl
+    COMMAND echo "       Installing GHDL"
+    COMMAND make install 
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/../HDL_simulator"
+    DEPENDS ${PROJECT_SOURCE_DIR}/../HDL_simulator/CMakeLists.txt
+  )
+
 add_custom_target(ghdl_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     COMMAND echo "       Compiling GHDL plugin"
     COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl
-    COMMAND ${CMAKE_COMMAND} -E make_directory ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/src/ghdl.cc
   )
@@ -112,6 +120,8 @@ endif()
 add_dependencies(dummy_parser_plugins_lib synlig_build ghdl_plugin_build)
 if (RAPTOR)
   add_dependencies(synlig_build synlig_yosys_build)
+else()
+  add_dependencies(ghdl_plugin_build ghdl_install)
 endif()
 add_dependencies(ghdl_plugin_build yosys)
 add_dependencies(synlig_build yosys)
