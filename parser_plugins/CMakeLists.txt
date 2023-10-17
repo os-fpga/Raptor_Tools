@@ -41,12 +41,16 @@ add_library(dummy_parser_plugins_lib STATIC ${PROJECT_SOURCE_DIR}/dummy.cpp)
 if (RAPTOR)
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/)
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
-  message("YOSYS_PATH:" ${YOSYS_PATH})
-  message("YOSYS_CONFIG:" ${YOSYS_CONFIG})
+  set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl)
 else()
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/)
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/install/bin/yosys-config)
+  set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../HDL_simulator/build/bin/HDL_simulator/GHDL/bin/ghdl)
 endif()
+
+message("YOSYS_PATH:" ${YOSYS_PATH})
+message("YOSYS_CONFIG:" ${YOSYS_CONFIG})
+message("GHDL_BIN_PATH:" ${GHDL_BIN_PATH})
 
 if (RAPTOR)
   FILE(COPY ${PROJECT_SOURCE_DIR}/include/simplify.cc
@@ -86,8 +90,8 @@ else()
    set (BUILD_DIR build)
 endif()
 
-add_custom_target(ghdl_install DEPENDS ${PROJECT_SOURCE_DIR}/../HDL_simulator/GHDL/bin/ghdl)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/../HDL_simulator/GHDL/bin/ghdl
+add_custom_target(ghdl_install DEPENDS ${GHDL_BIN_PATH})
+add_custom_command(OUTPUT ${GHDL_BIN_PATH}
     COMMAND echo "       Installing GHDL"
     COMMAND make install 
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/../HDL_simulator"
@@ -97,7 +101,7 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/../HDL_simulator/GHDL/bin/ghdl
 add_custom_target(ghdl_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     COMMAND echo "       Compiling GHDL plugin"
-    COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl
+    COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${GHDL_BIN_PATH}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin"
