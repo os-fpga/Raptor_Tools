@@ -29,16 +29,6 @@ current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 
 INSTALL_PATH:= ${current_dir}
 
-release: run-cmake-release
-
-debug: run-cmake-debug
-
-surelog:
-	cd synlig_plugin/third_party/surelog ; make ; make install PREFIX=${INSTALL_PATH}/dinstall ; cd ..
-
-run-cmake-release:
-	cmake -DCMAKE_BUILD_TYPE=Release -S . -B build
-	cmake --build build
-run-cmake-debug:
-	cd synlig_plugin/third_party/surelog ; make debug ; make debug install PREFIX=${INSTALL_PATH}/dinstall ; cd ..
-	export UHDM_INSTALL_DIR=${INSTALL_PATH}/dinstall; make -C ${current_dir}/yosys-f4pga-plugins/ install PLUGIN_LIST=systemverilog  -j$(nproc)
+all:
+	cmake -DCMAKE_BUILD_TYPE=Release -DCPU_CORES=$(CPU_CORES) -S . -B build 
+	cmake --build build -j $(CPU_CORES)
