@@ -1,0 +1,24 @@
+.model dsp38_test
+.inputs B[17] B[16] B[15] B[14] B[13] B[12] B[11] B[10] B[9] B[8] B[7] B[6] B[5] B[4] B[3] B[2] B[1] B[0] A[19] A[18] A[17] A[16] A[15] A[14] A[13] A[12] A[11] A[10] A[9] A[8] A[7] A[6] A[5] A[4] A[3] A[2] A[1] A[0]
+.outputs Z[37] Z[36] Z[35] Z[34] Z[33] Z[32] Z[31] Z[30] Z[29] Z[28] Z[27] Z[26] Z[25] Z[24] Z[23] Z[22] Z[21] Z[20] Z[19] Z[18] Z[17] Z[16] Z[15] Z[14] Z[13] Z[12] Z[11] Z[10] Z[9] Z[8] Z[7] Z[6] Z[5] Z[4] Z[3] Z[2] Z[1] Z[0]
+.names $false
+.names $true
+1
+.names $undef
+.subckt DSP38 A[0]=A[0] A[1]=A[1] A[2]=A[2] A[3]=A[3] A[4]=A[4] A[5]=A[5] A[6]=A[6] A[7]=A[7] A[8]=A[8] A[9]=A[9] A[10]=A[10] A[11]=A[11] A[12]=A[12] A[13]=A[13] A[14]=A[14] A[15]=A[15] A[16]=A[16] A[17]=A[17] A[18]=A[18] A[19]=A[19] B[0]=B[0] B[1]=B[1] B[2]=B[2] B[3]=B[3] B[4]=B[4] B[5]=B[5] B[6]=B[6] B[7]=B[7] B[8]=B[8] B[9]=B[9] B[10]=B[10] B[11]=B[11] B[12]=B[12] B[13]=B[13] B[14]=B[14] B[15]=B[15] B[16]=B[16] B[17]=B[17] ACC_FIR[0]=$false ACC_FIR[1]=$false ACC_FIR[2]=$false ACC_FIR[3]=$false ACC_FIR[4]=$false ACC_FIR[5]=$false Z[0]=Z[0] Z[1]=Z[1] Z[2]=Z[2] Z[3]=Z[3] Z[4]=Z[4] Z[5]=Z[5] Z[6]=Z[6] Z[7]=Z[7] Z[8]=Z[8] Z[9]=Z[9] Z[10]=Z[10] Z[11]=Z[11] Z[12]=Z[12] Z[13]=Z[13] Z[14]=Z[14] Z[15]=Z[15] Z[16]=Z[16] Z[17]=Z[17] Z[18]=Z[18] Z[19]=Z[19] Z[20]=Z[20] Z[21]=Z[21] Z[22]=Z[22] Z[23]=Z[23] Z[24]=Z[24] Z[25]=Z[25] Z[26]=Z[26] Z[27]=Z[27] Z[28]=Z[28] Z[29]=Z[29] Z[30]=Z[30] Z[31]=Z[31] Z[32]=Z[32] Z[33]=Z[33] Z[34]=Z[34] Z[35]=Z[35] Z[36]=Z[36] Z[37]=Z[37] FEEDBACK[0]=$false FEEDBACK[1]=$false FEEDBACK[2]=$false LOAD_ACC=$true SATURATE=$false SHIFT_RIGHT[0]=$false SHIFT_RIGHT[1]=$false SHIFT_RIGHT[2]=$false SHIFT_RIGHT[3]=$false SHIFT_RIGHT[4]=$false SHIFT_RIGHT[5]=$false ROUND=$false SUBTRACT=$false UNSIGNED_A=$true UNSIGNED_B=$true
+.param OUTPUT_REG_EN "TRUE"
+.param DSP_MODE "MULTIPLY"
+.param COEFF_3 00000000000001010000
+.param COEFF_2 00000000000000111100
+.param COEFF_1 00000000000000101000
+.param INPUT_REG_EN "FALSE"
+.param COEFF_0 00000000000000010100
+.subckt DSP38 A[0]=A[0] A[1]=A[1] A[2]=A[2] A[3]=A[3] A[4]=A[4] A[5]=A[5] A[6]=A[6] A[7]=A[7] A[8]=A[8] A[9]=A[9] A[10]=A[10] A[11]=A[11] A[12]=A[12] A[13]=A[13] A[14]=A[14] A[15]=A[15] A[16]=A[16] A[17]=A[17] A[18]=A[18] A[19]=A[19] B[0]=B[0] B[1]=B[1] B[2]=B[2] B[3]=B[3] B[4]=B[4] B[5]=B[5] B[6]=B[6] B[7]=B[7] B[8]=B[8] B[9]=B[9] B[10]=B[10] B[11]=B[11] B[12]=B[12] B[13]=B[13] B[14]=B[14] B[15]=B[15] B[16]=B[16] B[17]=B[17] ACC_FIR[0]=$false ACC_FIR[1]=$false ACC_FIR[2]=$false ACC_FIR[3]=$false ACC_FIR[4]=$false ACC_FIR[5]=$false Z[0]=Z[0] Z[1]=Z[1] Z[2]=Z[2] Z[3]=Z[3] Z[4]=Z[4] Z[5]=Z[5] Z[6]=Z[6] Z[7]=Z[7] Z[8]=Z[8] Z[9]=Z[9] Z[10]=Z[10] Z[11]=Z[11] Z[12]=Z[12] Z[13]=Z[13] Z[14]=Z[14] Z[15]=Z[15] Z[16]=Z[16] Z[17]=Z[17] Z[18]=Z[18] Z[19]=Z[19] Z[20]=Z[20] Z[21]=Z[21] Z[22]=Z[22] Z[23]=Z[23] Z[24]=Z[24] Z[25]=Z[25] Z[26]=Z[26] Z[27]=Z[27] Z[28]=Z[28] Z[29]=Z[29] Z[30]=Z[30] Z[31]=Z[31] Z[32]=Z[32] Z[33]=Z[33] Z[34]=Z[34] Z[35]=Z[35] Z[36]=Z[36] Z[37]=Z[37] FEEDBACK[0]=$false FEEDBACK[1]=$false FEEDBACK[2]=$false LOAD_ACC=$true SATURATE=$false SHIFT_RIGHT[0]=$false SHIFT_RIGHT[1]=$false SHIFT_RIGHT[2]=$false SHIFT_RIGHT[3]=$false SHIFT_RIGHT[4]=$false SHIFT_RIGHT[5]=$false ROUND=$false SUBTRACT=$false UNSIGNED_A=$true UNSIGNED_B=$true
+.param OUTPUT_REG_EN "FALSE"
+.param DSP_MODE "MULTIPLY_ACCUMULATE"
+.param COEFF_3 00000000000001010000
+.param COEFF_2 00000000000000111100
+.param COEFF_1 00000000000000101000
+.param INPUT_REG_EN "FALSE"
+.param COEFF_0 00000000000000010100
+.end
