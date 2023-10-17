@@ -62,12 +62,16 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/surelog
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/surelog/src/main.cpp
   )
 
-
+# We have an old Yosys version, we need to selectively copy its source code under the plugin yosys until we update our own yosys.
 add_custom_target(synlig_yosys_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys
     COMMAND echo "       Compiling Yosys for Synlig plugin"
-    COMMAND ${CMAKE_COMMAND} -E remove_directory synlig_plugin/third_party/yosys
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH} ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/frontends ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/frontends
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/backends ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/backends
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/kernel ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/kernel
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/libs ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/libs
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/misc ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/misc
+    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/passes ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/passes
     COMMAND make CONFIG=gcc PREFIX=${YOSYS_PATH} install -j 
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/simplify.cc
