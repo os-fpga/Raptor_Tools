@@ -47,16 +47,18 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        submodules: false
+        submodules: true
         fetch-depth: 1
 
-     - name: Checkout submodules
-        run: |
-          cd parser_plugins/synlig_plugin
-          git submodule sync
-          git submodule update --depth 1 --init --recursive --checkout \
-              third_party/{surelog,yosys} \
-              ;
+    - name: Checkout submodules
+      run: |
+        cd parser_plugins/synlig_plugin
+        echo $PWD
+        ls
+        git submodule sync
+        git submodule update --depth 3 --init --recursive --checkout \
+          ./third_party/{surelog,yosys} \
+          ;
 
     - name: Install dependencies
       run: 
@@ -66,5 +68,5 @@ jobs:
       shell: bash
       run: |
         cd parser_plugins
-        make
+        make CPU_CORES=1
 
