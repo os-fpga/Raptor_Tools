@@ -50,13 +50,13 @@ jobs:
         submodules: false
         fetch-depth: 1
 
-     - name: Checkout submodules
-        run: |
-          cd parser_plugins/synlig_plugin
-          git submodule sync
-          git submodule update --depth 1 --init --recursive --checkout \
-              third_party/{surelog,yosys} \
-              ;
+    - name: Checkout submodules
+      run: |
+        cd parser_plugins/synlig_plugin
+        git submodule sync
+        git submodule update --depth 1 --init --recursive --checkout \
+          third_party/{surelog,yosys} \
+          ;
 
     - name: Install dependencies
       run: 
