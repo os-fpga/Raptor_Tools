@@ -1,10 +1,10 @@
 #include "pin_map.h"
 int main(int argc, char* argv[]) {
   // Get the file name to work on
-    std::string intf_json = "interface.json";
-    std::string mod_ios = "mod_ios.json";
-    std::string user_sdc = "pc.pin";
-    std::string pin_table = "pin_table.csv";
+    std::string intf_json  = "interface.json";
+    std::string mod_ios    = "mod_ios.json";
+    std::string user_sdc   = "pc.pin";
+    std::string pin_table  = "pin_table.csv";
     std::string output_sdc = "output.sdc";
 
     for (int i = 1; i < argc; ++i) {
@@ -37,6 +37,5 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-	get_io_info(mod_ios);
-	print_ios();
+	update_sdc (intf_json, mod_ios, user_sdc, pin_table, output_sdc);
 }

@@ -1,0 +1,63 @@
+[
+    {
+        "ports": [
+            {
+                "direction": "Input",
+                "name": "clk",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "rst",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "D",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Output",
+                "name": "Q",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "clk_select",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "check_in",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Output",
+                "name": "out",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        ],
+        "topModule": "serdes_top"
+    }
+]
