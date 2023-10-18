@@ -36,6 +36,13 @@ set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+   set (BUILD_DIR dbuild)
+else()
+   set (BUILD_DIR build)
+endif()
+
+
 add_library(dummy_parser_plugins_lib STATIC ${PROJECT_SOURCE_DIR}/dummy.cpp)
 
 if (RAPTOR)
@@ -83,12 +90,6 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/syst
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/frontends/systemverilog/uhdm_ast.cc
   )
-
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-   set (BUILD_DIR dbuild)
-else()
-   set (BUILD_DIR build)
-endif()
 
 add_custom_target(ghdl_install DEPENDS ${GHDL_BIN_PATH})
 add_custom_command(OUTPUT ${GHDL_BIN_PATH}
