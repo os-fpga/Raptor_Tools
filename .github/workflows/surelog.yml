@@ -53,6 +53,7 @@ jobs:
     - name: Checkout submodules
       run: |
         cd parser_plugins/synlig_plugin
+        echo $PWD
         git submodule sync
         git submodule update --depth 1 --init --recursive --checkout \
           third_party/{surelog,yosys} \
