@@ -1,8 +1,17 @@
 #include "pin_map.h"
 #include <json.hpp>
 using json = nlohmann::json;
+#define VERI_INOUT 329
+#define VERI_INPUT 330
+#define VERI_OUTPUT 346
+#define VERI_WIRE 392
 
 std::vector<orig_io> orig_ios;
+std::unordered_map<std::string, int> directions = {
+  {"Input", VERI_INPUT},
+  {"Output", VERI_OUTPUT},
+  {"Inout", VERI_INOUT}
+};
 
 int get_io_info(std::string mod_ios)
 {
@@ -25,7 +34,8 @@ int get_io_info(std::string mod_ios)
 
     for (const auto& port : portsArray) {
         orig_io io_info;
-        io_info.dir = port["direction"];
+        std::string dir = port["direction"];
+        io_info.dir = directions[dir];
         io_info.io_name = port["name"];
         io_info.lsb = port["range"]["lsb"];
         io_info.msb = port["range"]["msb"];
@@ -42,7 +52,7 @@ void print_ios()
         std::string io_name = entry.io_name;
         unsigned lsb = entry.lsb;
         unsigned msb = entry.msb;
-        std::string dir = entry.dir;
+        unsigned dir = entry.dir;
         std::cout << "io_name: " << io_name << " lsb: " << lsb << " msb: " << msb << " dir: " << dir << std::endl;
     }
 }
