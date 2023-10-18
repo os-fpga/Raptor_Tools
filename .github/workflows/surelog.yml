@@ -45,11 +45,19 @@ jobs:
         pip3 install psutil
 
     - name: Checkout code
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3
       with:
-        submodules: recursive
-        fetch-depth: 0
-  
+        submodules: false
+        fetch-depth: 1
+
+     - name: Checkout submodules
+        run: |
+          cd parser_plugins/synlig_plugin
+          git submodule sync
+          git submodule update --depth 1 --init --recursive --checkout \
+              third_party/{surelog,yosys} \
+              ;
+
     - name: Install dependencies
       run: 
         sudo apt-get install cmake build-essential g++-11 gcc-11 tclsh tcl-dev tcllib cmake 
