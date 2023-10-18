@@ -47,7 +47,7 @@ jobs:
     - name: Checkout code
       uses: actions/checkout@v3
       with:
-        submodules: false
+        submodules: true
         fetch-depth: 1
 
     - name: Checkout submodules
@@ -57,7 +57,7 @@ jobs:
         ls
         git submodule sync
         git submodule update --depth 1 --init --recursive --checkout \
-          third_party/{surelog,yosys} \
+          ./third_party/{surelog,yosys} \
           ;
 
     - name: Install dependencies
