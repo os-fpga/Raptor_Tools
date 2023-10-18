@@ -56,7 +56,7 @@ jobs:
         echo $PWD
         ls
         git submodule sync
-        git submodule update --depth 1 --init --recursive --checkout \
+        git submodule update --depth 3 --init --recursive --checkout \
           ./third_party/{surelog,yosys} \
           ;
 
@@ -68,5 +68,5 @@ jobs:
       shell: bash
       run: |
         cd parser_plugins
-        make
+        make CPU_CORES=1
 
