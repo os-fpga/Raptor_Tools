@@ -1,3 +1,4 @@
+#include "pin_map.h"
 int main(int argc, char* argv[]) {
   // Get the file name to work on
     std::string intf_json = "interface.json";
@@ -36,4 +37,6 @@ int main(int argc, char* argv[]) {
             }
         }
     }
+	get_io_info(mod_ios);
+	print_ios();
 }
