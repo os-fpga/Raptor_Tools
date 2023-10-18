@@ -45,11 +45,18 @@ jobs:
         pip3 install psutil
 
     - name: Checkout code
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3
       with:
         submodules: recursive
         fetch-depth: 0
-  
+
+    - name: Install vendored dependencies
+      run: |
+        git clone --depth 1 --branch v1.0.0 https://github.com/capnproto/capnproto.git
+        pushd capnproto
+        cmake -B build -DCMAKE_BUILD_TYPE=Release -DCMAKE_CXX_STANDARD=17 -DCMAKE_POSITION_INDEPENDENT_CODE=ON . && cmake --build build && sudo cmake --install build
+        popd
+
     - name: Install dependencies
       run: 
         sudo apt-get install cmake build-essential g++-11 gcc-11 tclsh tcl-dev tcllib cmake 
