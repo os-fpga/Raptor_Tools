@@ -61,17 +61,21 @@ option(SYNLIG_BUILD_TESTS "Enable testing." ON)
 
 
 if (SYNLIG_USE_HOST_YOSYS)
+  message("Using HOST YOSYS")
   find_package(yosys)
   get_target_property(YOSYS_INCLUDE_DIR yosys::yosys INTERFACE_INCLUDE_DIRECTORIES)
 else()
-  if (YOSYS_CONFIG)
+  if (DEFINED YOSYS_CONFIG AND NOT YOSYS_CONFIG STREQUAL "")
     # Use the Yosys custom location given
     set(YOSYS_INCLUDE_DIR ${YOSYS_PATH})
+    message("Using YOSYS from ${YOSYS_PATH}")
   else()
+    message("Using Vendored YOSYS")
     set(VENDORED_YOSYS 1)
     set(Yosys_BuildTests OFF CACHE INTERNAL "")
     set(YOSYS_INCLUDE_DIR ${PROJECT_SOURCE_DIR}/third_party/yosys)
     set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/third_party/yosys/yosys-config)
+
     add_custom_target(yosys DEPENDS ${INSTALL_DIR}/bin/yosys)
     add_custom_command(OUTPUT ${INSTALL_DIR}/bin/yosys
       COMMAND echo "       Compiling Yosys"
@@ -251,13 +255,15 @@ set(synlig_SRC
 )
 
 add_library(synlig SHARED ${synlig_SRC})
+
 if (VENDORED_YOSYS)
   add_dependencies(synlig yosys)
   add_dependencies(surelog yosys)
   add_dependencies(surelog-bin yosys)
   add_dependencies(antlr4_static yosys)
   add_dependencies(capnp yosys)
-endif()  
+endif()
+
 add_dependencies(synlig surelog)
 add_dependencies(synlig uhdm)
 target_link_libraries(synlig PUBLIC ${UHDM_LIBRARY})

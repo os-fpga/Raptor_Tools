@@ -48,10 +48,12 @@ add_library(dummy_parser_plugins_lib STATIC ${PROJECT_SOURCE_DIR}/dummy.cpp)
 if (RAPTOR)
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/)
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
+  set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl)
 else()
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/)
-  set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/yosys-config)
+  # Do not set YOSYS_CONFIG in this case
+  set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/yosys-config)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../HDL_simulator/build/bin/HDL_simulator/GHDL/bin/ghdl)
 endif()
 
@@ -78,7 +80,7 @@ FILE(COPY ${PROJECT_SOURCE_DIR}/include/CMakeLists.txt
 add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
-    COMMAND make -f makefile YOSYS_CONFIG=${YOSYS_CONFIG} -j ${CPU_CORES}
+    COMMAND make -f makefile YOSYS_CONFIG=${YOSYS_CONFIG} YOSYS_PATH=${YOSYS_PATH} -j ${CPU_CORES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
@@ -97,7 +99,7 @@ add_custom_command(OUTPUT ${GHDL_BIN_PATH}
 add_custom_target(ghdl_plugin_build DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     COMMAND echo "       Compiling GHDL plugin"
-    COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} GHDL=${GHDL_BIN_PATH}
+    COMMAND make install YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${GHDL_YOSYS_CONFIG} GHDL=${GHDL_BIN_PATH}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin"
