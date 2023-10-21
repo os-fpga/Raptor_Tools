@@ -75,7 +75,7 @@ else()
     add_custom_target(yosys DEPENDS ${INSTALL_DIR}/bin/yosys)
     add_custom_command(OUTPUT ${INSTALL_DIR}/bin/yosys
       COMMAND echo "       Compiling Yosys"
-      COMMAND make CONFIG=gcc PREFIX=${INSTALL_DIR} install -j ${CPU_CORES}
+      COMMAND make CONFIG=gcc PREFIX=${INSTALL_DIR} install -j${CPU_CORES}
 
       WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/third_party/yosys"
       DEPENDS ${PROJECT_SOURCE_DIR}/third_party/yosys/kernel/yosys.cc
@@ -116,18 +116,9 @@ message("Building Synlig version v${SYNLIG_VERSION_MAJOR}.${SYNLIG_VERSION_MINOR
 #configure_file(${PROJECT_SOURCE_DIR}/include/Synlig/synlig-version.h.in ${GENDIR}/include/Synlig/synlig-version.h)
 
 
-#if(WITH_LIBCXX)
-#  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-#endif()
-
-#execute_process (
-#    COMMAND bash -c "${YOSYS_CONFIG} --cxxflags"
-#    OUTPUT_VARIABLE YOSYS_CONFIG_FLAGS
-#    WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}
-#)
-#string(REGEX REPLACE "\n$" "" YOSYS_CONFIG_FLAGS "${YOSYS_CONFIG_FLAGS}")
-#string(REGEX REPLACE "\\-std=c\\+\\+11" "" YOSYS_CONFIG_FLAGS "${YOSYS_CONFIG_FLAGS}")
-#string(REGEX REPLACE "\\-stdlib=libc\\+\\+" "" YOSYS_CONFIG_FLAGS "${YOSYS_CONFIG_FLAGS}")
+if(WITH_LIBCXX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
+endif()
 
 set(YOSYS_CONFIG_FLAGS "-MD -MP -D_YOSYS_ -fPIC -Os -DYOSYS_ENABLE_READLINE -DYOSYS_ENABLE_PLUGINS -DYOSYS_ENABLE_GLOB -DYOSYS_ENABLE_ZLIB -I/usr/local/include -I/usr/include/tcl8.6 -DYOSYS_ENABLE_TCL -DYOSYS_ENABLE_ABC -DYOSYS_ENABLE_COVER")
 
@@ -263,6 +254,9 @@ add_library(synlig SHARED ${synlig_SRC})
 if (VENDORED_YOSYS)
   add_dependencies(synlig yosys)
   add_dependencies(surelog yosys)
+  add_dependencies(surelog-bin yosys)
+  add_dependencies(antlr4_static yosys)
+  add_dependencies(capnp yosys)
 endif()  
 add_dependencies(synlig surelog)
 add_dependencies(synlig uhdm)
