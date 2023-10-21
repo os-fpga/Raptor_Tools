@@ -68,5 +68,5 @@ jobs:
       shell: bash
       run: |
         cd parser_plugins
-        make
+        make CPU_CORES=1
 

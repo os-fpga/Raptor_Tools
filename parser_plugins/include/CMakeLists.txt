@@ -262,6 +262,7 @@ set(synlig_SRC
 add_library(synlig SHARED ${synlig_SRC})
 if (VENDORED_YOSYS)
   add_dependencies(synlig yosys)
+  add_dependencies(surelog yosys)
 endif()  
 add_dependencies(synlig surelog)
 add_dependencies(synlig uhdm)
