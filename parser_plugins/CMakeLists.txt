@@ -24,10 +24,10 @@ if(NOT CMAKE_BUILD_TYPE)
             FORCE)
 endif(NOT CMAKE_BUILD_TYPE)
 
-option(
-  WITH_LIBCXX
-  "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On"
-  On)
+#option(
+#  WITH_LIBCXX
+#  "Building with clang++ and libc++(in Linux). To enable with: -DWITH_LIBCXX=On"
+#  On)
 
 project(YOSYS_SV)
 
@@ -51,7 +51,7 @@ if (RAPTOR)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl)
 else()
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/)
-  set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/install/bin/yosys-config)
+  set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/yosys-config)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../HDL_simulator/build/bin/HDL_simulator/GHDL/bin/ghdl)
 endif()
 
@@ -64,29 +64,24 @@ if (RAPTOR)
        DESTINATION ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/)
 endif()
 
-# We have an old Yosys version, we need to selectively copy its source code under the plugin yosys until we update our own yosys.
-if (RAPTOR)
-add_custom_target(synlig_yosys_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/out/release/bin/yosys
-    COMMAND echo "       Compiling Yosys for Synlig plugin"
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/frontends ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/frontends
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/backends ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/backends
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/kernel ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/kernel
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/libs ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/libs
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/misc ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/misc
-    COMMAND ${CMAKE_COMMAND} -E copy_directory ${YOSYS_PATH}/passes ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/passes
-    COMMAND make CONFIG=gcc PREFIX=${YOSYS_PATH} install -j ${CPU_CORES}
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
-    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/simplify.cc
-  )
-endif()
+FILE(COPY ${PROJECT_SOURCE_DIR}/include/CMakeLists.txt
+          ${PROJECT_SOURCE_DIR}/include/makefile
+     DESTINATION ${PROJECT_SOURCE_DIR}/synlig_plugin/)
+
+
+# TODO: The best solution would be to do the following:
+#   add_sybsystem(synlig_plugin)
+# instead of the current: 
+#   add_custom_target(synlig_build ...)
+# and to make the targets depend on synlig lib, but the problem is json, capnp, common libraries that gets multiply defined at Raptor level.
 
 add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
-    COMMAND make build YOSYS_PATH=${YOSYS_PATH} YOSYS_CONFIG=${YOSYS_CONFIG} UHDM_INSTALL_DIR=${PROJECT_SOURCE_DIR}/install -j ${CPU_CORES}
+    COMMAND make -f makefile YOSYS_CONFIG=${YOSYS_CONFIG} -j ${CPU_CORES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/frontends/systemverilog/uhdm_ast.cc
   )
@@ -108,25 +103,10 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin"
     DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/src/ghdl.cc
   )
-
-if (RAPTOR)
-else()
-  add_custom_target(yosys DEPENDS ${PROJECT_SOURCE_DIR}/install/bin/yosys)
-  add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/install/bin/yosys
-    COMMAND echo "       Compiling Yosys"
-    COMMAND make CONFIG=gcc PREFIX=${PROJECT_SOURCE_DIR}/install install -j ${CPU_CORES}
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys"
-    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/kernel/yosys.cc
-  )
-endif()
-
-
   
 add_dependencies(dummy_parser_plugins_lib synlig_build ghdl_plugin_build)
 if (RAPTOR)
-  add_dependencies(synlig_build synlig_yosys_build)
 else()
   add_dependencies(ghdl_plugin_build ghdl_install)
 endif()
-add_dependencies(ghdl_plugin_build yosys)
-add_dependencies(synlig_build yosys)
+add_dependencies(ghdl_plugin_build synlig_build)
