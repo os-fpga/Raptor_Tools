@@ -30,5 +30,5 @@ current_dir := $(patsubst %/,%,$(dir $(mkfile_path)))
 INSTALL_PATH:= ${current_dir}
 
 all:
-	cmake -DCMAKE_BUILD_TYPE=Release -DCPU_CORES=$(CPU_CORES) -S . -B build 
+	cmake -DCMAKE_BUILD_TYPE=Release -DCPU_CORES=$(CPU_CORES) $(ADDITIONAL_CMAKE_OPTIONS) -S . -B build
 	cmake --build build -j $(CPU_CORES)
