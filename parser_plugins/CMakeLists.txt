@@ -66,11 +66,6 @@ if (RAPTOR)
        DESTINATION ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/)
 endif()
 
-FILE(COPY ${PROJECT_SOURCE_DIR}/include/CMakeLists.txt
-          ${PROJECT_SOURCE_DIR}/include/makefile
-     DESTINATION ${PROJECT_SOURCE_DIR}/synlig_plugin/)
-
-
 # TODO: The best solution would be to do the following:
 #   add_sybsystem(synlig_plugin)
 # instead of the current: 
@@ -80,7 +75,7 @@ FILE(COPY ${PROJECT_SOURCE_DIR}/include/CMakeLists.txt
 add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
 add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
-    COMMAND make -f makefile YOSYS_CONFIG=${YOSYS_CONFIG} YOSYS_PATH=${YOSYS_PATH} -j ${CPU_CORES}
+    COMMAND make -f cmake-makefile YOSYS_CONFIG=${YOSYS_CONFIG} YOSYS_PATH=${YOSYS_PATH} -j ${CPU_CORES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
