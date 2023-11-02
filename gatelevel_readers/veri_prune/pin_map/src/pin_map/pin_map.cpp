@@ -324,7 +324,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
     }
 
     // Define a regular expression pattern
-    std::regex pattern(R"(\bPIN_LOC\s+(\S+)\s+\[get_ports\s+(\S+)\])");
+    std::regex pattern("set_property PIN_LOC (\\w+) \\[get_ports (\\w+)\\]");
 
     // Create a regex iterator
     std::sregex_iterator iter(text.begin(), text.end(), pattern);
@@ -340,7 +340,8 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
         std::cerr << "Error opening the SDC file." << std::endl;
         return 1;
     }
-
+    unsigned max_msb = 0;
+    unsigned rx_msb = 0;
     // Iterate through the matches and append the SDC lines to the file
     while (iter != end) {
         std::smatch match = *iter;
@@ -357,7 +358,19 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
           const std::vector<Connection>& instanceConnections = entry.second;
           //std::cout << "Instance: " << instance << std::endl;
           for (const auto& conn : instanceConnections) {
-              std::string mode = conn.module.find("I_") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
+                 std::vector<ioInfo> iosInfo = instIOs[instance];
+                    for (const auto& io : iosInfo) {
+                        if (io.ioDir == "OUT_DIR") {
+                            if (io.ioName == "Q") {
+                                rx_msb = std::max(rx_msb, io.msb);
+                            }
+                        } else if (io.ioDir == "IN_DIR") {
+                            if (io.ioName == "D") {
+                                max_msb = io.msb;
+                            }
+                        }
+                    }
+             // std::string mode = conn.module.find("I_") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
               //std::cout << "Signal: " << conn.signal << std::endl;
               //std::cout << "Module: " << conn.module << std::endl;
               if (conn.signal == get_ports) {
@@ -369,6 +382,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                     used_pins.push_back(ball_id);
                 }
                 if (conn.module.find("BUF") != std::string::npos) {
+                     std::string mode = conn.module.find("I_") != std::string::npos ? "MODE_BP_DIR_A_TX" : "MODE_BP_DIR_A_RX";
                 // Print other fields as needed
                   for (const auto& port : conn.ports) {
                       std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
@@ -388,7 +402,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                   }
                 } else {
                     for (const auto& port : conn.ports) {
-                      if(conn.module.find("O_") != std::string::npos) {
+                      if(conn.module.find("O_SERDES") != std::string::npos) {
                         if(port.first == "Q") {
                           if (!instIOs[instance].empty()) {
                             std::vector<ioInfo> iosInfo = instIOs[instance];
@@ -404,15 +418,15 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                                       std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
                                       std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                       if(io.ioName == "D") {
-                                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                        sdcFile << "set_property mode " << "MODE_RATE_" << max_msb << "_A_TX "<< " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << k << "]" << std::endl;
                                       } else {
-                                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                        sdcFile << "set_property mode " <<"MODE_RATE_" << max_msb << "_A_TX " << " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << pinsMap[io.ioName] << "[" << k << "]" << std::endl;
                                       }
                                     }
                                   } else {
-                                    sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                    sdcFile << "set_property mode " << "MODE_RATE_" << max_msb << "_A_TX "  << " " << customerName << std::endl;
                                     sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
                                   }
                                 } else {
@@ -425,7 +439,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                           std::cout << "MODULE isss :::: " << conn.module << std::endl;
                           std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
                         }
-                     } else //if(conn.module.find("I_") != std::string::npos) 
+                     } else if(conn.module.find("I_SERDES") != std::string::npos)
                        {
                         if(port.first == "D") {
                           if (!instIOs[instance].empty()) {
@@ -442,15 +456,15 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                                       std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
                                       std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                       if(io.ioName == "Q") {
-                                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                        sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX "<< " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << k << "]" << std::endl;
                                       } else {
-                                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                        sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX " << " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << pinsMap[io.ioName] << "[" << k << "]" << std::endl;
                                       }
                                     }
                                   } else {
-                                    sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                    sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX " << " " << customerName << std::endl;
                                     sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
                                   }
                                 } else {
