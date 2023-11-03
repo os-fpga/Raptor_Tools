@@ -62,7 +62,7 @@ message("YOSYS_CONFIG:" ${YOSYS_CONFIG})
 message("GHDL_BIN_PATH:" ${GHDL_BIN_PATH})
 
 if (RAPTOR)
-  FILE(COPY ${PROJECT_SOURCE_DIR}/include/simplify.cc
+  FILE(COPY ${PROJECT_SOURCE_DIR}/include/synlig_simplify.cc
        DESTINATION ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys_mod/)
 endif()
 
