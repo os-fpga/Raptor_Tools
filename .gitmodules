@@ -13,6 +13,3 @@
 [submodule "parser_plugins/ghdl-yosys-plugin"]
 	path = parser_plugins/ghdl-yosys-plugin
 	url = https://github.com/ghdl/ghdl-yosys-plugin.git
-[submodule "parser_plugins/synlig_plugin"]
-	path = parser_plugins/synlig_plugin
-	url = https://github.com/chipsalliance/synlig.git
