@@ -52,7 +52,7 @@ jobs:
 
     - name: Checkout submodules
       run: |
-        cd parser_plugins/synlig_plugin
+        cd parser_plugins/synlig
         echo $PWD
         ls
         git submodule sync

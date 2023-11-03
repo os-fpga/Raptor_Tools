@@ -51,9 +51,9 @@ if (RAPTOR)
   set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl)
 else()
-  set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/)
+  set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys/)
   # Do not set YOSYS_CONFIG in this case
-  set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys/yosys-config)
+  set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys/yosys-config)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../HDL_simulator/build/bin/HDL_simulator/GHDL/bin/ghdl)
 endif()
 
@@ -63,7 +63,7 @@ message("GHDL_BIN_PATH:" ${GHDL_BIN_PATH})
 
 if (RAPTOR)
   FILE(COPY ${PROJECT_SOURCE_DIR}/include/simplify.cc
-       DESTINATION ${PROJECT_SOURCE_DIR}/synlig_plugin/third_party/yosys_mod/)
+       DESTINATION ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys_mod/)
 endif()
 
 # TODO: The best solution would be to do the following:
@@ -72,15 +72,15 @@ endif()
 #   add_custom_target(synlig_build ...)
 # and to make the targets depend on synlig lib, but the problem is json, capnp, common libraries that gets multiply defined at Raptor level.
 
-add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig_plugin/build/release/systemverilog-plugin/systemverilog.so
+add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig/build/release/systemverilog-plugin/systemverilog.so)
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig/build/release/systemverilog-plugin/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
     COMMAND make -f cmake-makefile YOSYS_CONFIG=${YOSYS_CONFIG} YOSYS_PATH=${YOSYS_PATH} -j ${CPU_CORES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig_plugin/install/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
-    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig_plugin"
-    DEPENDS ${PROJECT_SOURCE_DIR}/synlig_plugin/frontends/systemverilog/uhdm_ast.cc
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/install/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/install/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig"
+    DEPENDS ${PROJECT_SOURCE_DIR}/synlig/frontends/systemverilog/uhdm_ast.cc
   )
 
 add_custom_target(ghdl_install DEPENDS ${GHDL_BIN_PATH})
