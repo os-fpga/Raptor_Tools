@@ -1,0 +1,6 @@
+#Pin Constraints
+set_property PIN_LOC AB5 [get_ports clk]
+set_property PIN_LOC AH18 [get_ports clk_select]
+set_property PIN_LOC AH8 [get_ports D]
+set_property PIN_LOC AD14 [get_ports Q]
+set_property PIN_LOC P23 [get_ports rst]
