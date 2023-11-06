@@ -324,7 +324,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
     }
 
     // Define a regular expression pattern
-    std::regex pattern("set_property PIN_LOC (\\w+) \\[get_ports (\\w+)\\]");
+    std::regex pattern("set_property PIN_LOC (\\w+) \\[get_ports (\\w+)(\\[(\\d+)\\])?\\]");
 
     // Create a regex iterator
     std::sregex_iterator iter(text.begin(), text.end(), pattern);
@@ -345,6 +345,15 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
     // Iterate through the matches and append the SDC lines to the file
     while (iter != end) {
         std::smatch match = *iter;
+        std::cout << "First part: " << match[1] << std::endl;
+        std::cout << "Second part: " << match[2] << std::endl;
+        if (match.size() > 3) {
+            if (!match[3].str().empty()) {
+                std::string extractedNumber = match[3].str(); // Extract the matched string
+                extractedNumber = extractedNumber.substr(1, extractedNumber.length() - 2); // Remove the brackets []
+                std::cout << "Extracted number: " << extractedNumber << std::endl;
+            }
+        }
         std::string pin_loc = match[1].str();
         std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
         get_ports = match[2].str(); // Assign get_ports here
