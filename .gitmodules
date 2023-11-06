@@ -1,6 +1,3 @@
-[submodule "verific_rs"]
-	path = verific_rs
-	url = git@github.com:RapidSilicon/verific_rs.git
 [submodule "Device_Modeling/external/googletest"]
 	path = Device_Modeling/external/googletest
 	url = git@github.com:google/googletest.git
@@ -13,12 +10,9 @@
 [submodule "graph_parttion/mt-kahypar"]
 	path = graph_partition/mt-kahypar
 	url = https://github.com/kahypar/mt-kahypar.git
-[submodule "surelog_sv_plugin/Surelog"]
-	path = surelog_sv_plugin/Surelog
-	url = https://github.com/chipsalliance/Surelog.git
-[submodule "surelog_sv_plugin/yosys-f4pga-plugins"]
-	path = surelog_sv_plugin/yosys-f4pga-plugins
-	url = https://github.com/chipsalliance/yosys-f4pga-plugins.git
-[submodule "surelog_sv_plugin/ghdl-yosys-plugin"]
-	path = surelog_sv_plugin/ghdl-yosys-plugin
+[submodule "parser_plugins/ghdl-yosys-plugin"]
+	path = parser_plugins/ghdl-yosys-plugin
 	url = https://github.com/ghdl/ghdl-yosys-plugin.git
+[submodule "parser_plugins/synlig"]
+	path = parser_plugins/synlig
+	url = https://github.com/alaindargelas/synlig.git

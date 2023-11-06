@@ -1,4 +1,4 @@
-name: Surelog Workflow
+name: Surelog Synlig GHDL Workflow
 
 on:
   push:
@@ -45,19 +45,28 @@ jobs:
         pip3 install psutil
 
     - name: Checkout code
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v3
       with:
-        submodules: recursive
-        fetch-depth: 0
-  
+        submodules: true
+        fetch-depth: 1
+
+    - name: Checkout submodules
+      run: |
+        cd parser_plugins/synlig
+        echo $PWD
+        ls
+        git submodule sync
+        git submodule update --depth 3 --init --recursive --checkout \
+          ./third_party/{surelog,yosys} \
+          ;
+
     - name: Install dependencies
       run: 
-        sudo apt-get install tclsh cmake yosys
-
-    - name: Surelog_Plugin_Ubuntu
+        sudo apt-get install cmake build-essential g++-11 gcc-11 tclsh tcl-dev tcllib cmake 
+    - name: Synlig_GHDL_Plugins_Ubuntu
       if: matrix.mode == 'basic_test' 
       shell: bash
       run: |
-        cd surelog_sv_plugin
-        make surelog
+        cd parser_plugins
+        make CPU_CORES=2
 

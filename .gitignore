@@ -7,3 +7,4 @@ gatelevel_readers/read_verilog/read_verilog
 gatelevel_readers/read_verilog/tmp/
 Device_Modeling/src/build/
 Device_Modeling/.vscode/
+.vscode/
