@@ -52,7 +52,7 @@ endif()
 #)
 
 include_directories(PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/
-                        ${CMAKE_CURRENT_SOURCE_DIR}/../../../libs/external/nlohmann_json/ )
+                        ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/ )
 
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
