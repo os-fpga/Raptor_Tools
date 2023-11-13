@@ -17,12 +17,12 @@
 #include "Array.h" // Make class Array available
 #include <cstring>
 #include <iostream>
-
+#include <regex>
 #include "Map.h"          // Make class Map available
 #include "VeriCopy.h"     // Make class VeriMapForCopy available
 #include "VeriId.h"       // Definitions of all identifier definition tree nodes
 #include "VeriTreeNode.h" // Definition of VeriTreeNode
-
+#include <set>
 #include "Message.h" // Make message handlers available
 
 #include "DataBase.h" // Make (hierarchical netlist) database API available
@@ -40,6 +40,7 @@
 #include "veri_file.h" // Make verilog reader available
 #include "veri_prune.h"
 #include <json.hpp>
+#include <ostream>
 using json = nlohmann::json;
 
 #ifdef USE_COMREAD
@@ -56,11 +57,62 @@ using namespace Verific;
 #define VERI_OUTPUT 346
 #define VERI_WIRE 392
 
+std::vector<orig_io> orig_ios;
+std::map<std::string, std::vector<Connection>> instConns;
+
 std::unordered_map<int, std::string> directions = {
   {VERI_INPUT, "Input"},
   {VERI_OUTPUT, "Output"},
   {VERI_INOUT, "Inout"}
 };
+std::map<std::string, std::string> myMap; // Define myMap at a global scope
+std::string get_ports; // Define get_ports at a global scope
+struct ioInfo {
+    std::string ioName;
+    std::string actualName;
+    std::string ioDir;
+    unsigned lsb;
+    unsigned msb;
+};
+std::map<std::string, std::vector<ioInfo>> instIOs;
+
+void getInstIos (const json& jsonData)
+{
+  for (const auto& [instanceName, instanceInfo] : jsonData["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                unsigned lsb = portInfo["lsb"];
+                unsigned msb = portInfo["msb"];
+                ioInfo pInfo;
+                pInfo.actualName = actualSignal;
+                pInfo.ioName = portName;
+                pInfo.ioDir = sigDir;
+                pInfo.lsb = lsb;
+                pInfo.msb = msb;
+                instIOs[instanceName].push_back(pInfo);
+            }
+        }
+    }
+}
+
+void printInstIos()
+{
+    for (const auto& entry : instIOs) {
+        std::cout << "Instance: " << entry.first << std::endl;
+        for (const auto& io : entry.second) {
+            std::cout << "  Port Name: " << io.ioName << std::endl;
+            std::cout << "  Actual Name: " << io.actualName << std::endl;
+            std::cout << "  IO Direction: " << io.ioDir << std::endl;
+            std::cout << "  LSB :  " << io.lsb << std::endl;
+            std::cout << "  MSB :  " << io.msb << std::endl;
+        }
+    }
+}
 
 std::vector<std::string> direction_print_outs = {
     "IN_DIR", "OUT_DIR", "INOUT_DIR", "OUT_CLK", "IN_CLK", "IN_RESET"};
@@ -344,14 +396,14 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
         out_stream << "        ";
         firstInst = false;
         out_stream << "\"" << inst_name << "\": {" << std::endl;
-        out_stream << "            \"module\": \"" << no_param_name << "\"";
+        out_stream << "            \"module\": \"" << no_param_name << "\",";
 
         Array *param_items = prim_item->GetParamValues();
         VeriExpression *param_assign;
         unsigned yy;
         if (param_items) {
           bool firstParam = true;
-          out_stream << ",\n            \"params\": {" << std::endl;
+          out_stream << "\n            \"params\": {" << std::endl;
           FOREACH_ARRAY_ITEM(param_items, yy, param_assign) {
             std::stringstream ss;
             if (param_assign) {
@@ -372,39 +424,83 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
           }
           out_stream << "\n            }," << std::endl;
         }
-
         Array *port_conn_arr = id->GetPortConnects();
         VeriExpression *expr;
         unsigned k;
         if (port_conn_arr) {
           bool firstPort = true;
-          out_stream << "            \"ports\": {" << std::endl;
+          out_stream << "\n            \"ports\": {" << std::endl;
           FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
-            if (!firstPort) {
-              out_stream << ",\n";
-            }
-            out_stream << "                \"";
-            firstPort = false;
             const char *formal_name = expr->NamedFormal();
-            out_stream << formal_name << "\": {" << std::endl;
-            if (current_primitive_spec_map.count(no_param_name) > 0 &&
-                current_primitive_spec_map[no_param_name].count(formal_name) >
-                    0 &&
-                current_primitive_spec_map[no_param_name][formal_name] <
-                    direction_print_outs.size()) {
-              out_stream
-                  << "                    \"FUNC\": \""
-                  << direction_print_outs[current_primitive_spec_map
-                                              [no_param_name][formal_name]]
-                  << "\"," << std::endl;
-            }
             VeriExpression *actual = expr->GetConnection();
-            if (actual) {
+            if (actual->GetClassId() == ID_VERICONCAT) {
+              VeriConcat *concat = static_cast<VeriConcat *>(actual);
+              Array *expr_arr = concat->GetExpressions();
+              unsigned j;
+              // Iterate through all expressions
+              VeriExpression *expr_;
+              FOREACH_ARRAY_ITEM(expr_arr, j, expr_) {
+                VeriIdDef *actual_id = expr ? expr_->GetId() : 0;
+                if (actual_id){
+                  if (!firstPort) {
+                    out_stream << ",\n";
+                  }
+                  out_stream << "                \"";
+                  firstPort = false;
+                  out_stream << formal_name << "\": {" << std::endl;
+                  if (current_primitive_spec_map.count(no_param_name) > 0 &&
+                      current_primitive_spec_map[no_param_name].count(formal_name) >
+                          0 &&
+                      current_primitive_spec_map[no_param_name][formal_name] <
+                          direction_print_outs.size()) {
+                    out_stream
+                        << "                    \"FUNC\": \""
+                        << direction_print_outs[current_primitive_spec_map
+                                                    [no_param_name][formal_name]]
+                        << "\"," << std::endl;
+                  }
+                  out_stream << "                    \"Actual\": \"";
+                  out_stream << actual_id->Name();
+                  out_stream << "\"," << std::endl;
+                  out_stream << "                    \"lsb\": ";
+                  out_stream << actual_id->GetLsbOfRange();
+                  out_stream << "," << std::endl;
+                  out_stream << "                    \"msb\": ";
+                  out_stream << actual_id->GetMsbOfRange();
+                  out_stream << "\n                }";
+                }
+              }
+            } else if (actual->GetId()) {
+              std::string actual_name = actual->GetId()->Name();
+              unsigned msb = actual->GetId()->GetMsbOfRange();
+              unsigned lsb = actual->GetId()->GetLsbOfRange();
+              if (!firstPort) {
+                out_stream << ",\n";
+              }
+              out_stream << "                \"";
+              firstPort = false;
+              out_stream << formal_name << "\": {" << std::endl;
+              if (current_primitive_spec_map.count(no_param_name) > 0 &&
+                  current_primitive_spec_map[no_param_name].count(formal_name) >
+                      0 &&
+                  current_primitive_spec_map[no_param_name][formal_name] <
+                      direction_print_outs.size()) {
+                out_stream
+                    << "                    \"FUNC\": \""
+                    << direction_print_outs[current_primitive_spec_map
+                                                [no_param_name][formal_name]]
+                    << "\"," << std::endl;
+              }
               out_stream << "                    \"Actual\": \"";
-              actual->PrettyPrint(out_stream, 0);
-              out_stream << "\"" << std::endl;
+              out_stream << actual_name;
+              out_stream << "\"," << std::endl;
+              out_stream << "                    \"lsb\": ";
+              out_stream << lsb;
+              out_stream << "," << std::endl;
+              out_stream << "                    \"msb\": ";
+              out_stream << msb;
+              out_stream << "\n                }";
             }
-            out_stream << "                }";
           }
           out_stream << "\n            }\n";
         }
@@ -414,6 +510,128 @@ void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
   }
   out_stream << "\n    }\n}" << std::endl;
   gb.interface_data_dump = out_stream.str();
+}
+
+void map_inputs (const json& data, std::string signalName, const std::string& dir)
+{
+    Connection conn;
+    
+    std::string firstInst;
+    /////////////////// check input connection
+    for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                if (dir == "Input" && sigDir == "IN_DIR" && actualSignal == signalName) {
+					bool input_buf = false;
+					if(modName == "I_BUF" || modName == "CLK_BUF") input_buf = true;
+                    if (input_buf && portName == "I") {
+                        std::string outPort = ports["O"]["Actual"];
+                        signalName = outPort;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        }
+                        conn.ports["O"] = ports["O"]["Actual"];
+                        conn.module = modName;
+                        firstInst = instanceName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
+					bool output_buf = false;
+					if(modName == "O_BUF" || modName == "O_BUFT") output_buf = true;
+                    if (output_buf && portName == "O") {
+                       std::string inPort = ports["I"]["Actual"];
+                        signalName = inPort;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        }
+                        conn.ports["I"] = ports["I"]["Actual"];
+                        conn.module = modName;
+                        firstInst = instanceName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                }
+            }
+        }
+    }
+
+    for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
+    {
+        const json& ports = instanceInfo["ports"];
+        std::string modName = instanceInfo["module"];
+        for (const auto& [portName, portInfo] : ports.items()) {
+            std::string actualSignal = portInfo["Actual"];
+            if (portInfo.contains("FUNC")) {
+                std::string sigDir = portInfo["FUNC"];
+                bool inputSignal;
+                if(sigDir == "IN_DIR" || sigDir == "IN_CLK" || sigDir == "IN_RESET") inputSignal = true;
+                if (dir == "Input" && inputSignal && actualSignal == signalName) {
+                    bool complexPrim = true;
+					if (modName.find("BUF") != std::string::npos) complexPrim = false;
+                    if (complexPrim) {
+                        std::string tempSig;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        } else {
+                            tempSig = conn.signal;
+                            if (conn.module == "I_BUF") {
+                                instConns[firstInst].pop_back();
+                                conn = Connection();
+                                conn.signal = tempSig;
+                            }
+                        }
+                        conn.ports[portName] = actualSignal;
+                        conn.module = modName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
+                    bool complexPrim = true;
+					if (modName.find("BUF") != std::string::npos) complexPrim = false;
+                    if (complexPrim) {
+                        std::string tempSig;
+                        if (conn.signal.empty()) {
+                            conn.signal = actualSignal;
+                        } else {
+                            tempSig = conn.signal;
+							bool output_buf = false;
+							if(conn.module == "O_BUF" || conn.module == "O_BUFT") output_buf = true;
+                            if (output_buf) {
+                                instConns[firstInst].pop_back();
+                                conn = Connection();
+                                conn.signal = tempSig;
+                            }
+                        }
+                        conn.ports[portName] = actualSignal;
+                        conn.module = modName;
+                        instConns[instanceName].push_back(conn);
+                    }
+                }
+            }
+        }
+    }
+    
+}
+
+void printPinMap ()
+{
+	for (const auto& entry : instConns) {
+        const std::string& instance = entry.first;
+        const std::vector<Connection>& instanceConnections = entry.second;
+
+        std::cout << "Instance: " << instance << std::endl;
+        for (const auto& conn : instanceConnections) {
+            std::cout << "Signal: " << conn.signal << std::endl;
+            std::cout << "Module: " << conn.module << std::endl;
+            // Print other fields as needed
+            for (const auto& port : conn.ports) {
+                std::cout << "  " << port.first << ": " << port.second << std::endl;
+        }
+        }
+    }
 }
 
 ////////////////////////////////////////////////////////////////////////////
@@ -450,12 +668,18 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   FOREACH_ARRAY_ITEM(module_ports, q, port_id_) {
     if (!port_id_)
       continue;
+    orig_io io_info;
     json range;
     range["msb"] = port_id_->LeftRangeBound();
     range["lsb"] = port_id_->RightRangeBound();
     j_module["ports"].push_back({{"name", port_id_->GetName()}, 
             {"direction", directions[port_id_->Dir()]}, 
             {"range", range}});
+    io_info.dir = port_id_->Dir();
+    io_info.io_name = port_id_->GetName();
+    io_info.lsb = port_id_->RightRangeBound();
+    io_info.msb = port_id_->LeftRangeBound();
+    orig_ios.push_back(io_info);
   }
 
   // Now copy of the top level module
@@ -1015,6 +1239,33 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   // Generate Interface data base
   print_out_io_primitives(intf_mod, gb);
 
+  // Parse the contents of gb.interface_data_dump as JSON
+  nlohmann::json json_object;
+  try {
+    json_object = nlohmann::json::parse(gb.interface_data_dump);
+  } catch (const nlohmann::json::parse_error& e) {
+    std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
+    return 1;
+  }
+
+  // getInstIos(json_object);
+  // printInstIos();
+
+  for (const orig_io& entry : orig_ios)
+  {
+    std::string io_name = entry.io_name;
+    unsigned lsb = entry.lsb;
+    unsigned msb = entry.msb;
+    unsigned dir = entry.dir;
+	if (dir == VERI_INPUT) {
+        map_inputs(json_object, io_name, "Input");
+    } else if (dir == VERI_OUTPUT) {
+         map_inputs(json_object, io_name, "Output");
+    }
+  }
+
+ // printPinMap();
+
   // Remove all analyzed modules
   veri_file::RemoveAllModules();
 
@@ -1035,4 +1286,260 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   }
 
   return 0; // Status OK
+}
+
+///##################################################################################
+// Function to map Ball ID to Customer Name
+std::map<std::string, std::string> BallID_to_CustomerName(const std::string& arg2) {
+    // Create a map to store the mapping of Ball ID to Customer Name
+    std::map<std::string, std::string> ballIdToCustomer;
+
+    // Open the CSV file
+    std::ifstream file(arg2);
+
+    if (!file.is_open()) {
+        std::cerr << "Error: Could not open the CSV file." << std::endl;
+        return ballIdToCustomer; // Return an empty map on error
+    }
+
+    // Read the CSV file line by line
+    std::string line;
+    while (std::getline(file, line)) {
+        std::istringstream iss(line);
+        std::string token;
+        std::string ballId;
+        std::string customerName;
+
+        // Split the line into tokens using a comma as the delimiter
+        std::getline(iss, token, ','); // Bump/Pin Name
+        std::getline(iss, token, ','); // Customer Name
+        std::getline(iss, token, ','); // Customer Name
+        customerName = token;
+        std::getline(iss, token, ','); // Ball ID
+        ballId = token;
+        // Store the mapping of Ball ID to Customer Name in the map
+        ballIdToCustomer[ballId] = customerName;
+    }
+
+    return ballIdToCustomer;
+}
+
+int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs& gb) {
+    myMap = {
+        {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
+        {"FIFO_RST", "f2g_rx_sfifo_reset_A"},
+        {"RST", "f2g_trx_reset_n_A"},
+        {"DLY_ADJ", "f2g_trx_dly_adj"},
+        {"DLY_INCDEC", "f2g_trx_dly_inc"},
+        {"DLY_LOAD", "f2g_trx_dly_ld"},
+        {"DATA_VALID", "g2f_rx_dvalid_A"},
+        {"DPA_ERROR", "g2f_rx_dpa_error"},
+        {"DPA_LOCK", "g2f_rx_dpa_lock"},
+        {"PLL_FAST_CLK", "fast_clk"},
+        {"CLK_OUT", "f2g_rx_core_clk"},
+        {"LOAD_WORD", "f2g_tx_dvalid_A"},
+        {"OE", "f2g_tx_oe_A"},
+        {"O", "f2g_tx_clk_en_A"}
+    };
+
+    nlohmann::json json_object;
+    try {
+        json_object = nlohmann::json::parse(gb.interface_data_dump);
+    } catch (const nlohmann::json::parse_error& e) {
+        std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
+        return 1;
+    }
+
+    getInstIos(json_object);
+
+    // Open the file for reading
+    std::ifstream file(example_file);
+
+    if (!file.is_open()) {
+        std::cerr << "Error opening the file." << std::endl;
+        return 1;
+    }
+
+   std::string text;
+    std::string line;
+    while (std::getline(file, line)) {
+        if (line.empty() || line[0] == '#') {
+            continue; // Skip empty lines and lines starting with '#'
+        }
+        text += line + "\n";
+    }
+
+    // Define a regular expression pattern
+    std::regex pattern(R"(\bPIN_LOC\s+(\S+)\s+\[get_ports\s+(\S+)\])");
+
+    // Create a regex iterator
+    std::sregex_iterator iter(text.begin(), text.end(), pattern);
+    std::sregex_iterator end;
+
+    // Get the mapping of Ball ID to Customer Name
+    std::map<std::string, std::string> ballIdToCustomer = BallID_to_CustomerName(arg2);
+
+    // Open the output SDC file for appending
+    std::ofstream sdcFile(arg3);
+
+    if (!sdcFile.is_open()) {
+        std::cerr << "Error opening the SDC file." << std::endl;
+        return 1;
+    }
+
+    // Iterate through the matches and append the SDC lines to the file
+    while (iter != end) {
+        std::smatch match = *iter;
+        std::string pin_loc = match[1].str();
+        std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
+        get_ports = match[2].str(); // Assign get_ports here
+        auto it = ballIdToCustomer.find(ball_id);
+        std::string customerName = it->second;
+        std::cout << "PORTS: " << get_ports << std::endl;
+        // Iterate over instConns
+        for (const auto& entry : instConns) {
+          const std::string& instance = entry.first;
+          const std::vector<Connection>& instanceConnections = entry.second;
+          //std::cout << "Instance: " << instance << std::endl;
+          for (const auto& conn : instanceConnections) {
+              std::string mode = conn.module.find("I_") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
+              //std::cout << "Signal: " << conn.signal << std::endl;
+              //std::cout << "Module: " << conn.module << std::endl;
+              if (conn.signal == get_ports) {
+                std::cout << "Instance: " << instance << std::endl;
+                if (conn.module.find("BUF") != std::string::npos) {
+                // Print other fields as needed
+                  for (const auto& port : conn.ports) {
+                      std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
+                      if(port.first == "O") {
+                        if (rx_count.find(ball_id) != rx_count.end()) {
+                            // Key exists, so increment its value
+                            rx_count[ball_id]++;
+                        } else {
+                            // Key doesn't exist, so create it with a value of 1
+                            rx_count[ball_id] = 1;
+                        }
+                        unsigned rx_index = rx_count[ball_id] - 1;
+                        std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
+                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[" << rx_index << "]" << std::endl;
+                      } else if(port.first == "I") {
+                        if (tx_count.find(ball_id) != tx_count.end()) {
+                            // Key exists, so increment its value
+                            tx_count[ball_id]++;
+                        } else {
+                            // Key doesn't exist, so create it with a value of 1
+                            tx_count[ball_id] = 1;
+                        }
+                        unsigned tx_index = tx_count[ball_id] - 1;
+                        std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
+                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[" << tx_index << "]" << std::endl;
+                      }
+                  }
+                } else {
+                    for (const auto& port : conn.ports) {
+                      if(conn.module.find("O_") != std::string::npos) {
+                        if(port.first == "Q") {
+                          if (!instIOs[instance].empty()) {
+                            std::vector<ioInfo> iosInfo = instIOs[instance];
+                            for (const auto& io : iosInfo) {
+                              if (io.ioDir == "IN_DIR"){
+                                std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
+                                std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
+                                unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
+                                unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
+                                if(j!=0) {
+                                  if (tx_count.find(ball_id) != tx_count.end()) {
+                                      // Key exists, so increment its value
+                                      tx_count[ball_id]++;
+                                  } else {
+                                      // Key doesn't exist, so create it with a value of 1
+                                      tx_count[ball_id] = 1;
+                                  }
+                                  for (unsigned k = i; k <= j; k++) {
+                                    unsigned tx_index = tx_count[ball_id] - 1;
+                                    std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
+                                    std::cout << "PIN NAME ::::  " << pin_name << std::endl;
+                                    if(io.ioName == "D") {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << tx_index << "]" << std::endl;
+                                    } else {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << tx_index << "]" << std::endl;
+                                    }
+                                    tx_count[ball_id]++;
+                                  }
+                                } else {
+                                  sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                  sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
+                                }
+                              }
+                            }
+                          }
+                          std::cout << "Inst isss :::: " << instance << std::endl;
+                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
+                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
+                        }
+                     } else //if(conn.module.find("I_") != std::string::npos) 
+                       {
+                        if(port.first == "D") {
+                          if (!instIOs[instance].empty()) {
+                            std::vector<ioInfo> iosInfo = instIOs[instance];
+                            for (const auto& io : iosInfo) {
+                              if (io.ioDir == "OUT_DIR"){
+                                std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
+                                std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
+                                unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
+                                unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
+                                if(j!=0) {
+                                  if (rx_count.find(ball_id) != rx_count.end()) {
+                                      // Key exists, so increment its value
+                                      rx_count[ball_id]++;
+                                  } else {
+                                      // Key doesn't exist, so create it with a value of 1
+                                      rx_count[ball_id] = 1;
+                                  }
+                                  for (unsigned k = i; k <= j; k++) {
+                                    unsigned rx_index = rx_count[ball_id] - 1;
+                                    std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
+                                    std::cout << "PIN NAME ::::  " << pin_name << std::endl;
+                                    if(io.ioName == "Q") {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << rx_index << "]" << std::endl;
+                                    } else {
+                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << rx_index << "]" << std::endl;
+                                    }
+                                    rx_count[ball_id]++;
+                                  }
+                                } else {
+                                  sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
+                                  sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
+                                }
+                              }
+                            }
+                          }
+                          std::cout << "Inst isss :::: " << instance << std::endl;
+                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
+                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
+                        }
+                    }
+                  }
+                }
+              }
+          }
+      }
+
+        iter++; // Move to the next match
+    }
+
+       // Move to the next match
+    
+
+    // Close the SDC file
+    sdcFile.close();
+    file.close(); // Close the file
+
+    return 0;
 }

@@ -1,0 +1,87 @@
+[
+    {
+        "ports": [
+            {
+                "direction": "Input",
+                "name": "in",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "clk",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "rst",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "ibuf1_en",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "ibuf2_en",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "ibuf3_en",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "ibuf4_en",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Input",
+                "name": "ibuf5_en",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Output",
+                "name": "q_n",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            },
+            {
+                "direction": "Output",
+                "name": "q_p",
+                "range": {
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        ],
+        "topModule": "primitive_example_design_4"
+    }
+]

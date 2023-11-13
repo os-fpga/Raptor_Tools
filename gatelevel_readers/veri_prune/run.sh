@@ -15,4 +15,4 @@ make -j
 #./veri_prune ../example/Output_DDR/output_ddr_gate.v output_ddr_gate_nl.v output_ddr_gate_wrapper.v
 #./veri_prune ../example/SERDES_DESIGN/serdes_post_synth.v serdes_post_synth_nl.v serdes_post_synth_wrapper.v
 #./veri_prune ../example/Tristate/tristate_gate.v tristate_gate_nl.v tristate_gate_wrapper.v
-./veri_prune ../example/DDR_BUFS/iddr_oddr_post_synth.v iddr_nl.v iddr_wrapper.v
+./veri_prune -f ../example/serdies/serdes_top_post_synth.v -o serdies_nl.v -w serdies_wrapper.v -u ../example/example_1.txt -p ../example/Gemini_Pin_Table.csv -os output.sdc

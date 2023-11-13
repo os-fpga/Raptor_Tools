@@ -1,0 +1,116 @@
+// AN: For this design RST is connected to the top level IO Buffer as defined by the user. removed f2g_trx_reset_n_A
+// AN: The each pin is design dependent
+/* ----- From user design -----------
+I_SERDES  i_serdes_inst (
+    .BITSLIP_ADJ(1'h0),		// Input,
+    .CLK_IN(clk_mux),		// Input, From Fabric Parallel Clock
+    .CLK_OUT(clk_out1),		// Output, CORE clcok out for parallel data
+    .D(d_buf),			// Input Serial Data from PAD	
+    .DATA_VALID(load_data),	// output Load Valid parallel Data (Q)
+    .DPA_ERROR(dpa_error),	// Output DPA Error
+    .DPA_LOCK(dpa_lock),	// Output DPA is locked
+    .DPA_PHASE (3'b0)		// Output DPA Phase, Missing in Model
+    .EN(1'h1),			// Input IBUF EN 
+    .FIFO_RST(fifo_rst),	// Input FIFO Reset
+    .PLL_FAST_CLK(fast_clk),	// Input From PLL
+    .PLL_LOCK(pll_lock),	// Input from PLL
+    .Q(des_data),		// Output Paralel Data to fabric
+    .RST(rst_buf)		// Input Asynchronous reset from Fabric
+  );
+*/----------------------------------------
+// I_SERDES mapping
+BITSLIP_ADJ, 	f2g_rx_bitslip_adj
+FIFO_RST , 	f2g_rx_sfifo_reset_A/B
+RST, 		f2g_trx_reset_n_A/B
+DLY_ADJ, 	f2g_trx_dly_adj
+DLY_INCDEC, 	f2g_trx_dly_inc
+DLY_LOAD,	f2g_trx_dly_ld
+DATA_VALID, 	g2f_rx_dvalid_A/B
+DPA_ERROR, 	g2f_rx_dpa_error
+DPA_LOCK , 	g2f_rx_dpa_lock
+DLY_TAP_VALUE, 	g2f_trx_dly_tap[5:0]
+DPA_PHASE,	g2f_rx_dpa_phase[2:0]   //Missing in Model
+CLK_IN,		fast_clk			// AN: From PLL, Not in spread sheet, see clocking, Good
+CLK_OUT,	f2g_rx_core_clk			// AN: Will be assigned to "f2g_rx_core_clk" not in the spread sheet
+D,		g2f_rx_in[9:0]_A	
+	
+/* ------- From User Design ----------------------------
+  O_SERDES  o_serdes_inst (
+    .CHANNEL_BOND_SYNC_IN(1'h0),			// AN: Input		
+    .CHANNEL_BOND_SYNC_OUT(channel_bond_sync_out),	// AN: Output
+    .CLK_EN(1'h1),					// AN: Input, Clock enable for TX Clock if IO is use as TX clock IO. This is not a SERDES function
+    .CLK_IN(clk_mux),					// AN: Input, Parallel data clock (Core Clock),
+    .CLK_OUT(clk_out2),					// AN: Output, Core clock from RX side, This is not O_SERDES signal??
+    .D(processedData),					// AN: Input, from fabric Parallel Data in
+    .LOAD_WORD(loaded),					// AN: Input, Parallel data vaild load from fabric
+    .OE(out_en),					// AN: Input, IO BUFF Output Enable from Fabric
+    .PLL_FAST_CLK(fast_clk),				// AN: Input, fast clock from PLL, No mapping required
+    .PLL_LOCK(pll_lock),				// AN: Input, PLL Lock from PLL< No mapping required
+    .Q(ser_data),					// AN: Output, Serail Data out to PAD, Pin constrain provided by the user
+    .RST(rst_buf)					// AN: Input, Reset from Fabric
+  );
+*/ ------------------------------------------------------		
+
+//O_SERDES  mapping
+CHANNEL_BOND_SYNC_IN(1'h0),					// AN: Pin constrain not required
+CHANNEL_BOND_SYNC_OUT(channel_bond_sync_out),			// AN: Pin constrain not required
+CLK_EN(1'h1),					f2g_tx_clk_en	// AN: When IO is used as TX clock IOB			
+CLK_IN(clk_mux),						// AN: Pin is missing in spread sheet. Needs to be added
+CLK_OUT(clk_out2),						// AN: This is not needed in O_SERDES
+D(processedData),				f2g_tx_out[9:0]_A 	// Parallel data from fabric
+LOAD_WORD(loaded),				f2g_tx_dvalid_A		// Parallel data is valid
+OE(out_en),					f2g_tx_oe_A		// OE for IO Buffer
+PLL_FAST_CLK(fast_clk),							// This is PLL clock, No VPR PIN placement constrain
+PLL_LOCK(pll_lock),							// This is PLL Lock. No VPR PIN placement constrain
+Q(ser_data),								// Serial Data out. PIN constrain provided by user
+RST(rst_buf)					f2g_trx_reset_n_A/B
+
+
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_2_0	1	2	0	A2F_72	g2f_trx_dly_tap[0]
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_2_1	1	2	1	A2F_73	g2f_trx_dly_tap[1]
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_2_2	1	2	2	A2F_74	g2f_trx_dly_tap[2]
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_2_3	1	2	3	A2F_75	g2f_trx_dly_tap[3]
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_2_4	1	2	4	A2F_76	g2f_trx_dly_tap[4]
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_2_5	1	2	5	A2F_77	g2f_trx_dly_tap[5]
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_2_6	1	2	6	A2F_78	g2f_rx_dpa_lock
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_2_7	1	2	7	A2F_79	g2f_rx_dpa_error
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_2_8	1	2	8	A2F_80	g2f_rx_dpa_phase[0]
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_2_9	1	2	9	A2F_81	g2f_rx_dpa_phase[1]
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_2_10	1	2	10	A2F_82	g2f_rx_dpa_phase[2]
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_24	1	2	24	F2A_96	f2g_addr[0]
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_25	1	2	25	F2A_97	f2g_addr[1]
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_26	1	2	26	F2A_98	f2g_addr[2]
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_27	1	2	27	F2A_99	f2g_addr[3]
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_28	1	2	28	F2A_100	f2g_addr[4]
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_29	1	2	29	F2A_101	f2g_trx_dly_ld
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_30	1	2	30	F2A_102	f2g_trx_dly_adj
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_31	1	2	31	F2A_103	f2g_trx_dly_inc
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_2_32	1	2	32	F2A_104	f2g_rx_bitslip_adj
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_3_0	1	3	0	A2F_144	g2f_rx_dvalid_A
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_3_1	1	3	1	A2F_145	g2f_rx_in[0]_A
+HR_1_0_0P	P23	460	40	1000	4000	FPGA_1_3_2	1	3	2	A2F_146	g2f_rx_in[1]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_3	1	3	3	A2F_147	g2f_rx_in[2]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_4	1	3	4	A2F_148	g2f_rx_in[3]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_5	1	3	5	A2F_149	g2f_rx_in[4]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_6	1	3	6	A2F_150	g2f_rx_in[5]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_7	1	3	7	A2F_151	g2f_rx_in[6]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_8	1	3	8	A2F_152	g2f_rx_in[7]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_9	1	3	9	A2F_153	g2f_rx_in[8]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_10	1	3	10	A2F_154	g2f_rx_in[9]_A
+HR_1_0_0P	P23	70	40	1000	1000	FPGA_1_3_24	1	3	24	F2A_168	f2g_rx_sfifo_reset_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_25	1	3	25	F2A_169	f2g_rx_dpa_restart_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_26	1	3	26	F2A_170	f2g_trx_reset_n_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_27	1	3	27	F2A_171	f2g_in_en_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_28	1	3	28	F2A_172	f2g_tx_oe_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_29	1	3	29	F2A_173	f2g_tx_dvalid_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_30	1	3	30	F2A_174	f2g_tx_out[0]_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_31	1	3	31	F2A_175	f2g_tx_out[1]_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_32	1	3	32	F2A_176	f2g_tx_out[2]_A
+HR_1_0_0P	P23	200	40	1000	2000	FPGA_1_3_33	1	3	33	F2A_177	f2g_tx_out[3]_A
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_3_34	1	3	34	F2A_178	f2g_tx_out[4]_A
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_3_35	1	3	35	F2A_179	f2g_tx_out[5]_A
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_3_36	1	3	36	F2A_180	f2g_tx_out[6]_A
+HR_1_0_0P	P23	330	40	1000	3000	FPGA_1_3_37	1	3	37	F2A_181	f2g_tx_out[7]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_38	1	3	38	F2A_182	f2g_tx_out[8]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_39	1	3	39	F2A_183	f2g_tx_out[9]_A
+HR_1_0_0P	P23	590	40	1000	5000	FPGA_1_3_40	1	3	40	F2A_184	f2g_tx_clk_en_A

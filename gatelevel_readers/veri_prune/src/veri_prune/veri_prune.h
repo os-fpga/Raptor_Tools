@@ -12,6 +12,21 @@
 
 using namespace std;
 
+struct Connection {
+    std::string signal;
+    std::map<std::string, std::string> ports;
+    std::string module;
+    std::string instance;
+};
+
+struct orig_io
+{
+    std::string io_name;
+    int         lsb;
+    int         msb;
+    unsigned dir;
+};
+
 struct gb_constructs
 {
     std::vector<std::pair<std::string, int>> mod_ios;
@@ -43,5 +58,7 @@ struct gb_constructs
     std::string interface_data_dump;
     bool contains_io_prem = false;
 };
+int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs &gb);
 int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name);
+
 #endif
