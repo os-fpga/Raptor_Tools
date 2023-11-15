@@ -667,7 +667,7 @@
 .subckt adder_carry cin=$auto$alumacc.cc:485:replace_alu$33.C[7] cout=$auto$alumacc.cc:485:replace_alu$33.C[8] g=P[7] p=$auto$alumacc.cc:485:replace_alu$33.S[7] sumout=add_or_sub[7]
 .subckt adder_carry cin=$auto$alumacc.cc:485:replace_alu$33.C[8] cout=$auto$alumacc.cc:485:replace_alu$33.C[9] g=P[8] p=$auto$alumacc.cc:485:replace_alu$33.S[8] sumout=add_or_sub[8]
 .subckt adder_carry cin=$auto$alumacc.cc:485:replace_alu$33.C[9] cout=$auto$alumacc.cc:485:replace_alu$33.C[10] g=P[9] p=$auto$alumacc.cc:485:replace_alu$33.S[9] sumout=add_or_sub[9]
-.subckt CARRY_CHAIN cout=$auto$alumacc.cc:485:replace_alu$33.C[0] g=$true p=$false
+.subckt CARRY cout=$auto$alumacc.cc:485:replace_alu$33.C[0] g=$true p=$false
 .names $auto$alumacc.cc:485:replace_alu$30.BB[37] $auto$alumacc.cc:485:replace_alu$30.BB[19]
 1 1
 .names $auto$alumacc.cc:485:replace_alu$30.BB[37] $auto$alumacc.cc:485:replace_alu$30.BB[20]
