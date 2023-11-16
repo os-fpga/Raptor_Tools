@@ -9,3 +9,6 @@ diff ./res/and2_post_synth_transformed.eblif ../tests/and2/golden/and2_post_synt
 diff ./res/read_netlist_blif_accumulator_post_synth_transformed.blif ../tests/accumulator/golden/read_netlist_blif_accumulator_post_synth.blif 
 ./transform_eblif ../tests/DSP38/dsp38_out.eblif ./res/dsp38_out_transformed.eblif
 diff ./res/dsp38_out_transformed.eblif ../tests/DSP38/golden/dsp38_out_golden.eblif
+./transform_eblif ../tests/carry/counter.eblif ./res/counter.eblif
+diff ./res/counter.eblif ../tests/carry/golden/counter.eblif
+
