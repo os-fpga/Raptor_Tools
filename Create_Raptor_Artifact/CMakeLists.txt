@@ -118,9 +118,9 @@ target_link_libraries(Encryption_method OpenSSL::Crypto)
 # encrypt and delete
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Encrypt XML files and copy README to top DIR"
-    # 2nd arg is a list of the path to xml files
-	COMMAND ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/encrypt ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key.pem 
-                                                            ${RS_DEVICES}
+    # execute encrypt_device.cmake script
+    COMMAND ${CMAKE_COMMAND} -DENCRYPT_EXE="${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/encrypt" -DPUBLIC_KEY="${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key.pem" -DDEVICES_LIST="${RS_DEVICES}"  -P ${CMAKE_CURRENT_SOURCE_DIR}/encrypt_devic.cmake
+                         
     # below command will delete the files
     COMMAND ${CMAKE_COMMAND} -E remove -f  ${RS_DEVICES}
     COMMAND ${CMAKE_COMMAND} -E copy ${RAPTOR_INSTALL_PATH}/share/raptor/doc/README.md ${RAPTOR_INSTALL_PATH}                                   
