@@ -62,7 +62,7 @@ const char* file_name = "../example/example.v";
   interface_data_dump_file += "_interface.json";
   gb_constructs gb;
   prune_verilog(file_name, gb, device_name);
-  write_sdc(user_sdc, pin_table, output_sdc ,gb );
+  //write_sdc(user_sdc, pin_table, output_sdc ,gb );
   if (gb.contains_io_prem) {
     std::ofstream out_file;
     out_file.open(out_file_name);

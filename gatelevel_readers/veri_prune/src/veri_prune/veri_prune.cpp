@@ -1,1069 +1,398 @@
-/*
- *
- * (c) Copyright 1999 - 2022 Verific Design Automation Inc.
- * All rights reserved.
- *
- * This source code belongs to Verific Design Automation Inc.
- * It is considered trade secret and confidential, and is not to be used
- * by parties who have not received written authorization
- * from Verific Design Automation Inc.
- *
- * Only authorized users are allowed to use, copy and modify
- * this software provided that the above copyright notice
- * remains in all copies of this software.
- *
- *
- */
-#include "Array.h" // Make class Array available
+
 #include <cstring>
 #include <iostream>
 #include <regex>
-#include "Map.h"          // Make class Map available
-#include "VeriCopy.h"     // Make class VeriMapForCopy available
-#include "VeriId.h"       // Definitions of all identifier definition tree nodes
-#include "VeriTreeNode.h" // Definition of VeriTreeNode
 #include <set>
-#include "Message.h" // Make message handlers available
 
-#include "DataBase.h" // Make (hierarchical netlist) database API available
-#include "Strings.h" // Definition of class to manipulate copy, concatenate, create etc...
-#include "VeriConstVal.h"   // Definitions of all constant expression tree nodes
-#include "VeriExpression.h" // Definitions of all verilog expression tree nodes
-#include "VeriMisc.h" // Definitions of all extraneous verilog tree nodes (ie. range, path, strength, etc...)
-#include "VeriModule.h"     // Definition of a VeriModule and VeriPrimitive
-#include "VeriModuleItem.h" // Definitions of all verilog module item tree nodes
-#include "VeriScope.h"      // Symbol table of locally declared identifiers
-#include "VeriStatement.h"  // Make VeriCaseStatement class available
-#include "VeriTreeNode.h"   // Definition of VeriTreeNode
-#include "VeriVisitor.h"    // For visitor patterns
 #include "gb_map.h"
-#include "veri_file.h" // Make verilog reader available
 #include "veri_prune.h"
 #include <json.hpp>
 #include <ostream>
 using json = nlohmann::json;
 
-#ifdef USE_COMREAD
-#include "ComRead.h"
-#include "Commands.h"
-#endif
+//#define dir_inout 329
+//#define dir_input 330
+//#define dir_output 346
+//#define is_wire 392
+//
+//std::vector<orig_io> orig_ios;
+//std::map<std::string, std::vector<Connection>> instConns;
+//
+//std::unordered_map<int, std::string> directions = {
+//  {dir_input, "Input"},
+//  {dir_output, "Output"},
+//  {dir_inout, "Inout"}
+//};
+//std::map<std::string, std::string> myMap; // Define myMap at a global scope
+//std::string get_ports; // Define get_ports at a global scope
+//struct ioInfo {
+//    std::string ioName;
+//    std::string actualName;
+//    std::string ioDir;
+//    unsigned lsb;
+//    unsigned msb;
+//};
+//std::map<std::string, std::vector<ioInfo>> instIOs;
 
-#ifdef VERIFIC_NAMESPACE
-using namespace Verific;
-#endif
+//void getInstIos (const json& jsonData)
+//{
+//  for (const auto& [instanceName, instanceInfo] : jsonData["IO_Instances"].items())
+//    {
+//        const json& ports = instanceInfo["ports"];
+//        std::string modName = instanceInfo["module"];
+//        for (const auto& [portName, portInfo] : ports.items()) {
+//            std::string actualSignal = portInfo["Actual"];
+//            if (portInfo.contains("FUNC")) {
+//                std::string sigDir = portInfo["FUNC"];
+//                unsigned lsb = portInfo["lsb"];
+//                unsigned msb = portInfo["msb"];
+//                ioInfo pInfo;
+//                pInfo.actualName = actualSignal;
+//                pInfo.ioName = portName;
+//                pInfo.ioDir = sigDir;
+//                pInfo.lsb = lsb;
+//                pInfo.msb = msb;
+//                instIOs[instanceName].push_back(pInfo);
+//            }
+//        }
+//    }
+//}
 
-#define VERI_INOUT 329
-#define VERI_INPUT 330
-#define VERI_OUTPUT 346
-#define VERI_WIRE 392
+//void printInstIos()
+//{
+//    for (const auto& entry : instIOs) {
+//        std::cout << "Instance: " << entry.first << std::endl;
+//        for (const auto& io : entry.second) {
+//            std::cout << "  Port Name: " << io.ioName << std::endl;
+//            std::cout << "  Actual Name: " << io.actualName << std::endl;
+//            std::cout << "  IO Direction: " << io.ioDir << std::endl;
+//            std::cout << "  LSB :  " << io.lsb << std::endl;
+//            std::cout << "  MSB :  " << io.msb << std::endl;
+//        }
+//    }
+//}
 
-std::vector<orig_io> orig_ios;
-std::map<std::string, std::vector<Connection>> instConns;
+//std::vector<std::string> direction_print_outs = {
+//    "IN_DIR", "OUT_DIR", "INOUT_DIR", "OUT_CLK", "IN_CLK", "IN_RESET"};
+//std::unordered_map<std::string, std::map<std::string, int>>
+//    current_primitive_spec_map;
 
-std::unordered_map<int, std::string> directions = {
-  {VERI_INPUT, "Input"},
-  {VERI_OUTPUT, "Output"},
-  {VERI_INOUT, "Inout"}
-};
-std::map<std::string, std::string> myMap; // Define myMap at a global scope
-std::string get_ports; // Define get_ports at a global scope
-struct ioInfo {
-    std::string ioName;
-    std::string actualName;
-    std::string ioDir;
-    unsigned lsb;
-    unsigned msb;
-};
-std::map<std::string, std::vector<ioInfo>> instIOs;
+//void keep_nets(mod *mod, std::unordered_set<std::string> io_intf,
+//               gb_constructs &gb, std::vector<std::string> &remove_nets) {
+//  std::unordered_set<std::string> keep_intf_ios;
+//  keep_intf_ios.insert(gb.intf_ios.begin(), gb.intf_ios.end());
+//  keep_intf_ios.insert(io_intf.begin(), io_intf.end());
+//  
+//  // Remove signals not found in keep_intf_nets
+//}
 
-void getInstIos (const json& jsonData)
-{
-  for (const auto& [instanceName, instanceInfo] : jsonData["IO_Instances"].items())
-    {
-        const json& ports = instanceInfo["ports"];
-        std::string modName = instanceInfo["module"];
-        for (const auto& [portName, portInfo] : ports.items()) {
-            std::string actualSignal = portInfo["Actual"];
-            if (portInfo.contains("FUNC")) {
-                std::string sigDir = portInfo["FUNC"];
-                unsigned lsb = portInfo["lsb"];
-                unsigned msb = portInfo["msb"];
-                ioInfo pInfo;
-                pInfo.actualName = actualSignal;
-                pInfo.ioName = portName;
-                pInfo.ioDir = sigDir;
-                pInfo.lsb = lsb;
-                pInfo.msb = msb;
-                instIOs[instanceName].push_back(pInfo);
-            }
-        }
-    }
-}
+//void remove_mod_clks(
+//    std::vector<std::pair<std::string, std::vector<int>>> &indexed_data,
+//    std::vector<std::string> &mod_clks) {
+//  indexed_data.erase(
+//      std::remove_if(
+//          indexed_data.begin(), indexed_data.end(),
+//          [&mod_clks](const std::pair<std::string, std::vector<int>> &pair) {
+//            return std::find(mod_clks.begin(), mod_clks.end(), pair.first) !=
+//                   mod_clks.end();
+//          }),
+//      indexed_data.end());
+//}
 
-void printInstIos()
-{
-    for (const auto& entry : instIOs) {
-        std::cout << "Instance: " << entry.first << std::endl;
-        for (const auto& io : entry.second) {
-            std::cout << "  Port Name: " << io.ioName << std::endl;
-            std::cout << "  Actual Name: " << io.actualName << std::endl;
-            std::cout << "  IO Direction: " << io.ioDir << std::endl;
-            std::cout << "  LSB :  " << io.lsb << std::endl;
-            std::cout << "  MSB :  " << io.msb << std::endl;
-        }
-    }
-}
+//void add_idx_intf_ports(
+//    mod *intf_mod,
+//    std::vector<std::pair<std::string, std::vector<int>>> &indexed_intf_ios,
+//    unsigned dir, std::unordered_set<std::string> &ports_intf) {
+//  for (const auto &pair : indexed_intf_ios) {
+//    const auto &values = pair.second;
+//    unsigned msb;
+//    unsigned lsb;
+//    msb = values[0];
+//    lsb = values[1];
+//    // Add port
+//    ports_intf.insert(pair.first);
+//  }
+//}
 
-std::vector<std::string> direction_print_outs = {
-    "IN_DIR", "OUT_DIR", "INOUT_DIR", "OUT_CLK", "IN_CLK", "IN_RESET"};
-std::unordered_map<std::string, std::map<std::string, int>>
-    current_primitive_spec_map;
+//void add_intf_ports() {
+//  for (const auto &port : intf_ios) {
+//    // Add port
+//    ports_intf.insert(port);
+//  }
+//}
 
-void keep_nets(VeriModule *mod, std::unordered_set<std::string> io_intf,
-               gb_constructs &gb, std::vector<std::string> &remove_nets) {
-  std::unordered_set<std::string> keep_intf_ios;
-  keep_intf_ios.insert(gb.intf_ios.begin(), gb.intf_ios.end());
-  keep_intf_ios.insert(io_intf.begin(), io_intf.end());
-  Array *items = mod->GetModuleItems();
-  VeriModuleItem *item;
-  unsigned im;
-  // Get the module item list of module.
-  FOREACH_ARRAY_ITEM(items, im, item) {
-    if (!item)
-      continue;
-    if (ID_VERINETDECL == item->GetClassId()) {
-      VeriNetDecl *net_decl = static_cast<VeriNetDecl *>(item);
-      VeriIdDef *id;
-      unsigned j;
-      FOREACH_ARRAY_ITEM(net_decl->GetIds(), j, id) {
-        if (!id)
-          continue; // null pointer check
-        const char *name = id->Name();
-        std::string nameString(name);
-        if (keep_intf_ios.find(nameString) == keep_intf_ios.end()) {
-          remove_nets.push_back(nameString);
-        }
-      }
-    }
-  }
-}
+//void add_mod_ports() {
+//  for (const auto &pair : indexed_mod_ios) {
+//    const auto &values = pair.second;
+//    unsigned msb;
+//    unsigned lsb;
+//    unsigned dir;
+//    if (values.size() == 3) {
+//      msb = values[0];
+//      lsb = values[1];
+//      dir = values[2];
+//    } else {
+//      msb = values[0];
+//      lsb = values[1];
+//      dir = dir_input;
+//    }
+//    // Add port
+//  }
+//}
 
-void remove_mod_clks(
-    std::vector<std::pair<std::string, std::vector<int>>> &indexed_data,
-    std::vector<std::string> &mod_clks) {
-  indexed_data.erase(
-      std::remove_if(
-          indexed_data.begin(), indexed_data.end(),
-          [&mod_clks](const std::pair<std::string, std::vector<int>> &pair) {
-            return std::find(mod_clks.begin(), mod_clks.end(), pair.first) !=
-                   mod_clks.end();
-          }),
-      indexed_data.end());
-}
-
-void add_idx_intf_ports(
-    VeriModule *intf_mod,
-    std::vector<std::pair<std::string, std::vector<int>>> &indexed_intf_ios,
-    unsigned dir, std::unordered_set<std::string> &ports_intf) {
-  for (const auto &pair : indexed_intf_ios) {
-    const auto &values = pair.second;
-    unsigned msb;
-    unsigned lsb;
-    msb = values[0];
-    lsb = values[1];
-    intf_mod->AddPort(
-        (pair.first).c_str(), dir,
-        new VeriDataType(
-            0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb))));
-    ports_intf.insert(pair.first);
-  }
-}
-
-void add_intf_ports(VeriModule *intf_mod, std::vector<std::string> &intf_ios,
-                    unsigned dir, std::unordered_set<std::string> &ports_intf) {
-  for (const auto &port : intf_ios) {
-    intf_mod->AddPort(port.c_str() /* port to be added*/, dir /* direction*/,
-                      0 /* data type */);
-    ports_intf.insert(port);
-  }
-}
-
-void add_mod_ports(
-    VeriModule *mod,
-    std::vector<std::pair<std::string, std::vector<int>>> &indexed_mod_ios) {
-  for (const auto &pair : indexed_mod_ios) {
-    const auto &values = pair.second;
-    unsigned msb;
-    unsigned lsb;
-    unsigned dir;
-    if (values.size() == 3) {
-      msb = values[0];
-      lsb = values[1];
-      dir = values[2];
-    } else {
-      msb = values[0];
-      lsb = values[1];
-      dir = VERI_INPUT;
-    }
-    mod->AddPort(
-        (pair.first).c_str(), dir,
-        new VeriDataType(
-            0, 0, new VeriRange(new VeriIntVal(msb), new VeriIntVal(lsb))));
-  }
-}
-
-void gather_data(VeriModule *mod, gb_constructs &gb, const char *formal_name,
-                 std::map<std::string, int> &m_items, VeriExpression *actual) {
-  std::string actual_name;
-  VeriIdDef *actual_id;
-  if (actual->GetIndexExpr()) {
-    actual_id = (actual) ? actual->GetId() : 0;
-  } else {
-    actual_id = (actual) ? actual->FullId() : 0;
-  }
-  if (actual_id) {
-    std::vector<int> io_data;
-    unsigned msb = actual_id->GetMsbOfRange();
-    unsigned lsb = actual_id->GetLsbOfRange();
-    VeriIndexedId *indexed_id = static_cast<VeriIndexedId *>(actual);
-    unsigned port_size = indexed_id->FindSize();
-    actual_name = actual_id->Name();
-    if (actual_id->Dir() == VERI_INPUT) {
-      for (const auto &pair : m_items) {
-        if (strcmp((pair.first).c_str(), formal_name) == 0) {
-          if (pair.second != IN_CLK && pair.second != IN_RESET) {
-            gb.del_ports.insert(actual_name);
-          }
-        }
-      }
-      gb.intf_ins.push_back(actual_name);
-    } else if (actual_id->Dir() == VERI_OUTPUT) {
-      gb.intf_outs.push_back(actual_name);
-      gb.del_ports.insert(actual_name);
-    } else if (actual_id->Dir() == VERI_INOUT) {
-      gb.intf_inouts.push_back(actual_name);
-      gb.del_ports.insert(actual_name);
-    } else {
-      // check in gb mods for direction
-      for (const auto &pair : m_items) {
-        if (strcmp((pair.first).c_str(), formal_name) == 0) {
-          if (pair.second == OUT_DIR) {
-            if (port_size > 1) {
-              io_data.push_back(msb);
-              io_data.push_back(lsb);
-              io_data.push_back(VERI_INPUT);
-              gb.indexed_mod_ios.push_back(
-                  std::make_pair(actual_name, io_data));
-              io_data.pop_back();
-              gb.indexed_intf_outs.push_back(
-                  std::make_pair(actual_name, io_data));
-            } else {
-              if (actual->GetIndexExpr()) {
-                VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str());
-                msb = sig_id->GetMsbOfRange();
-                lsb = sig_id->GetLsbOfRange();
-                io_data.push_back(msb);
-                io_data.push_back(lsb);
-                io_data.push_back(VERI_INPUT);
-                gb.indexed_mod_ios.push_back(
-                    std::make_pair(actual_name, io_data));
-                io_data.pop_back();
-                gb.indexed_intf_outs.push_back(
-                    std::make_pair(actual_name, io_data));
-              } else {
-                gb.mod_ios.push_back(std::make_pair(actual_name, VERI_INPUT));
-                gb.intf_outs.push_back(actual_name);
-              }
-            }
-          } else if (pair.second == IN_DIR || pair.second == IN_CLK ||
-                     pair.second == IN_RESET) {
-            if (port_size > 1) {
-              io_data.push_back(msb);
-              io_data.push_back(lsb);
-              io_data.push_back(VERI_OUTPUT);
-              gb.indexed_mod_ios.push_back(
-                  std::make_pair(actual_name, io_data));
-              io_data.pop_back();
-              gb.indexed_intf_ins.push_back(
-                  std::make_pair(actual_name, io_data));
-            } else {
-              if (actual->GetIndexExpr()) {
-                VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str());
-                msb = sig_id->GetMsbOfRange();
-                lsb = sig_id->GetLsbOfRange();
-                io_data.push_back(msb);
-                io_data.push_back(lsb);
-                io_data.push_back(VERI_OUTPUT);
-                gb.indexed_mod_ios.push_back(
-                    std::make_pair(actual_name, io_data));
-                io_data.pop_back();
-                gb.indexed_intf_ins.push_back(
-                    std::make_pair(actual_name, io_data));
-              } else {
-                gb.mod_ios.push_back(std::make_pair(actual_name, VERI_OUTPUT));
-                gb.intf_ins.push_back(actual_name);
-              }
-            }
-          } else if (pair.second == OUT_CLK) {
-            if (port_size > 1) {
-              io_data.push_back(msb);
-              io_data.push_back(lsb);
-              gb.indexed_mod_clks.push_back(
-                  std::make_pair(actual_name, io_data));
-            } else {
-              if (actual->GetIndexExpr()) {
-                VeriIdDef *sig_id = mod->FindDeclared(actual_name.c_str());
-                msb = sig_id->GetMsbOfRange();
-                lsb = sig_id->GetLsbOfRange();
-                io_data.push_back(msb);
-                io_data.push_back(lsb);
-                gb.indexed_mod_clks.push_back(
-                    std::make_pair(actual_name, io_data));
-              } else {
-                gb.mod_clks.push_back(actual_name);
-              }
-            }
-          }
-        }
-      }
-    }
-  }
-}
+//void gather_data() {
+//  // Fillout data
+//}
 
 ////////////////////////////////////////////////////////////////////////////
 
-std::pair<std::string, std::string> parseKeyValue(const std::string &input) {
-  size_t keyStart = input.find_first_not_of('.');
-  size_t keyEnd = input.find('(');
+//std::pair<std::string, std::string> parseKeyValue(const std::string &input) {
+//  size_t keyStart = input.find_first_not_of('.');
+//  size_t keyEnd = input.find('(');
+//
+//  if (keyStart == std::string::npos || keyEnd == std::string::npos) {
+//    // Invalid format
+//    return {"", ""};
+//  }
+//
+//  std::string key = input.substr(keyStart, keyEnd - keyStart);
+//
+//  size_t valStart = keyEnd + 1;
+//  size_t valEnd = input.find(')', valStart);
+//
+//  if (valStart == std::string::npos || valEnd == std::string::npos) {
+//    // Invalid format
+//    return {"", ""};
+//  }
+//
+//  std::string value = input.substr(valStart, valEnd - valStart);
+//
+//  return {key, value};
+//}
 
-  if (keyStart == std::string::npos || keyEnd == std::string::npos) {
-    // Invalid format
-    return {"", ""};
-  }
+//void print_out_io_primitives( *intf_mod, gb_constructs &gb) {
+//  std:stringstream out_stream;
+//  out_stream << "{\n    \"IO_Instances\": {" << std::endl;
+//  unsigned idx;
+//  bool firstInst = true;
+//
+//  foreach(prim_items, idx, prim_item) {
+//    if (!prim_item)
+//      continue;
+//    if (prim_item(isInstance)) {
+//
+//      // out_stream << __LINE__ << " &&&& ";
+//      // prim_item->PrettyPrint(out_stream, 0);
+//
+//      // Get instances
+//      foreach(inst in insts) {
+//
+//        std::string mod_name
+//        std::string no_param_name = "";
+//
+//        // reducing a correctly named parametrized module MyModule(par1=99) to
+//        // MyModule discuss with thierry !
+//        for (auto k : mod_name)
+//          if ('(' == k)
+//            break;
+//          else
+//            no_param_name.push_back(k);
+//
+//        std::map<std::string, int> m_items;
+//        const char *inst_name
+//        if (!firstInst) {
+//          out_stream << ",\n";
+//        }
+//        out_stream << "        ";
+//        firstInst = false;
+//        out_stream << "\"" << inst_name << "\": {" << std::endl;
+//        out_stream << "            \"module\": \"" << no_param_name << "\",";
+//
+//        // Fillout params
+//        
+//        // Fillout ports information
+//        out_stream << "        }";
+//      }
+//    }
+//  }
+//  out_stream << "\n    }\n}" << std::endl;
+//  gb.interface_data_dump = out_stream.str();
+//}
 
-  std::string key = input.substr(keyStart, keyEnd - keyStart);
-
-  size_t valStart = keyEnd + 1;
-  size_t valEnd = input.find(')', valStart);
-
-  if (valStart == std::string::npos || valEnd == std::string::npos) {
-    // Invalid format
-    return {"", ""};
-  }
-
-  std::string value = input.substr(valStart, valEnd - valStart);
-
-  return {key, value};
-}
-
-void print_out_io_primitives(VeriModule *intf_mod, gb_constructs &gb) {
-    std:stringstream out_stream;
-  out_stream << "{\n    \"IO_Instances\": {" << std::endl;
-  Array *prim_items = intf_mod->GetModuleItems();
-  VeriModuleItem *prim_item;
-  unsigned idx;
-  bool firstInst = true;
-
-  FOREACH_ARRAY_ITEM(prim_items, idx, prim_item) {
-    if (!prim_item)
-      continue;
-    if (prim_item->IsInstantiation()) {
-
-      // out_stream << __LINE__ << " &&&& ";
-      // prim_item->PrettyPrint(out_stream, 0);
-
-      VeriIdDef *id;
-      unsigned m;
-      Array *insts = prim_item->GetInstances();
-      FOREACH_ARRAY_ITEM(insts, m, id) {
-
-        std::string mod_name = prim_item->GetModuleName();
-        std::string no_param_name = "";
-
-        // reducing a correctly named parametrized module MyModule(par1=99) to
-        // MyModule discuss with thierry !
-        for (auto k : mod_name)
-          if ('(' == k)
-            break;
-          else
-            no_param_name.push_back(k);
-
-        std::map<std::string, int> m_items;
-        const char *inst_name = id->InstName();
-        if (!firstInst) {
-          out_stream << ",\n";
-        }
-        out_stream << "        ";
-        firstInst = false;
-        out_stream << "\"" << inst_name << "\": {" << std::endl;
-        out_stream << "            \"module\": \"" << no_param_name << "\",";
-
-        Array *param_items = prim_item->GetParamValues();
-        VeriExpression *param_assign;
-        unsigned yy;
-        if (param_items) {
-          bool firstParam = true;
-          out_stream << "\n            \"params\": {" << std::endl;
-          FOREACH_ARRAY_ITEM(param_items, yy, param_assign) {
-            std::stringstream ss;
-            if (param_assign) {
-              param_assign->PrettyPrint(ss, 0);
-              auto pa = parseKeyValue(ss.str());
-              if (!firstParam) {
-                out_stream << ",\n";
-              }
-              out_stream << "                ";
-              firstParam = false;
-              out_stream << "\"" << pa.first << "\": ";
-              if ('"' != pa.second[0])
-                out_stream << "\"";
-              out_stream << pa.second;
-              if ('"' != pa.second.back())
-                out_stream << "\"";
-            }
-          }
-          out_stream << "\n            }," << std::endl;
-        }
-        Array *port_conn_arr = id->GetPortConnects();
-        VeriExpression *expr;
-        unsigned k;
-        if (port_conn_arr) {
-          bool firstPort = true;
-          out_stream << "\n            \"ports\": {" << std::endl;
-          FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
-            const char *formal_name = expr->NamedFormal();
-            VeriExpression *actual = expr->GetConnection();
-            if (actual->GetClassId() == ID_VERICONCAT) {
-              VeriConcat *concat = static_cast<VeriConcat *>(actual);
-              Array *expr_arr = concat->GetExpressions();
-              unsigned j;
-              // Iterate through all expressions
-              VeriExpression *expr_;
-              FOREACH_ARRAY_ITEM(expr_arr, j, expr_) {
-                VeriIdDef *actual_id = expr ? expr_->GetId() : 0;
-                if (actual_id){
-                  if (!firstPort) {
-                    out_stream << ",\n";
-                  }
-                  out_stream << "                \"";
-                  firstPort = false;
-                  out_stream << formal_name << "\": {" << std::endl;
-                  if (current_primitive_spec_map.count(no_param_name) > 0 &&
-                      current_primitive_spec_map[no_param_name].count(formal_name) >
-                          0 &&
-                      current_primitive_spec_map[no_param_name][formal_name] <
-                          direction_print_outs.size()) {
-                    out_stream
-                        << "                    \"FUNC\": \""
-                        << direction_print_outs[current_primitive_spec_map
-                                                    [no_param_name][formal_name]]
-                        << "\"," << std::endl;
-                  }
-                  out_stream << "                    \"Actual\": \"";
-                  out_stream << actual_id->Name();
-                  out_stream << "\"," << std::endl;
-                  out_stream << "                    \"lsb\": ";
-                  out_stream << actual_id->GetLsbOfRange();
-                  out_stream << "," << std::endl;
-                  out_stream << "                    \"msb\": ";
-                  out_stream << actual_id->GetMsbOfRange();
-                  out_stream << "\n                }";
-                }
-              }
-            } else if (actual->GetId()) {
-              std::string actual_name = actual->GetId()->Name();
-              unsigned msb = actual->GetId()->GetMsbOfRange();
-              unsigned lsb = actual->GetId()->GetLsbOfRange();
-              if (!firstPort) {
-                out_stream << ",\n";
-              }
-              out_stream << "                \"";
-              firstPort = false;
-              out_stream << formal_name << "\": {" << std::endl;
-              if (current_primitive_spec_map.count(no_param_name) > 0 &&
-                  current_primitive_spec_map[no_param_name].count(formal_name) >
-                      0 &&
-                  current_primitive_spec_map[no_param_name][formal_name] <
-                      direction_print_outs.size()) {
-                out_stream
-                    << "                    \"FUNC\": \""
-                    << direction_print_outs[current_primitive_spec_map
-                                                [no_param_name][formal_name]]
-                    << "\"," << std::endl;
-              }
-              out_stream << "                    \"Actual\": \"";
-              out_stream << actual_name;
-              out_stream << "\"," << std::endl;
-              out_stream << "                    \"lsb\": ";
-              out_stream << lsb;
-              out_stream << "," << std::endl;
-              out_stream << "                    \"msb\": ";
-              out_stream << msb;
-              out_stream << "\n                }";
-            }
-          }
-          out_stream << "\n            }\n";
-        }
-        out_stream << "        }";
-      }
-    }
-  }
-  out_stream << "\n    }\n}" << std::endl;
-  gb.interface_data_dump = out_stream.str();
-}
-
-void map_inputs (const json& data, std::string signalName, const std::string& dir)
-{
-    Connection conn;
-    
-    std::string firstInst;
-    /////////////////// check input connection
-    for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
-    {
-        const json& ports = instanceInfo["ports"];
-        std::string modName = instanceInfo["module"];
-        for (const auto& [portName, portInfo] : ports.items()) {
-            std::string actualSignal = portInfo["Actual"];
-            if (portInfo.contains("FUNC")) {
-                std::string sigDir = portInfo["FUNC"];
-                if (dir == "Input" && sigDir == "IN_DIR" && actualSignal == signalName) {
-					bool input_buf = false;
-					if(modName == "I_BUF" || modName == "CLK_BUF") input_buf = true;
-                    if (input_buf && portName == "I") {
-                        std::string outPort = ports["O"]["Actual"];
-                        signalName = outPort;
-                        if (conn.signal.empty()) {
-                            conn.signal = actualSignal;
-                        }
-                        conn.ports["O"] = ports["O"]["Actual"];
-                        conn.module = modName;
-                        firstInst = instanceName;
-                        instConns[instanceName].push_back(conn);
-                    }
-                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
-					bool output_buf = false;
-					if(modName == "O_BUF" || modName == "O_BUFT") output_buf = true;
-                    if (output_buf && portName == "O") {
-                       std::string inPort = ports["I"]["Actual"];
-                        signalName = inPort;
-                        if (conn.signal.empty()) {
-                            conn.signal = actualSignal;
-                        }
-                        conn.ports["I"] = ports["I"]["Actual"];
-                        conn.module = modName;
-                        firstInst = instanceName;
-                        instConns[instanceName].push_back(conn);
-                    }
-                }
-            }
-        }
-    }
-
-    for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
-    {
-        const json& ports = instanceInfo["ports"];
-        std::string modName = instanceInfo["module"];
-        for (const auto& [portName, portInfo] : ports.items()) {
-            std::string actualSignal = portInfo["Actual"];
-            if (portInfo.contains("FUNC")) {
-                std::string sigDir = portInfo["FUNC"];
-                bool inputSignal;
-                if(sigDir == "IN_DIR" || sigDir == "IN_CLK" || sigDir == "IN_RESET") inputSignal = true;
-                if (dir == "Input" && inputSignal && actualSignal == signalName) {
-                    bool complexPrim = true;
-					if (modName.find("BUF") != std::string::npos) complexPrim = false;
-                    if (complexPrim) {
-                        std::string tempSig;
-                        if (conn.signal.empty()) {
-                            conn.signal = actualSignal;
-                        } else {
-                            tempSig = conn.signal;
-                            if (conn.module == "I_BUF") {
-                                instConns[firstInst].pop_back();
-                                conn = Connection();
-                                conn.signal = tempSig;
-                            }
-                        }
-                        conn.ports[portName] = actualSignal;
-                        conn.module = modName;
-                        instConns[instanceName].push_back(conn);
-                    }
-                } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
-                    bool complexPrim = true;
-					if (modName.find("BUF") != std::string::npos) complexPrim = false;
-                    if (complexPrim) {
-                        std::string tempSig;
-                        if (conn.signal.empty()) {
-                            conn.signal = actualSignal;
-                        } else {
-                            tempSig = conn.signal;
-							bool output_buf = false;
-							if(conn.module == "O_BUF" || conn.module == "O_BUFT") output_buf = true;
-                            if (output_buf) {
-                                instConns[firstInst].pop_back();
-                                conn = Connection();
-                                conn.signal = tempSig;
-                            }
-                        }
-                        conn.ports[portName] = actualSignal;
-                        conn.module = modName;
-                        instConns[instanceName].push_back(conn);
-                    }
-                }
-            }
-        }
-    }
-    
-}
-
-void printPinMap ()
-{
-	for (const auto& entry : instConns) {
-        const std::string& instance = entry.first;
-        const std::vector<Connection>& instanceConnections = entry.second;
-
-        std::cout << "Instance: " << instance << std::endl;
-        for (const auto& conn : instanceConnections) {
-            std::cout << "Signal: " << conn.signal << std::endl;
-            std::cout << "Module: " << conn.module << std::endl;
-            // Print other fields as needed
-            for (const auto& port : conn.ports) {
-                std::cout << "  " << port.first << ": " << port.second << std::endl;
-        }
-        }
-    }
-}
+//void printPinMap ()
+//{
+//	for (const auto& entry : instConns) {
+//        const std::string& instance = entry.first;
+//        const std::vector<Connection>& instanceConnections = entry.second;
+//
+//        std::cout << "Instance: " << instance << std::endl;
+//        for (const auto& conn : instanceConnections) {
+//            std::cout << "Signal: " << conn.signal << std::endl;
+//            std::cout << "Module: " << conn.module << std::endl;
+//            // Print other fields as needed
+//            for (const auto& port : conn.ports) {
+//                std::cout << "  " << port.first << ": " << port.second << std::endl;
+//        }
+//        }
+//    }
+//}
 
 ////////////////////////////////////////////////////////////////////////////
 
 int prune_verilog(const char *file_name, gb_constructs &gb,
                   const std::string &device_name) {
-
-  Message::SetMessageType("VERI-1116", VERIFIC_IGNORE);
-  Message::SetMessageType("VERI-2541", VERIFIC_IGNORE);
-  if (!veri_file::Analyze(file_name, veri_file::VERILOG_2K /*v2k*/))
-    return 1;
-  gb_mods_default default_mods;
+// Removing verific dependent code and commenting simple code and comments
+//gb_mods_default default_mods;
 #ifdef GB_CONSTRUCTS_DATA
   gb_constructs_data gb_mods_data;
 #endif
 
   // Get all the top level modules
-  Array *all_top_modules = veri_file::GetTopModules();
   // Get a handle of the first top level module, if any.
-  VeriModule *mod = (all_top_modules && all_top_modules->Size())
-                        ? (VeriModule *)all_top_modules->GetFirst()
-                        : 0;
-  if (!mod) {
-    Message::PrintLine("Cannot find a top level module");
-    delete all_top_modules;
-    return 3;
-  }
 
-  json j_module;
-  j_module["topModule"] = mod->Name();
-  Array *module_ports = mod->GetPorts(); // Get the ports
-  unsigned q;
-  VeriIdDef *port_id_;
-  FOREACH_ARRAY_ITEM(module_ports, q, port_id_) {
-    if (!port_id_)
-      continue;
-    orig_io io_info;
-    json range;
-    range["msb"] = port_id_->LeftRangeBound();
-    range["lsb"] = port_id_->RightRangeBound();
-    j_module["ports"].push_back({{"name", port_id_->GetName()}, 
-            {"direction", directions[port_id_->Dir()]}, 
-            {"range", range}});
-    io_info.dir = port_id_->Dir();
-    io_info.io_name = port_id_->GetName();
-    io_info.lsb = port_id_->RightRangeBound();
-    io_info.msb = port_id_->LeftRangeBound();
-    orig_ios.push_back(io_info);
-  }
+  //json j_module;
+  // save original IOs in orig_ios
 
-  // Now copy of the top level module
-  VeriMapForCopy id_map_table(POINTER_HASH);
-  char *intf_name = Strings::save("interface_to_fabric_", mod->Name());
-  VeriModuleItem *intf_mod_ =
-      mod->CopyWithName(intf_name, id_map_table,
-                        1 /* add copied module to library containing 'mod'*/);
-  VeriModule *intf_mod = (VeriModule *)intf_mod_;
-  char *top_name = Strings::save("top_", mod->Name());
-  VeriModuleItem *top_mod_ = intf_mod->CopyWithName(
-      top_name, id_map_table,
-      1 /* add copied module to library containing 'mod'*/);
-  VeriModule *top_mod = (VeriModule *)top_mod_;
-  delete all_top_modules;
-
-  /////////////////// Rename original module ////////////////////////////
-  // mod->Rename(Strings::save("nl_to_fabric_", mod->Name()));
+  // Now copy the top level module to create interface module
 
   //////////////////////////// Remove assign statements from interface and
   /// wrapper modules /////////////////////
   // Get the module item list of module.
-  Array *top_items = top_mod->GetModuleItems();
-  Array *empty;
-  VeriModuleItem *top_item;
-  unsigned j;
-  FOREACH_ARRAY_ITEM(top_items, j, top_item) {
-    if (!top_item)
-      continue;
-    if (ID_VERICONTINUOUSASSIGN == top_item->GetClassId()) {
-      top_mod->ReplaceChildBy(top_item, empty);
-    }
-  }
 
   // Get the module item list of module.
-  Array *intf_items = intf_mod->GetModuleItems();
-  VeriModuleItem *intf_item;
-  unsigned m;
-  FOREACH_ARRAY_ITEM(intf_items, m, intf_item) {
-    if (!intf_item)
-      continue;
-    if (ID_VERIDATADECL == intf_item->GetClassId()) {
-      VeriDataDecl *data_decl = static_cast<VeriDataDecl *>(intf_item);
-      VeriIdDef *id;
-      unsigned j;
-      FOREACH_ARRAY_ITEM(data_decl->GetIds(), j, id) {
-        if (!id)
-          continue; // null pointer check
-        const char *name = id->Name();
-        gb.intf_ports.insert(name); // Store interface module's IOs
-      }
-    }
-    if (ID_VERICONTINUOUSASSIGN == intf_item->GetClassId()) {
-      intf_mod->ReplaceChildBy(intf_item, empty);
-    }
-  }
-  /////////////////////////////////////////// BLOCK END
-  //////////////////////////////////////////////////////////
+  
 
   //////////////////////////////////////// Get the nets' names used in assign
   /// statements /////////////////////
-  // Get the module item list of module.
-  Array *items = mod->GetModuleItems();
-  VeriModuleItem *module_item;
-  unsigned i;
-  FOREACH_ARRAY_ITEM(items, i, module_item) {
-    if (!module_item)
-      continue;
-    if (ID_VERICONTINUOUSASSIGN == module_item->GetClassId()) {
-      Array *net_assigns =
-          ((VeriContinuousAssign *)module_item)->GetNetAssigns();
-      VeriNetRegAssign *assign;
-      unsigned j;
-      FOREACH_ARRAY_ITEM(net_assigns, j, assign) {
-        if (!assign)
-          continue;
-        if (assign->GetLValExpr()->IsConcat()) {
-
-        } else {
-          VeriExpression *lval = assign->GetLValExpr();
-          if (lval->GetId()) {
-            const char *lvalname = lval->GetId()->Name();
-            gb.assign_nets.insert(lvalname);
-          }
-          VeriExpression *rval = assign->GetRValExpr();
-          if (rval->IsConcat()) {
-            unsigned e;
-            VeriExpression *expr;
-            FOREACH_ARRAY_ITEM(rval->GetExpressions(), e, expr) {
-              if (expr->GetId())
-                gb.assign_nets.insert(expr->GetId()->Name());
-            }
-          } else {
-            if (rval->GetId())
-              gb.assign_nets.insert(rval->GetId()->Name());
-          }
-        }
-      }
-    }
-    ///////////////////////////////////////////// BLOCK END
-    //////////////////////////////////////////////////
-    if (module_item->IsInstantiation()) {
-      std::string mod_name = module_item->GetModuleName();
-      std::string no_param_name;
-      // reducing a correctly named parametrized module MyModule(par1=99) to
-      // MyModule discuss with thierry !
-      for (auto k : mod_name)
-        if ('(' == k)
-          break;
-        else
-          no_param_name.push_back(k);
-
-      VeriIdDef *id;
-      unsigned m;
-      Array *insts = module_item->GetInstances();
-      FOREACH_ARRAY_ITEM(insts, m, id) {
-        bool is_gb_cons;
-        std::map<std::string, int> m_items;
-        const char *inst_name = id->InstName();
-#ifdef GB_CONSTRUCTS_DATA
-        if (!gb_mods_data.device_premitives.empty() &&
-            gb_mods_data.device_premitives.find(device_name) !=
-                gb_mods_data.device_premitives.end()) {
-          for (auto &p : gb_mods_data.device_premitives[device_name]) {
-            current_primitive_spec_map[p.first] = p.second;
-          }
-          for (const auto &element_ :
-               gb_mods_data
-                   .device_premitives) { // Will update the code once I find out
-                                         // how to check which device to use
-            std::string device_name_ = element_.first;
-            if (device_name_ == device_name) {
-              for (const auto &element : element_.second) {
-                std::string str = element.first;
-                if (str == no_param_name) {
-                  m_items = element.second;
-                  is_gb_cons = true;
-                  gb.contains_io_prem = true;
-                  break;
-                } else {
-                  is_gb_cons = false;
-                }
-              }
-            }
-          }
-        } else {
-          for (const auto &element : default_mods.gb_mods) {
-            std::string str = element.first;
-            if (str == no_param_name) {
-              m_items = element.second;
-              is_gb_cons = true;
-              gb.contains_io_prem = true;
-              break;
-            } else {
-              is_gb_cons = false;
-            }
-          }
-        }
-#else
-        for (const auto &element : default_mods.gb_mods) {
-          std::string str = element.first;
-          if (str == no_param_name) {
-            m_items = element.second;
-            is_gb_cons = true;
-            gb.contains_io_prem = true;
-            break;
-          } else {
-            is_gb_cons = false;
-          }
-        }
-#endif
-        if (is_gb_cons) {
-          std::vector<std::string> prefs;
-          std::unordered_map<std::string, std::vector<std::string>> del_inst;
-          VeriExpression *actual;
-          const char *formal_name;
-          VeriExpression *expr;
-          unsigned k;
-          Array *port_conn_arr = id->GetPortConnects();
-          FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
-            formal_name = expr->NamedFormal();
-            prefs.push_back(formal_name);
-            actual = expr->GetConnection();
-            if (actual->GetClassId() == ID_VERICONSTVAL) {
-              // Do nothing
-              ;
-            } else if (actual->GetClassId() == ID_VERICONCAT) {
-              Array *expr_arr = actual->GetExpressions();
-              unsigned c;
-              VeriExpression *pexpr;
-              FOREACH_ARRAY_ITEM(expr_arr, i, pexpr) {
-                gather_data(mod, gb, formal_name, m_items, pexpr);
-              }
-            } else {
-              gather_data(mod, gb, formal_name, m_items, actual);
-            }
-          }
-
-          for (const auto &prf : prefs) {
-            mod->RemovePortRef(inst_name /* instance name */,
-                               prf.c_str() /* formal port name */);
-          }
-          gb.gb_insts.push_back(inst_name);
-        } else {
-          gb.normal_insts.push_back(inst_name);
-        }
-      }
-    }
-  }
-  if (!gb.contains_io_prem)
-    return 0;
+    
+  /////////////////////////
+  //if (!gb.contains_io_prem)
+  //  return 0;
+  /////////////////////////
 
   ////////////////////////////// Remove gearbox modules' instances from original
   /// module ////////////////////////////
-  for (const auto &gb_inst : gb.gb_insts) {
-    mod->RemoveInstance(gb_inst.c_str() /* instance to be removed*/);
-  }
 
   ///////////////////////////// Get the nets connected to the remaining
   /// instances //////////////////////////////////
-  Array *updated_items = mod->GetModuleItems();
-  VeriModuleItem *updated_item;
-  unsigned u;
-  FOREACH_ARRAY_ITEM(updated_items, u, updated_item) {
-    if (!updated_item)
-      continue;
-    if (updated_item->IsInstantiation()) {
-      VeriIdDef *id;
-      unsigned m;
-      Array *insts = updated_item->GetInstances();
-      FOREACH_ARRAY_ITEM(insts, m, id) {
-        const char *inst_name = id->InstName();
-        VeriIdDef *actual_id;
-        VeriExpression *actual;
-        std::string actual_name;
-        VeriExpression *expr;
-        unsigned k;
-        Array *port_conn_arr = id->GetPortConnects();
-        FOREACH_ARRAY_ITEM(port_conn_arr, k, expr) {
-          actual = expr->GetConnection();
-          if (actual->GetClassId() == ID_VERICONCAT) {
-            VeriConcat *concat = static_cast<VeriConcat *>(actual);
-            Array *expr_arr = concat->GetExpressions();
-            unsigned j;
-            // Iterate through all expressions
-            VeriExpression *expr;
-            FOREACH_ARRAY_ITEM(expr_arr, j, expr) {
-              actual_id = expr ? expr->GetId() : 0;
-              if (actual_id)
-                gb.inst_nets.insert(actual_id->Name());
-            }
-          } else if (actual->GetId()) {
-            actual_name = actual->GetId()->Name();
-            gb.inst_nets.insert(actual_name);
-          }
-        }
-      }
-    }
-  }
-  //////////////////////////////// BLOCK END
-  ////////////////////////////////////////////////////////////////
 
   //////////// Check if an output of the interface module is also an input of
   /// the same module ////////////
-  std::unordered_set<std::string>
-      io_intf; // To store duplicate IOs of interface module
-  for (const std::string &element : gb.intf_outs) {
-    if (std::find(gb.intf_ins.begin(), gb.intf_ins.end(), element) !=
-        gb.intf_ins.end()) {
-      io_intf.insert(element);
-    }
-  }
+  //std::unordered_set<std::string>
+  //    io_intf; // To store duplicate IOs of interface module
+  //for (const std::string &element : gb.intf_outs) {
+  //  if (std::find(gb.intf_ins.begin(), gb.intf_ins.end(), element) !=
+  //      gb.intf_ins.end()) {
+  //    io_intf.insert(element);
+  //  }
+  //}
 
   // Iterate over indexed_intf_outs
-  for (const auto &out_pair : gb.indexed_intf_outs) {
-    const std::string &out_first = out_pair.first;
-
-    // Iterate over indexed_intf_ins
-    for (const auto &in_pair : gb.indexed_intf_ins) {
-      const std::string &in_first = in_pair.first;
-
-      // Compare the first elements of the pairs
-      if (out_first == in_first) {
-        // Push the first element to the set
-        io_intf.insert(out_first);
-        break; // No need to continue searching for the same out_first
-      }
-    }
-  }
+  //for (const auto &out_pair : gb.indexed_intf_outs) {
+  //  const std::string &out_first = out_pair.first;
+  //  // Iterate over indexed_intf_ins
+  //  for (const auto &in_pair : gb.indexed_intf_ins) {
+  //    const std::string &in_first = in_pair.first;
+  //    // Compare the first elements of the pairs
+  //    if (out_first == in_first) {
+  //      // Push the first element to the set
+  //      io_intf.insert(out_first);
+  //      break; // No need to continue searching for the same out_first
+  //    }
+  //  }
+  //}
 
   /////////////// Remove it from the port list of the original module
   /////////////////////////////////////
   // Iterate over the vector and check if the first element exists in the set
-  for (auto it = gb.indexed_mod_ios.begin(); it != gb.indexed_mod_ios.end();) {
-    const std::string &firstElement = it->first;
-    if (io_intf.count(firstElement) > 0) {
-      it = gb.indexed_mod_ios.erase(it); // Remove the pair from the vector
-    } else {
-      ++it;
-    }
-  }
+  //for (auto it = gb.indexed_mod_ios.begin(); it != gb.indexed_mod_ios.end();) {
+  //  const std::string &firstElement = it->first;
+  //  if (io_intf.count(firstElement) > 0) {
+  //    it = gb.indexed_mod_ios.erase(it); // Remove the pair from the vector
+  //  } else {
+  //    ++it;
+  //  }
+  //}
 
-  auto remove_if_found = [&io_intf](const std::pair<std::string, int> &pair) {
-    return io_intf.find(pair.first) != io_intf.end();
-  };
+  //auto remove_if_found = [&io_intf](const std::pair<std::string, int> &pair) {
+  //  return io_intf.find(pair.first) != io_intf.end();
+  //};
 
-  gb.mod_ios.erase(
-      std::remove_if(gb.mod_ios.begin(), gb.mod_ios.end(), remove_if_found),
-      gb.mod_ios.end());
+  //gb.mod_ios.erase(
+  //    std::remove_if(gb.mod_ios.begin(), gb.mod_ios.end(), remove_if_found),
+  //    gb.mod_ios.end());
   /////////////////////////////////////////////// BLOCK END
   //////////////////////////////////////////////////
 
   //////////////////////// Remove the output of the clock buffer from module IOs
   ///////////////////////////
-  std::vector<std::string> mod_clks;
-  for (const auto &pair : gb.indexed_mod_clks) {
-    mod_clks.push_back(pair.first);
-  }
+  //std::vector<std::string> mod_clks;
+  //for (const auto &pair : gb.indexed_mod_clks) {
+  //  mod_clks.push_back(pair.first);
+  //}
 
   // Remove elements from indexed_mod_ios if their first element matches any in
   // mod_clks
-  remove_mod_clks(gb.indexed_mod_ios, mod_clks);
+  //remove_mod_clks(gb.indexed_mod_ios, mod_clks);
 
   // Iterate over mod_clks
-  for (const auto &clk : gb.mod_clks) {
-    // Find the pair with matching first element in mod_ios
-    auto it = std::find_if(gb.mod_ios.begin(), gb.mod_ios.end(),
-                           [&clk](const std::pair<std::string, int> &p) {
-                             return p.first == clk;
-                           });
-
-    // If a match is found, remove the pair from mod_ios
-    if (it != gb.mod_ios.end()) {
-      gb.mod_ios.erase(it);
-    }
-  }
+  //for (const auto &clk : gb.mod_clks) {
+  //  // Find the pair with matching first element in mod_ios
+  //  auto it = std::find_if(gb.mod_ios.begin(), gb.mod_ios.end(),
+  //                         [&clk](const std::pair<std::string, int> &p) {
+  //                           return p.first == clk;
+  //                         });
+  //  // If a match is found, remove the pair from mod_ios
+  //  if (it != gb.mod_ios.end()) {
+  //    gb.mod_ios.erase(it);
+  //  }
+  //}
   ////////////////////////////////// BLOCK END
   ////////////////////////////////////////////////////////////////
 
   ////////////////////////// Add ports to the original module
   ////////////////////////////////////////////////
-  add_mod_ports(mod, gb.indexed_mod_ios);
-  add_mod_ports(mod, gb.indexed_mod_clks);
+  //add_mod_ports(mod, gb.indexed_mod_ios);
+  //add_mod_ports(mod, gb.indexed_mod_clks);
 
-  for (const auto &pair : gb.mod_ios) {
-    mod->AddPort((pair.first).c_str() /* port to be added*/,
-                 pair.second /* direction*/, 0 /* data type */);
-  }
+  //for (const auto &pair : gb.mod_ios) {
+  //  //Add Port with proper dir
+  //}
 
-  for (const auto &port : gb.mod_clks) {
-    mod->AddPort(port.c_str() /* port to be added*/, VERI_INPUT /* direction*/,
-                 0 /* data type */);
-  }
+  //for (const auto &port : gb.mod_clks) {
+  //  //Add port as input
+  //}
   ////////////////////////////////////// BLOCK END
   ////////////////////////////////////////////////////////////
 
   ///////////// Keep the ports still being used in design, and remove
   /// unnecessary ports ///////////////////
   // Iterate over the elements in del_ports
-  std::unordered_set<std::string> keep_ports;
-  for (const auto &element : gb.del_ports) {
-    // Check if the element is present in inst_nets or assign_nets
-    if (gb.inst_nets.count(element) > 0 || gb.assign_nets.count(element) > 0) {
-      // Element found, remove it from del_ports
-      keep_ports.insert(element);
-    }
-  }
+  //std::unordered_set<std::string> keep_ports;
+  //for (const auto &element : gb.del_ports) {
+  //  // Check if the element is present in inst_nets or assign_nets
+  //  if (gb.inst_nets.count(element) > 0 || gb.assign_nets.count(element) > 0) {
+  //    // Element found, remove it from del_ports
+  //    keep_ports.insert(element);
+  //  }
+  //}
 
   // Iterate over keep_ports and remove elements found in del_ports
-  for (const auto &element : keep_ports) {
-    if (gb.del_ports.find(element) != gb.del_ports.end()) {
-      gb.del_ports.erase(element);
-    }
-  }
+  //for (const auto &element : keep_ports) {
+  //  if (gb.del_ports.find(element) != gb.del_ports.end()) {
+  //    gb.del_ports.erase(element);
+  //  }
+  //}
 
-  for (const auto &dp : gb.del_ports) {
-    mod->RemovePort(dp.c_str());
-  }
+  //for (const auto &dp : gb.del_ports) {
+  //  // Remove port
+  //}
   ////////////////////////////////////// BLOCK END
   /////////////////////////////////////////////////////////
 
   //////////////////////////// Get updated module for file writting
   ///////////////////////////////////////
-  gb.mod_str = mod->GetPrettyPrintedString();
+  // gb.mod_str
 
   /////////////////////////////////////////////////////////////////////////
 
@@ -1071,475 +400,187 @@ int prune_verilog(const char *file_name, gb_constructs &gb,
   /// same module ///////////
   // Iterate over the vector and remove pairs if the first element is found in
   // the set
-  gb.indexed_intf_ins.erase(
-      std::remove_if(
-          gb.indexed_intf_ins.begin(), gb.indexed_intf_ins.end(),
-          [&io_intf](const std::pair<std::string, std::vector<int>> &pair) {
-            return io_intf.find(pair.first) != io_intf.end();
-          }),
-      gb.indexed_intf_ins.end());
+  //gb.indexed_intf_ins.erase(
+  //    std::remove_if(
+  //        gb.indexed_intf_ins.begin(), gb.indexed_intf_ins.end(),
+  //        [&io_intf](const std::pair<std::string, std::vector<int>> &pair) {
+  //          return io_intf.find(pair.first) != io_intf.end();
+  //        }),
+  //    gb.indexed_intf_ins.end());
 
   // Iterate over the vector and remove pairs if the first element is found in
   // the set
-  gb.indexed_intf_outs.erase(
-      std::remove_if(
-          gb.indexed_intf_outs.begin(), gb.indexed_intf_outs.end(),
-          [&io_intf](const std::pair<std::string, std::vector<int>> &pair) {
-            return io_intf.find(pair.first) != io_intf.end();
-          }),
-      gb.indexed_intf_outs.end());
+  //gb.indexed_intf_outs.erase(
+  //    std::remove_if(
+  //        gb.indexed_intf_outs.begin(), gb.indexed_intf_outs.end(),
+  //        [&io_intf](const std::pair<std::string, std::vector<int>> &pair) {
+  //          return io_intf.find(pair.first) != io_intf.end();
+  //        }),
+  //    gb.indexed_intf_outs.end());
 
   // Iterate over the vector
-  for (auto it = gb.intf_outs.begin(); it != gb.intf_outs.end();) {
-    // Check if the element exists in the unordered set
-    if (io_intf.count(*it) > 0) {
-      // Remove the element from the vector
-      it = gb.intf_outs.erase(it);
-    } else {
-      ++it;
-    }
-  }
+  //for (auto it = gb.intf_outs.begin(); it != gb.intf_outs.end();) {
+  //  // Check if the element exists in the unordered set
+  //  if (io_intf.count(*it) > 0) {
+  //    // Remove the element from the vector
+  //    it = gb.intf_outs.erase(it);
+  //  } else {
+  //    ++it;
+  //  }
+  //}
 
   // Iterate over the vector
-  for (auto it = gb.intf_ins.begin(); it != gb.intf_ins.end();) {
-    // Check if the element exists in the unordered set
-    if (io_intf.count(*it) > 0) {
-      // Remove the element from the vector
-      it = gb.intf_ins.erase(it);
-    } else {
-      ++it;
-    }
-  }
+  //for (auto it = gb.intf_ins.begin(); it != gb.intf_ins.end();) {
+  //  // Check if the element exists in the unordered set
+  //  if (io_intf.count(*it) > 0) {
+  //    // Remove the element from the vector
+  //    it = gb.intf_ins.erase(it);
+  //  } else {
+  //    ++it;
+  //  }
+  //}
   //////////////////////////////// BLOCK END
   ///////////////////////////////////////
 
   /////////////////// Remove the output of clock buffers from interface IOs
   /////////////////////////
   // Remove matching elements from indexed_intf_ins
-  remove_mod_clks(gb.indexed_intf_ins, mod_clks);
-  remove_mod_clks(gb.indexed_intf_outs, mod_clks);
+  //remove_mod_clks(gb.indexed_intf_ins, mod_clks);
+  //remove_mod_clks(gb.indexed_intf_outs, mod_clks);
 
   // Remove elements from intf_ins
-  for (const auto &clk : gb.mod_clks) {
-    auto it = std::find(gb.intf_ins.begin(), gb.intf_ins.end(), clk);
-    if (it != gb.intf_ins.end()) {
-      gb.intf_ins.erase(it);
-    }
-  }
+  //for (const auto &clk : gb.mod_clks) {
+  //  auto it = std::find(gb.intf_ins.begin(), gb.intf_ins.end(), clk);
+  //  if (it != gb.intf_ins.end()) {
+  //    gb.intf_ins.erase(it);
+  //  }
+  //}
 
   // Remove elements from intf_outs
-  for (const auto &clk : gb.mod_clks) {
-    auto it = std::find(gb.intf_outs.begin(), gb.intf_outs.end(), clk);
-    if (it != gb.intf_outs.end()) {
-      gb.intf_outs.erase(it);
-    }
-  }
+  //for (const auto &clk : gb.mod_clks) {
+  //  auto it = std::find(gb.intf_outs.begin(), gb.intf_outs.end(), clk);
+  //  if (it != gb.intf_outs.end()) {
+  //    gb.intf_outs.erase(it);
+  //  }
+  //}
   //////////////////////////////////// BLOCK END
   ////////////////////////////////////////////////////////
 
-  std::unordered_set<std::string> ports_intf;
+  //std::unordered_set<std::string> ports_intf;
 
   /////////////////////////// Add ports to interface module
   ////////////////////////////////////////////
-  add_idx_intf_ports(intf_mod, gb.indexed_intf_ins, VERI_INPUT, ports_intf);
-  add_idx_intf_ports(intf_mod, gb.indexed_intf_outs, VERI_OUTPUT, ports_intf);
-  add_idx_intf_ports(intf_mod, gb.indexed_mod_clks, VERI_OUTPUT, ports_intf);
-
-  add_intf_ports(intf_mod, gb.intf_ins, VERI_INPUT, ports_intf);
-  add_intf_ports(intf_mod, gb.intf_outs, VERI_OUTPUT, ports_intf);
-  add_intf_ports(intf_mod, gb.mod_clks, VERI_OUTPUT, ports_intf);
-  add_intf_ports(intf_mod, gb.intf_inouts, VERI_INOUT, ports_intf);
+  //add_idx_intf_ports(intf_mod, gb.indexed_intf_ins, input, ports_intf);
+  //add_idx_intf_ports(intf_mod, gb.indexed_intf_outs, output, ports_intf);
+  //add_idx_intf_ports(intf_mod, gb.indexed_mod_clks, output, ports_intf);
+//
+  //add_intf_ports(intf_mod, gb.intf_ins, input, ports_intf);
+  //add_intf_ports(intf_mod, gb.intf_outs, output, ports_intf);
+  //add_intf_ports(intf_mod, gb.mod_clks, output, ports_intf);
+  //add_intf_ports(intf_mod, gb.intf_inouts, inout, ports_intf);
   ///////////////////////////////////////// BLOCK END
   ////////////////////////////////////////////////////////////
 
   ///////////////////////// Remove instances from interface and wrapper module
   //////////////////////////////////
-  for (const auto &del_inst : gb.normal_insts) {
-    intf_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/);
-  }
+  //for (const auto &del_inst : gb.normal_insts) {
+  //  // remove instance
+  //}
 
-  for (const auto &del_inst : gb.normal_insts) {
-    top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/);
-  }
+  //for (const auto &del_inst : gb.normal_insts) {
+  //  // remove instance
+  //}
 
-  for (const auto &del_inst : gb.gb_insts) {
-    top_mod->RemoveInstance(del_inst.c_str() /* instance to be removed*/);
-  }
+  //for (const auto &del_inst : gb.gb_insts) {
+  //  // remove instance
+  //}
   /////////////////////////////////////// BLOCK END
   //////////////////////////////////////////////////////////////
 
   ///////////////////////// Remove unnecessary ports from interface module
   ///////////////////////////////////////
-  for (const auto &port : ports_intf) {
-    gb.intf_ports.erase(port);
-  }
+  //for (const auto &port : ports_intf) {
+  //  // remove port
+  //}
 
-  for (const auto &port : gb.intf_ports) {
-    intf_mod->RemovePort(port.c_str() /* port to be removed */);
-  }
+  //for (const auto &port : gb.intf_ports) {
+  //  // remove port
+  //}
   ////////////////////////////////////////// BLOCK END
   ///////////////////////////////////////////////////////////
 
   /////////////////////////////// Add interface ports and instance to the
   /// wrapper /////////////////////////////
-  Array *top_ports = intf_mod->GetPorts(); // Get the ports
-  unsigned n;
-  VeriIdDef *top_port_id;
-  FOREACH_ARRAY_ITEM(top_ports, n, top_port_id) {
-    std::unordered_set<std::string> intf_ios;
-    gb.intf_ios.insert(top_port_id->GetName());
-    gb.top_ports.push_back(top_port_id->GetName());
-  }
-
-  VeriModuleInstantiation *intf_inst =
-      top_mod->AddInstance("intf_inst", intf_name);
-  for (const auto &port : gb.top_ports) {
-    top_mod->AddPortRef(
-        "intf_inst" /* instance name */, port.c_str() /* formal port name */,
-        new VeriIdRef(Strings::save(port.c_str())) /* actual */);
-  }
+  
   //////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
   /////////////////////////////// Add original module's ports and instance to
   /// the wrapper /////////////////////////////
-  Array *mod_ports = mod->GetPorts(); // Get the ports
-  unsigned k;
-  VeriIdDef *port_id;
-  FOREACH_ARRAY_ITEM(mod_ports, k, port_id) {
-    if (!port_id)
-      continue;
-    gb.top_ios.insert(port_id->GetName());
-    gb.mod_ports.push_back(port_id->GetName());
-  }
-
-  VeriModuleInstantiation *mod_inst =
-      top_mod->AddInstance("mod_inst", mod->Name());
-  for (const auto &port : gb.mod_ports) {
-    top_mod->AddPortRef(
-        "mod_inst" /* instance name */, port.c_str() /* formal port name */,
-        new VeriIdRef(Strings::save(port.c_str())) /* actual */);
-  }
   /////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-  keep_nets(intf_mod, io_intf, gb, gb.remove_intf_nets);
-  keep_nets(top_mod, gb.top_ios, gb, gb.remove_top_nets);
+  //keep_nets(intf_mod, io_intf, gb, gb.remove_intf_nets);
+  //keep_nets(top_mod, gb.top_ios, gb, gb.remove_top_nets);
 
-  for (const auto &el : gb.remove_intf_nets) {
-    intf_mod->RemoveSignal(el.c_str() /* signal to be removed */);
-  }
+  //for (const auto &el : gb.remove_intf_nets) {
+  //  // remove signal
+  //}
 
-  for (const auto &el : gb.remove_top_nets) {
-    top_mod->RemoveSignal(el.c_str() /* signal to be removed */);
-  }
+  //for (const auto &el : gb.remove_top_nets) {
+  //  // remove signal
+  //}
   /////////////////////////// Get interface and wrapper modules as strings
   /////////////////////////////////////////////////
-  gb.intf_mod_str = intf_mod->GetPrettyPrintedString();
-  gb.top_mod_str = top_mod->GetPrettyPrintedString();
+  // gb.intf_mod_str
+  // gb.top_mod_str
 
   // Generate Interface data base
-  print_out_io_primitives(intf_mod, gb);
+  //print_out_io_primitives(intf_mod, gb);
 
   // Parse the contents of gb.interface_data_dump as JSON
-  nlohmann::json json_object;
-  try {
-    json_object = nlohmann::json::parse(gb.interface_data_dump);
-  } catch (const nlohmann::json::parse_error& e) {
-    std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
-    return 1;
-  }
+  //nlohmann::json json_object;
+  //try {
+  //  json_object = nlohmann::json::parse(gb.interface_data_dump);
+  //} catch (const nlohmann::json::parse_error& e) {
+  //  std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
+  //  return 1;
+  //}
 
   // getInstIos(json_object);
   // printInstIos();
 
-  for (const orig_io& entry : orig_ios)
-  {
-    std::string io_name = entry.io_name;
-    unsigned lsb = entry.lsb;
-    unsigned msb = entry.msb;
-    unsigned dir = entry.dir;
-	if (dir == VERI_INPUT) {
-        map_inputs(json_object, io_name, "Input");
-    } else if (dir == VERI_OUTPUT) {
-         map_inputs(json_object, io_name, "Output");
-    }
-  }
+  //for (const orig_io& entry : orig_ios)
+  //{
+  //  std::string io_name = entry.io_name;
+  //  unsigned lsb = entry.lsb;
+  //  unsigned msb = entry.msb;
+  //  unsigned dir = entry.dir;
+	//if (dir == dir_input) {
+  //      map_inputs(json_object, io_name, "Input");
+  //  } else if (dir == dir_output) {
+  //       map_inputs(json_object, io_name, "Output");
+  //  }
+  //}
 
  // printPinMap();
 
   // Remove all analyzed modules
-  veri_file::RemoveAllModules();
+  
 
-  std::filesystem::path path(file_name);
-  std::string directory = std::filesystem::current_path().string();
-  std::string js_port_file = directory + "/" + "post_synth_ports.json";
-  std::ofstream myfile(js_port_file.c_str());
-  if (myfile.is_open())
-  {
-      json output_array = { j_module };
-      myfile << std::setw(4) << output_array << std::endl;
-      myfile.close();
-      std::cout << "Output file created at: " << js_port_file << std::endl;
-  }
-  else
-  {
-      std::cout << "Failed to create the output file." << std::endl;
-  }
+  //std::filesystem::path path(file_name);
+  //std::string directory = std::filesystem::current_path().string();
+  //std::string js_port_file = directory + "/" + "post_synth_ports.json";
+  //std::ofstream myfile(js_port_file.c_str());
+  //if (myfile.is_open())
+  //{
+  //    json output_array = { j_module };
+  //    myfile << std::setw(4) << output_array << std::endl;
+  //    myfile.close();
+  //    std::cout << "Output file created at: " << js_port_file << std::endl;
+  //}
+  //else
+  //{
+  //    std::cout << "Failed to create the output file." << std::endl;
+  //}
 
   return 0; // Status OK
-}
-
-///##################################################################################
-// Function to map Ball ID to Customer Name
-std::map<std::string, std::string> BallID_to_CustomerName(const std::string& arg2) {
-    // Create a map to store the mapping of Ball ID to Customer Name
-    std::map<std::string, std::string> ballIdToCustomer;
-
-    // Open the CSV file
-    std::ifstream file(arg2);
-
-    if (!file.is_open()) {
-        std::cerr << "Error: Could not open the CSV file." << std::endl;
-        return ballIdToCustomer; // Return an empty map on error
-    }
-
-    // Read the CSV file line by line
-    std::string line;
-    while (std::getline(file, line)) {
-        std::istringstream iss(line);
-        std::string token;
-        std::string ballId;
-        std::string customerName;
-
-        // Split the line into tokens using a comma as the delimiter
-        std::getline(iss, token, ','); // Bump/Pin Name
-        std::getline(iss, token, ','); // Customer Name
-        std::getline(iss, token, ','); // Customer Name
-        customerName = token;
-        std::getline(iss, token, ','); // Ball ID
-        ballId = token;
-        // Store the mapping of Ball ID to Customer Name in the map
-        ballIdToCustomer[ballId] = customerName;
-    }
-
-    return ballIdToCustomer;
-}
-
-int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs& gb) {
-    myMap = {
-        {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
-        {"FIFO_RST", "f2g_rx_sfifo_reset_A"},
-        {"RST", "f2g_trx_reset_n_A"},
-        {"DLY_ADJ", "f2g_trx_dly_adj"},
-        {"DLY_INCDEC", "f2g_trx_dly_inc"},
-        {"DLY_LOAD", "f2g_trx_dly_ld"},
-        {"DATA_VALID", "g2f_rx_dvalid_A"},
-        {"DPA_ERROR", "g2f_rx_dpa_error"},
-        {"DPA_LOCK", "g2f_rx_dpa_lock"},
-        {"PLL_FAST_CLK", "fast_clk"},
-        {"CLK_OUT", "f2g_rx_core_clk"},
-        {"LOAD_WORD", "f2g_tx_dvalid_A"},
-        {"OE", "f2g_tx_oe_A"},
-        {"O", "f2g_tx_clk_en_A"}
-    };
-
-    nlohmann::json json_object;
-    try {
-        json_object = nlohmann::json::parse(gb.interface_data_dump);
-    } catch (const nlohmann::json::parse_error& e) {
-        std::cerr << "Failed to parse interface data: " << e.what() << std::endl;
-        return 1;
-    }
-
-    getInstIos(json_object);
-
-    // Open the file for reading
-    std::ifstream file(example_file);
-
-    if (!file.is_open()) {
-        std::cerr << "Error opening the file." << std::endl;
-        return 1;
-    }
-
-   std::string text;
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#') {
-            continue; // Skip empty lines and lines starting with '#'
-        }
-        text += line + "\n";
-    }
-
-    // Define a regular expression pattern
-    std::regex pattern(R"(\bPIN_LOC\s+(\S+)\s+\[get_ports\s+(\S+)\])");
-
-    // Create a regex iterator
-    std::sregex_iterator iter(text.begin(), text.end(), pattern);
-    std::sregex_iterator end;
-
-    // Get the mapping of Ball ID to Customer Name
-    std::map<std::string, std::string> ballIdToCustomer = BallID_to_CustomerName(arg2);
-
-    // Open the output SDC file for appending
-    std::ofstream sdcFile(arg3);
-
-    if (!sdcFile.is_open()) {
-        std::cerr << "Error opening the SDC file." << std::endl;
-        return 1;
-    }
-
-    // Iterate through the matches and append the SDC lines to the file
-    while (iter != end) {
-        std::smatch match = *iter;
-        std::string pin_loc = match[1].str();
-        std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
-        get_ports = match[2].str(); // Assign get_ports here
-        auto it = ballIdToCustomer.find(ball_id);
-        std::string customerName = it->second;
-        std::cout << "PORTS: " << get_ports << std::endl;
-        // Iterate over instConns
-        for (const auto& entry : instConns) {
-          const std::string& instance = entry.first;
-          const std::vector<Connection>& instanceConnections = entry.second;
-          //std::cout << "Instance: " << instance << std::endl;
-          for (const auto& conn : instanceConnections) {
-              std::string mode = conn.module.find("I_") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
-              //std::cout << "Signal: " << conn.signal << std::endl;
-              //std::cout << "Module: " << conn.module << std::endl;
-              if (conn.signal == get_ports) {
-                std::cout << "Instance: " << instance << std::endl;
-                if (conn.module.find("BUF") != std::string::npos) {
-                // Print other fields as needed
-                  for (const auto& port : conn.ports) {
-                      std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
-                      if(port.first == "O") {
-                        if (rx_count.find(ball_id) != rx_count.end()) {
-                            // Key exists, so increment its value
-                            rx_count[ball_id]++;
-                        } else {
-                            // Key doesn't exist, so create it with a value of 1
-                            rx_count[ball_id] = 1;
-                        }
-                        unsigned rx_index = rx_count[ball_id] - 1;
-                        std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
-                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[" << rx_index << "]" << std::endl;
-                      } else if(port.first == "I") {
-                        if (tx_count.find(ball_id) != tx_count.end()) {
-                            // Key exists, so increment its value
-                            tx_count[ball_id]++;
-                        } else {
-                            // Key doesn't exist, so create it with a value of 1
-                            tx_count[ball_id] = 1;
-                        }
-                        unsigned tx_index = tx_count[ball_id] - 1;
-                        std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
-                        sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                        sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[" << tx_index << "]" << std::endl;
-                      }
-                  }
-                } else {
-                    for (const auto& port : conn.ports) {
-                      if(conn.module.find("O_") != std::string::npos) {
-                        if(port.first == "Q") {
-                          if (!instIOs[instance].empty()) {
-                            std::vector<ioInfo> iosInfo = instIOs[instance];
-                            for (const auto& io : iosInfo) {
-                              if (io.ioDir == "IN_DIR"){
-                                std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
-                                std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
-                                unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
-                                unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
-                                if(j!=0) {
-                                  if (tx_count.find(ball_id) != tx_count.end()) {
-                                      // Key exists, so increment its value
-                                      tx_count[ball_id]++;
-                                  } else {
-                                      // Key doesn't exist, so create it with a value of 1
-                                      tx_count[ball_id] = 1;
-                                  }
-                                  for (unsigned k = i; k <= j; k++) {
-                                    unsigned tx_index = tx_count[ball_id] - 1;
-                                    std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
-                                    std::cout << "PIN NAME ::::  " << pin_name << std::endl;
-                                    if(io.ioName == "D") {
-                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << tx_index << "]" << std::endl;
-                                    } else {
-                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << tx_index << "]" << std::endl;
-                                    }
-                                    tx_count[ball_id]++;
-                                  }
-                                } else {
-                                  sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                  sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
-                                }
-                              }
-                            }
-                          }
-                          std::cout << "Inst isss :::: " << instance << std::endl;
-                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
-                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
-                        }
-                     } else //if(conn.module.find("I_") != std::string::npos) 
-                       {
-                        if(port.first == "D") {
-                          if (!instIOs[instance].empty()) {
-                            std::vector<ioInfo> iosInfo = instIOs[instance];
-                            for (const auto& io : iosInfo) {
-                              if (io.ioDir == "OUT_DIR"){
-                                std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
-                                std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
-                                unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
-                                unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
-                                if(j!=0) {
-                                  if (rx_count.find(ball_id) != rx_count.end()) {
-                                      // Key exists, so increment its value
-                                      rx_count[ball_id]++;
-                                  } else {
-                                      // Key doesn't exist, so create it with a value of 1
-                                      rx_count[ball_id] = 1;
-                                  }
-                                  for (unsigned k = i; k <= j; k++) {
-                                    unsigned rx_index = rx_count[ball_id] - 1;
-                                    std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
-                                    std::cout << "PIN NAME ::::  " << pin_name << std::endl;
-                                    if(io.ioName == "Q") {
-                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << rx_index << "]" << std::endl;
-                                    } else {
-                                      sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                      sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " " << myMap[io.ioName] << "[" << rx_index << "]" << std::endl;
-                                    }
-                                    rx_count[ball_id]++;
-                                  }
-                                } else {
-                                  sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                                  sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << myMap[io.ioName] << std::endl;
-                                }
-                              }
-                            }
-                          }
-                          std::cout << "Inst isss :::: " << instance << std::endl;
-                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
-                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
-                        }
-                    }
-                  }
-                }
-              }
-          }
-      }
-
-        iter++; // Move to the next match
-    }
-
-       // Move to the next match
-    
-
-    // Close the SDC file
-    sdcFile.close();
-    file.close(); // Close the file
-
-    return 0;
 }

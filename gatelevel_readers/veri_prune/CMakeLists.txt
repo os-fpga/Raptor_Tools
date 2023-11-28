@@ -50,30 +50,11 @@ endfunction(files_to_dirs)
 
 file(GLOB_RECURSE LIB_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
 
-get_filename_component(VERIFIC_HOME "../../verific_rs"
-    REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}" CACHE)
-message("VERIFIC_HOME: ${VERIFIC_HOME}")
-file(GLOB_RECURSE LIB_HEADERS
-    ${VERIFIC_HOME}/*/*.h)
-
-if (NOT RAPTOR AND NOT YOSYS_VERIFIC AND CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_subdirectory(${VERIFIC_HOME} "verific_rs")
-endif()
-
 if (APPLE)
     set(OS "mac")
 elseif (UNIX)
     set(OS "linux")
 endif()
-
-list(APPEND VERIFIC_LIBS
-    ${VERIFIC_HOME}/verilog/verilog-${OS}.a
-    ${VERIFIC_HOME}/database/database-${OS}.a
-    ${VERIFIC_HOME}/util/util-${OS}.a
-    ${VERIFIC_HOME}/containers/containers-${OS}.a
-    ${VERIFIC_HOME}/hier_tree/hier_tree-${OS}.a
-    ${VERIFIC_HOME}/vhdl/vhdl-${OS}.a
-    )
 
 get_filename_component(BOOST_INCLUDE_DIR "../../libs/external/boost"
   REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
@@ -111,28 +92,21 @@ list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
 # Add executable for internal use
 if(NOT PRODUCTION_BUILD)
     add_executable(veri_prune ${EXEC_SOURCE})
-    target_link_libraries(veri_prune PUBLIC ${VERIFIC_LIBS} ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
+    target_link_libraries(veri_prune PUBLIC ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
 	if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-	    add_dependencies(veri_prune verific generate_map_target)
+	    add_dependencies(veri_prune generate_map_target)
     else()
         add_dependencies(veri_prune generate_map_target)
 	endif()
 endif()
 
 
-
-#suppress Verific warnings
-add_compile_options(-w)
 # Create the library
 add_library(libveriprune STATIC
     ${LIB_SOURCE}
 )
 SET_TARGET_PROPERTIES(libveriprune PROPERTIES PREFIX "")
-target_link_libraries(libveriprune PUBLIC ${VERIFIC_LIBS} ${Boost_LIBRARIES})
+target_link_libraries(libveriprune PUBLIC ${Boost_LIBRARIES})
 set_property(TARGET libveriprune PROPERTY POSITION_INDEPENDENT_CODE ON)
 message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
-if (CMAKE_BUILD_TYPE STREQUAL "Debug")
-    add_dependencies(libveriprune verific generate_map_target)
-else()
     add_dependencies(libveriprune generate_map_target)
-endif()
