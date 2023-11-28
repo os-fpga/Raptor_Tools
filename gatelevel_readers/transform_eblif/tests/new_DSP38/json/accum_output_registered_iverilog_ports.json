@@ -1,0 +1,397 @@
+[
+  {
+	"ports": [
+	  {
+		"direction": "input",
+		"name": "a[19]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[18]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[17]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[16]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "a[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[17]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[16]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "b[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "clk",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "reset",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[37]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[36]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[35]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[34]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[33]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[32]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[31]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[30]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[29]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[28]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[27]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[26]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[25]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[24]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[23]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[22]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[21]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[20]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[19]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[18]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[17]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[16]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "z_out[0]",
+		"type": "WIRE"
+	  }
+	],
+	"topModule": "accum_output_registered_iverilog"
+  }
+]

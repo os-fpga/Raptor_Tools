@@ -1,0 +1,12 @@
+.model RS_DSP_MULT_REGIN
+.inputs a[19] a[18] a[17] a[16] a[15] a[14] a[13] a[12] a[11] a[10] a[9] a[8] a[7] a[6] a[5] a[4] a[3] a[2] a[1] a[0] b[17] b[16] b[15] b[14] b[13] b[12] b[11] b[10] b[9] b[8] b[7] b[6] b[5] b[4] b[3] b[2] b[1] b[0] clk lreset feedback[2] feedback[1] feedback[0] unsigned_a unsigned_b
+.outputs z[37] z[36] z[35] z[34] z[33] z[32] z[31] z[30] z[29] z[28] z[27] z[26] z[25] z[24] z[23] z[22] z[21] z[20] z[19] z[18] z[17] z[16] z[15] z[14] z[13] z[12] z[11] z[10] z[9] z[8] z[7] z[6] z[5] z[4] z[3] z[2] z[1] z[0]
+.names $false
+.names $true
+1
+.names $undef
+.subckt DSP38 A[0]=a[0] A[1]=a[1] A[2]=a[2] A[3]=a[3] A[4]=a[4] A[5]=a[5] A[6]=a[6] A[7]=a[7] A[8]=a[8] A[9]=a[9] A[10]=a[10] A[11]=a[11] A[12]=a[12] A[13]=a[13] A[14]=a[14] A[15]=a[15] A[16]=a[16] A[17]=a[17] A[18]=a[18] A[19]=a[19] B[0]=b[0] B[1]=b[1] B[2]=b[2] B[3]=b[3] B[4]=b[4] B[5]=b[5] B[6]=b[6] B[7]=b[7] B[8]=b[8] B[9]=b[9] B[10]=b[10] B[11]=b[11] B[12]=b[12] B[13]=b[13] B[14]=b[14] B[15]=b[15] B[16]=b[16] B[17]=b[17] Z[0]=z[0] Z[1]=z[1] Z[2]=z[2] Z[3]=z[3] Z[4]=z[4] Z[5]=z[5] Z[6]=z[6] Z[7]=z[7] Z[8]=z[8] Z[9]=z[9] Z[10]=z[10] Z[11]=z[11] Z[12]=z[12] Z[13]=z[13] Z[14]=z[14] Z[15]=z[15] Z[16]=z[16] Z[17]=z[17] Z[18]=z[18] Z[19]=z[19] Z[20]=z[20] Z[21]=z[21] Z[22]=z[22] Z[23]=z[23] Z[24]=z[24] Z[25]=z[25] Z[26]=z[26] Z[27]=z[27] Z[28]=z[28] Z[29]=z[29] Z[30]=z[30] Z[31]=z[31] Z[32]=z[32] Z[33]=z[33] Z[34]=z[34] Z[35]=z[35] Z[36]=z[36] Z[37]=z[37] FEEDBACK[0]=feedback[0] FEEDBACK[1]=feedback[1] FEEDBACK[2]=feedback[2] UNSIGNED_A=unsigned_a UNSIGNED_B=unsigned_b CLK=clk RESET=lreset
+.param INPUT_REG_EN "TRUE"
+.param OUTPUT_REG_EN "FALSE"
+.param DSP_MODE "MULTIPY"
+.end
