@@ -7,9 +7,10 @@ using json = nlohmann::json;
 #define VERI_OUTPUT 346
 #define VERI_WIRE 392
 
-std::vector<orig_io> orig_ios;
-std::map<std::string, std::vector<Connection>> instConns;
-std::map<std::string, std::string> pinsMap; // Define pinsMap at a global scope
+std::vector<orig_io> orig_ios;                      // Information of original module's IOs
+std::map<std::string, std::vector<Connection>> instConns;   // map of instance name and 
+                                        // its connection with original IOs and fabric side signals
+std::map<std::string, std::string> pinsMap;         // Define pinsMap at a global scope
 std::string get_ports;
 std::vector<std::string> used_pins;
 std::unordered_map<std::string, int> directions = {
@@ -125,11 +126,15 @@ int map_inputs (std::string& intfJson, std::string& signalName, const std::strin
     nlohmann::json data;
     jsonFile >> data;
     /////////////////// check input connection
+    // Loop through all the instances of interface module
     for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
     {
+        // ports contains ports information for the instance in iteration
         const json& ports = instanceInfo["ports"];
         std::string modName = instanceInfo["module"];
+        // Iterate through all the ports of the instance
         for (const auto& [portName, portInfo] : ports.items()) {
+            // Actual signal in the port connection
             std::string actualSignal = portInfo["Actual"];
             if (portInfo.contains("FUNC")) {
                 std::string sigDir = portInfo["FUNC"];
@@ -137,6 +142,7 @@ int map_inputs (std::string& intfJson, std::string& signalName, const std::strin
 					bool input_buf = false;
 					if(modName == "I_BUF" || modName == "CLK_BUF") input_buf = true;
                     if (input_buf && portName == "I") {
+                        // For input buffers the signal connected with O is on the inner side
                         std::string outPort = ports["O"]["Actual"];
                         signalName = outPort;
                         if (conn.signal.empty()) {
@@ -144,13 +150,14 @@ int map_inputs (std::string& intfJson, std::string& signalName, const std::strin
                         }
                         conn.ports["O"] = ports["O"]["Actual"];
                         conn.module = modName;
-                        firstInst = instanceName;
+                        firstInst = instanceName;   // IBUFS are the first instances connected with Inputs
                         instConns[instanceName].push_back(conn);
                     }
                 } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
 					bool output_buf = false;
 					if(modName == "O_BUF" || modName == "O_BUFT") output_buf = true;
                     if (output_buf && portName == "O") {
+                        // For output buffers the signal connected with I is on the inner side
                        std::string inPort = ports["I"]["Actual"];
                         signalName = inPort;
                         if (conn.signal.empty()) {
@@ -158,7 +165,7 @@ int map_inputs (std::string& intfJson, std::string& signalName, const std::strin
                         }
                         conn.ports["I"] = ports["I"]["Actual"];
                         conn.module = modName;
-                        firstInst = instanceName;
+                        firstInst = instanceName;   // OBUFS are the first instances connected with Outputs
                         instConns[instanceName].push_back(conn);
                     }
                 }
@@ -166,6 +173,7 @@ int map_inputs (std::string& intfJson, std::string& signalName, const std::strin
         }
     }
 
+    // Next iteration to check if any SERDES or DDR is connected
     for (const auto& [instanceName, instanceInfo] : data["IO_Instances"].items())
     {
         const json& ports = instanceInfo["ports"];
@@ -177,20 +185,21 @@ int map_inputs (std::string& intfJson, std::string& signalName, const std::strin
                 bool inputSignal;
                 if(sigDir == "IN_DIR" || sigDir == "IN_CLK" || sigDir == "IN_RESET") inputSignal = true;
                 if (dir == "Input" && inputSignal && actualSignal == signalName) {
-                    bool complexPrim = true;
+                    bool complexPrim = true;    // It is a complex (not a buf) primitive
 					if (modName.find("BUF") != std::string::npos) complexPrim = false;
                     if (complexPrim) {
                         std::string tempSig;
                         if (conn.signal.empty()) {
                             conn.signal = actualSignal;
                         } else {
-                            tempSig = conn.signal;
+                            tempSig = conn.signal;  // intermediate bw buf and complex prim
                             if (conn.module == "I_BUF") {
-                                instConns[firstInst].pop_back();
+                                instConns[firstInst].pop_back();    // remove the info saved for buffer
                                 conn = Connection();
                                 conn.signal = tempSig;
                             }
                         }
+                        // Update connection using complex prim info and push to instConns
                         conn.ports[portName] = actualSignal;
                         conn.module = modName;
                         instConns[instanceName].push_back(conn);
@@ -289,6 +298,7 @@ std::map<std::string, std::string> BallID_to_CustomerName(const std::string& pin
 }
 //write_sdc(user_sdc, pin_table, output_sdc
 int write_sdc(const std::string& user_sdc, const std::string& pin_table, const std::string& output_sdc) {
+    // Map of pin names in primitive modules and pin table
     pinsMap = {
         {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
         {"FIFO_RST", "f2g_rx_sfifo_reset_A"},
@@ -323,7 +333,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
         text += line + "\n";
     }
 
-    // Define a regular expression pattern
+    // Define a regular expression pattern to parse pin location commands
     std::regex pattern("set_property PIN_LOC (\\w+) \\[get_ports (\\w+)(\\[(\\d+)\\])?\\]");
 
     // Create a regex iterator
@@ -379,9 +389,6 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                             }
                         }
                     }
-             // std::string mode = conn.module.find("I_") ? "Mode_RATE_10_ARX" : "Mode_RATE_10_ATX";
-              //std::cout << "Signal: " << conn.signal << std::endl;
-              //std::cout << "Module: " << conn.module << std::endl;
               if (conn.signal == get_ports) {
                 std::cout << "Instance: " << instance << std::endl;
                 if (std::find(used_pins.begin(), used_pins.end(), ball_id) != used_pins.end()) {
@@ -391,6 +398,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                     used_pins.push_back(ball_id);
                 }
                 if (conn.module.find("BUF") != std::string::npos) {
+                    // If the pin is connected to BUF only
                      std::string mode = conn.module.find("I_") != std::string::npos ? "MODE_BP_DIR_A_TX" : "MODE_BP_DIR_A_RX";
                 // Print other fields as needed
                   for (const auto& port : conn.ports) {
@@ -409,10 +417,11 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                           throw std::runtime_error("Pin is already in use.");
                       }
                   }
-                } else {
+                } else { // if SERDES or DDR is being used
                     for (const auto& port : conn.ports) {
                       if(conn.module.find("O_SERDES") != std::string::npos) {
                         if(port.first == "Q") {
+                            // If port is Q, set constraints for input side which is connected to fabric
                           if (!instIOs[instance].empty()) {
                             std::vector<ioInfo> iosInfo = instIOs[instance];
                             for (const auto& io : iosInfo) {
@@ -451,6 +460,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                      } else if(conn.module.find("I_SERDES") != std::string::npos)
                        {
                         if(port.first == "D") {
+                            // If port is D, set constraints for output side which is connected to fabric
                           if (!instIOs[instance].empty()) {
                             std::vector<ioInfo> iosInfo = instIOs[instance];
                             for (const auto& io : iosInfo) {
@@ -509,9 +519,11 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
 int update_sdc (std::string& intf_json, std::string& mod_ios, 
             std::string& user_sdc, std::string& pin_table, std::string& output_sdc)
 {
-	get_io_info(mod_ios);
-	//print_ios();
+	// Get original module's IOs
+    get_io_info(mod_ios);
+	// Get interface module's IOs
 	getInstIos(intf_json);
+    // For each original module IO
     for (const orig_io& entry : orig_ios)
 	{
     	std::string io_name = entry.io_name;
@@ -519,12 +531,16 @@ int update_sdc (std::string& intf_json, std::string& mod_ios,
     	unsigned msb = entry.msb;
     	unsigned dir = entry.dir;
 		if (dir == VERI_INPUT) {
+            // From original input, it gives the output of bufs (connected to fabric) if no SERDES or DDR are present
+            // Otherwise it gives the corrsponding input of the SERDES or DDR (not connected to fabric)
     	    map_inputs(intf_json, io_name, "Input");
     	} else if (dir == VERI_OUTPUT) {
+            // From original output, it gives the input of bufs (connected to fabric) if no SERDES or DDR are present
+            // Otherwise it gives the corrsponding output of the SERDES or DDR (not connected to fabric)
     	     map_inputs(intf_json, io_name, "Output");
     	}
 	}
-	//printPinMap();
+	printPinMap();
 	write_sdc(user_sdc, pin_table, output_sdc);
     return 0;
 }
