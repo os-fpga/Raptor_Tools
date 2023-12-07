@@ -419,7 +419,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                   }
                 } else { // if SERDES or DDR is being used
                     for (const auto& port : conn.ports) {
-                      if(conn.module.find("O_SERDES") != std::string::npos) {
+                      if(conn.module.find("O_") != std::string::npos) {
                         if(port.first == "Q") {
                             // If port is Q, set constraints for input side which is connected to fabric
                           if (!instIOs[instance].empty()) {
