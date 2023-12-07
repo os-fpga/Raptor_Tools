@@ -109,7 +109,7 @@ int get_io_info(std::string& mod_ios)
     return 0;
 }
 
-int map_inputs (std::string& intfJson, std::string& signalName, const std::string& dir)
+int map_signal (std::string& intfJson, std::string& signalName, const std::string& dir)
 {
     Connection conn;
     
@@ -533,11 +533,11 @@ int update_sdc (std::string& intf_json, std::string& mod_ios,
 		if (dir == VERI_INPUT) {
             // From original input, it gives the output of bufs (connected to fabric) if no SERDES or DDR are present
             // Otherwise it gives the corrsponding input of the SERDES or DDR (not connected to fabric)
-    	    map_inputs(intf_json, io_name, "Input");
+    	    map_signal(intf_json, io_name, "Input");
     	} else if (dir == VERI_OUTPUT) {
             // From original output, it gives the input of bufs (connected to fabric) if no SERDES or DDR are present
             // Otherwise it gives the corrsponding output of the SERDES or DDR (not connected to fabric)
-    	     map_inputs(intf_json, io_name, "Output");
+    	     map_signal(intf_json, io_name, "Output");
     	}
 	}
 	printPinMap();
