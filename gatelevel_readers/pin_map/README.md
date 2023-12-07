@@ -26,8 +26,8 @@ To use this project, follow the steps below:
 
 Make sure you have all the necessary files ready:
 
-- A modified I/Os file
-- An interface file
+- A file containing IO infrmation (post_synth_ports.json)
+- A file containing interface module ports
 - A user SDC file
 - A pin table file
 
