@@ -193,7 +193,7 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                             conn.signal = actualSignal;
                         } else {
                             tempSig = conn.signal;  // intermediate bw buf and complex prim
-                            if (conn.module == "I_BUF") {
+                            if (conn.module == "I_BUF" || conn.module == "CLK_BUF") {
                                 instConns[firstInst].pop_back();    // remove the info saved for buffer
                                 conn = Connection();
                                 conn.signal = tempSig;
