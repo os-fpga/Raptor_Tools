@@ -36,6 +36,7 @@ function(files_to_dirs file_list directory_list)
 endfunction(files_to_dirs)
 
 file(GLOB_RECURSE LIB_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/*.cpp)
+file(GLOB_RECURSE DUMP_TCL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_tcl/*.cpp)
 
 if (APPLE)
     set(OS "mac")
@@ -52,6 +53,7 @@ endif()
 #)
 
 include_directories(PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/
+                        ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_tcl/
                         ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/ )
 
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/*.cpp)
@@ -67,3 +69,4 @@ SET_TARGET_PROPERTIES(libpinmap PROPERTIES PREFIX "")
 message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 add_executable(pin_map ${EXEC_SOURCE})
+add_executable(dump_tcl ${DUMP_TCL_SOURCE})
