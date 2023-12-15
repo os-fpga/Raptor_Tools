@@ -52,8 +52,10 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl)
                 tclFile << "puts $outfile \",\\n            \\\"index\\\" : " << extractedNumber << "\"" << std::endl;
             }
         }
-        tclFile << "puts $outfile \"\\n        }\"" << std::endl;
+        tclFile << "puts $outfile \"\\n        },\"" << std::endl;
         iter++; // Move to the next match
     }
+    tclFile << "puts $outfile \"\\n    }\"" << std::endl;
+    tclFile << "puts $outfile \"\\n}\"" << std::endl;
     return 0;
 }
