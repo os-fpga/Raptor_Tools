@@ -35,27 +35,29 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl)
     }
 
     tclFile << "set outfile [open \"pin_map.json\" w+] " << std::endl;
-    tclFile << "puts $outfile \"{\"\nputs $outfile \"\\n    \\\"locations\\\" : {\" " << std::endl;
+    tclFile << "puts $outfile \"{\"\nputs $outfile \"    \\\"locations\\\" : {\" " << std::endl;
 
     // Iterate through the matches and append the SDC lines to the file
     while (iter != end) {
         std::smatch match = *iter;
         std::cout << "First part: " << match[1] << std::endl;
         std::cout << "Second part: " << match[2] << std::endl;
-        tclFile << "puts $outfile \"\\n        \\\"" << match[1] <<"\\\" : {\"" << std::endl;
-        tclFile << "puts $outfile \"\\n            \\\"name\\\" : \\\"" << match[2] << "\\\"\"" << std::endl;
+        tclFile << "puts $outfile \"        \\\"" << match[1] <<"\\\" : {\"" << std::endl;
+        tclFile << "puts $outfile \"            \\\"name\\\" : \\\"" << match[2] << "\\\"";
         if (match.size() > 3) {
             if (!match[3].str().empty()) {
                 std::string extractedNumber = match[3].str(); // Extract the matched string
                 extractedNumber = extractedNumber.substr(1, extractedNumber.length() - 2); // Remove the brackets []
                 std::cout << "Extracted number: " << extractedNumber << std::endl;
-                tclFile << "puts $outfile \",\\n            \\\"index\\\" : " << extractedNumber << "\"" << std::endl;
+                tclFile << ",\"" << std::endl;
+                tclFile << "puts $outfile \"            \\\"index\\\" : " << extractedNumber;
             }
         }
-        tclFile << "puts $outfile \"\\n        },\"" << std::endl;
+        tclFile << "\"" << std::endl;
+        tclFile << "puts $outfile \"        },\"" << std::endl;
         iter++; // Move to the next match
     }
-    tclFile << "puts $outfile \"\\n    }\"" << std::endl;
-    tclFile << "puts $outfile \"\\n}\"" << std::endl;
+    tclFile << "puts $outfile \"    }\"" << std::endl;
+    tclFile << "puts $outfile \"}\"" << std::endl;
     return 0;
 }
