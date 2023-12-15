@@ -54,7 +54,11 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl)
             }
         }
         tclFile << "\"" << std::endl;
-        tclFile << "puts $outfile \"        },\"" << std::endl;
+        if (std::next(iter) != end) {
+            tclFile << "puts $outfile \"        },\"" << std::endl;
+        } else {
+            tclFile << "puts $outfile \"        }\"" << std::endl;
+        }
         iter++; // Move to the next match
     }
     tclFile << "puts $outfile \"    }\"" << std::endl;
