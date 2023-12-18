@@ -11,7 +11,7 @@ std::string get_ports(const std::string& port)
     }
 }
 
-int dump_tcl(std::string& user_sdc, std::string& output_tcl)
+int dump_tcl(std::string& user_sdc, std::string& output_tcl, std::string& output_json)
 {
     // Open the file for reading
     std::ifstream file(user_sdc);
@@ -46,7 +46,7 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl)
     }
 
     tclFile << "load ./libdump.so" << std::endl;
-    tclFile << "set outfile [open \"pin_map.json\" w+] " << std::endl;
+    tclFile << "set outfile [open \"" << output_json << "\" w+] " << std::endl;
     tclFile << "puts $outfile \"{\"\nputs $outfile \"    \\\"locations\\\" : {\" " << std::endl;
 
     // Iterate through the matches and append the SDC lines to the file

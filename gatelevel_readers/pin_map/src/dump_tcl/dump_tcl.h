@@ -5,4 +5,4 @@
 #include <map>
 
 std::string get_ports(const std::string& port);
-int dump_tcl(std::string& user_sdc, std::string& output_tcl);
+int dump_tcl(std::string& user_sdc, std::string& output_tcl, std::string& output_json);
