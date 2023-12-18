@@ -11,7 +11,6 @@ std::vector<orig_io> orig_ios;                      // Information of original m
 std::map<std::string, std::vector<Connection>> instConns;   // map of instance name and 
                                         // its connection with original IOs and fabric side signals
 std::map<std::string, std::string> pinsMap;         // Define pinsMap at a global scope
-std::string get_ports;
 std::vector<std::string> used_pins;
 std::unordered_map<std::string, int> directions = {
   {"Input", VERI_INPUT},
@@ -296,8 +295,8 @@ std::map<std::string, std::string> BallID_to_CustomerName(const std::string& pin
 
     return ballIdToCustomer;
 }
-//write_sdc(user_sdc, pin_table, output_sdc
-int write_sdc(const std::string& user_sdc, const std::string& pin_table, const std::string& output_sdc) {
+
+int write_sdc(const std::string& map_json, const std::string& pin_table, const std::string& output_sdc) {
     // Map of pin names in primitive modules and pin table
     pinsMap = {
         {"BITSLIP_ADJ", "f2g_rx_bitslip_adj"},
@@ -317,28 +316,12 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
     };
 
     // Open the file for reading
-    std::ifstream file(user_sdc);
+    std::ifstream file(map_json);
 
     if (!file.is_open()) {
         std::cerr << "Error opening the file." << std::endl;
         return 1;
     }
-
-   std::string text;
-    std::string line;
-    while (std::getline(file, line)) {
-        if (line.empty() || line[0] == '#') {
-            continue; // Skip empty lines and lines starting with '#'
-        }
-        text += line + "\n";
-    }
-
-    // Define a regular expression pattern to parse pin location commands
-    std::regex pattern("set_property PIN_LOC (\\w+) \\[get_ports (\\w+)(\\[(\\d+)\\])?\\]");
-
-    // Create a regex iterator
-    std::sregex_iterator iter(text.begin(), text.end(), pattern);
-    std::sregex_iterator end;
 
     // Get the mapping of Ball ID to Customer Name
     std::map<std::string, std::string> ballIdToCustomer = BallID_to_CustomerName(pin_table);
@@ -352,24 +335,34 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
     }
     unsigned max_msb = 0;
     unsigned rx_msb = 0;
+
+    // Parse the JSON data from the file.
+    nlohmann::json data;
+    file >> data;
+    /////////////////// check input connection
+    // Loop through all the instances of interface module
+    //for (const auto& [location, pinInfo] : data["locations"].items())
+    //{
+    //    std::string portName = pinInfo["name"];
+    //    std::cout << "name : " << portName << "    location : " << location;
+    //    if (pinInfo.contains("index")) 
+    //    {
+    //        unsigned index = pinInfo["index"];
+    //        std::cout << "    INDEX : " << index;
+    //    }
+    //    std::cout << " " << std::endl;
+    //}
     // Iterate through the matches and append the SDC lines to the file
-    while (iter != end) {
-        std::smatch match = *iter;
-        std::cout << "First part: " << match[1] << std::endl;
-        std::cout << "Second part: " << match[2] << std::endl;
-        if (match.size() > 3) {
-            if (!match[3].str().empty()) {
-                std::string extractedNumber = match[3].str(); // Extract the matched string
-                extractedNumber = extractedNumber.substr(1, extractedNumber.length() - 2); // Remove the brackets []
-                std::cout << "Extracted number: " << extractedNumber << std::endl;
-            }
-        }
-        std::string pin_loc = match[1].str();
+    for (const auto& [pin_loc, pinInfo] : data["locations"].items()) {
         std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
-        get_ports = match[2].str(); // Assign get_ports here
+        std::string portName = pinInfo["name"];
         auto it = ballIdToCustomer.find(ball_id);
         std::string customerName = it->second;
-        std::cout << "PORTS: " << get_ports << std::endl;
+        std::cout << "PORTS: " << portName << std::endl;
+        if (pinInfo.contains("index")) 
+        {
+            unsigned index = pinInfo["index"];
+        }
         bool available = true;
         // Iterate over instConns
         for (const auto& entry : instConns) {
@@ -389,7 +382,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
                             }
                         }
                     }
-              if (conn.signal == get_ports) {
+              if (conn.signal == portName) {
                 std::cout << "Instance: " << instance << std::endl;
                 if (std::find(used_pins.begin(), used_pins.end(), ball_id) != used_pins.end()) {
                     
@@ -502,8 +495,6 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
               }
           }
       }
-
-        iter++; // Move to the next match
     }
 
        // Move to the next match
@@ -517,7 +508,7 @@ int write_sdc(const std::string& user_sdc, const std::string& pin_table, const s
 }
 
 int update_sdc (std::string& intf_json, std::string& mod_ios, 
-            std::string& user_sdc, std::string& pin_table, std::string& output_sdc)
+            std::string& map_json, std::string& pin_table, std::string& output_sdc)
 {
 	// Get original module's IOs
     get_io_info(mod_ios);
@@ -541,8 +532,6 @@ int update_sdc (std::string& intf_json, std::string& mod_ios,
     	}
 	}
 	printPinMap();
-	write_sdc(user_sdc, pin_table, output_sdc);
+	write_sdc(map_json, pin_table, output_sdc);
     return 0;
 }
-
-//write_sdc(user_sdc, pin_table, output_sdc
