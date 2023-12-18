@@ -15,6 +15,12 @@ endif(NOT CMAKE_BUILD_TYPE)
 # set the project name
 project(pin_map)
 
+# finding swig for tcl interface generation
+find_package(SWIG REQUIRED)
+include(FindTCL)
+message(STATUS "tcl.h path is : ${TCL_INCLUDE_PATH}")
+message(STATUS "libtcl.so path is : ${TCL_LIBRARY}")
+
 set(CMAKE_CXX_STANDARD 17)
 
 function(files_to_dirs file_list directory_list)
@@ -36,7 +42,7 @@ function(files_to_dirs file_list directory_list)
 endfunction(files_to_dirs)
 
 file(GLOB_RECURSE LIB_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/*.cpp)
-file(GLOB_RECURSE DUMP_TCL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_tcl/*.cpp)
+file(GLOB_RECURSE DUMP_TCL_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_tcl/dump_tcl.cpp)
 
 if (APPLE)
     set(OS "mac")
@@ -54,10 +60,50 @@ endif()
 
 include_directories(PUBLIC ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/
                         ${CMAKE_CURRENT_SOURCE_DIR}/src/dump_tcl/
-                        ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/ )
+                        ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/
+                        ${TCL_INCLUDE_PATH})
 
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/pin_map/*.cpp)
 list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+
+#
+# Tcl Interface Generation
+#
+set(tcl-GENERATED_SRC
+    ${PROJECT_SOURCE_DIR}/src/dump_tcl/dump_tcl_wrap.cpp
+)
+
+# Create the static library
+add_library(libdump SHARED
+    ${DUMP_TCL_SOURCE}
+    ${tcl-GENERATED_SRC}
+)
+
+set_target_properties(libdump PROPERTIES PREFIX "") # Avoid extra 'lib' prefix
+
+foreach(gen_src ${tcl-GENERATED_SRC})
+    set_source_files_properties(${gen_src} PROPERTIES GENERATED TRUE)
+endforeach()
+
+add_custom_command(
+    OUTPUT ${tcl-GENERATED_SRC}
+    DEPENDS ${PROJECT_SOURCE_DIR}/src/dump_tcl/dump_tcl.cpp
+    ${PROJECT_SOURCE_DIR}/src/dump_tcl/dump_tcl.h
+    ${PROJECT_SOURCE_DIR}/src/dump_tcl/dump_tcl.i
+    WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}"
+    COMMAND echo "---------- Tcl DESIGN API generation ----------"
+    COMMAND ${SWIG_EXECUTABLE} -c++ -tcl -cppext cpp -o ${tcl-GENERATED_SRC} ${PROJECT_SOURCE_DIR}/src/dump_tcl/dump_tcl.i
+)
+
+target_link_libraries(libdump PUBLIC ${TCL_LIBRARY})
+file(GLOB_RECURSE DUMP_EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src//dump_tcl/*.cpp)
+
+message(TRACE ${DUMP_EXEC_SOURCE})
+# create executable
+add_executable(dump
+    ${DUMP_EXEC_SOURCE}
+)
+target_link_libraries(dump PUBLIC libdump)
 
 #suppress Verific warnings
 add_compile_options(-w)
@@ -69,4 +115,4 @@ SET_TARGET_PROPERTIES(libpinmap PROPERTIES PREFIX "")
 message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
 
 add_executable(pin_map ${EXEC_SOURCE})
-add_executable(dump_tcl ${DUMP_TCL_SOURCE})
+#add_executable(dump_tcl ${DUMP_TCL_SOURCE})

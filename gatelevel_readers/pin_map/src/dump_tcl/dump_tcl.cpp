@@ -1,5 +1,16 @@
 #include "dump_tcl.h"
 #include <regex>
+
+
+std::string get_ports(const std::string& port)
+{
+    if (port.empty()) {
+        return "";  // Return an empty string if port is not provided
+    } else {
+        return port;
+    }
+}
+
 int dump_tcl(std::string& user_sdc, std::string& output_tcl)
 {
     // Open the file for reading
@@ -34,6 +45,7 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl)
         return 1;
     }
 
+    tclFile << "load ./libdump.so" << std::endl;
     tclFile << "set outfile [open \"pin_map.json\" w+] " << std::endl;
     tclFile << "puts $outfile \"{\"\nputs $outfile \"    \\\"locations\\\" : {\" " << std::endl;
 
@@ -43,7 +55,7 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl)
         std::cout << "First part: " << match[1] << std::endl;
         std::cout << "Second part: " << match[2] << std::endl;
         tclFile << "puts $outfile \"        \\\"" << match[1] <<"\\\" : {\"" << std::endl;
-        tclFile << "puts $outfile \"            \\\"name\\\" : \\\"" << match[2] << "\\\"";
+        tclFile << "puts $outfile \"            \\\"name\\\" : \\\"[get_ports " << match[2] << "]\\\"";
         if (match.size() > 3) {
             if (!match[3].str().empty()) {
                 std::string extractedNumber = match[3].str(); // Extract the matched string
