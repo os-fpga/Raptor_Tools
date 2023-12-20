@@ -340,25 +340,12 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
     nlohmann::json data;
     file >> data;
     /////////////////// check input connection
-    // Loop through all the instances of interface module
-    //for (const auto& [location, pinInfo] : data["locations"].items())
-    //{
-    //    std::string portName = pinInfo["name"];
-    //    std::cout << "name : " << portName << "    location : " << location;
-    //    if (pinInfo.contains("index")) 
-    //    {
-    //        unsigned index = pinInfo["index"];
-    //        std::cout << "    INDEX : " << index;
-    //    }
-    //    std::cout << " " << std::endl;
-    //}
     // Iterate through the matches and append the SDC lines to the file
     for (const auto& [pin_loc, pinInfo] : data["locations"].items()) {
         std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
         std::string portName = pinInfo["name"];
         auto it = ballIdToCustomer.find(ball_id);
         std::string customerName = it->second;
-        std::cout << "PORTS: " << portName << std::endl;
         if (pinInfo.contains("index")) 
         {
             unsigned index = pinInfo["index"];
@@ -368,7 +355,6 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
         for (const auto& entry : instConns) {
           const std::string& instance = entry.first;
           const std::vector<Connection>& instanceConnections = entry.second;
-          //std::cout << "Instance: " << instance << std::endl;
           for (const auto& conn : instanceConnections) {
                  std::vector<ioInfo> iosInfo = instIOs[instance];
                     for (const auto& io : iosInfo) {
@@ -383,9 +369,7 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                         }
                     }
               if (conn.signal == portName) {
-                std::cout << "Instance: " << instance << std::endl;
                 if (std::find(used_pins.begin(), used_pins.end(), ball_id) != used_pins.end()) {
-                    
                     available = false;
                 } else {
                     used_pins.push_back(ball_id);
@@ -395,14 +379,11 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                      std::string mode = conn.module.find("I_") != std::string::npos ? "MODE_BP_DIR_A_TX" : "MODE_BP_DIR_A_RX";
                 // Print other fields as needed
                   for (const auto& port : conn.ports) {
-                      std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
                       if ( available) {
                         if(port.first == "O") {
-                          std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                           sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
                           sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[0]" << std::endl;
                         } else if(port.first == "I") {
-                          std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                           sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
                           sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[0]" << std::endl;
                         }
@@ -420,14 +401,11 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                             for (const auto& io : iosInfo) {
                               if (io.ioDir == "IN_DIR"){
                                 if(available) {
-                                  std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
-                                  std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
                                   unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
                                   unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
                                   if(j!=0) {
                                     for (unsigned k = i; k <= j; k++) {
                                       std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
-                                      std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                       if(io.ioName == "D") {
                                         sdcFile << "set_property mode " << "MODE_RATE_" << max_msb << "_A_TX "<< " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << k << "]" << std::endl;
@@ -446,9 +424,6 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                               }
                             }
                           }
-                          std::cout << "Inst isss :::: " << instance << std::endl;
-                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
-                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
                         }
                      } else if(conn.module.find("I_SERDES") != std::string::npos)
                        {
@@ -459,14 +434,11 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                             for (const auto& io : iosInfo) {
                                 if (io.ioDir == "OUT_DIR"){
                                   if(available) {
-                                  std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
-                                  std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
                                   unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
                                   unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
                                   if(j!=0) {
                                     for (unsigned k = i; k <= j; k++) {
                                       std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
-                                      std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                       if(io.ioName == "Q") {
                                         sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX "<< " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << k << "]" << std::endl;
@@ -485,9 +457,6 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                               }
                             }
                           }
-                          std::cout << "Inst isss :::: " << instance << std::endl;
-                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
-                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
                         }
                     }
                   }
@@ -531,7 +500,7 @@ int update_sdc (std::string& intf_json, std::string& mod_ios,
     	     map_signal(intf_json, io_name, "Output");
     	}
 	}
-	printPinMap();
+	//printPinMap();
 	write_sdc(map_json, pin_table, output_sdc);
     return 0;
 }

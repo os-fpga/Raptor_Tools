@@ -52,15 +52,12 @@ int dump_tcl(std::string& user_sdc, std::string& output_tcl, std::string& output
     // Iterate through the matches and append the SDC lines to the file
     while (iter != end) {
         std::smatch match = *iter;
-        std::cout << "First part: " << match[1] << std::endl;
-        std::cout << "Second part: " << match[2] << std::endl;
         tclFile << "puts $outfile \"        \\\"" << match[1] <<"\\\" : {\"" << std::endl;
         tclFile << "puts $outfile \"            \\\"name\\\" : \\\"[get_ports " << match[2] << "]\\\"";
         if (match.size() > 3) {
             if (!match[3].str().empty()) {
                 std::string extractedNumber = match[3].str(); // Extract the matched string
                 extractedNumber = extractedNumber.substr(1, extractedNumber.length() - 2); // Remove the brackets []
-                std::cout << "Extracted number: " << extractedNumber << std::endl;
                 tclFile << ",\"" << std::endl;
                 tclFile << "puts $outfile \"            \\\"index\\\" : " << extractedNumber;
             }
