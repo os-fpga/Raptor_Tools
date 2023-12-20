@@ -3,7 +3,7 @@ int main(int argc, char* argv[]) {
   // Get the file name to work on
     std::string intf_json  = "interface.json";
     std::string mod_ios    = "mod_ios.json";
-    std::string user_sdc   = "pc.pin";
+    std::string map_json   = "pin_map.json";
     std::string pin_table  = "pin_table.csv";
     std::string output_sdc = "output.sdc";
 
@@ -20,9 +20,9 @@ int main(int argc, char* argv[]) {
                 mod_ios = argv[i + 1];
                 i++;
             }
-        } else if (arg == "-u" || arg == "--user_sdc") {
+        } else if (arg == "-j" || arg == "--map_json") {
             if (i + 1 < argc) {
-                user_sdc = argv[i + 1];
+                map_json = argv[i + 1];
                 i++;
             }
         } else if (arg == "-t" || arg == "--ptable") {
@@ -37,5 +37,5 @@ int main(int argc, char* argv[]) {
             }
         }
     }
-	update_sdc (intf_json, mod_ios, user_sdc, pin_table, output_sdc);
+	update_sdc (intf_json, mod_ios, map_json, pin_table, output_sdc);
 }
