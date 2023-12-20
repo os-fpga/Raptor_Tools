@@ -346,9 +346,12 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
         std::string portName = pinInfo["name"];
         auto it = ballIdToCustomer.find(ball_id);
         std::string customerName = it->second;
+        bool isIndexed = false;
+        unsigned index;
         if (pinInfo.contains("index")) 
         {
-            unsigned index = pinInfo["index"];
+            isIndexed = true;
+            index = pinInfo["index"];
         }
         bool available = true;
         // Iterate over instConns
@@ -382,10 +385,14 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                       if ( available) {
                         if(port.first == "O") {
                           sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                          sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[0]" << std::endl;
+                          sdcFile << "set_pin_loc "<< port.second;
+                          if(isIndexed) sdcFile << "[" << index << "]";
+                          sdcFile << " " << customerName << " g2f_rx_in[0]" << std::endl;
                         } else if(port.first == "I") {
                           sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                          sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[0]" << std::endl;
+                          sdcFile << "set_pin_loc " << port.second;
+                          if(isIndexed) sdcFile << "[" << index << "]"; 
+                          sdcFile << " " << customerName << " f2g_tx_out[0]" << std::endl;
                         }
                       } else {
                           throw std::runtime_error("Pin is already in use.");
@@ -416,7 +423,9 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                                     }
                                   } else {
                                     sdcFile << "set_property mode " << "MODE_RATE_" << max_msb << "_A_TX "  << " " << customerName << std::endl;
-                                    sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
+                                    sdcFile << "set_pin_loc " << io.actualName;
+                                    if(isIndexed) sdcFile << "[" << index << "]"; 
+                                    sdcFile << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
                                   }
                                 } else {
                                    throw std::runtime_error("Pin is already in use.");
@@ -449,7 +458,9 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                                     }
                                   } else {
                                     sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX " << " " << customerName << std::endl;
-                                    sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
+                                    sdcFile << "set_pin_loc " << io.actualName;
+                                    if(isIndexed) sdcFile << "[" << index << "]"; 
+                                    sdcFile << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
                                   }
                                 } else {
                                    throw std::runtime_error("Pin is already in use.");
