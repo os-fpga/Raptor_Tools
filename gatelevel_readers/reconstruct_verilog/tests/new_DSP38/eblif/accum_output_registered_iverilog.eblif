@@ -1,0 +1,86 @@
+.model accum_output_registered_iverilog
+.inputs a[19] a[18] a[17] a[16] a[15] a[14] a[13] a[12] a[11] a[10] a[9] a[8] a[7] a[6] a[5] a[4] a[3] a[2] a[1] a[0] b[17] b[16] b[15] b[14] b[13] b[12] b[11] b[10] b[9] b[8] b[7] b[6] b[5] b[4] b[3] b[2] b[1] b[0] clk reset
+.outputs z_out[37] z_out[36] z_out[35] z_out[34] z_out[33] z_out[32] z_out[31] z_out[30] z_out[29] z_out[28] z_out[27] z_out[26] z_out[25] z_out[24] z_out[23] z_out[22] z_out[21] z_out[20] z_out[19] z_out[18] z_out[17] z_out[16] z_out[15] z_out[14] z_out[13] z_out[12] z_out[11] z_out[10] z_out[9] z_out[8] z_out[7] z_out[6] z_out[5] z_out[4] z_out[3] z_out[2] z_out[1] z_out[0]
+.names $false
+.names $true
+1
+.names $undef
+.subckt RS_DSP_MULTACC_REGOUT a[0]=a[0] a[1]=a[1] a[2]=a[2] a[3]=a[3] a[4]=a[4] a[5]=a[5] a[6]=a[6] a[7]=a[7] a[8]=a[8] a[9]=a[9] a[10]=a[10] a[11]=a[11] a[12]=a[12] a[13]=a[13] a[14]=a[14] a[15]=a[15] a[16]=a[16] a[17]=a[17] a[18]=a[18] a[19]=a[19] b[0]=b[0] b[1]=b[1] b[2]=b[2] b[3]=b[3] b[4]=b[4] b[5]=b[5] b[6]=b[6] b[7]=b[7] b[8]=b[8] b[9]=b[9] b[10]=b[10] b[11]=b[11] b[12]=b[12] b[13]=b[13] b[14]=b[14] b[15]=b[15] b[16]=b[16] b[17]=b[17] z[0]=z_w[0] z[1]=z_w[1] z[2]=z_w[2] z[3]=z_w[3] z[4]=z_w[4] z[5]=z_w[5] z[6]=z_w[6] z[7]=z_w[7] z[8]=z_w[8] z[9]=z_w[9] z[10]=z_w[10] z[11]=z_w[11] z[12]=z_w[12] z[13]=z_w[13] z[14]=z_w[14] z[15]=z_w[15] z[16]=z_w[16] z[17]=z_w[17] z[18]=z_w[18] z[19]=z_w[19] z[20]=z_w[20] z[21]=z_w[21] z[22]=z_w[22] z[23]=z_w[23] z[24]=z_w[24] z[25]=z_w[25] z[26]=z_w[26] z[27]=z_w[27] z[28]=z_w[28] z[29]=z_w[29] z[30]=z_w[30] z[31]=z_w[31] z[32]=z_w[32] z[33]=z_w[33] z[34]=z_w[34] z[35]=z_w[35] z[36]=z_w[36] z[37]=z_w[37] clk=clk lreset=reset load_acc=$true feedback[0]=$true feedback[1]=$false feedback[2]=$false unsigned_a=$true unsigned_b=$true saturate_enable=$false shift_right[0]=$false shift_right[1]=$false shift_right[2]=$false shift_right[3]=$false shift_right[4]=$false shift_right[5]=$false round=$false subtract=$false
+.param MODE_BITS 00000000000000000000000000000000000000000000000000000000000000000000000000000000
+.names z_w[37] z_out[37]
+1 1
+.names z_w[36] z_out[36]
+1 1
+.names z_w[35] z_out[35]
+1 1
+.names z_w[34] z_out[34]
+1 1
+.names z_w[33] z_out[33]
+1 1
+.names z_w[32] z_out[32]
+1 1
+.names z_w[31] z_out[31]
+1 1
+.names z_w[30] z_out[30]
+1 1
+.names z_w[29] z_out[29]
+1 1
+.names z_w[28] z_out[28]
+1 1
+.names z_w[27] z_out[27]
+1 1
+.names z_w[26] z_out[26]
+1 1
+.names z_w[25] z_out[25]
+1 1
+.names z_w[24] z_out[24]
+1 1
+.names z_w[23] z_out[23]
+1 1
+.names z_w[22] z_out[22]
+1 1
+.names z_w[21] z_out[21]
+1 1
+.names z_w[20] z_out[20]
+1 1
+.names z_w[19] z_out[19]
+1 1
+.names z_w[18] z_out[18]
+1 1
+.names z_w[17] z_out[17]
+1 1
+.names z_w[16] z_out[16]
+1 1
+.names z_w[15] z_out[15]
+1 1
+.names z_w[14] z_out[14]
+1 1
+.names z_w[13] z_out[13]
+1 1
+.names z_w[12] z_out[12]
+1 1
+.names z_w[11] z_out[11]
+1 1
+.names z_w[10] z_out[10]
+1 1
+.names z_w[9] z_out[9]
+1 1
+.names z_w[8] z_out[8]
+1 1
+.names z_w[7] z_out[7]
+1 1
+.names z_w[6] z_out[6]
+1 1
+.names z_w[5] z_out[5]
+1 1
+.names z_w[4] z_out[4]
+1 1
+.names z_w[3] z_out[3]
+1 1
+.names z_w[2] z_out[2]
+1 1
+.names z_w[1] z_out[1]
+1 1
+.names z_w[0] z_out[0]
+1 1
+.end
