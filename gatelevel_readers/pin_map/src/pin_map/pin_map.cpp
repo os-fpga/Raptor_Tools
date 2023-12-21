@@ -8,7 +8,7 @@ using json = nlohmann::json;
 #define VERI_WIRE 392
 
 std::vector<orig_io> orig_ios;                      // Information of original module's IOs
-std::map<std::string, std::vector<Connection>> instConns;   // map of instance name and 
+std::map<std::string, std::vector<Connection>> instConns;   // map of instance name and
                                         // its connection with original IOs and fabric side signals
 std::map<std::string, std::string> pinsMap;         // Define pinsMap at a global scope
 std::vector<std::string> used_pins;
@@ -111,7 +111,6 @@ int get_io_info(std::string& mod_ios)
 int map_signal (std::string& intfJson, std::string& signalName, const std::string& dir)
 {
     Connection conn;
-    
     std::string firstInst;
     std::ifstream jsonFile(intfJson);
 
@@ -139,8 +138,8 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                 std::string sigDir = portInfo["FUNC"];
                 if (dir == "Input" && sigDir == "IN_DIR" && actualSignal == signalName) {
 					bool input_buf = false;
-					if(modName == "I_BUF" || modName == "CLK_BUF") input_buf = true;
-                    if (input_buf && portName == "I") {
+					if(modName == "CLK_BUF" || modName.find("I_BUF") != std::string::npos) input_buf = true;
+                    if (input_buf && (portName == "I" || portName == "I_P")) {
                         // For input buffers the signal connected with O is on the inner side
                         std::string outPort = ports["O"]["Actual"];
                         signalName = outPort;
@@ -154,8 +153,8 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                     }
                 } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
 					bool output_buf = false;
-					if(modName == "O_BUF" || modName == "O_BUFT") output_buf = true;
-                    if (output_buf && portName == "O") {
+					if (modName.substr(0, 5) == "O_BUF") output_buf = true;
+                    if (output_buf && (portName == "O" || portName == "O_P")) {
                         // For output buffers the signal connected with I is on the inner side
                        std::string inPort = ports["I"]["Actual"];
                         signalName = inPort;
@@ -192,7 +191,7 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                             conn.signal = actualSignal;
                         } else {
                             tempSig = conn.signal;  // intermediate bw buf and complex prim
-                            if (conn.module == "I_BUF" || conn.module == "CLK_BUF") {
+                            if(conn.module == "CLK_BUF" || conn.module.find("I_BUF") != std::string::npos) {
                                 instConns[firstInst].pop_back();    // remove the info saved for buffer
                                 conn = Connection();
                                 conn.signal = tempSig;
@@ -213,7 +212,7 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                         } else {
                             tempSig = conn.signal;
 							bool output_buf = false;
-							if(conn.module == "O_BUF" || conn.module == "O_BUFT") output_buf = true;
+							if (conn.module.substr(0, 5) == "O_BUF") output_buf = true;
                             if (output_buf) {
                                 instConns[firstInst].pop_back();
                                 conn = Connection();
