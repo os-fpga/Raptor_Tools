@@ -433,7 +433,7 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                             }
                           }
                         }
-                     } else if(conn.module.find("I_SERDES") != std::string::npos)
+                     } else if(conn.module.find("I_") != std::string::npos)
                        {
                         if(port.first == "D") {
                             // If port is D, set constraints for output side which is connected to fabric
