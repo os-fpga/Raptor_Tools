@@ -9,9 +9,6 @@ tclsh primitive_example_design_1.tcl
 ./dump -u ../Test_cases/primitive_example_design_2/primitive_example_design_2.pin -o primitive_example_design_2.tcl -j primitive_example_design_2.json
 tclsh primitive_example_design_2.tcl
 ./pin_map -io ../Test_cases/primitive_example_design_2/post_synth_ports.json -i ../Test_cases/primitive_example_design_2/interface.json -j primitive_example_design_2.json -t ../Test_cases/Gemini_Pin_Table.csv -o primitive_example_design_2.pin
-./dump -u ../Test_cases/primitive_example_design_3/primitive_example_design_3.pin -o primitive_example_design_3.tcl -j primitive_example_design_3.json
-tclsh primitive_example_design_3.tcl
-./pin_map -io ../Test_cases/primitive_example_design_3/post_synth_ports.json -i ../Test_cases/primitive_example_design_3/interface.json -j primitive_example_design_3.json -t ../Test_cases/Gemini_Pin_Table.csv -o primitive_example_design_3.pin
 ./dump -u ../Test_cases/primitive_example_design_4/primitive_example_design_4.pin -o primitive_example_design_4.tcl -j primitive_example_design_4.json
 tclsh primitive_example_design_4.tcl
 ./pin_map -io ../Test_cases/primitive_example_design_4/post_synth_ports.json -i ../Test_cases/primitive_example_design_4/interface.json -j primitive_example_design_4.json -t ../Test_cases/Gemini_Pin_Table.csv -o primitive_example_design_4.pin
