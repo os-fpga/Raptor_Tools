@@ -10,9 +10,9 @@ set(CMAKE_CXX_STANDARD_REQUIRED True)
 # list(APPEND CMAKE_MODULE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/cmake")
 
 # Collect all the source files to be compiled
-add_executable(reconstruct_verilog src/reconstruct_verilog.cpp)
-target_include_directories(reconstruct_verilog PUBLIC  "${PROJECT_SOURCE_DIR}../../libs/external/boost")
-set_target_properties(reconstruct_verilog PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
+add_executable(finalize src/reconstruct_verilog.cpp)
+target_include_directories(finalize PUBLIC  "${PROJECT_SOURCE_DIR}../../libs/external/boost")
+set_target_properties(finalize PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # If you have any additional libraries to link, use target_link_libraries
 # target_link_libraries(reconstruct_verilog PRIVATE some_library)
