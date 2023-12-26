@@ -1,0 +1,1107 @@
+[
+  {
+	"ports": [
+	  {
+		"direction": "input",
+		"name": "WEN_A1",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WEN_B1",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "REN_A1",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "REN_B1",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "CLK_A1",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "CLK_B1",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_A1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_A1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_B1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_B1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_A1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_A1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_B1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_B1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_A1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_A1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_B1[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_B1[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WEN_A2",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WEN_B2",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "REN_A2",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "REN_B2",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "CLK_A2",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "CLK_B2",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_A2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_A2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_B2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "BE_B2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_A2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "ADDR_B2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_A2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_A2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_A2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WDATA_B2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_B2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "input",
+		"name": "WPARITY_B2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_A2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_A2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_A2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[15]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[14]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[13]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[12]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[11]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[10]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[9]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[8]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[7]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[6]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[5]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[4]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[3]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[2]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RDATA_B2[0]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_B2[1]",
+		"type": "WIRE"
+	  },
+	  {
+		"direction": "output",
+		"name": "RPARITY_B2[0]",
+		"type": "WIRE"
+	  }
+	],
+	"topModule": "TDP_RAM18KX2"
+  }
+]
