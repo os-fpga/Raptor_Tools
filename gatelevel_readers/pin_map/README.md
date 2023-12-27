@@ -46,7 +46,7 @@ Replace the placeholders `<dumped_tcl>`, `<dumped_json>`, `<path_to_mod_ios_file
 * The second command executes the tcl file to dump the json file
 * Finally, the third command uses the dumped json alongwith original ports, interface ports and pin table to create the updated pin file
 
-### Step 3
+### Alternative
 
 To build the project and generate the output file, use the following command:
 
