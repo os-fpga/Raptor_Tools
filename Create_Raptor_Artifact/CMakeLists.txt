@@ -169,8 +169,8 @@ set(CPACK_IFW_ROOT "${CMAKE_CURRENT_SOURCE_DIR}/QT_installer_exe/Linux/bin")
 # ----- List of images to show on installation page -------
 list(APPEND IMAGES_AT_INSTALL 
         ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/image_slide2.png 
-        ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/image_slide1.png 
-        ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/image_slide3.png
+#        ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/image_slide1.png 
+#        ${CMAKE_CURRENT_SOURCE_DIR}/qt_installer_config/image_slide3.png
   )
 #------ Package Level Config --------------
 set (CPACK_IFW_PACKAGE_NAME "Raptor")
