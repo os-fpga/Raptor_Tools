@@ -8,7 +8,7 @@ using json = nlohmann::json;
 #define VERI_WIRE 392
 
 std::vector<orig_io> orig_ios;                      // Information of original module's IOs
-std::map<std::string, std::vector<Connection>> instConns;   // map of instance name and 
+std::map<std::string, std::vector<Connection>> instConns;   // map of instance name and
                                         // its connection with original IOs and fabric side signals
 std::map<std::string, std::string> pinsMap;         // Define pinsMap at a global scope
 std::vector<std::string> used_pins;
@@ -111,7 +111,6 @@ int get_io_info(std::string& mod_ios)
 int map_signal (std::string& intfJson, std::string& signalName, const std::string& dir)
 {
     Connection conn;
-    
     std::string firstInst;
     std::ifstream jsonFile(intfJson);
 
@@ -139,8 +138,8 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                 std::string sigDir = portInfo["FUNC"];
                 if (dir == "Input" && sigDir == "IN_DIR" && actualSignal == signalName) {
 					bool input_buf = false;
-					if(modName == "I_BUF" || modName == "CLK_BUF") input_buf = true;
-                    if (input_buf && portName == "I") {
+					if(modName == "CLK_BUF" || modName.find("I_BUF") != std::string::npos) input_buf = true;
+                    if (input_buf && (portName == "I" || portName == "I_P")) {
                         // For input buffers the signal connected with O is on the inner side
                         std::string outPort = ports["O"]["Actual"];
                         signalName = outPort;
@@ -154,8 +153,8 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                     }
                 } else if (dir == "Output" && sigDir == "OUT_DIR" && actualSignal == signalName) {
 					bool output_buf = false;
-					if(modName == "O_BUF" || modName == "O_BUFT") output_buf = true;
-                    if (output_buf && portName == "O") {
+					if (modName.substr(0, 5) == "O_BUF") output_buf = true;
+                    if (output_buf && (portName == "O" || portName == "O_P")) {
                         // For output buffers the signal connected with I is on the inner side
                        std::string inPort = ports["I"]["Actual"];
                         signalName = inPort;
@@ -192,7 +191,7 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                             conn.signal = actualSignal;
                         } else {
                             tempSig = conn.signal;  // intermediate bw buf and complex prim
-                            if (conn.module == "I_BUF" || conn.module == "CLK_BUF") {
+                            if(conn.module == "CLK_BUF" || conn.module.find("I_BUF") != std::string::npos) {
                                 instConns[firstInst].pop_back();    // remove the info saved for buffer
                                 conn = Connection();
                                 conn.signal = tempSig;
@@ -213,7 +212,7 @@ int map_signal (std::string& intfJson, std::string& signalName, const std::strin
                         } else {
                             tempSig = conn.signal;
 							bool output_buf = false;
-							if(conn.module == "O_BUF" || conn.module == "O_BUFT") output_buf = true;
+							if (conn.module.substr(0, 5) == "O_BUF") output_buf = true;
                             if (output_buf) {
                                 instConns[firstInst].pop_back();
                                 conn = Connection();
@@ -340,35 +339,24 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
     nlohmann::json data;
     file >> data;
     /////////////////// check input connection
-    // Loop through all the instances of interface module
-    //for (const auto& [location, pinInfo] : data["locations"].items())
-    //{
-    //    std::string portName = pinInfo["name"];
-    //    std::cout << "name : " << portName << "    location : " << location;
-    //    if (pinInfo.contains("index")) 
-    //    {
-    //        unsigned index = pinInfo["index"];
-    //        std::cout << "    INDEX : " << index;
-    //    }
-    //    std::cout << " " << std::endl;
-    //}
     // Iterate through the matches and append the SDC lines to the file
     for (const auto& [pin_loc, pinInfo] : data["locations"].items()) {
         std::string ball_id = pin_loc; // Assuming PIN_LOC corresponds to Ball ID
         std::string portName = pinInfo["name"];
         auto it = ballIdToCustomer.find(ball_id);
         std::string customerName = it->second;
-        std::cout << "PORTS: " << portName << std::endl;
+        bool isIndexed = false;
+        unsigned index;
         if (pinInfo.contains("index")) 
         {
-            unsigned index = pinInfo["index"];
+            isIndexed = true;
+            index = pinInfo["index"];
         }
         bool available = true;
         // Iterate over instConns
         for (const auto& entry : instConns) {
           const std::string& instance = entry.first;
           const std::vector<Connection>& instanceConnections = entry.second;
-          //std::cout << "Instance: " << instance << std::endl;
           for (const auto& conn : instanceConnections) {
                  std::vector<ioInfo> iosInfo = instIOs[instance];
                     for (const auto& io : iosInfo) {
@@ -383,9 +371,7 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                         }
                     }
               if (conn.signal == portName) {
-                std::cout << "Instance: " << instance << std::endl;
                 if (std::find(used_pins.begin(), used_pins.end(), ball_id) != used_pins.end()) {
-                    
                     available = false;
                 } else {
                     used_pins.push_back(ball_id);
@@ -395,16 +381,17 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                      std::string mode = conn.module.find("I_") != std::string::npos ? "MODE_BP_DIR_A_TX" : "MODE_BP_DIR_A_RX";
                 // Print other fields as needed
                   for (const auto& port : conn.ports) {
-                      std::cout << "PORT is ::   " << port.first << ": " << port.second << std::endl;
                       if ( available) {
                         if(port.first == "O") {
-                          std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                           sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                          sdcFile << "set_pin_loc " << port.second << " " << customerName << " g2f_rx_in[0]" << std::endl;
+                          sdcFile << "set_pin_loc "<< port.second;
+                          if(isIndexed) sdcFile << "[" << index << "]";
+                          sdcFile << " " << customerName << " g2f_rx_in[0]" << std::endl;
                         } else if(port.first == "I") {
-                          std::cout << "PORT isssss ::   " << port.first << ": " << port.second << std::endl;
                           sdcFile << "set_property mode " << mode << " " << customerName << std::endl;
-                          sdcFile << "set_pin_loc " << port.second << " " << customerName << " f2g_tx_out[0]" << std::endl;
+                          sdcFile << "set_pin_loc " << port.second;
+                          if(isIndexed) sdcFile << "[" << index << "]"; 
+                          sdcFile << " " << customerName << " f2g_tx_out[0]" << std::endl;
                         }
                       } else {
                           throw std::runtime_error("Pin is already in use.");
@@ -420,14 +407,11 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                             for (const auto& io : iosInfo) {
                               if (io.ioDir == "IN_DIR"){
                                 if(available) {
-                                  std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
-                                  std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
                                   unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
                                   unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
                                   if(j!=0) {
                                     for (unsigned k = i; k <= j; k++) {
                                       std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
-                                      std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                       if(io.ioName == "D") {
                                         sdcFile << "set_property mode " << "MODE_RATE_" << max_msb << "_A_TX "<< " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " f2g_tx_out[" << k << "]" << std::endl;
@@ -438,7 +422,9 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                                     }
                                   } else {
                                     sdcFile << "set_property mode " << "MODE_RATE_" << max_msb << "_A_TX "  << " " << customerName << std::endl;
-                                    sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
+                                    sdcFile << "set_pin_loc " << io.actualName;
+                                    if(isIndexed) sdcFile << "[" << index << "]"; 
+                                    sdcFile << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
                                   }
                                 } else {
                                    throw std::runtime_error("Pin is already in use.");
@@ -446,11 +432,8 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                               }
                             }
                           }
-                          std::cout << "Inst isss :::: " << instance << std::endl;
-                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
-                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
                         }
-                     } else if(conn.module.find("I_SERDES") != std::string::npos)
+                     } else if(conn.module.find("I_") != std::string::npos)
                        {
                         if(port.first == "D") {
                             // If port is D, set constraints for output side which is connected to fabric
@@ -459,14 +442,11 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                             for (const auto& io : iosInfo) {
                                 if (io.ioDir == "OUT_DIR"){
                                   if(available) {
-                                  std::cout << "ioname :: " << io.ioName << "    actualName ::: " << io.actualName << std::endl;
-                                  std::cout << "lsb :: " << io.lsb << "    msb ::: " << io.msb << std::endl;
                                   unsigned j = (io.lsb > io.msb) ? io.lsb : io.msb;
                                   unsigned i = (io.lsb > io.msb)? io.msb : io.lsb;
                                   if(j!=0) {
                                     for (unsigned k = i; k <= j; k++) {
                                       std::string pin_name = io.actualName + "[" + std::to_string(k) + "]";
-                                      std::cout << "PIN NAME ::::  " << pin_name << std::endl;
                                       if(io.ioName == "Q") {
                                         sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX "<< " " << customerName << std::endl;
                                         sdcFile << "set_pin_loc " << io.actualName << "[" << k << "] " << customerName << " g2f_rx_in[" << k << "]" << std::endl;
@@ -477,7 +457,9 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                                     }
                                   } else {
                                     sdcFile << "set_property mode " << "MODE_RATE_" << rx_msb << "_A_RX " << " " << customerName << std::endl;
-                                    sdcFile << "set_pin_loc " << io.actualName << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
+                                    sdcFile << "set_pin_loc " << io.actualName;
+                                    if(isIndexed) sdcFile << "[" << index << "]"; 
+                                    sdcFile << " " << customerName << " " << pinsMap[io.ioName] << std::endl;
                                   }
                                 } else {
                                    throw std::runtime_error("Pin is already in use.");
@@ -485,9 +467,6 @@ int write_sdc(const std::string& map_json, const std::string& pin_table, const s
                               }
                             }
                           }
-                          std::cout << "Inst isss :::: " << instance << std::endl;
-                          std::cout << "MODULE isss :::: " << conn.module << std::endl;
-                          std::cout << "first ::  " << port.first << "   second   ::  " << port.second << std::endl;
                         }
                     }
                   }
@@ -531,7 +510,7 @@ int update_sdc (std::string& intf_json, std::string& mod_ios,
     	     map_signal(intf_json, io_name, "Output");
     	}
 	}
-	printPinMap();
+	//printPinMap();
 	write_sdc(map_json, pin_table, output_sdc);
     return 0;
 }
