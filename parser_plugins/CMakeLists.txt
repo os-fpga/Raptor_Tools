@@ -72,13 +72,13 @@ endif()
 #   add_custom_target(synlig_build ...)
 # and to make the targets depend on synlig lib, but the problem is json, capnp, common libraries that gets multiply defined at Raptor level.
 
-add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig/build/release/systemverilog-plugin/systemverilog.so)
-add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig/build/release/systemverilog-plugin/systemverilog.so
+add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so)
+add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so
     COMMAND echo "       Compiling SV plugin"
     COMMAND make -f cmake-makefile YOSYS_CONFIG=${YOSYS_CONFIG} YOSYS_PATH=${YOSYS_PATH} -j ${CPU_CORES}
     COMMAND ${CMAKE_COMMAND} -E make_directory ${YOSYS_PATH}/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/install/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
-    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/install/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
+    COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig"
     DEPENDS ${PROJECT_SOURCE_DIR}/synlig/frontends/systemverilog/uhdm_ast.cc
   )
