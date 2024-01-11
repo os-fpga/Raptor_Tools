@@ -17,7 +17,7 @@ int main(int argc, char *argv[]) {
   Eblif_Transformer tr;
   // std::string W, T;
   if (argc < 2 || argc > 3) {
-    std::cout << "./tranform_blif <infile> [<outfile>]" << std::endl;
+    std::cout << "./finalize <infile> [<outfile>]" << std::endl;
   }
   char *filename = argv[1];
   std::string str_fn(filename);
