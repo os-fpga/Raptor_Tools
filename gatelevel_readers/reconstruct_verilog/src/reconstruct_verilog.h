@@ -607,6 +607,7 @@ public:
   void rs_transform_verilog(std::istream &ifs, std::ostream &ofs) {
     std::string line;
     bool within_rs_dsp = false;
+    std::string hdr = "";
     while (std::getline(ifs, line)) {
       std::string ln(line);
       while ('\\' == ln.back() && std::getline(ifs, line)) {
@@ -620,11 +621,31 @@ public:
         continue;
       }
       if (verilog_dsp_int_names.find(tokens[0]) != end(verilog_dsp_int_names)) {
-        within_rs_dsp = true, ofs << verilog_dsp_int_names[tokens[0]] << ",\n";
+        within_rs_dsp = true;
+        hdr =  verilog_dsp_int_names[tokens[0]] ;
       } else if (tokens[0] == ");") {
         within_rs_dsp = false;
+        hdr = "";
         ofs << line << "\n";
       } else if (within_rs_dsp && '.' == tokens[0][0]) {
+        if (tokens[0].find("MODE_BITS") == 1) {
+          std::string bts = tokens[0].substr(15);
+          bts.pop_back();
+          if (bts.size() != 80) {
+            std::invalid_argument(
+                "Invalid MODE_BITS, expected exactly 80 bits!");
+          }
+          std::string COEFF_0 = bts.substr(0, 20);
+          std::string COEFF_1 = bts.substr(20, 20);
+          std::string COEFF_2 = bts.substr(40, 20);
+          std::string COEFF_3 = bts.substr(60, 20);
+          std::string print_Coef =
+              ",\n        .COEFF_0(20b'" + COEFF_0 + "),\n        .COEFF_1(20b'" + COEFF_1 +
+              "),\n        .COEFF_2(20b'" + COEFF_2 + "),\n        .COEFF_3(20b'" + COEFF_3 + ")";
+          hdr += print_Coef;
+          ofs << hdr << std::endl;
+          continue;
+        }
         auto par_pos = tokens[0].find('(');
         // Error if not found
         transform(tokens[0].begin(), tokens[0].begin() + par_pos,
@@ -703,4 +724,3 @@ public:
     return infile;
   }
 };
-

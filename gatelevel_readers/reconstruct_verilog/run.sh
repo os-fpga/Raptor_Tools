@@ -15,3 +15,5 @@ diff ./res/counter.eblif ../tests/carry/golden/counter.eblif
 diff ./res/TDP_RAM18KX2_primitive_inst_post_synth.eblif ../tests/RAM/golden/TDP_RAM18KX2_primitive_inst_post_synth_golden.eblif
 ./bin/finalize ../tests/RAM/TDP_RAM36K_primitive_inst_post_synth.eblif ./res/TDP_RAM36K_primitive_inst_post_synth.eblif
 diff ./res/TDP_RAM36K_primitive_inst_post_synth.eblif ../tests/RAM/golden/TDP_RAM36K_primitive_inst_post_synth_golden.eblif
+./bin/finalize ../tests/new_DSP38/verilog/accum_output_registered_iverilog_post_rout.v ./res/accum_output_registered_iverilog_post_rout.v
+diff ./res/accum_output_registered_iverilog_post_rout.v ../tests/new_DSP38/golden/accum_output_registered_iverilog_post_rout_golden.v
