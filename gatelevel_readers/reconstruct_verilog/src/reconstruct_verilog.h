@@ -655,12 +655,12 @@ public:
         if (tokens[0].find(std::string(".LRESET")) == 0) {
           ofs << ".RESET" << tokens[0].substr(par_pos);
           for (int idx = 1; idx < tokens.size(); ++idx) {
-            ofs << tokens[idx];
+            ofs  << " "<< tokens[idx];
           }
         } else if (tokens[0].find(std::string(".SATURATE_ENABLE")) == 0) {
           ofs << ".SATURATE" << tokens[0].substr(par_pos);
           for (int idx = 1; idx < tokens.size(); ++idx) {
-            ofs << tokens[idx];
+            ofs  << " "<< tokens[idx];
           }
         } else
           for (auto &a : tokens) {

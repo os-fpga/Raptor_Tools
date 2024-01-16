@@ -861,9 +861,9 @@ module accum_output_registered_iverilog (
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_2_0 
          }),
         .LOAD_ACC(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_4_0 ), 
-        .RESET(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_7_0),
+        .RESET(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_7_0 ),
         .ROUND(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_10_0 ), 
-        .SATURATE(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_8_0),
+        .SATURATE(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_8_0 ),
         .SHIFT_RIGHT({ 
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_5 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_4 ,
