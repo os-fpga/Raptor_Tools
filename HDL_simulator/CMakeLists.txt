@@ -32,7 +32,7 @@ project(HDL_Simulator)
 message(${PROJECT_SOURCE_DIR})
 
 set(FETCHCONTENT_QUIET FALSE)
-set(Release_URL https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/HDL_simulator_30Aug2023.zip)
+set(Release_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/HDL_simulator_30Aug2023.zip)
 set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
 set(expected_size 274782917)
 set(DO_DOWNLOAD 0)

@@ -106,7 +106,7 @@ create_tar_ () {
         then 
         do_encryption $source
         fi
-	    cd $SCRIPT_DIR && wget https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/external_libs.tar.gz
+	    cd $SCRIPT_DIR && wget https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/external_libs.tar.gz
         tar -xvzf $2/external_libs.tar.gz -C $source
         cd $destination && tar -cvzf Raptor_$5\.tar.gz -C $source .
         [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
@@ -130,7 +130,7 @@ clone_compile_install_from_rapo () {
     fi
     src_from_github=$WORK_SPACE/clone_dir
     mkdir -p $src_from_github
-    cd $src_from_github && git clone git@github.com:RapidSilicon/Raptor.git | tee $WORK_SPACE/.raptor_install.log
+    cd $src_from_github && git clone git@github.com:os-fpga/Raptor.git | tee $WORK_SPACE/.raptor_install.log
     cd $src_from_github/Raptor &&  git submodule update --init --recursive | tee -a $WORK_SPACE/.raptor_install.log
     if [ $? -ne 0 ]
     then 
@@ -214,7 +214,7 @@ then
     raptor_version=`$w_dir/bin/raptor --version | grep "Build" | awk '{print $3}'`
     if [ ! -f "$SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker/inst_libs.tar.gz" ]
     then
-    cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && wget https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/inst_libs.tar.gz && cd -
+    cd $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker && wget https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/inst_libs.tar.gz && cd -
     fi
     [ -f $SCRIPT_DIR/../../licenses/rs-eula.txt ] && lic="$SCRIPT_DIR/../../licenses/rs-eula.txt" || { echo "Failed to find license"; exit 1; }
     cd $SCRIPT_DIR/../Install_Raptor_Artifact && $SCRIPT_DIR/makeself-2.4.0/makeself.sh  --sha256 --help-header $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker/short_help $SCRIPT_DIR/../Install_Raptor_Artifact/qtIFW_invoker Raptor_$release\.run "Raptor installer" ./install.sh

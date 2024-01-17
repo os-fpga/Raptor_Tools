@@ -25,11 +25,11 @@ project(Litex)
 message(${PROJECT_SOURCE_DIR})
 # set download fetch URL as per OS
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
-    set(py_fatch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/python3.8_static_zlib_8march_2023.tar.gz")
+    set(py_fatch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/python3.8_static_zlib_8march_2023.tar.gz")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Windows")
     set(py_fatch_url "https://www.python.org/ftp/python/3.8.7/python-3.8.7-embed-amd64.zip")
 elseif (${CMAKE_SYSTEM_NAME} STREQUAL "Darwin")
-    set(py_fatch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/python3.8_static_lib.tar.gz")
+    set(py_fatch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/python3.8_static_lib.tar.gz")
 else()
     message(SEND_ERROR "No python fetch URL is available for this OS")    
 endif()
@@ -111,7 +111,7 @@ file(MD5 ${req_file} CalculatedCheckSum)
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/litex_feb62023.tar.gz")
+set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/litex_feb62023.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
 set(litex_expected_size 83784561)
@@ -185,7 +185,7 @@ endif ()
 #                   ChatGPT VENV                                                   |
 #----------------------------------------------------------------------------------
 # fetch URL for pre build ChatGPT virtual env tar
-set(chatgpt_env_fetch_url "https://github.com/RapidSilicon/post_build_artifacts/releases/download/v0.1/chatGPT_8april_2023.tar.gz")
+set(chatgpt_env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/chatGPT_8april_2023.tar.gz")
 # set the name of file and folder to put the download
 set(chatgpt_env_zip ${PROJECT_SOURCE_DIR}/chatgpt_env.zip)
 set(chatgpt_expected_size 23896907)
@@ -282,12 +282,12 @@ else()
             set(CGT_GITHUB_REPO_PATH ${CMAKE_CURRENT_BINARY_DIR}/chatgpt-integration)
             message(STATUS "Doing Fresh Clone at ${CGT_GITHUB_REPO_PATH}")
             execute_process(
-                COMMAND git clone git@github.com:RapidSilicon/chatgpt-integration.git
+                COMMAND git clone git@github.com:os-fpga/chatgpt-integration.git
                 WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
                 RESULT_VARIABLE GIT_RESULT
                 )
               if  (NOT GIT_RESULT EQUAL "0")
-                message(FATAL_ERROR "Fail to clone git@github.com:RapidSilicon/chatgpt-integration.git")
+                message(FATAL_ERROR "Fail to clone git@github.com:os-fpga/chatgpt-integration.git")
               endif()
         endif()
 
