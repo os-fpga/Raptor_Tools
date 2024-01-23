@@ -65,8 +65,6 @@ endif()
 add_subdirectory(gen_map)
 
 include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
-                            ${FLEX_LM_SRC_DIR}
-                            ${FLEX_LM_SRC_DIR}/machind
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune
                             ${CMAKE_CURRENT_BINARY_DIR}/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/
