@@ -47,6 +47,8 @@ get_filename_component(BOOST_INCLUDE_DIR "../../libs/external/boost"
   REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 get_filename_component(BOOST_ROOT "../../libs/external/boost"
   REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+get_filename_component(YOSYS_SRC_DIR "../../yosys"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
 
 set (Boost_NO_BOOST_CMAKE ON)
 find_package (Boost)
@@ -68,6 +70,9 @@ include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
                             ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune
                             ${CMAKE_CURRENT_BINARY_DIR}/include
                             ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/
+                            ${YOSYS_SRC_DIR}/kernel
+                            ${YOSYS_SRC_DIR}/backends/rtlil
+                            ${YOSYS_SRC_DIR}/frontends
 )
 
 file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune/*.cpp)
