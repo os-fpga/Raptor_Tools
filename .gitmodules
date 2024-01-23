@@ -16,9 +16,3 @@
 [submodule "parser_plugins/synlig"]
 	path = parser_plugins/synlig
 	url = https://github.com/alaindargelas/synlig.git
-[submodule "licensecc"]
-	path = licensecc
-	url = https://github.com/open-license-manager/licensecc.git
-[submodule "OpenLM/licensecc"]
-	path = OpenLM/licensecc
-	url = https://github.com/open-license-manager/licensecc.git
