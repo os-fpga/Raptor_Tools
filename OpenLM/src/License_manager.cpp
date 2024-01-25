@@ -1,7 +1,8 @@
- #include "License_manager.hpp"
-
+#include "License_manager.hpp"
 using namespace std;
 
+const map<int, string> stringByStrategyId = {
+	{STRATEGY_DEFAULT, "DEFAULT"}, {STRATEGY_ETHERNET, "MAC"}, {STRATEGY_IP_ADDRESS, "IP"}, {STRATEGY_DISK, "Disk"}};
 
 const unordered_map<int, string> stringByEventType = {
 	{LICENSE_OK, "OK "},
@@ -16,12 +17,11 @@ const unordered_map<int, string> stringByEventType = {
 	{IDENTIFIERS_MISMATCH, "Calculated identifier and the one provided in license didn't match"}};
 
 map<License_Manager::LicensedProductName, string> License_Manager::licensedProductNameMap = {
-    {License_Manager::LicensedProductName::MPW1, "MPW1"},
-};
+    {License_Manager::LicensedProductName::MPW1, "MPW1"}};
 
 map<string, License_Manager::LicensedProductName> License_Manager::licensedProductNameEnumMap = {
     {"MPW1", License_Manager::LicensedProductName::MPW1},
-    };
+ };
 
 License_Manager::License_Manager(LicensedProductName licensedProductName) {
     auto it = licensedProductNameMap.find(licensedProductName);
@@ -33,18 +33,33 @@ License_Manager::License_Manager(LicensedProductName licensedProductName) {
     bool checkoutSuccess = licenseCheckout(productName);
     if (!checkoutSuccess) {
         std::cerr << "License checkout failed for product: " << productName << std::endl;
-        // Handle the failure as necessary
+           throw LicenseFatalException();
     }
 }
 
 bool License_Manager::licenseCheckout(const string &productName) {
     LicenseInfo licenseInfo;
-    size_t pc_id_sz = LCC_API_PC_IDENTIFIER_SIZE + 1;
-    char pc_identifier[LCC_API_PC_IDENTIFIER_SIZE + 1];
+	char hw_identifier[LCC_API_PC_IDENTIFIER_SIZE + 1];
+	size_t bufSize = LCC_API_PC_IDENTIFIER_SIZE + 1;
+	ExecutionEnvironmentInfo exec_env_info;
+	for (const auto& x : stringByStrategyId) {
+		if (identify_pc(static_cast<LCC_API_HW_IDENTIFICATION_STRATEGY>(x.first), hw_identifier, &bufSize,
+						&exec_env_info)) {
+		//	std::cout << x.second << ':' << hw_identifier << std::endl;
+		} else {
+			std::cout << x.second << ": NA" << endl;
+		}
+	}
     	CallerInformations callInfo;
 	strcpy(callInfo.feature_name,productName.c_str());
-  //  CallerInformations callerInfo = {"\0", productName.c_str()};
-    LCC_EVENT_TYPE result = acquire_license(&callInfo, nullptr, &licenseInfo);
+	LicenseLocation licLocation = {LICENSE_PATH};
+     const char* env_var_value = std::getenv("LCC_LICENSE_LOCATION_ENV_VAR");
+		if (env_var_value != nullptr && env_var_value[0] != '\0') {
+			const vector<string> declared_licenses = split_string(string(env_var_value), ';');
+			for (string fname : declared_licenses) {
+				ifstream license_file(fname);
+               std::copy(fname.begin(), fname.end(), licLocation.licenseData); }}
+    LCC_EVENT_TYPE result = acquire_license(&callInfo, &licLocation, &licenseInfo);
 
     if (result == LICENSE_OK) {
         cout << "License OK" << endl;
@@ -55,12 +70,17 @@ bool License_Manager::licenseCheckout(const string &productName) {
     } else {
         cout << "License ERROR :" << endl;
         cout << "    " << stringByEventType.at(result) << endl;
-        if (identify_pc(STRATEGY_DEFAULT, pc_identifier, &pc_id_sz, nullptr)) {
-            cout << "Hardware id is :" << endl;
-            cout << "    " << pc_identifier << endl;
-        } else {
-            cerr << "Errors in identify_pc" << endl;
-        }
         return false;  // Unsuccessful checkout
     }
+}
+
+const vector<string> License_Manager::split_string(const string &licensePositions, char splitchar) {
+	std::stringstream streamToSplit(licensePositions);
+	std::string segment;
+	std::vector<string> seglist;
+
+	while (std::getline(streamToSplit, segment, splitchar)) {
+		seglist.push_back(segment);
+	}
+	return seglist;
 }
