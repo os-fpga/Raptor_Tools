@@ -610,7 +610,7 @@ public:
     std::string hdr = "";
     while (std::getline(ifs, line)) {
       std::string ln(line);
-      while ('\\' == ln.back() && std::getline(ifs, line)) {
+      while (!ln.empty() && '\\' == ln.back() && std::getline(ifs, line)) {
         ln.pop_back();
         ln += " " + line;
       }

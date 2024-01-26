@@ -26,12 +26,6 @@ jobs:
       uses: styfle/cancel-workflow-action@0.11.0
       with:
         access_token: ${{ github.token }}
-        
-    - name: ssh-agent
-      uses: webfactory/ssh-agent@v0.5.4
-      with: 
-        ssh-private-key: |
-          ${{ secrets.SSH_PRIVATE_KEY_VERIFIC_RS }}
 
     - name: Setup Python
       uses: actions/setup-python@v4
@@ -61,7 +55,7 @@ jobs:
           ;
 
     - name: Install dependencies
-      run: 
+      run: | 
         sudo apt-get install cmake build-essential g++-11 gcc-11 tclsh tcl-dev tcllib cmake 
     - name: Synlig_GHDL_Plugins_Ubuntu
       if: matrix.mode == 'basic_test' 
