@@ -43,3 +43,6 @@ add_dependencies(example generate_license_manager_hpp)
 cmake_policy(SET CMP0028 NEW)
 target_link_libraries(rs_licenseManager licensecc_static)
 target_link_libraries(example licensecc_static)
+
+# path for privte key -s= /projects/Raptor/       projects folder is built in with exctuable in build folder
+# -p /projects/Raptor/include/licensecc/Raptor/
