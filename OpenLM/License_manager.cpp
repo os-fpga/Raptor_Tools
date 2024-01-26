@@ -51,6 +51,8 @@ bool License_Manager::licenseCheckout(const string &productName) {
 			std::cout << x.second << ": NA" << endl;
 		}
 	}
+	size_t pc_id_sz = LCC_API_PC_IDENTIFIER_SIZE + 1;
+	char pc_identifier[LCC_API_PC_IDENTIFIER_SIZE + 1];
     	CallerInformations callInfo;
 	strcpy(callInfo.feature_name,productName.c_str());
 	LicenseLocation licLocation = {LICENSE_PATH};
@@ -69,8 +71,13 @@ bool License_Manager::licenseCheckout(const string &productName) {
         }
         return true;  // Successful checkout
     } else {
+		
         cout << "License ERROR :" << endl;
         cout << "    " << stringByEventType.at(result) << endl;
+		if (identify_pc(STRATEGY_DEFAULT, pc_identifier, &pc_id_sz, nullptr)) {
+			cout << "hardware id is :" << endl;
+			cout << "    " << pc_identifier << endl;
+		}
         return false;  // Unsuccessful checkout
     }
 }
