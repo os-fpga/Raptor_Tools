@@ -1,21 +1,45 @@
 cmake_minimum_required(VERSION 3.7)
 
-project (LicenseManager CXX)
+project(LicenseManager CXX)
+
+# Set paths and variables
 set(LICENSECC_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install/lib/cmake/licensecc/")
 set(LCC_PROJECT_NAME "Raptor")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
+set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
+# Add subdirectory for licensecc
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc)
-SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
+# Custom target for installing licensecc
 add_custom_target(install_licensecc ALL
     COMMENT "Building and installing licensecc"
     COMMAND $(MAKE) install
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/licensecc
 )
-
 add_dependencies(install_licensecc licensecc_static)
 
-add_executable(example src/example.cpp  src/License_manager.cpp)
-add_library(rs_licenseManager src/License_manager.cpp)
+# Custom command to run licensing_feature.py script
+add_custom_command(
+    OUTPUT License_manager.hpp
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py
+    DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py
+    COMMENT "Generating License_manager.hpp from licensing_feature.py"
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
+)
+
+# Custom target to ensure License_manager.hpp is generated before compiling the library
+add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
+
+# Define targets
+add_executable(example example.cpp License_manager.cpp)
+add_library(rs_licenseManager License_manager.cpp)
+
+# Ensure License_manager.hpp is generated before building these targets
+add_dependencies(rs_licenseManager generate_license_manager_hpp)
+add_dependencies(example generate_license_manager_hpp)
+
+# Link libraries
 cmake_policy(SET CMP0028 NEW)
 target_link_libraries(rs_licenseManager licensecc_static)
 target_link_libraries(example licensecc_static)

@@ -8,12 +8,13 @@
  * @copyright Copyright (c) 2023
  *
  */
-
+#include "License_manager.hpp"
 #include "reconstruct_verilog.h"
 
 using namespace std;
 
 int main(int argc, char *argv[]) {
+  License_Manager manager(License_Manager::LicensedProductName::Finalize);
   Eblif_Transformer tr;
   // std::string W, T;
   if (argc < 2 || argc > 3) {

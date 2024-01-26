@@ -1,4 +1,5 @@
 #include "License_manager.hpp"
+
 using namespace std;
 
 const map<int, string> stringByStrategyId = {
@@ -16,12 +17,12 @@ const unordered_map<int, string> stringByEventType = {
 	{LICENSE_CORRUPTED, "license signature didn't match with current license "},
 	{IDENTIFIERS_MISMATCH, "Calculated identifier and the one provided in license didn't match"}};
 
-map<License_Manager::LicensedProductName, string> License_Manager::licensedProductNameMap = {
-    {License_Manager::LicensedProductName::MPW1, "MPW1"}};
+// map<License_Manager::LicensedProductName, string> License_Manager::licensedProductNameMap = {
+//     {License_Manager::LicensedProductName::MPW1, "MPW1"}};
 
-map<string, License_Manager::LicensedProductName> License_Manager::licensedProductNameEnumMap = {
-    {"MPW1", License_Manager::LicensedProductName::MPW1},
- };
+//  map<string, License_Manager::LicensedProductName> License_Manager::licensedProductNameEnumMap = {
+//      {"RSMPW1", License_Manager::LicensedProductName::MPW1},
+//   };
 
 License_Manager::License_Manager(LicensedProductName licensedProductName) {
     auto it = licensedProductNameMap.find(licensedProductName);
@@ -53,7 +54,7 @@ bool License_Manager::licenseCheckout(const string &productName) {
     	CallerInformations callInfo;
 	strcpy(callInfo.feature_name,productName.c_str());
 	LicenseLocation licLocation = {LICENSE_PATH};
-     const char* env_var_value = std::getenv("LCC_LICENSE_LOCATION_ENV_VAR");
+     const char* env_var_value = std::getenv("LICENSE_LOCATION");
 		if (env_var_value != nullptr && env_var_value[0] != '\0') {
 			const vector<string> declared_licenses = split_string(string(env_var_value), ';');
 			for (string fname : declared_licenses) {
