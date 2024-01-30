@@ -610,7 +610,7 @@ public:
     std::string hdr = "";
     while (std::getline(ifs, line)) {
       std::string ln(line);
-      while ('\\' == ln.back() && std::getline(ifs, line)) {
+      while (!ln.empty() && '\\' == ln.back() && std::getline(ifs, line)) {
         ln.pop_back();
         ln += " " + line;
       }
@@ -640,8 +640,8 @@ public:
           std::string COEFF_2 = bts.substr(40, 20);
           std::string COEFF_3 = bts.substr(60, 20);
           std::string print_Coef =
-              ",\n        .COEFF_0(20b'" + COEFF_0 + "),\n        .COEFF_1(20b'" + COEFF_1 +
-              "),\n        .COEFF_2(20b'" + COEFF_2 + "),\n        .COEFF_3(20b'" + COEFF_3 + ")";
+              ",\n        .COEFF_0(20'b" + COEFF_0 + "),\n        .COEFF_1(20'b" + COEFF_1 +
+              "),\n        .COEFF_2(20'b" + COEFF_2 + "),\n        .COEFF_3(20'b" + COEFF_3 + ")";
           hdr += print_Coef;
           ofs << hdr << std::endl;
           continue;
