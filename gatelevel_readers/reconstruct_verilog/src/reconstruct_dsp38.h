@@ -7,9 +7,8 @@
  * @date 2024-01-
  *
  * @copyright Copyright (c) 2024
-*/
+ */
 #include "reconstruct_utils.h"
-
 
 struct dsp38_instance {
 
@@ -2476,11 +2475,13 @@ struct dsp38_instance {
   void print(std::ostream &ofs) {
     std::string rs_prim = RS_DSP_Primitives.at(get_block_key());
     ofs << ".subckt " << rs_prim << " ";
-    for (auto &cn : port_connections) {
-      if (prim_io_maps_dsp_to_rs_prim[rs_prim].find(cn.first) !=
-          end(prim_io_maps_dsp_to_rs_prim[rs_prim])) {
-        std::string at_prim = prim_io_maps_dsp_to_rs_prim[rs_prim][cn.first];
-        ofs << at_prim << "=" << cn.second << " ";
+    for (auto &innerCon : prim_io_maps[rs_prim]) {
+      if (port_connections.find(innerCon.second) != end(port_connections)) {
+        ofs << innerCon.first << "=" << port_connections[innerCon.second]
+            << " ";
+      } else {
+        // std::cout << "Warn: Unconnrcted port " << innerCon.first << " from
+        // cell "  << rs_prim << std::endl;
       }
     }
     ofs << std::endl;
