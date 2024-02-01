@@ -117,36 +117,36 @@ localparam [0:80] MODE_BITS = {1'b0, read_mode_A, read_mode_B, write_mode_A, wri
       .MODE_BITS(MODE_BITS)
       //.INIT_i(INIT_i1)
   ) RS_TDP36K_inst (
-      .WEN_A1(WEN_A),
-      .WEN_B1(WEN_B),
-      .REN_A1(REN_A),
-      .REN_B1(REN_B),
-      .CLK_A1(CLK_A),
-      .CLK_B1(CLK_B),
-      .BE_A1(BE_A[1:0]),
-      .BE_B1(BE_B[1:0]),
-      .ADDR_A1(ADDR_A),
-      .ADDR_B1(ADDR_B),
-      .WDATA_A1(WDATA_A1),
-      .WDATA_B1(WDATA_B1),
-      .RDATA_A1(DATA_OUT_A1),
-      .RDATA_B1(DATA_OUT_B1),
-      .FLUSH1(1'b0),
-      .WEN_A2(WEN_A),
-      .WEN_B2(WEN_B),
-      .REN_A2(REN_A),
-      .REN_B2(REN_B),
-      .CLK_A2(CLK_A),
-      .CLK_B2(CLK_B),
-      .BE_A2(BE_A[3:2]),
-      .BE_B2(BE_B[3:2]),
-      .ADDR_A2(ADDR_A),
-      .ADDR_B2(ADDR_B),
-      .WDATA_A2(WDATA_A2),
-      .WDATA_B2(WDATA_B2),
-      .RDATA_A2(DATA_OUT_A2),
-      .RDATA_B2(DATA_OUT_B2),
-      .FLUSH2(1'b0)
+      .WEN_A1(WEN_A), // <input name="WEN_A1" num_pins="1"/>
+      .WEN_B1(WEN_B), // <input name="WEN_B1" num_pins="1"/>
+      .REN_A1(REN_A), // <input name="REN_A1" num_pins="1"/>
+      .REN_B1(REN_B), // <input name="REN_B1" num_pins="1"/>
+      .CLK_A1(CLK_A), // <clock name="CLK_A1" num_pins="1"/>
+      .CLK_B1(CLK_B), // <clock name="CLK_B1" num_pins="1"/>
+      .BE_A1(BE_A[1:0]), // <input name="BE_A1" num_pins="2"/>
+      .BE_B1(BE_B[1:0]), // <input name="BE_B1" num_pins="2"/>
+      .ADDR_A1(ADDR_A), //  <input name="ADDR_A1" num_pins="15"/>
+      .ADDR_B1(ADDR_B), // <input name="ADDR_B1" num_pins="15"/>
+      .WDATA_A1(WDATA_A1), // <input name="WDATA_A1" num_pins="18"/>
+      .WDATA_B1(WDATA_B1), // <input name="WDATA_B1" num_pins="18"/>
+      .RDATA_A1(DATA_OUT_A1), // <output name="RDATA_A1" num_pins="18"/>
+      .RDATA_B1(DATA_OUT_B1), // <output name="RDATA_B1" num_pins="18"/>
+      .FLUSH1(1'b0), // <input name="FLUSH1" num_pins="1"/>
+      .WEN_A2(WEN_A), // <input name="WEN_A2" num_pins="1"/>
+      .WEN_B2(WEN_B), // <input name="WEN_B2" num_pins="1"/>
+      .REN_A2(REN_A), // <input name="REN_A2" num_pins="1"/>
+      .REN_B2(REN_B), // <input name="REN_B2" num_pins="1"/>
+      .CLK_A2(CLK_A), // <clock name="CLK_A2" num_pins="1"/>
+      .CLK_B2(CLK_B), // <clock name="CLK_B2" num_pins="1"/>
+      .BE_A2(BE_A[3:2]), // <input name="BE_A2" num_pins="2"/>
+      .BE_B2(BE_B[3:2]), // <input name="BE_B2" num_pins="2"/>
+      .ADDR_A2(ADDR_A), // <input name="ADDR_A2" num_pins="14"/>
+      .ADDR_B2(ADDR_B), // <input name="ADDR_B2" num_pins="14"/>
+      .WDATA_A2(WDATA_A2), // <input name="WDATA_A2" num_pins="18"/>
+      .WDATA_B2(WDATA_B2), // <input name="WDATA_B2" num_pins="18"/>
+      .RDATA_A2(DATA_OUT_A2), // <output name="RDATA_A2" num_pins="18"/>
+      .RDATA_B2(DATA_OUT_B2), // <output name="RDATA_B2" num_pins="18"/>
+      .FLUSH2(1'b0) // <input name="FLUSH2" num_pins="1"/>
   );
   /*
   initial 
