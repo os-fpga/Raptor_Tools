@@ -47,7 +47,7 @@ upload_to_ftp () {
 
 # create tar.gz having .run and README
 final_tar_dir=`dirname $1` 
-cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor*.run README.md && rm Raptor*.run  && echo "Done Creating final tar"
+cd $final_tar_dir/Install_Raptor_Artifact && tar -cvzf Raptor_$2\.tar.gz Raptor*.run && rm Raptor*.run  && echo "Done Creating final tar"
 mkdir -p $final_tar_dir/upload && rm -rf $final_tar_dir/upload/* && mkdir -p $final_tar_dir/upload/$4
 mv $final_tar_dir/Install_Raptor_Artifact/Raptor_$2\.tar.gz  $final_tar_dir/upload/$4
 
