@@ -9,6 +9,7 @@
  * @copyright Copyright (c) 2024
  */
 
+#include <set>
 #include "reconstruct_utils.h"
 
 struct TDP_RAM36K_instance {
@@ -599,6 +600,7 @@ struct TDP_RAM36K_instance {
     ofs << ".param INIT_i "
         << get_init_i1(parameters["INIT"], parameters["INIT_PARITY"])
         << std::endl;
+    std::set<std::string> printed;
     for (auto &p : parameters) {
       if (p.first.find("READ") == 0 || p.first.find("WRITE") == 0) {
         for (auto &assign : get_param_value_assigns(p.first)) {
@@ -621,7 +623,11 @@ struct TDP_RAM36K_instance {
             }
           }
           if (connected) {
-            ofs << tokens[0] << " " << f_i_name << " " << s_i_name << "\n1 1\n";
+            std::string conn = tokens[0] + " " + f_i_name + " " + s_i_name + "\n1 1\n";
+            if (printed.find(conn) == printed.end()) {
+              printed.insert(conn);
+              ofs << conn;
+            }
           }
         }
       }
