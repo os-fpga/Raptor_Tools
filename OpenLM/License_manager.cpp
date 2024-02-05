@@ -17,14 +17,9 @@ const unordered_map<int, string> stringByEventType = {
 	{LICENSE_CORRUPTED, "license signature didn't match with current license "},
 	{IDENTIFIERS_MISMATCH, "Calculated identifier and the one provided in license didn't match"}};
 
-// map<License_Manager::LicensedProductName, string> License_Manager::licensedProductNameMap = {
-//     {License_Manager::LicensedProductName::MPW1, "MPW1"}};
+License_Manager::License_Manager(){}
 
-//  map<string, License_Manager::LicensedProductName> License_Manager::licensedProductNameEnumMap = {
-//      {"RSMPW1", License_Manager::LicensedProductName::MPW1},
-//   };
-
-License_Manager::License_Manager(LicensedProductName licensedProductName) {
+License_Manager::License_Manager(LicensedProductName licensedProductName)  : License_Manager() {
     auto it = licensedProductNameMap.find(licensedProductName);
     if (it == licensedProductNameMap.end()) {
         throw std::runtime_error("Invalid licensed product name");
@@ -37,6 +32,14 @@ License_Manager::License_Manager(LicensedProductName licensedProductName) {
            throw LicenseFatalException();
     }
 }
+
+License_Manager::License_Manager(std::string licensedProductName) {
+        bool checkoutSuccess = licenseCheckout(licensedProductName);
+        if (!checkoutSuccess) {
+            std::cerr << "License checkout failed for product: " << licensedProductName << std::endl;
+            throw LicenseFatalException();
+        }
+    }
 
 bool License_Manager::licenseCheckout(const string &productName) {
     LicenseInfo licenseInfo;
@@ -92,3 +95,4 @@ const vector<string> License_Manager::split_string(const string &licensePosition
 	}
 	return seglist;
 }
+License_Manager::~License_Manager(){}

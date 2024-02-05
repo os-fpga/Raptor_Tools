@@ -9,3 +9,4 @@ Device_Modeling/src/build/
 Device_Modeling/.vscode/
 .vscode/
 gatelevel_readers/reconstruct_verilog/build/
+OpenLM/License_manager.hpp
