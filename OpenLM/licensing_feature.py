@@ -1,5 +1,6 @@
 import xml.etree.ElementTree as ET
 import os
+import argparse
 
 def extract_device_names(file_paths):
     device_names = []
@@ -54,11 +55,13 @@ def create_cpp_header(device_names, header_file_path):
             file.write(f"        {name},\n")
         file.write("    };\n\n")
         file.write("    map<License_Manager::LicensedProductName, string> licensedProductNameMap = {\n")
-        for i, name in enumerate(device_names):
+        for i, name in enumerate(device_names):              
+            enum_name = 'RS' + name if name[0].isdigit() else name  # Prepend 'RS' if name starts with a digit
             separator = "," if i < len(device_names) - 1 else ""
-            file.write(f"        {{License_Manager::LicensedProductName::{name}, \"{name}\"}}{separator}\n")
-        file.write("    };\n\n")
+            file.write(f"        {{License_Manager::LicensedProductName::{enum_name}, \"{name}\"}}{separator}\n")        
+        file.write("    };\n\n")      
         file.write("    License_Manager(LicensedProductName licensedProductName);\n")
+        file.write("    License_Manager(string licensedProductName);\n")
         file.write("    bool licenseCheckout(const string &productName);\n")
         file.write("    const vector<string> split_string(const string& stringToBeSplit, const char splitchar);\n")
         file.write("    struct LicenseFatalException : public exception {\n")
@@ -71,14 +74,35 @@ def create_cpp_header(device_names, header_file_path):
         file.write("            return \"License was not acquired due to a correctable error\";\n")
         file.write("        }\n")
         file.write("    };\n\n")
+        file.write("    map<string, LicensedProductName> licensedProductNameEnumMap = {\n")
+        for i, name in enumerate(device_names):              
+            enum_name = 'RS' + name if name[0].isdigit() else name  # Prepend 'RS' if name starts with a digit
+            separator = "," if i < len(device_names) - 1 else ""
+            file.write(f"        {{\"{name}\", License_Manager::LicensedProductName::{enum_name}}}{separator}\n")       
+        file.write("    };\n\n")
+        file.write("    ~License_Manager();\n")
         file.write("private:\n")
-        file.write("    static map<string, LicensedProductName> licensedProductNameEnumMap;\n")
+        file.write("    License_Manager();\n")
         file.write("};\n")
 
-# Usage
-file_paths = ['device.xml', 'features.txt']  # Replace with actual paths
-header_file_path = 'License_manager.hpp'  # Path to the header file
-device_names = extract_device_names(file_paths)
-create_cpp_header(device_names, header_file_path)
+def main ():
+    parser = argparse.ArgumentParser()
+    parser.add_argument('--xml_filepath',
+                        type=str,default='',metavar='',required=True,help='Path for the device.xml which will be used', dest="XML_filepath")
+    parser.add_argument('--feature_txt_path',
+                        type=str,default='1',metavar='',help='Path of txt file having other feature list', dest="features_txt")
+    args = parser.parse_args()
+    print("XML file that will be update:\n\t\t",args.XML_filepath)
+    print("features.txt file path:\n\t\t",args.features_txt)
+    file_paths = [args.XML_filepath, args.features_txt]  # Replace with actual paths
+    header_file_path = 'License_manager.hpp'  # Path to the header file
+    device_names = extract_device_names(file_paths)
+    create_cpp_header(device_names, header_file_path)
+    print(f"Header file created at {header_file_path}")
 
-print(f"Header file created at {header_file_path}")
+if __name__ == "__main__":
+    main()
+
+
+
+

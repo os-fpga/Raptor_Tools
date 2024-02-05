@@ -3,11 +3,22 @@ cmake_minimum_required(VERSION 3.7)
 project(LicenseManager CXX)
 
 # Set paths and variables
+set(GIT_SUBMODULE OFF)
 set(LICENSECC_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install/lib/cmake/licensecc/")
 set(LCC_PROJECT_NAME "Raptor")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
+# inputs for licensing_feature.py
+if(RAPTOR)
+    set(XML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../etc/device.xml)
+else()
+    set(XML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/dummy.xml)
+endif()
+set(FEATURES_TXT ${CMAKE_CURRENT_SOURCE_DIR}/features.txt)
+
+cmake_policy(SET CMP0077 NEW)
+set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) 
 # Add subdirectory for licensecc
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc)
 
@@ -22,7 +33,7 @@ add_dependencies(install_licensecc licensecc_static)
 # Custom command to run licensing_feature.py script
 add_custom_command(
     OUTPUT License_manager.hpp
-    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py
+    COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py --xml_filepath ${XML_FILE} --feature_txt_path ${FEATURES_TXT} 
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py
     COMMENT "Generating License_manager.hpp from licensing_feature.py"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
@@ -32,7 +43,7 @@ add_custom_command(
 add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
 
 # Define targets
-add_executable(example example.cpp License_manager.cpp)
+add_executable(example src/example.cpp License_manager.cpp)
 add_library(rs_licenseManager License_manager.cpp)
 
 # Ensure License_manager.hpp is generated before building these targets
