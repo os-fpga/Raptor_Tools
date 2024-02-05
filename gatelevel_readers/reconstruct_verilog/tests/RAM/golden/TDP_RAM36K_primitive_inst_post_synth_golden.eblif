@@ -178,36 +178,4 @@
 1 1
 .names DATA_OUT_B1[0]_1 RDATA_B[0]
 1 1
-.names DATA_OUT_A1[15]_1 RDATA_A[15]
-1 1
-.names DATA_OUT_A1[14]_1 RDATA_A[14]
-1 1
-.names DATA_OUT_A1[13]_1 RDATA_A[13]
-1 1
-.names DATA_OUT_A1[12]_1 RDATA_A[12]
-1 1
-.names DATA_OUT_A1[11]_1 RDATA_A[11]
-1 1
-.names DATA_OUT_A1[10]_1 RDATA_A[10]
-1 1
-.names DATA_OUT_A1[9]_1 RDATA_A[9]
-1 1
-.names DATA_OUT_A1[8]_1 RDATA_A[8]
-1 1
-.names DATA_OUT_A1[7]_1 RDATA_A[7]
-1 1
-.names DATA_OUT_A1[6]_1 RDATA_A[6]
-1 1
-.names DATA_OUT_A1[5]_1 RDATA_A[5]
-1 1
-.names DATA_OUT_A1[4]_1 RDATA_A[4]
-1 1
-.names DATA_OUT_A1[3]_1 RDATA_A[3]
-1 1
-.names DATA_OUT_A1[2]_1 RDATA_A[2]
-1 1
-.names DATA_OUT_A1[1]_1 RDATA_A[1]
-1 1
-.names DATA_OUT_A1[0]_1 RDATA_A[0]
-1 1
 .end
