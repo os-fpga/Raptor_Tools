@@ -9,6 +9,7 @@
  * @copyright Copyright (c) 2024
  *
  */
+#include "reconstruct_dsp19.h"
 #include "reconstruct_dsp38.h"
 #include "reconstruct_ram18kx2.h"
 #include "reconstruct_ram36k.h"
@@ -17,20 +18,7 @@ class Eblif_Transformer {
   std::vector<TDP_RAM18KX2_instance> TDP_RAM18KX2_instances;
   std::vector<TDP_RAM36K_instance> TDP_RAM36K_instances;
   std::vector<dsp38_instance> dsp38_instances;
-  unsigned uint_from_bits(std::string bits) {
-    if (!bits.size() || bits.size() > 31)
-      throw std::invalid_argument("Invalid 32 bit binary number ");
-    unsigned pw = 1, res = 0;
-    for (int i = bits.size() - 1; i + 1; --i) {
-      if (bits[i] == '1')
-        res += pw;
-      else if (bits[i] != '0')
-        throw std::invalid_argument("Invalid character in a binary number : " +
-                                    std::string(1, bits[i]));
-      pw <<= 1;
-    }
-    return res;
-  };
+  std::vector<dsp19_instance> dsp19_instances;
   std::unordered_map<std::string, std::string>
   blifToCPlusPlusMap(const std::vector<std::string> &tokens) {
     std::unordered_map<std::string, std::string> res;
@@ -334,14 +322,11 @@ class Eblif_Transformer {
                                 {"LATCHSRE", lut_port_map_LATCHSRE},
                                 {"LATCHNSRE", lut_port_map_LATCHNSRE}};
   string mx = "179769313486231590772930519078902473361797697894230657273"
-              "43008115773267580"
-              "550096313270847732240753602112011387987139335765878976881"
-              "44166224928474306"
-              "394741243777678934248654852763022196012460941194530829520"
-              "85005768838150682"
-              "342462881473913110540827237163350510684586298239947245938"
-              "47971630483535632"
-              "9624224137215";
+              "430081157732675805500963132708477322407536021120113879871"
+              "393357658789768814416622492847430639474124377767893424865"
+              "485276302219601246094119453082952085005768838150682342462"
+              "881473913110540827237163350510684586298239947245938479716"
+              "304835356329624224137215";
   std::map<char, string> hexDecoder = {
       {'0', "0000"}, {'1', "0001"}, {'2', "0010"}, {'3', "0011"}, {'4', "0100"},
       {'5', "0101"}, {'6', "0110"}, {'7', "0111"}, {'8', "1000"}, {'9', "1001"},
@@ -423,6 +408,8 @@ public:
           }
           if (last_ckt == "dsp38" && dsp38_instances.size() &&
               dsp38_instances.back().set_param(par_name, par_value)) {
+          } else if (last_ckt == "dsp19" && dsp19_instances.size() &&
+                     dsp19_instances.back().set_param(par_name, par_value)) {
           } else if (last_ckt == "tdp_ram18kx2" &&
                      TDP_RAM18KX2_instances.size() &&
                      TDP_RAM18KX2_instances.back().set_param(par_name,
@@ -435,6 +422,9 @@ public:
           }
         } else if (tokens[0] == ".end") {
           for (auto &ds : dsp38_instances) {
+            ds.print(ofs);
+          }
+          for (auto &ds : dsp19_instances) {
             ds.print(ofs);
           }
           for (auto &rm : TDP_RAM18KX2_instances) {
@@ -583,6 +573,10 @@ public:
           last_ckt = "dsp38";
           dsp38_instances.push_back(dsp38_instance());
           dsp38_instances.back().port_connections = blifToCPlusPlusMap(tokens);
+        } else if (name.find("dsp19") == 0) {
+          last_ckt = "dsp19";
+          dsp19_instances.push_back(dsp19_instance());
+          dsp19_instances.back().port_connections = blifToCPlusPlusMap(tokens);
         } else if (name.find("tdp_ram18kx2") == 0) {
           last_ckt = "tdp_ram18kx2";
           TDP_RAM18KX2_instances.push_back(TDP_RAM18KX2_instance());
@@ -607,6 +601,7 @@ public:
   void rs_transform_verilog(std::istream &ifs, std::ostream &ofs) {
     std::string line;
     bool within_rs_dsp = false;
+    std::string hdr = "";
     while (std::getline(ifs, line)) {
       std::string ln(line);
       while ('\\' == ln.back() && std::getline(ifs, line)) {
@@ -620,11 +615,32 @@ public:
         continue;
       }
       if (verilog_dsp_int_names.find(tokens[0]) != end(verilog_dsp_int_names)) {
-        within_rs_dsp = true, ofs << verilog_dsp_int_names[tokens[0]] << ",\n";
+        within_rs_dsp = true;
+        hdr = verilog_dsp_int_names[tokens[0]];
       } else if (tokens[0] == ");") {
         within_rs_dsp = false;
+        hdr = "";
         ofs << line << "\n";
       } else if (within_rs_dsp && '.' == tokens[0][0]) {
+        if (tokens[0].find("MODE_BITS") == 1) {
+          std::string bts = tokens[0].substr(15);
+          bts.pop_back();
+          if (bts.size() != 80) {
+            std::invalid_argument(
+                "Invalid MODE_BITS, expected exactly 80 bits!");
+          }
+          std::string COEFF_0 = bts.substr(0, 20);
+          std::string COEFF_1 = bts.substr(20, 20);
+          std::string COEFF_2 = bts.substr(40, 20);
+          std::string COEFF_3 = bts.substr(60, 20);
+          std::string print_Coef = ",\n        .COEFF_0(20'b" + COEFF_0 +
+                                   "),\n        .COEFF_1(20'b" + COEFF_1 +
+                                   "),\n        .COEFF_2(20'b" + COEFF_2 +
+                                   "),\n        .COEFF_3(20'b" + COEFF_3 + ")";
+          hdr += print_Coef;
+          ofs << hdr << std::endl;
+          continue;
+        }
         auto par_pos = tokens[0].find('(');
         // Error if not found
         transform(tokens[0].begin(), tokens[0].begin() + par_pos,
@@ -634,12 +650,12 @@ public:
         if (tokens[0].find(std::string(".LRESET")) == 0) {
           ofs << ".RESET" << tokens[0].substr(par_pos);
           for (int idx = 1; idx < tokens.size(); ++idx) {
-            ofs << tokens[idx];
+            ofs << " " << tokens[idx];
           }
         } else if (tokens[0].find(std::string(".SATURATE_ENABLE")) == 0) {
           ofs << ".SATURATE" << tokens[0].substr(par_pos);
           for (int idx = 1; idx < tokens.size(); ++idx) {
-            ofs << tokens[idx];
+            ofs << " " << tokens[idx];
           }
         } else
           for (auto &a : tokens) {
@@ -703,4 +719,3 @@ public:
     return infile;
   }
 };
-
