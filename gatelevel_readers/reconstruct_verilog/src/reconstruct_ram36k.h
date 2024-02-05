@@ -300,276 +300,164 @@ struct TDP_RAM36K_instance {
            : W == str_2  ? "011"
                          : "101";
   }
-  std::vector<std::string> TDP_RAM36K_Assigns_params_WRITE_WIDTH_A_9_4_2_1 = {
-      ".names WPARITY_A[0] WDATA_A1[17]", ".names $false WDATA_A1[16]",
-      ".names $false WDATA_A1[15]", ".names $false WDATA_A1[14]",
-      ".names $false WDATA_A1[13]", ".names $false WDATA_A1[12]",
-      ".names $false WDATA_A1[11]", ".names $false WDATA_A1[10]",
-      ".names $false WDATA_A1[9]", ".names $false WDATA_A1[8]", ".names WDATA_A[7] WDATA_A1[7]",
-      ".names WDATA_A[6] WDATA_A1[6]", ".names WDATA_A[5] WDATA_A1[5]",
-      ".names WDATA_A[4] WDATA_A1[4]", ".names WDATA_A[3] WDATA_A1[3]",
-      ".names WDATA_A[2] WDATA_A1[2]", ".names WDATA_A[1] WDATA_A1[1]",
-      // ".names $undef WDATA_A2[17]",
-      // ".names $undef WDATA_A2[16]",
-      // ".names $undef WDATA_A2[15]",
-      // ".names $undef WDATA_A2[14]",
-      // ".names $undef WDATA_A2[13]",
-      // ".names $undef WDATA_A2[12]",
-      // ".names $undef WDATA_A2[11]",
-      // ".names $undef WDATA_A2[10]",
-      // ".names $undef WDATA_A2[9]",
-      // ".names $undef WDATA_A2[8]",
-      // ".names $undef WDATA_A2[7]",
-      // ".names $undef WDATA_A2[6]",
-      // ".names $undef WDATA_A2[5]",
-      // ".names $undef WDATA_A2[4]",
-      // ".names $undef WDATA_A2[3]",
-      // ".names $undef WDATA_A2[2]",
-      // ".names $undef WDATA_A2[1]",
-      // ".names $undef WDATA_A2[0]",
-      ".names WDATA_A[0] WDATA_A1[0]"};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_WRITE_WIDTH_B_9_4_2_1 = {
-      ".names WPARITY_B[0] WDATA_B1[17]", ".names $false WDATA_B1[16]",
-      ".names $false WDATA_B1[15]", ".names $false WDATA_B1[14]",
-      ".names $false WDATA_B1[13]", ".names $false WDATA_B1[12]",
-      ".names $false WDATA_B1[11]", ".names $false WDATA_B1[10]",
-      ".names $false WDATA_B1[9]", ".names $false WDATA_B1[8]", ".names WDATA_B[7] WDATA_B1[7]",
-      ".names WDATA_B[6] WDATA_B1[6]", ".names WDATA_B[5] WDATA_B1[5]",
-      ".names WDATA_B[4] WDATA_B1[4]", ".names WDATA_B[3] WDATA_B1[3]",
-      ".names WDATA_B[2] WDATA_B1[2]", ".names WDATA_B[1] WDATA_B1[1]",
-      // ".names $undef WDATA_B2[17]",
-      // ".names $undef WDATA_B2[16]",
-      // ".names $undef WDATA_B2[15]",
-      // ".names $undef WDATA_B2[14]",
-      // ".names $undef WDATA_B2[13]",
-      // ".names $undef WDATA_B2[12]",
-      // ".names $undef WDATA_B2[11]",
-      // ".names $undef WDATA_B2[10]",
-      // ".names $undef WDATA_B2[9]",
-      // ".names $undef WDATA_B2[8]",
-      // ".names $undef WDATA_B2[7]",
-      // ".names $undef WDATA_B2[6]",
-      // ".names $undef WDATA_B2[5]",
-      // ".names $undef WDATA_B2[4]",
-      // ".names $undef WDATA_B2[3]",
-      // ".names $undef WDATA_B2[2]",
-      // ".names $undef WDATA_B2[1]",
-      // ".names $undef WDATA_B2[0]",
-      ".names WDATA_B[0] WDATA_B1[0]"};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_READ_WIDTH_A_9_4_2_1 = {
-      ".names DATA_OUT_A1[7] RDATA_A[31]",  ".names DATA_OUT_A1[6] RDATA_A[30]",
-      ".names DATA_OUT_A1[5] RDATA_A[29]",  ".names DATA_OUT_A1[4] RDATA_A[28]",
-      ".names DATA_OUT_A1[3] RDATA_A[27]",  ".names DATA_OUT_A1[2] RDATA_A[26]",
-      ".names DATA_OUT_A1[1] RDATA_A[25]",  ".names DATA_OUT_A1[0] RDATA_A[24]",
-      ".names DATA_OUT_A1[16] RPARITY_A[3]"};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_READ_WIDTH_B_9_4_2_1 = {
-      ".names DATA_OUT_B1[7] RDATA_B[31]",  ".names DATA_OUT_B1[6] RDATA_B[30]",
-      ".names DATA_OUT_B1[5] RDATA_B[29]",  ".names DATA_OUT_B1[4] RDATA_B[28]",
-      ".names DATA_OUT_B1[3] RDATA_B[27]",  ".names DATA_OUT_B1[2] RDATA_B[26]",
-      ".names DATA_OUT_B1[1] RDATA_B[25]",  ".names DATA_OUT_B1[0] RDATA_B[24]",
-      ".names DATA_OUT_B1[16] RPARITY_B[3]",
-      ".names DATA_OUT_A1[15] RDATA_A[15]",
-      ".names DATA_OUT_A1[14] RDATA_A[14]",
-      ".names DATA_OUT_A1[13] RDATA_A[13]",
-      ".names DATA_OUT_A1[12] RDATA_A[12]",
-      ".names DATA_OUT_A1[11] RDATA_A[11]",
-      ".names DATA_OUT_A1[10] RDATA_A[10]",
-      ".names DATA_OUT_A1[9] RDATA_A[9]",
-      ".names DATA_OUT_A1[8] RDATA_A[8]",
-      ".names DATA_OUT_A1[7] RDATA_A[7]",
-      ".names DATA_OUT_A1[6] RDATA_A[6]",
-      ".names DATA_OUT_A1[5] RDATA_A[5]",
-      ".names DATA_OUT_A1[4] RDATA_A[4]",
-      ".names DATA_OUT_A1[3] RDATA_A[3]",
-      ".names DATA_OUT_A1[2] RDATA_A[2]",
-      ".names DATA_OUT_A1[1] RDATA_A[1]",
-      ".names DATA_OUT_A1[0] RDATA_A[0]"};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_WRITE_WIDTH_A_36_18 = {
-      ".names WPARITY_A[1] WDATA_A1[17]", ".names WPARITY_A[0] WDATA_A1[16]",
-      ".names WDATA_A[15] WDATA_A1[15]",  ".names WDATA_A[14] WDATA_A1[14]",
-      ".names WDATA_A[13] WDATA_A1[13]",  ".names WDATA_A[12] WDATA_A1[12]",
-      ".names WDATA_A[11] WDATA_A1[11]",  ".names WDATA_A[10] WDATA_A1[10]",
-      ".names WDATA_A[9] WDATA_A1[9]",    ".names WDATA_A[8] WDATA_A1[8]",
-      ".names WDATA_A[7] WDATA_A1[7]",    ".names WDATA_A[6] WDATA_A1[6]",
-      ".names WDATA_A[5] WDATA_A1[5]",    ".names WDATA_A[4] WDATA_A1[4]",
-      ".names WDATA_A[3] WDATA_A1[3]",    ".names WDATA_A[2] WDATA_A1[2]",
-      ".names WDATA_A[1] WDATA_A1[1]",    ".names WDATA_A[0] WDATA_A1[0]",
-      ".names WPARITY_A[3] WDATA_A2[17]", ".names WPARITY_A[2] WDATA_A2[16]",
-      ".names WDATA_A[31] WDATA_A2[15]",  ".names WDATA_A[30] WDATA_A2[14]",
-      ".names WDATA_A[29] WDATA_A2[13]",  ".names WDATA_A[28] WDATA_A2[12]",
-      ".names WDATA_A[27] WDATA_A2[11]",  ".names WDATA_A[26] WDATA_A2[10]",
-      ".names WDATA_A[25] WDATA_A2[9]",   ".names WDATA_A[24] WDATA_A2[8]",
-      ".names WDATA_A[23] WDATA_A2[7]",   ".names WDATA_A[22] WDATA_A2[6]",
-      ".names WDATA_A[21] WDATA_A2[5]",   ".names WDATA_A[20] WDATA_A2[4]",
-      ".names WDATA_A[19] WDATA_A2[3]",   ".names WDATA_A[18] WDATA_A2[2]",
-      ".names WDATA_A[17] WDATA_A2[1]",   ".names WDATA_A[16] WDATA_A2[0]", 
-      ".names DATA_OUT_A1[15] RDATA_A[15]",
-      ".names DATA_OUT_A1[14] RDATA_A[14]",
-      ".names DATA_OUT_A1[13] RDATA_A[13]",
-      ".names DATA_OUT_A1[12] RDATA_A[12]",
-      ".names DATA_OUT_A1[11] RDATA_A[11]",
-      ".names DATA_OUT_A1[10] RDATA_A[10]",
-      ".names DATA_OUT_A1[9] RDATA_A[9]",
-      ".names DATA_OUT_A1[8] RDATA_A[8]",
-      ".names DATA_OUT_A1[7] RDATA_A[7]",
-      ".names DATA_OUT_A1[6] RDATA_A[6]",
-      ".names DATA_OUT_A1[5] RDATA_A[5]",
-      ".names DATA_OUT_A1[4] RDATA_A[4]",
-      ".names DATA_OUT_A1[3] RDATA_A[3]",
-      ".names DATA_OUT_A1[2] RDATA_A[2]",
-      ".names DATA_OUT_A1[1] RDATA_A[1]",
-      ".names DATA_OUT_A1[0] RDATA_A[0]"};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_WRITE_WIDTH_B_36_18 = {
-      ".names WPARITY_B[1] WDATA_B1[17]", ".names WPARITY_B[0] WDATA_B1[16]",
-      ".names WDATA_B[15] WDATA_B1[15]",  ".names WDATA_B[14] WDATA_B1[14]",
-      ".names WDATA_B[13] WDATA_B1[13]",  ".names WDATA_B[12] WDATA_B1[12]",
-      ".names WDATA_B[11] WDATA_B1[11]",  ".names WDATA_B[10] WDATA_B1[10]",
-      ".names WDATA_B[9] WDATA_B1[9]",    ".names WDATA_B[8] WDATA_B1[8]",
-      ".names WDATA_B[7] WDATA_B1[7]",    ".names WDATA_B[6] WDATA_B1[6]",
-      ".names WDATA_B[5] WDATA_B1[5]",    ".names WDATA_B[4] WDATA_B1[4]",
-      ".names WDATA_B[3] WDATA_B1[3]",    ".names WDATA_B[2] WDATA_B1[2]",
-      ".names WDATA_B[1] WDATA_B1[1]",    ".names WDATA_B[0] WDATA_B1[0]",
-      ".names WPARITY_B[3] WDATA_B2[17]", ".names WPARITY_B[2] WDATA_B2[16]",
-      ".names WDATA_B[31] WDATA_B2[15]",  ".names WDATA_B[30] WDATA_B2[14]",
-      ".names WDATA_B[29] WDATA_B2[13]",  ".names WDATA_B[28] WDATA_B2[12]",
-      ".names WDATA_B[27] WDATA_B2[11]",  ".names WDATA_B[26] WDATA_B2[10]",
-      ".names WDATA_B[25] WDATA_B2[9]",   ".names WDATA_B[24] WDATA_B2[8]",
-      ".names WDATA_B[23] WDATA_B2[7]",   ".names WDATA_B[22] WDATA_B2[6]",
-      ".names WDATA_B[21] WDATA_B2[5]",   ".names WDATA_B[20] WDATA_B2[4]",
-      ".names WDATA_B[19] WDATA_B2[3]",   ".names WDATA_B[18] WDATA_B2[2]",
-      ".names WDATA_B[17] WDATA_B2[1]",   ".names WDATA_B[16] WDATA_B2[0]", 
-      ".names DATA_OUT_A1[15] RDATA_A[15]",
-      ".names DATA_OUT_A1[14] RDATA_A[14]",
-      ".names DATA_OUT_A1[13] RDATA_A[13]",
-      ".names DATA_OUT_A1[12] RDATA_A[12]",
-      ".names DATA_OUT_A1[11] RDATA_A[11]",
-      ".names DATA_OUT_A1[10] RDATA_A[10]",
-      ".names DATA_OUT_A1[9] RDATA_A[9]",
-      ".names DATA_OUT_A1[8] RDATA_A[8]",
-      ".names DATA_OUT_A1[7] RDATA_A[7]",
-      ".names DATA_OUT_A1[6] RDATA_A[6]",
-      ".names DATA_OUT_A1[5] RDATA_A[5]",
-      ".names DATA_OUT_A1[4] RDATA_A[4]",
-      ".names DATA_OUT_A1[3] RDATA_A[3]",
-      ".names DATA_OUT_A1[2] RDATA_A[2]",
-      ".names DATA_OUT_A1[1] RDATA_A[1]",
-      ".names DATA_OUT_A1[0] RDATA_A[0]",};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_READ_WIDTH_A_36_18 = {
-      ".names DATA_OUT_A2[15] RDATA_A[31]",
-      ".names DATA_OUT_A2[14] RDATA_A[30]",
-      ".names DATA_OUT_A2[13] RDATA_A[29]",
-      ".names DATA_OUT_A2[12] RDATA_A[28]",
-      ".names DATA_OUT_A2[11] RDATA_A[27]",
-      ".names DATA_OUT_A2[10] RDATA_A[26]",
-      ".names DATA_OUT_A2[9] RDATA_A[25]",
-      ".names DATA_OUT_A2[8] RDATA_A[24]",
-      ".names DATA_OUT_A2[7] RDATA_A[23]",
-      ".names DATA_OUT_A2[6] RDATA_A[22]",
-      ".names DATA_OUT_A2[5] RDATA_A[21]",
-      ".names DATA_OUT_A2[4] RDATA_A[20]",
-      ".names DATA_OUT_A2[3] RDATA_A[19]",
-      ".names DATA_OUT_A2[2] RDATA_A[18]",
-      ".names DATA_OUT_A2[1] RDATA_A[17]",
-      ".names DATA_OUT_A2[0] RDATA_A[16]",
-      ".names DATA_OUT_A1[15] RDATA_A[15]",
-      ".names DATA_OUT_A1[14] RDATA_A[14]",
-      ".names DATA_OUT_A1[13] RDATA_A[13]",
-      ".names DATA_OUT_A1[12] RDATA_A[12]",
-      ".names DATA_OUT_A1[11] RDATA_A[11]",
-      ".names DATA_OUT_A1[10] RDATA_A[10]",
-      ".names DATA_OUT_A1[9] RDATA_A[9]",
-      ".names DATA_OUT_A1[8] RDATA_A[8]",
-      ".names DATA_OUT_A1[7] RDATA_A[7]",
-      ".names DATA_OUT_A1[6] RDATA_A[6]",
-      ".names DATA_OUT_A1[5] RDATA_A[5]",
-      ".names DATA_OUT_A1[4] RDATA_A[4]",
-      ".names DATA_OUT_A1[3] RDATA_A[3]",
-      ".names DATA_OUT_A1[2] RDATA_A[2]",
-      ".names DATA_OUT_A1[1] RDATA_A[1]",
-      ".names DATA_OUT_A1[0] RDATA_A[0]",
+
+  std::vector<std::string> TDP_RAM36K_Assigns = {
+      // assign WDATA_A1 = {WPARITY_A[1:0], WDATA_A[15:0]};
+      ".names WPARITY_A[1] WDATA_A1[17]",
+      ".names WPARITY_A[0] WDATA_A1[16]",
+      ".names WDATA_A[15]  WDATA_A1[15]",
+      ".names WDATA_A[14]  WDATA_A1[14]",
+      ".names WDATA_A[13]  WDATA_A1[13]",
+      ".names WDATA_A[12]  WDATA_A1[12]",
+      ".names WDATA_A[11]  WDATA_A1[11]",
+      ".names WDATA_A[10]  WDATA_A1[10]",
+      ".names WDATA_A[9]  WDATA_A1[9]",
+      ".names WDATA_A[8]  WDATA_A1[8]",
+      ".names WDATA_A[7]  WDATA_A1[7]",
+      ".names WDATA_A[6]  WDATA_A1[6]",
+      ".names WDATA_A[5]  WDATA_A1[5]",
+      ".names WDATA_A[4]  WDATA_A1[4]",
+      ".names WDATA_A[3]  WDATA_A1[3]",
+      ".names WDATA_A[2]  WDATA_A1[2]",
+      ".names WDATA_A[1]  WDATA_A1[1]",
+      ".names WDATA_A[0]  WDATA_A1[0]",
+      // assign WDATA_A2 = {WPARITY_A[3:2], WDATA_A[31:16]};
+      ".names WPARITY_A[3] WDATA_A2[17]",
+      ".names WPARITY_A[2] WDATA_A2[16]",
+      ".names WDATA_A[31]  WDATA_A2[15]",
+      ".names WDATA_A[30]  WDATA_A2[14]",
+      ".names WDATA_A[29]  WDATA_A2[13]",
+      ".names WDATA_A[28]  WDATA_A2[12]",
+      ".names WDATA_A[27]  WDATA_A2[11]",
+      ".names WDATA_A[26]  WDATA_A2[10]",
+      ".names WDATA_A[25]  WDATA_A2[9]",
+      ".names WDATA_A[24]  WDATA_A2[8]",
+      ".names WDATA_A[23]  WDATA_A2[7]",
+      ".names WDATA_A[22]  WDATA_A2[6]",
+      ".names WDATA_A[21]  WDATA_A2[5]",
+      ".names WDATA_A[20]  WDATA_A2[4]",
+      ".names WDATA_A[19]  WDATA_A2[3]",
+      ".names WDATA_A[18]  WDATA_A2[2]",
+      ".names WDATA_A[17]  WDATA_A2[1]",
+      ".names WDATA_A[16]  WDATA_A2[0]",
+      // assign WDATA_B1 = {WPARITY_B[1:0], WDATA_B[15:0]};
+      ".names WPARITY_B[1] WDATA_B1[17]",
+      ".names WPARITY_B[0] WDATA_B1[16]",
+      ".names WDATA_B[15]  WDATA_B1[15]",
+      ".names WDATA_B[14]  WDATA_B1[14]",
+      ".names WDATA_B[13]  WDATA_B1[13]",
+      ".names WDATA_B[12]  WDATA_B1[12]",
+      ".names WDATA_B[11]  WDATA_B1[11]",
+      ".names WDATA_B[10]  WDATA_B1[10]",
+      ".names WDATA_B[9]  WDATA_B1[9]",
+      ".names WDATA_B[8]  WDATA_B1[8]",
+      ".names WDATA_B[7]  WDATA_B1[7]",
+      ".names WDATA_B[6]  WDATA_B1[6]",
+      ".names WDATA_B[5]  WDATA_B1[5]",
+      ".names WDATA_B[4]  WDATA_B1[4]",
+      ".names WDATA_B[3]  WDATA_B1[3]",
+      ".names WDATA_B[2]  WDATA_B1[2]",
+      ".names WDATA_B[1]  WDATA_B1[1]",
+      ".names WDATA_B[0]  WDATA_B1[0]",
+      // assign WDATA_B2 = {WPARITY_B[3:2], WDATA_B[31:16]};
+      ".names WPARITY_B[3] WDATA_B2[17]",
+      ".names WPARITY_B[2] WDATA_B2[16]",
+      ".names WDATA_B[31]  WDATA_B2[15]",
+      ".names WDATA_B[30]  WDATA_B2[14]",
+      ".names WDATA_B[29]  WDATA_B2[13]",
+      ".names WDATA_B[28]  WDATA_B2[12]",
+      ".names WDATA_B[27]  WDATA_B2[11]",
+      ".names WDATA_B[26]  WDATA_B2[10]",
+      ".names WDATA_B[25]  WDATA_B2[9]",
+      ".names WDATA_B[24]  WDATA_B2[8]",
+      ".names WDATA_B[23]  WDATA_B2[7]",
+      ".names WDATA_B[22]  WDATA_B2[6]",
+      ".names WDATA_B[21]  WDATA_B2[5]",
+      ".names WDATA_B[20]  WDATA_B2[4]",
+      ".names WDATA_B[19]  WDATA_B2[3]",
+      ".names WDATA_B[18]  WDATA_B2[2]",
+      ".names WDATA_B[17]  WDATA_B2[1]",
+      ".names WDATA_B[16]  WDATA_B2[0]",
+      // assign RDATA_A   = {DATA_OUT_A2[15:0],  DATA_OUT_A1[15:0]};
+      ".names DATA_OUT_A2[15]  RDATA_A[31]",
+      ".names DATA_OUT_A2[14]  RDATA_A[30]",
+      ".names DATA_OUT_A2[13]  RDATA_A[29",
+      ".names DATA_OUT_A2[12]  RDATA_A[28]",
+      ".names DATA_OUT_A2[11]  RDATA_A[27]",
+      ".names DATA_OUT_A2[10]  RDATA_A[26]",
+      ".names DATA_OUT_A2[9]  RDATA_A[25]",
+      ".names DATA_OUT_A2[8]  RDATA_A[24]",
+      ".names DATA_OUT_A2[7]  RDATA_A[23]",
+      ".names DATA_OUT_A2[6]  RDATA_A[22]",
+      ".names DATA_OUT_A2[5]  RDATA_A[21]",
+      ".names DATA_OUT_A2[4]  RDATA_A[20]",
+      ".names DATA_OUT_A2[3]  RDATA_A[19]",
+      ".names DATA_OUT_A2[2]  RDATA_A[18]",
+      ".names DATA_OUT_A2[1]  RDATA_A[17]",
+      ".names DATA_OUT_A2[0]  RDATA_A[16]",
+      ".names DATA_OUT_A1[15]  RDATA_A[15]",
+      ".names DATA_OUT_A1[14]  RDATA_A[14]",
+      ".names DATA_OUT_A1[13]  RDATA_A[13]",
+      ".names DATA_OUT_A1[12]  RDATA_A[12]",
+      ".names DATA_OUT_A1[11]  RDATA_A[11]",
+      ".names DATA_OUT_A1[10]  RDATA_A[10]",
+      ".names DATA_OUT_A1[9]  RDATA_A[9]",
+      ".names DATA_OUT_A1[8]  RDATA_A[8]",
+      ".names DATA_OUT_A1[7]  RDATA_A[7]",
+      ".names DATA_OUT_A1[6]  RDATA_A[6]",
+      ".names DATA_OUT_A1[5]  RDATA_A[5]",
+      ".names DATA_OUT_A1[4]  RDATA_A[4]",
+      ".names DATA_OUT_A1[3]  RDATA_A[3]",
+      ".names DATA_OUT_A1[2]  RDATA_A[2]",
+      ".names DATA_OUT_A1[1]  RDATA_A[1]",
+      ".names DATA_OUT_A1[0]  RDATA_A[0]",
+      // assign RPARITY_A = {DATA_OUT_A2[17:16], DATA_OUT_A1[17:16]};
       ".names DATA_OUT_A2[17] RPARITY_A[3]",
       ".names DATA_OUT_A2[16] RPARITY_A[2]",
       ".names DATA_OUT_A1[17] RPARITY_A[1]",
-      ".names DATA_OUT_A1[16] RPARITY_A[0]"};
-  std::vector<std::string> TDP_RAM36K_Assigns_params_READ_WIDTH_B_36_18 = {
-      ".names DATA_OUT_B2[15] RDATA_B[31]",
-      ".names DATA_OUT_B2[14] RDATA_B[30]",
-      ".names DATA_OUT_B2[13] RDATA_B[29]",
-      ".names DATA_OUT_B2[12] RDATA_B[28]",
-      ".names DATA_OUT_B2[11] RDATA_B[27]",
-      ".names DATA_OUT_B2[10] RDATA_B[26]",
-      ".names DATA_OUT_B2[9] RDATA_B[25]",
-      ".names DATA_OUT_B2[8] RDATA_B[24]",
-      ".names DATA_OUT_B2[7] RDATA_B[23]",
-      ".names DATA_OUT_B2[6] RDATA_B[22]",
-      ".names DATA_OUT_B2[5] RDATA_B[21]",
-      ".names DATA_OUT_B2[4] RDATA_B[20]",
-      ".names DATA_OUT_B2[3] RDATA_B[19]",
-      ".names DATA_OUT_B2[2] RDATA_B[18]",
-      ".names DATA_OUT_B2[1] RDATA_B[17]",
-      ".names DATA_OUT_B2[0] RDATA_B[16]",
-      ".names DATA_OUT_B1[15] RDATA_B[15]",
-      ".names DATA_OUT_B1[14] RDATA_B[14]",
-      ".names DATA_OUT_B1[13] RDATA_B[13]",
-      ".names DATA_OUT_B1[12] RDATA_B[12]",
-      ".names DATA_OUT_B1[11] RDATA_B[11]",
-      ".names DATA_OUT_B1[10] RDATA_B[10]",
-      ".names DATA_OUT_B1[9] RDATA_B[9]",
-      ".names DATA_OUT_B1[8] RDATA_B[8]",
-      ".names DATA_OUT_B1[7] RDATA_B[7]",
-      ".names DATA_OUT_B1[6] RDATA_B[6]",
-      ".names DATA_OUT_B1[5] RDATA_B[5]",
-      ".names DATA_OUT_B1[4] RDATA_B[4]",
-      ".names DATA_OUT_B1[3] RDATA_B[3]",
-      ".names DATA_OUT_B1[2] RDATA_B[2]",
-      ".names DATA_OUT_B1[1] RDATA_B[1]",
-      ".names DATA_OUT_B1[0] RDATA_B[0]",
+      ".names DATA_OUT_A1[16] RPARITY_A[0]",
+      // assign RDATA_B   = {DATA_OUT_B2[15:0],  DATA_OUT_B1[15:0]};
+      ".names DATA_OUT_B2[15]  RDATA_B[31]",
+      ".names DATA_OUT_B2[14]  RDATA_B[30]",
+      ".names DATA_OUT_B2[13]  RDATA_B[29",
+      ".names DATA_OUT_B2[12]  RDATA_B[28]",
+      ".names DATA_OUT_B2[11]  RDATA_B[27]",
+      ".names DATA_OUT_B2[10]  RDATA_B[26]",
+      ".names DATA_OUT_B2[9]  RDATA_B[25]",
+      ".names DATA_OUT_B2[8]  RDATA_B[24]",
+      ".names DATA_OUT_B2[7]  RDATA_B[23]",
+      ".names DATA_OUT_B2[6]  RDATA_B[22]",
+      ".names DATA_OUT_B2[5]  RDATA_B[21]",
+      ".names DATA_OUT_B2[4]  RDATA_B[20]",
+      ".names DATA_OUT_B2[3]  RDATA_B[19]",
+      ".names DATA_OUT_B2[2]  RDATA_B[18]",
+      ".names DATA_OUT_B2[1]  RDATA_B[17]",
+      ".names DATA_OUT_B2[0]  RDATA_B[16]",
+      ".names DATA_OUT_B1[15]  RDATA_B[15]",
+      ".names DATA_OUT_B1[14]  RDATA_B[14]",
+      ".names DATA_OUT_B1[13]  RDATA_B[13]",
+      ".names DATA_OUT_B1[12]  RDATA_B[12]",
+      ".names DATA_OUT_B1[11]  RDATA_B[11]",
+      ".names DATA_OUT_B1[10]  RDATA_B[10]",
+      ".names DATA_OUT_B1[9]  RDATA_B[9]",
+      ".names DATA_OUT_B1[8]  RDATA_B[8]",
+      ".names DATA_OUT_B1[7]  RDATA_B[7]",
+      ".names DATA_OUT_B1[6]  RDATA_B[6]",
+      ".names DATA_OUT_B1[5]  RDATA_B[5]",
+      ".names DATA_OUT_B1[4]  RDATA_B[4]",
+      ".names DATA_OUT_B1[3]  RDATA_B[3]",
+      ".names DATA_OUT_B1[2]  RDATA_B[2]",
+      ".names DATA_OUT_B1[1]  RDATA_B[1]",
+      ".names DATA_OUT_B1[0]  RDATA_B[0]",
+      // assign RPARITY_B = {DATA_OUT_B2[17:16], DATA_OUT_B1[17:16]};
       ".names DATA_OUT_B2[17] RPARITY_B[3]",
       ".names DATA_OUT_B2[16] RPARITY_B[2]",
       ".names DATA_OUT_B1[17] RPARITY_B[1]",
-      ".names DATA_OUT_B1[16] RPARITY_B[0]", 
-      ".names DATA_OUT_A1[15] RDATA_A[15]",
-      ".names DATA_OUT_A1[14] RDATA_A[14]",
-      ".names DATA_OUT_A1[13] RDATA_A[13]",
-      ".names DATA_OUT_A1[12] RDATA_A[12]",
-      ".names DATA_OUT_A1[11] RDATA_A[11]",
-      ".names DATA_OUT_A1[10] RDATA_A[10]",
-      ".names DATA_OUT_A1[9] RDATA_A[9]",
-      ".names DATA_OUT_A1[8] RDATA_A[8]",
-      ".names DATA_OUT_A1[7] RDATA_A[7]",
-      ".names DATA_OUT_A1[6] RDATA_A[6]",
-      ".names DATA_OUT_A1[5] RDATA_A[5]",
-      ".names DATA_OUT_A1[4] RDATA_A[4]",
-      ".names DATA_OUT_A1[3] RDATA_A[3]",
-      ".names DATA_OUT_A1[2] RDATA_A[2]",
-      ".names DATA_OUT_A1[1] RDATA_A[1]",
-      ".names DATA_OUT_A1[0] RDATA_A[0]",};
-  std::unordered_map<std::string, std::vector<std::string>> assign_map = {
-      {"WRITE_WIDTH_A_9_4_2_1",
-       TDP_RAM36K_Assigns_params_WRITE_WIDTH_A_9_4_2_1},
-      {"WRITE_WIDTH_B_9_4_2_1",
-       TDP_RAM36K_Assigns_params_WRITE_WIDTH_B_9_4_2_1},
-      {"READ_WIDTH_A_9_4_2_1", TDP_RAM36K_Assigns_params_READ_WIDTH_A_9_4_2_1},
-      {"READ_WIDTH_B_9_4_2_1", TDP_RAM36K_Assigns_params_READ_WIDTH_B_9_4_2_1},
-      {"WRITE_WIDTH_A_36_18", TDP_RAM36K_Assigns_params_WRITE_WIDTH_A_36_18},
-      {"WRITE_WIDTH_B_36_18", TDP_RAM36K_Assigns_params_WRITE_WIDTH_B_36_18},
-      {"READ_WIDTH_A_36_18", TDP_RAM36K_Assigns_params_READ_WIDTH_A_36_18},
-      {"READ_WIDTH_B_36_18", TDP_RAM36K_Assigns_params_READ_WIDTH_B_36_18},
-      {"DEFAULT", std::vector<std::string>()}};
-  std::vector<std::string> &get_param_value_assigns(std::string p) {
-    if (parameters.find(p) == end(parameters))
-      throw std::invalid_argument("Invalid TDP_RAM36K parameter name " + p);
-    std::unordered_set<std::string> _9_4_2_1 = {str_1, str_2, str_4, str_9};
-    std::unordered_set<std::string> _36_18 = {str_18, str_36};
-    if (_9_4_2_1.find(parameters[p]) != end(_9_4_2_1)) {
-      return assign_map[p + "_9_4_2_1"];
-    };
-    if (_36_18.find(parameters[p]) != end(_36_18)) {
-      return assign_map[p + "_36_18"];
-    };
-    return assign_map["DEFAULT"];
-  }
-  std::string get_MODE_BITS() {
+      ".names DATA_OUT_B1[16] RPARITY_B[0]",
+  };
+
+  std::string get_MODE_BITS()
+  {
     read_mode_A = conf_code(parameters["READ_WIDTH_A"]);
     read_mode_B = conf_code(parameters["WRITE_WIDTH_B"]);
     write_mode_A = conf_code(parameters["WRITE_WIDTH_A"]);
@@ -600,36 +488,27 @@ struct TDP_RAM36K_instance {
     ofs << ".param INIT_i "
         << get_init_i1(parameters["INIT"], parameters["INIT_PARITY"])
         << std::endl;
-    std::set<std::string> printed;
-    for (auto &p : parameters) {
-      if (p.first.find("READ") == 0 || p.first.find("WRITE") == 0) {
-        for (auto &assign : get_param_value_assigns(p.first)) {
-          bool connected = true;
-          std::vector<std::string> tokens = split_on_space(assign);
-          std::string f_i_name = per_instance_sig_name(tokens[1], cnt);
-          std::string s_i_name = per_instance_sig_name(tokens[2], cnt);
-          if (f_i_name == tokens[1]) {
-            if (port_connections.find(f_i_name) != port_connections.end()) {
-              f_i_name = port_connections[f_i_name];
-            } else {
-              connected = false;
-            }
-          }
-          if (s_i_name == tokens[2]) {
-            if (port_connections.find(s_i_name) != port_connections.end()) {
-              s_i_name = port_connections[s_i_name];
-            } else {
-              connected = false;
-            }
-          }
-          if (connected) {
-            std::string conn = tokens[0] + " " + f_i_name + " " + s_i_name + "\n1 1\n";
-            if (printed.find(conn) == printed.end()) {
-              printed.insert(conn);
-              ofs << conn;
-            }
-          }
+    for (auto &assign : TDP_RAM36K_Assigns) {
+      bool connected = true;
+      std::vector<std::string> tokens = split_on_space(assign);
+      std::string f_i_name = per_instance_sig_name(tokens[1], cnt);
+      std::string s_i_name = per_instance_sig_name(tokens[2], cnt);
+      if (f_i_name == tokens[1]) {
+        if (port_connections.find(f_i_name) != port_connections.end()) {
+          f_i_name = port_connections[f_i_name];
+        } else {
+          connected = false;
         }
+      }
+      if (s_i_name == tokens[2]) {
+        if (port_connections.find(s_i_name) != port_connections.end()) {
+          s_i_name = port_connections[s_i_name];
+        } else {
+          connected = false;
+        }
+      }
+      if (connected) {
+        ofs << tokens[0] << " " << f_i_name << " " << s_i_name << "\n1 1\n";
       }
     }
   }
