@@ -10,7 +10,7 @@ set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl_cmake/CMakeLists.txt)
-    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/opensslpkgConfig DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl/lib64)
+    file(COPY ${CMAKE_CURRENT_SOURCE_DIR}/lib64 DESTINATION ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl)
     set(OPENSSL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl)
     find_package(OpenSSL REQUIRED COMPONENTS Crypto)
     set(OPENSSL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl/include)
