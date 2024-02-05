@@ -9,6 +9,12 @@ set(LCC_PROJECT_NAME "Raptor")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
+set(OPENSSL_ROOT_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl)
+find_package(OpenSSL REQUIRED COMPONENTS Crypto)
+set(OPENSSL_INCLUDE_DIR ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl/include)
+set(OPENSSL_LIBRARIES ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl/libssl.so ${CMAKE_CURRENT_SOURCE_DIR}/../../FOEDAG/third_party/openssl/libcrypto.so)
+message(STATUS "****************** openssl include dir is ${OPENSSL_INCLUDE_DIR}")
+message(STATUS "****************** openssl libs are dir is ${OPENSSL_LIBRARIES}")
 # inputs for licensing_feature.py
 if(RAPTOR)
     set(XML_FILE ${CMAKE_CURRENT_SOURCE_DIR}/../../etc/device.xml)
@@ -57,3 +63,4 @@ target_link_libraries(example licensecc_static)
 
 # path for privte key -s= /projects/Raptor/       projects folder is built in with exctuable in build folder
 # -p /projects/Raptor/include/licensecc/Raptor/
+#generating /nfs_scratch/scratch/eda/nadeem/osfpga/openlmlic/umarway/FOEDAG_rs/projects/Raptor/include/licensecc/Raptor/public_key.h and /nfs_scratch/scratch/eda/nadeem/osfpga/openlmlic/umarway/FOEDAG_rs/projects/Raptor/private_key.rsa if they don't already exist
