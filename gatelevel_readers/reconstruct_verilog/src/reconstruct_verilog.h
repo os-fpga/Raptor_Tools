@@ -457,8 +457,8 @@ public:
         if (name.find("dff") != std::string::npos ||
             name == std::string("adder_carry") ||
             name == std::string("carry")) {
-          if (name == std::string("adder_carry")) {
-            name = std::string("carry");
+          if (name == std::string("carry")) {
+            name = std::string("adder_carry");
             for (int i = 2; i < tokens.size(); ++i) {
               auto itr = tokens[i].find('=');
               if (std::string::npos == itr) {
@@ -623,6 +623,9 @@ public:
       if (verilog_dsp_int_names.find(tokens[0]) != end(verilog_dsp_int_names)) {
         within_rs_dsp = true;
         hdr =  verilog_dsp_int_names[tokens[0]] ;
+      } else if(tokens[0] == "ADDER_CARRY") {
+        within_rs_dsp = false;
+        ofs << "    CARRY #(\n";
       } else if (tokens[0] == ");") {
         within_rs_dsp = false;
         hdr = "";
