@@ -416,9 +416,7 @@ struct TDP_RAM18KX2_instance {
 
     return extract_sram2(init2, parity2) + extract_sram1(init1, parity1);
   }
-  void print(std::ostream &ofs) {
-    static unsigned cnt = 0;
-    cnt++;
+  void print(std::ostream &ofs, unsigned cnt) {
     std::string rs_prim = "RS_TDP36K";
     ofs << ".subckt " << rs_prim << " ";
     for (auto &cn : TDP_RAM18KX2_to_RS_TDP36K_port_map) {
