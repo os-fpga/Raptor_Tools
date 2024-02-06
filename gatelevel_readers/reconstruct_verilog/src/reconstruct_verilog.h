@@ -463,14 +463,17 @@ public:
             ofs << ln << "\n";
           }
         } else if (tokens[0] == ".end") {
+          unsigned int cnt = 0;
           for (auto &ds : dsp38_instances) {
             ds.print(ofs);
           }
           for (auto &rm : TDP_RAM18KX2_instances) {
-            rm.print(ofs);
+            cnt++;
+            rm.print(ofs, cnt);
           }
           for (auto &rm : TDP_RAM36K_instances) {
-            rm.print(ofs);
+            cnt++;
+            rm.print(ofs, cnt);
           }
 
           ofs << ln << "\n";

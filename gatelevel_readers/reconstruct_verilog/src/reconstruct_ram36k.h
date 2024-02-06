@@ -469,9 +469,7 @@ struct TDP_RAM36K_instance {
     return MODE_BITS;
   };
 
-  void print(std::ostream &ofs) {
-    static unsigned cnt = 0;
-    cnt++;
+  void print(std::ostream &ofs,  unsigned cnt) {
     std::string rs_prim = "RS_TDP36K";
     ofs << ".subckt " << rs_prim << " ";
     for (auto &cn : TDP_RAM36K_to_RS_TDP36K_port_map) {
