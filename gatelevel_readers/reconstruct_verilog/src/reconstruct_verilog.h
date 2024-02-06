@@ -457,8 +457,8 @@ public:
         if (name.find("dff") != std::string::npos ||
             name == std::string("adder_carry") ||
             name == std::string("carry")) {
-          if (name == std::string("carry")) {
-            name = std::string("adder_carry");
+          if (name == std::string("adder_carry")) {
+            name = std::string("carry");
             for (int i = 2; i < tokens.size(); ++i) {
               auto itr = tokens[i].find('=');
               if (std::string::npos == itr) {
