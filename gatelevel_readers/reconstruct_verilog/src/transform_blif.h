@@ -364,16 +364,16 @@ class Eblif_Transformer {
       {'d', "1101"}, {'e', "1110"}, {'f', "1111"}, {'x', "xxxx"}};
   std::unordered_map<std::string, std::string> verilog_dsp_int_names = {
       {"RS_DSP_MULT",
-       "    DSP38 #(\n        .DSP_MODE(\"MULTIPY\"),\n        "
+       "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY\"),\n        "
        ".OUTPUT_REG_EN(\"FALSE\"),\n        .INPUT_REG_EN(\"FALSE\")"},
       {"RS_DSP_MULT_REGIN",
-       "    DSP38 #(\n        .DSP_MODE(\"MULTIPY\"),\n        "
+       "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY\"),\n        "
        ".OUTPUT_REG_EN(\"FALSE\"),\n        .INPUT_REG_EN(\"TRUE\")"},
       {"RS_DSP_MULT_REGOUT",
-       "    DSP38 #(\n        .DSP_MODE(\"MULTIPY\"),\n        "
+       "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY\"),\n        "
        ".OUTPUT_REG_EN(\"TRUE\"),\n        .INPUT_REG_EN(\"FALSE\")"},
       {"RS_DSP_MULT_REGIN_REGOUT",
-       "    DSP38 #(\n        .DSP_MODE(\"MULTIPY\"),\n        "
+       "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY\"),\n        "
        ".OUTPUT_REG_EN(\"TRUE\"),\n        .INPUT_REG_EN(\"TRUE\")"},
       {"RS_DSP_MULTADD",
        "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY_ADD_SUB\"),\n        "
