@@ -44,6 +44,35 @@ class Eblif_Transformer {
    *
    */
 
+  void replaceCarryTokens(std::string &line) {
+    // Replace tokens
+    size_t pos = 0;
+    while ((pos = line.find(".cin", pos)) != std::string::npos) {
+      line.replace(pos, 4, ".CIN");
+      pos += 4;
+    }
+    pos = 0;
+    while ((pos = line.find(".g", pos)) != std::string::npos) {
+      line.replace(pos, 2, ".G");
+      pos += 2;
+    }
+    pos = 0;
+    while ((pos = line.find(".p", pos)) != std::string::npos) {
+      line.replace(pos, 2, ".P");
+      pos += 2;
+    }
+    pos = 0;
+    while ((pos = line.find(".cout", pos)) != std::string::npos) {
+      line.replace(pos, 5, ".COUT");
+      pos += 5;
+    }
+    pos = 0;
+    while ((pos = line.find(".sumout", pos)) != std::string::npos) {
+      line.replace(pos, 7, ".O");
+      pos += 7;
+    }
+  }
+
   bool is_binary_param_(const std::string &param) {
     /* Must be non-empty */
     if (param.empty()) {
@@ -604,10 +633,11 @@ public:
   void rs_transform_verilog(std::istream &ifs, std::ostream &ofs) {
     std::string line;
     bool within_rs_dsp = false;
+    bool is_carry_mod = false;
     std::string hdr = "";
     while (std::getline(ifs, line)) {
       std::string ln(line);
-      while ('\\' == ln.back() && std::getline(ifs, line)) {
+      while (!ln.empty() && '\\' == ln.back() && std::getline(ifs, line)) {
         ln.pop_back();
         ln += " " + line;
       }
@@ -620,10 +650,18 @@ public:
       if (verilog_dsp_int_names.find(tokens[0]) != end(verilog_dsp_int_names)) {
         within_rs_dsp = true;
         hdr = verilog_dsp_int_names[tokens[0]];
+      } else if (tokens[0] == "ADDER_CARRY") {
+        within_rs_dsp = false;
+        is_carry_mod = true;
+        ofs << "    CARRY #(\n";
       } else if (tokens[0] == ");") {
         within_rs_dsp = false;
+        is_carry_mod = false;
         hdr = "";
         ofs << line << "\n";
+      } else if (is_carry_mod && '.' == tokens[0][0]) {
+        replaceCarryTokens(line);
+        ofs << line << '\n';
       } else if (within_rs_dsp && '.' == tokens[0][0]) {
         if (tokens[0].find("MODE_BITS") == 1) {
           std::string bts = tokens[0].substr(15);

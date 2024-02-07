@@ -9,7 +9,7 @@
  *
  */
 
-#include "reconstruct_verilog.h"
+#include "transform_blif.h"
 
 using namespace std;
 
