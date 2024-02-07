@@ -1,0 +1,98 @@
+cmake_minimum_required(VERSION 3.10)
+
+# Detect build type, fallback to release and throw a warning if use didn't
+# specify any
+if(NOT CMAKE_BUILD_TYPE)
+    message(WARNING "Build type not set, falling back to Release mode.
+        To specify build type use:
+        -DCMAKE_BUILD_TYPE=<mode> where <mode> is Debug or Release.")
+    set(CMAKE_BUILD_TYPE
+        "Release"
+        CACHE STRING "Choose the type of build, options are: Debug Release."
+        FORCE)
+endif(NOT CMAKE_BUILD_TYPE)
+
+# set the project name
+project(veri_prune)
+
+set(CMAKE_CXX_STANDARD 17)
+
+function(files_to_dirs file_list directory_list)
+    # Extract the directories for each header file
+    foreach(file ${${file_list}})
+        get_filename_component(dir ${file} DIRECTORY)
+        list(APPEND dir_list ${dir})
+    endforeach()
+
+    # Remove any duplicates
+    list(LENGTH "${dir_list}" length)
+
+    if(${length} GREATER 1) # Avoid error with zero-length lists
+        list(REMOVE_DUPLICATES ${dir_list})
+    endif()
+
+    # Set the second argument in the caller's scope
+    set(${directory_list} ${dir_list} PARENT_SCOPE)
+endfunction(files_to_dirs)
+
+file(GLOB_RECURSE LIB_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/*/*.cpp)
+
+if (APPLE)
+    set(OS "mac")
+elseif (UNIX)
+    set(OS "linux")
+endif()
+
+get_filename_component(BOOST_INCLUDE_DIR "../../libs/external/boost"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+get_filename_component(BOOST_ROOT "../../libs/external/boost"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+get_filename_component(YOSYS_SRC_DIR "../../yosys"
+  REALPATH BASE_DIR "${CMAKE_CURRENT_SOURCE_DIR}")
+
+set (Boost_NO_BOOST_CMAKE ON)
+find_package (Boost)
+include_directories(${Boost_INCLUDE_DIRS})
+files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS)
+find_package(PkgConfig REQUIRED)
+pkg_search_module(OPENSSL REQUIRED openssl)
+if(OPENSSL_FOUND)
+    include_directories(${OPENSSL_INCLUDE_DIRS})
+    message(STATUS "Using OpenSSL ${OPENSSL_VERSION}")
+else()
+    message("SSL not found")
+    # Error; with REQUIRED, pkg_search_module() will throw an error by it's own
+endif()
+
+add_subdirectory(gen_map)
+
+include_directories(PUBLIC ${LIB_INCLUDE_DIRS}
+                            ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune
+                            ${CMAKE_CURRENT_BINARY_DIR}/include
+                            ${CMAKE_CURRENT_SOURCE_DIR}/../../libs/external/nlohmann_json/
+                            ${YOSYS_SRC_DIR}/kernel
+                            ${YOSYS_SRC_DIR}/backends/rtlil
+                            ${YOSYS_SRC_DIR}/frontends
+)
+
+file(GLOB_RECURSE EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/veri_prune/*.cpp)
+list(APPEND EXEC_SOURCE ${CMAKE_CURRENT_SOURCE_DIR}/src/main.cpp)
+
+
+add_executable(veri_prune ${EXEC_SOURCE})
+target_link_libraries(veri_prune PUBLIC ${OPENSSL_LIBRARIES} ${Boost_LIBRARIES})
+if (CMAKE_BUILD_TYPE STREQUAL "Debug")
+    add_dependencies(veri_prune generate_map_target)
+else()
+    add_dependencies(veri_prune generate_map_target)
+endif()
+
+# Create the library
+add_library(libveriprune STATIC
+    ${LIB_SOURCE}
+)
+SET_TARGET_PROPERTIES(libveriprune PROPERTIES PREFIX "")
+target_link_libraries(libveriprune PUBLIC ${Boost_LIBRARIES})
+set_property(TARGET libveriprune PROPERTY POSITION_INDEPENDENT_CODE ON)
+message(STATUS "CMAKE_CXX_FLAGS: ${CMAKE_CXX_FLAGS}")
+    add_dependencies(libveriprune generate_map_target)
