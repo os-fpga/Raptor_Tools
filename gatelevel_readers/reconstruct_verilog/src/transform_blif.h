@@ -362,6 +362,16 @@ class Eblif_Transformer {
       {'A', "1010"}, {'B', "1011"}, {'C', "1100"}, {'D', "1101"}, {'E', "1110"},
       {'F', "1111"}, {'X', "xxxx"}, {'a', "1010"}, {'b', "1011"}, {'c', "1100"},
       {'d', "1101"}, {'e', "1110"}, {'f', "1111"}, {'x', "xxxx"}};
+  char hexEncode(std::string val) {
+    static std::unordered_map<string, char> hexEncoder = {
+        {"0000", '0'}, {"0001", '1'}, {"0010", '2'}, {"0011", '3'},
+        {"0100", '4'}, {"0101", '5'}, {"0110", '6'}, {"0111", '7'},
+        {"1000", '8'}, {"1001", '9'}, {"1010", 'A'}, {"1011", 'B'},
+        {"1100", 'C'}, {"1101", 'D'}, {"1110", 'E'}, {"1111", 'F'}};
+    if (hexEncoder.find(val) == end(hexEncoder))
+      return 'X';
+    return hexEncoder[val];
+  }
   std::unordered_map<std::string, std::string> verilog_dsp_int_names = {
       {"RS_DSP_MULT",
        "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY\"),\n        "
@@ -647,7 +657,32 @@ public:
         ofs << line << "\n";
         continue;
       }
-      if (verilog_dsp_int_names.find(tokens[0]) != end(verilog_dsp_int_names)) {
+      if (tokens[0].find("INIT_i") != std::string::npos) {
+        auto pos = tokens[0].find("'b");
+        if (pos != std::string::npos) {
+          std::string mval = tokens[0].substr(pos + 2);
+          std::string bck = "";
+          while (mval.back() != '0' && mval.back() != '1') {
+            bck.push_back(mval.back());
+            mval.pop_back();
+          }
+          std::reverse(bck.begin(), bck.end());
+          if (mval.size() % 4) { // not divisible by 4
+            ofs << line << "\n";
+            continue;
+          }
+          ofs << "        " <<tokens[0].substr(0, pos) << "'h";
+          for (int i = 0; i < mval.size(); i += 4) {
+            ofs << hexEncode(mval.substr(i, 4));
+          }
+          ofs << bck << "\n";
+          continue;
+        } else {
+          ofs << line << "\n";
+          continue;
+        }
+      } else if (verilog_dsp_int_names.find(tokens[0]) !=
+                 end(verilog_dsp_int_names)) {
         within_rs_dsp = true;
         hdr = verilog_dsp_int_names[tokens[0]];
       } else if (tokens[0] == "ADDER_CARRY") {
