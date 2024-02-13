@@ -381,7 +381,7 @@ struct TDP_RAM36K_instance {
       // assign RDATA_A   = {DATA_OUT_A2[15:0],  DATA_OUT_A1[15:0]};
       ".names DATA_OUT_A2[15]  RDATA_A[31]",
       ".names DATA_OUT_A2[14]  RDATA_A[30]",
-      ".names DATA_OUT_A2[13]  RDATA_A[29",
+      ".names DATA_OUT_A2[13]  RDATA_A[29]",
       ".names DATA_OUT_A2[12]  RDATA_A[28]",
       ".names DATA_OUT_A2[11]  RDATA_A[27]",
       ".names DATA_OUT_A2[10]  RDATA_A[26]",
@@ -419,7 +419,7 @@ struct TDP_RAM36K_instance {
       // assign RDATA_B   = {DATA_OUT_B2[15:0],  DATA_OUT_B1[15:0]};
       ".names DATA_OUT_B2[15]  RDATA_B[31]",
       ".names DATA_OUT_B2[14]  RDATA_B[30]",
-      ".names DATA_OUT_B2[13]  RDATA_B[29",
+      ".names DATA_OUT_B2[13]  RDATA_B[29]",
       ".names DATA_OUT_B2[12]  RDATA_B[28]",
       ".names DATA_OUT_B2[11]  RDATA_B[27]",
       ".names DATA_OUT_B2[10]  RDATA_B[26]",

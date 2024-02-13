@@ -19,4 +19,5 @@ diff ./res/TDP_RAM36K_primitive_inst_post_synth.eblif ../tests/RAM/golden/TDP_RA
 diff ./res/accum_output_registered_iverilog_post_rout.v ../tests/new_DSP38/golden/accum_output_registered_iverilog_post_rout_golden.v
 ./bin/finalize ../tests/DSP19x2/eda_2323_post_synth.eblif ./res/eda_2323_post_synth.eblif
 diff ./res/eda_2323_post_synth.eblif ../tests/DSP19x2/golden/eda_2323_post_synth_golden.eblif
-
+./bin/finalize ../tests/RAM/ram_simple_dp_dc_512x32_post_route.v ./res/ram_simple_dp_dc_512x32_post_route.v
+diff ./res/ram_simple_dp_dc_512x32_post_route.v ../tests/RAM/golden/ram_simple_dp_dc_512x32_post_route_golden.v
