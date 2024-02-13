@@ -10,7 +10,7 @@ $(error "Didn't find 'yosys-config' under '$(YOSYS_PATH)'")
 endif
 
 CXX ?= $(shell $(YOSYS_CONFIG) --cxx)
-CXXFLAGS ?= $(shell $(YOSYS_CONFIG) --cxxflags) -Isrc/veri_prune -I../../libs/external/nlohmann_json
+CXXFLAGS ?= $(shell $(YOSYS_CONFIG) --cxxflags) -Isrc/veri_prune -I../../libs/external/nlohmann_json -v
 LDFLAGS ?= $(shell $(YOSYS_CONFIG) --ldflags)
 LDLIBS ?= $(shell $(YOSYS_CONFIG) --ldlibs)
 PLUGINS_DIR ?= $(shell $(YOSYS_CONFIG) --datdir)/plugins
@@ -66,20 +66,39 @@ VERILOG_MODULES	= $(COMMON)/cells_sim.v \
 				  $(GENESIS3)/dsp38_map.v \
 				  $(GENESIS3)/FPGA_PRIMITIVES_MODELS/sim_models/verilog/DSP38.v
 
-NAME = veri_prune
-SOURCES = src/veri_prune/veri_prune.cpp 
+# Directories
+SRC_DIR = src
+BUILD_DIR = build
+LIB_DIR = lib
 
-OBJS := $(SOURCES:cpp=o)
+# Source files
+SRC_FILES := $(wildcard $(SRC_DIR)/veri_prune/*.cpp)
+OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
 
-all: $(NAME).so
+# Executable name
+EXEC_NAME = veriprune
 
-$(OBJS): %.o: %.cpp $(DEPS)
-	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) -c -o $@ $(filter %.cpp, $^)
+# Static library name
+LIB_NAME = libveriprune.a
 
-$(NAME).so: $(OBJS)
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
+# Targets
+all: $(BUILD_DIR)/$(EXEC_NAME)
 
-install_plugin: $(NAME).so
+# Build executable
+$(BUILD_DIR)/$(EXEC_NAME): $(BUILD_DIR)/main.o $(LIB_DIR)/$(LIB_NAME)
+	$(CXX) $(CXXFLAGS) -o $@ $< -L$(LIB_DIR) -l:$(LIB_NAME)
+
+# Build object files
+$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
+	mkdir -p $(@D)
+	$(CXX) $(CXXFLAGS) -c $< -o $@
+
+# Build static library
+$(LIB_DIR)/$(LIB_NAME): $(OBJ_FILES)
+	mkdir -p $(@D)
+	ar rcs $@ $^
+
+install_plugin: $(BUILD_DIR)/$(EXEC_NAME)
 	install -D $< $(PLUGINS_DIR)/$<
 
 install_modules: $(VERILOG_MODULES)
@@ -100,6 +119,7 @@ test_gen:
 test:
 	$(MAKE) -C tests tests_gen2 YOSYS_PATH=$(YOSYS_PATH)
 
+# Clean
 clean:
-	rm -rf src/*.d src/*.o *.so pmgen/
+	rm -rf $(BUILD_DIR)/*.o $(BUILD_DIR)/$(EXEC_NAME) $(LIB_DIR)/*.a
 	

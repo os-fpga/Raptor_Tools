@@ -19,11 +19,11 @@
 #include <ostream>
 using json = nlohmann::json;
 USING_YOSYS_NAMESPACE
-PRIVATE_NAMESPACE_BEGIN
+//PUBLIC_NAMESPACE_BEGIN
 
 int prune_verilog(const char *file_name, gb_constructs &gb,
 				const std::string &device_name) {
 	std::cout << "Just started working on the tool" << std::endl;
 	return 0; // Status OK
 }
-PRIVATE_NAMESPACE_END
+//PRIVATE_NAMESPACE_EN

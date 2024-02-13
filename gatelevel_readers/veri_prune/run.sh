@@ -1,7 +1,7 @@
-mkdir build
-cd build && rm -rf *
-cmake ..
-make -j
+#mkdir build
+#cd build && rm -rf *
+#cmake ..
+#make -j
 #./veri_prune ../example/OSERDES_4_to_1/o_serdes_4_to_1_gate.v oserdes_nl.v oserdes_wrapper.v
 #./veri_prune ../example/io_buf.v io_buf_nl.v io_buf_wrapper.v
 #./veri_prune ../example/ibuf_obuf.v ibuf_obuf_nl.v ibuf_obuf_wrapper.v
@@ -15,4 +15,5 @@ make -j
 #./veri_prune ../example/Output_DDR/output_ddr_gate.v output_ddr_gate_nl.v output_ddr_gate_wrapper.v
 #./veri_prune ../example/SERDES_DESIGN/serdes_post_synth.v serdes_post_synth_nl.v serdes_post_synth_wrapper.v
 #./veri_prune ../example/Tristate/tristate_gate.v tristate_gate_nl.v tristate_gate_wrapper.v
-./veri_prune -f ../example/serdies/serdes_top_post_synth.v -o serdies_nl.v -w serdies_wrapper.v -u ../example/example_1.txt -p ../example/Gemini_Pin_Table.csv -os output.sdc
+cd build
+./veriprune -f ../example/serdies/serdes_top_post_synth.v -o serdies_nl.v -w serdies_wrapper.v -u ../example/example_1.txt -p ../example/Gemini_Pin_Table.csv -os output.sdc
