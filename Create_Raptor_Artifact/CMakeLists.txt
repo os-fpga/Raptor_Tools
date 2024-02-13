@@ -33,9 +33,9 @@ project(RaptorInstaller DESCRIPTION "Raptor installer")
 
 set(FETCHCONTENT_QUIET FALSE)
 #set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../os-fpga/Raptor/${RELEASE_VERSION})
-set(EXT_LIBS_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/external_libs_feb12_2024.tar.gz)
+set(EXT_LIBS_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/external_libs_13feb24.tar.gz)
 set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
-set(expected_size 199444001)
+set(expected_size 199851300)
 
 # Raptor Install Path,
 if (NOT RAPTOR_INSTALL_PATH)
