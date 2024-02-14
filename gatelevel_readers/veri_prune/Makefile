@@ -68,37 +68,21 @@ VERILOG_MODULES	= $(COMMON)/cells_sim.v \
 
 # Directories
 SRC_DIR = src
-BUILD_DIR = build
-LIB_DIR = lib
+NAME = veriprune
 
 # Source files
 SRC_FILES := $(wildcard $(SRC_DIR)/veri_prune/*.cpp)
-OBJ_FILES := $(patsubst $(SRC_DIR)/%.cpp,$(BUILD_DIR)/%.o,$(SRC_FILES))
-
-# Executable name
-EXEC_NAME = veriprune
-
-# Static library name
-LIB_NAME = libveriprune.a
+OBJS := $(SRC_FILES:cpp=o)
 
 # Targets
-all: $(BUILD_DIR)/$(EXEC_NAME)
+all: $(NAME).so
+$(OBJS): %.o: %.cpp
+	$(CXX) $(CXXFLAGS) $(CPPFLAGS) $(EXTRA_FLAGS) -c -o $@ $(filter %.cpp, $^)
 
-# Build executable
-$(BUILD_DIR)/$(EXEC_NAME): $(BUILD_DIR)/main.o $(LIB_DIR)/$(LIB_NAME)
-	$(CXX) $(CXXFLAGS) -o $@ $< -L$(LIB_DIR) -l:$(LIB_NAME)
+$(NAME).so: $(OBJS)
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -shared -o $@ $^ $(LDLIBS)
 
-# Build object files
-$(BUILD_DIR)/%.o: $(SRC_DIR)/%.cpp
-	mkdir -p $(@D)
-	$(CXX) $(CXXFLAGS) -c $< -o $@
-
-# Build static library
-$(LIB_DIR)/$(LIB_NAME): $(OBJ_FILES)
-	mkdir -p $(@D)
-	ar rcs $@ $^
-
-install_plugin: $(BUILD_DIR)/$(EXEC_NAME)
+install_plugin: $(NAME).so
 	install -D $< $(PLUGINS_DIR)/$<
 
 install_modules: $(VERILOG_MODULES)
