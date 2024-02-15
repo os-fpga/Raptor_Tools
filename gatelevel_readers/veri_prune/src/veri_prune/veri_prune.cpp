@@ -19,6 +19,7 @@
 #include <ostream>
 using json = nlohmann::json;
 USING_YOSYS_NAMESPACE
+using namespace RTLIL;
 
 struct EditingTool : public ScriptPass 
 {
@@ -38,8 +39,12 @@ struct EditingTool : public ScriptPass
 
     string netlist_file;
 	string interface_file;
+	string wrapper_file;
    
 	RTLIL::Design *_design;
+	#ifdef GB_CONSTRUCTS_DATA
+		gb_constructs_data gb_mods_data;
+	#endif
 
 	void clear_flags() override
     {
@@ -61,36 +66,27 @@ struct EditingTool : public ScriptPass
                 continue;
             }
 			if ((args[argidx] == "-w" || args[argidx] == "--wrapper") && argidx + 1 < args.size()) {
-                interface_file = args[++argidx];
+                wrapper_file = args[++argidx];
                 continue;
             }
             break;
         }
-
 		extra_args(args, argidx, design);
-
-
 		run_script(design);
 	}
 
 	void script() override
     {
 		std::cout << "Run Script" << std::endl;
-
 		for (auto mod : _design->modules())
 		{
 			// Iterate over all cells in the module
-			
     		for (auto cell :  mod->cells()) {
     		    if (cell->type == RTLIL::escape_id("I_BUF")) {
 					// Print the instance and module name
 					log("Instance name: %s  of Module: %s\n ", log_id(cell->name), log_id(cell->type));
 				}
     		}
-		}
-
-		
-		
-		
+		}	
 	}
 }EditingTool;
