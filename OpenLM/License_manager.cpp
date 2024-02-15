@@ -1,4 +1,5 @@
 #include "License_manager.hpp"
+#include <cstring>
 
 using namespace std;
 
@@ -12,7 +13,7 @@ const unordered_map<int, string> stringByEventType = {
 	{ENVIRONMENT_VARIABLE_NOT_DEFINED, "environment variable not defined "},
 	{FILE_FORMAT_NOT_RECOGNIZED, "license file has invalid format (not .ini file) "},
 	{LICENSE_MALFORMED, "some mandatory field are missing, or data can't be fully read. "},
-	{PRODUCT_NOT_LICENSED, "this product was not licensed "},
+	{PRODUCT_NOT_LICENSED, "this product is not licensed "},
 	{PRODUCT_EXPIRED, "license expired "},
 	{LICENSE_CORRUPTED, "license signature didn't match with current license "},
 	{IDENTIFIERS_MISMATCH, "Calculated identifier and the one provided in license didn't match"}};
@@ -42,48 +43,49 @@ License_Manager::License_Manager(std::string licensedProductName) {
     }
 
 bool License_Manager::licenseCheckout(const string &productName) {
+    string featureName = productName;
+    LicenseLocation licLocation = {LICENSE_PATH};
+    //const char* env_var_value = std::getenv("LICENSE_LOCATION");
     LicenseInfo licenseInfo;
-	char hw_identifier[LCC_API_PC_IDENTIFIER_SIZE + 1];
-	size_t bufSize = LCC_API_PC_IDENTIFIER_SIZE + 1;
-	ExecutionEnvironmentInfo exec_env_info;
-	for (const auto& x : stringByStrategyId) {
-		if (identify_pc(static_cast<LCC_API_HW_IDENTIFICATION_STRATEGY>(x.first), hw_identifier, &bufSize,
-						&exec_env_info)) {
-		//	std::cout << x.second << ':' << hw_identifier << std::endl;
-		} else {
-			std::cout << x.second << ": NA" << endl;
-		}
-	}
-	size_t pc_id_sz = LCC_API_PC_IDENTIFIER_SIZE + 1;
-	char pc_identifier[LCC_API_PC_IDENTIFIER_SIZE + 1];
-    	CallerInformations callInfo;
-	strcpy(callInfo.feature_name,productName.c_str());
-	LicenseLocation licLocation = {LICENSE_PATH};
-     const char* env_var_value = std::getenv("LICENSE_LOCATION");
-		if (env_var_value != nullptr && env_var_value[0] != '\0') {
-			const vector<string> declared_licenses = split_string(string(env_var_value), ';');
-			for (string fname : declared_licenses) {
-				ifstream license_file(fname);
-               std::copy(fname.begin(), fname.end(), licLocation.licenseData); }}
-    LCC_EVENT_TYPE result = acquire_license(&callInfo, &licLocation, &licenseInfo);
+    size_t pc_id_sz = LCC_API_PC_IDENTIFIER_SIZE + 1;
+    char pc_identifier[LCC_API_PC_IDENTIFIER_SIZE + 1];
+
+    LCC_EVENT_TYPE result = acquire_license(nullptr, &licLocation, &licenseInfo);
 
     if (result == LICENSE_OK) {
-        cout << "License OK" << endl;
-        if (!licenseInfo.linked_to_pc) {
-            cout << "No hardware signature in license file. This is a 'demo' license that works on every PC." << endl;
+        cout << "License for Raptor software OK" << endl;
+        CallerInformations callerInfo;        
+        strncpy(callerInfo.feature_name, featureName.c_str(), sizeof(callerInfo.feature_name) - 1);
+        callerInfo.feature_name[sizeof(callerInfo.feature_name) - 1] = '\0';
+        /*
+        // turn on below lines for debug 
+        cout << "Copied feature name: " << callerInfo.feature_name << endl;
+        cout << "Length of callerInfo.feature_name: " << strlen(callerInfo.feature_name) << endl;
+        cout << "Length of productName: " << featureName.length() << endl;
+        cout << "productNmae is "  << featureName.c_str() << endl;
+        */
+        //CallerInformations callerInfo = {"\0", "MPW1"};  // another way to send call to CallerInformations
+        result = acquire_license(&callerInfo, &licLocation, &licenseInfo);
+        if (result == LICENSE_OK) {
+            cout << productName.c_str() << "  is licensed" << endl;
+            return true;
+        } else {
+            cout << productName.c_str() << "  is NOT licensed because " << stringByEventType.at(result) << endl;
+            return false;
         }
-        return true;  // Successful checkout
     } else {
-		
-        cout << "License ERROR :" << endl;
+        cout << "License ERROR:" << endl;
         cout << "    " << stringByEventType.at(result) << endl;
-		if (identify_pc(STRATEGY_DEFAULT, pc_identifier, &pc_id_sz, nullptr)) {
-			cout << "hardware id is :" << endl;
-			cout << "    " << pc_identifier << endl;
-		}
-        return false;  // Unsuccessful checkout
+        if (identify_pc(STRATEGY_DEFAULT, pc_identifier, &pc_id_sz, nullptr)) {
+            cout << "PC signature is:" << endl;
+            cout << "    " << pc_identifier << endl;
+        } else {
+            cout << "Errors in identify_pc" << endl;
+        }
+        return false;
     }
 }
+
 
 const vector<string> License_Manager::split_string(const string &licensePositions, char splitchar) {
 	std::stringstream streamToSplit(licensePositions);
