@@ -55,11 +55,11 @@ struct EditingTool : public ScriptPass
 
 		size_t argidx;
         for (argidx = 1; argidx < args.size(); argidx++) {
-            if ((args[argidx] == "-f" || args[argidx] == "--file") && argidx + 1 < args.size()) {
-                netlist_file = args[++argidx];
+			if ((args[argidx] == "-o" || args[argidx] == "--out") && argidx + 1 < args.size()) {
+                interface_file = args[++argidx];
                 continue;
             }
-			if ((args[argidx] == "-o" || args[argidx] == "--out") && argidx + 1 < args.size()) {
+			if ((args[argidx] == "-w" || args[argidx] == "--wrapper") && argidx + 1 < args.size()) {
                 interface_file = args[++argidx];
                 continue;
             }
@@ -68,12 +68,17 @@ struct EditingTool : public ScriptPass
 
 		extra_args(args, argidx, design);
 
+
 		run_script(design);
 	}
 
 	void script() override
     {
 		std::cout << "Run Script" << std::endl;
+
+		RTLIL::Module *module = _design->addModule("\\absval");
+        log("Name of this module: %s\n", log_id(module));
+		
 		
 	}
 }EditingTool;
@@ -81,5 +86,6 @@ struct EditingTool : public ScriptPass
 int prune_verilog(const char *file_name, gb_constructs &gb,
 				const std::string &device_name) {
 	std::cout << "Just started working on the tool" << std::endl;
+	gb_constructs_data gb_mods_data;
 	return 0; // Status OK
 }
