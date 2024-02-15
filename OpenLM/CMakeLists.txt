@@ -55,17 +55,18 @@ add_custom_command(
 add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
 
 # Define targets
-add_executable(example src/example.cpp License_manager.cpp)
-add_library(rs_licenseManager License_manager.cpp)
+#add_executable(example src/example.cpp License_manager.cpp)
+#add_dependencies(example generate_license_manager_hpp)
 
 # Ensure License_manager.hpp is generated before building these targets
+add_library(rs_licenseManager License_manager.cpp)
 add_dependencies(rs_licenseManager generate_license_manager_hpp)
-add_dependencies(example generate_license_manager_hpp)
 
 # Link libraries
 cmake_policy(SET CMP0028 NEW)
 target_link_libraries(rs_licenseManager licensecc_static)
-target_link_libraries(example licensecc_static)
+add_dependencies(rs_licenseManager install_licensecc)
+#target_link_libraries(example licensecc_static)
 
 # path for privte key -s= /projects/Raptor/       projects folder is built in with exctuable in build folder
 # -p /projects/Raptor/include/licensecc/Raptor/

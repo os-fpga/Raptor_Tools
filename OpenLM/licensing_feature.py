@@ -53,12 +53,13 @@ def create_cpp_header(device_names, header_file_path):
         file.write("    enum class LicensedProductName {\n")
         for name in device_names:
             file.write(f"        {name},\n")
+        file.write(f"        DE,\n")    
         file.write("    };\n\n")
         file.write("    map<License_Manager::LicensedProductName, string> licensedProductNameMap = {\n")
         for i, name in enumerate(device_names):              
             enum_name = 'RS' + name if name[0].isdigit() else name  # Prepend 'RS' if name starts with a digit
-            separator = "," if i < len(device_names) - 1 else ""
-            file.write(f"        {{License_Manager::LicensedProductName::{enum_name}, \"{name}\"}}{separator}\n")        
+            file.write(f"        {{License_Manager::LicensedProductName::{enum_name}, \"{name}\"}},\n")
+        file.write(f"        {{License_Manager::LicensedProductName::DE, \"de\"}}\n")
         file.write("    };\n\n")      
         file.write("    License_Manager(LicensedProductName licensedProductName);\n")
         file.write("    License_Manager(string licensedProductName);\n")
