@@ -1,12 +1,12 @@
-// Wrapper to MAP New Primitive to Old Primitive for Synthesis
+// BRAM Mapping File
 
 module TDP_RAM36K #(
     parameter [32767:0] INIT          = {32768{1'b0}}, // Initial Contents of data memory
-    parameter [4095:0] INIT_PARITY    = {4096{1'b0}}, // Initial Contents of parity memory
-    parameter WRITE_WIDTH_A           = 36, // Write data width on port A (1-36)
-    parameter READ_WIDTH_A            = 36, // Read data width on port A (1-36)
-    parameter WRITE_WIDTH_B           = 36, // Write data width on port B (1-36)
-    parameter READ_WIDTH_B            = 36  // Read data width on port B (1-36)
+    parameter [4095:0]  INIT_PARITY   = {4096{1'b0}}, // Initial Contents of parity memory
+    parameter WRITE_WIDTH_A           = 36, // Write data width on port A (1,2,4,9,18, 36)
+    parameter READ_WIDTH_A            = 36, // Read data width on port A  (1,2,4,9,18, 36)
+    parameter WRITE_WIDTH_B           = 36, // Write data width on port B (1,2,4,9,18, 36)
+    parameter READ_WIDTH_B            = 36  // Read data width on port B  (1,2,4,9,18, 36)
   ) 
   (
     // Ports
@@ -30,16 +30,6 @@ module TDP_RAM36K #(
     output wire [3:0] RPARITY_B // Read parity port B
   );
   
-  // internal wires
-  wire [17:0] DATA_OUT_A1;
-  wire [17:0] DATA_OUT_A2;
-  wire [17:0] DATA_OUT_B1;
-  wire [17:0] DATA_OUT_B2;
-  
-  wire [17:0] WDATA_A1;
-  wire [17:0] WDATA_A2;
-  wire [17:0] WDATA_B1;
-  wire [17:0] WDATA_B2;
 
   // Modes Mapping
   localparam write_mode_A =   WRITE_WIDTH_A == 36 ? 3'b110 : 
@@ -66,29 +56,33 @@ module TDP_RAM36K #(
                               READ_WIDTH_B  == 4  ? 3'b001 :
                               READ_WIDTH_B  == 2  ? 3'b011 : 3'b101 ;
   
-  // Write Data Port A
-  assign WDATA_A1 = (WRITE_WIDTH_A == 36 || WRITE_WIDTH_A == 18) ? {WPARITY_A[1:0], WDATA_A[15:0]} :
-                    (WRITE_WIDTH_A == 9 || WRITE_WIDTH_A == 4 || WRITE_WIDTH_A == 2 || WRITE_WIDTH_A == 1) ? {WPARITY_A[0], 8'd0, WDATA_A[7:0]} : 18'bzzzzzzzzzzzzzzzzzz;
-  assign WDATA_A2 = (WRITE_WIDTH_A == 36 || WRITE_WIDTH_A == 18) ? {WPARITY_A[3:2], WDATA_A[31:16]} : 18'bzzzzzzzzzzzzzzzzzz;
-
-  // Write Data Port B
-  assign WDATA_B1 = (WRITE_WIDTH_B == 36 || WRITE_WIDTH_B == 18) ? {WPARITY_B[1:0], WDATA_B[15:0]} :
-                    (WRITE_WIDTH_B == 9 || WRITE_WIDTH_B == 4 || WRITE_WIDTH_B == 2 || WRITE_WIDTH_B == 1) ? {WPARITY_B[0], 8'd0, WDATA_B[7:0]} : 18'bzzzzzzzzzzzzzzzzzz;
-  assign WDATA_B2 = (WRITE_WIDTH_B == 36 || WRITE_WIDTH_B == 18) ? {WPARITY_B[3:2], WDATA_B[31:16]} : 18'bzzzzzzzzzzzzzzzzzz;   
+    // internal wires
   
+    wire [17:0] WDATA_A1;
+    wire [17:0] WDATA_A2;
+  // Write Data Port A
+    assign WDATA_A1 = {WPARITY_A[1:0], WDATA_A[15:0]};
+    assign WDATA_A2 = {WPARITY_A[3:2], WDATA_A[31:16]};
+
+    wire [17:0] WDATA_B1;
+    wire [17:0] WDATA_B2;
+  // Write Data Port B
+    assign WDATA_B1 = {WPARITY_B[1:0], WDATA_B[15:0]};
+    assign WDATA_B2 = {WPARITY_B[3:2], WDATA_B[31:16]}; 
+
+    wire [17:0] DATA_OUT_A1;
+    wire [17:0] DATA_OUT_A2;
   // Read Data Port A
-  assign RDATA_A   = (READ_WIDTH_A == 36 || READ_WIDTH_A == 18) ? {DATA_OUT_A2[15:0], DATA_OUT_A1[15:0]} :
-                     (READ_WIDTH_A == 9 || READ_WIDTH_A == 4 || READ_WIDTH_A == 2 || READ_WIDTH_A == 1) ? DATA_OUT_A1[7:0] : 32'bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
-  assign RPARITY_A = (READ_WIDTH_A == 36 || READ_WIDTH_A == 18) ? {DATA_OUT_A2[17:16], DATA_OUT_A1[17:16]} :
-                     (READ_WIDTH_A == 9 || READ_WIDTH_A == 4 || READ_WIDTH_A == 2 || READ_WIDTH_A == 1) ? DATA_OUT_A1[16] : 4'bzzzz;
+    assign RDATA_A   = {DATA_OUT_A2[15:0],  DATA_OUT_A1[15:0]};
+    assign RPARITY_A = {DATA_OUT_A2[17:16], DATA_OUT_A1[17:16]};
 
+    wire [17:0] DATA_OUT_B1;
+    wire [17:0] DATA_OUT_B2;
   // Read Data Port B
-  assign RDATA_B   = (READ_WIDTH_B == 36 || READ_WIDTH_B == 18) ? {DATA_OUT_B2[15:0], DATA_OUT_B1[15:0]} :
-                     (READ_WIDTH_B == 9 || READ_WIDTH_B == 4 || READ_WIDTH_B == 2 || READ_WIDTH_B == 1) ? DATA_OUT_B1[7:0] : 32'bzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzzz;
-  assign RPARITY_B = (READ_WIDTH_B == 36 || READ_WIDTH_B == 18) ? {DATA_OUT_B2[17:16], DATA_OUT_B1[17:16]} :
-                     (READ_WIDTH_B == 9 || READ_WIDTH_B == 4 || READ_WIDTH_B == 2 || READ_WIDTH_B == 1) ? DATA_OUT_B1[16] : 4'bzzzz;
-
-/*/ Memory Initialization
+    assign RDATA_B   = {DATA_OUT_B2[15:0],  DATA_OUT_B1[15:0]};
+    assign RPARITY_B = {DATA_OUT_B2[17:16], DATA_OUT_B1[17:16]};
+/*
+// Memory Initialization
 function [18432-1:0] sram1();
     integer i;
     sram1 = {18432{1'b0}};
@@ -111,42 +105,42 @@ localparam INIT_i1 = {sram2(), sram1()};
 */
 // Mode Bits
 localparam [0:80] MODE_BITS = {1'b0, read_mode_A, read_mode_B, write_mode_A, write_mode_B, 29'd0, read_mode_A, read_mode_B, write_mode_A, write_mode_B, 27'd0};
-  
+
   // Old Model
   RS_TDP36K  #(
       .MODE_BITS(MODE_BITS)
-      //.INIT_i(INIT_i1)
+      // .INIT_i(INIT_i1)
   ) RS_TDP36K_inst (
-      .WEN_A1(WEN_A), // <input name="WEN_A1" num_pins="1"/>
-      .WEN_B1(WEN_B), // <input name="WEN_B1" num_pins="1"/>
-      .REN_A1(REN_A), // <input name="REN_A1" num_pins="1"/>
-      .REN_B1(REN_B), // <input name="REN_B1" num_pins="1"/>
-      .CLK_A1(CLK_A), // <clock name="CLK_A1" num_pins="1"/>
-      .CLK_B1(CLK_B), // <clock name="CLK_B1" num_pins="1"/>
-      .BE_A1(BE_A[1:0]), // <input name="BE_A1" num_pins="2"/>
-      .BE_B1(BE_B[1:0]), // <input name="BE_B1" num_pins="2"/>
-      .ADDR_A1(ADDR_A), //  <input name="ADDR_A1" num_pins="15"/>
-      .ADDR_B1(ADDR_B), // <input name="ADDR_B1" num_pins="15"/>
-      .WDATA_A1(WDATA_A1), // <input name="WDATA_A1" num_pins="18"/>
-      .WDATA_B1(WDATA_B1), // <input name="WDATA_B1" num_pins="18"/>
-      .RDATA_A1(DATA_OUT_A1), // <output name="RDATA_A1" num_pins="18"/>
-      .RDATA_B1(DATA_OUT_B1), // <output name="RDATA_B1" num_pins="18"/>
-      .FLUSH1(1'b0), // <input name="FLUSH1" num_pins="1"/>
-      .WEN_A2(WEN_A), // <input name="WEN_A2" num_pins="1"/>
-      .WEN_B2(WEN_B), // <input name="WEN_B2" num_pins="1"/>
-      .REN_A2(REN_A), // <input name="REN_A2" num_pins="1"/>
-      .REN_B2(REN_B), // <input name="REN_B2" num_pins="1"/>
-      .CLK_A2(CLK_A), // <clock name="CLK_A2" num_pins="1"/>
-      .CLK_B2(CLK_B), // <clock name="CLK_B2" num_pins="1"/>
-      .BE_A2(BE_A[3:2]), // <input name="BE_A2" num_pins="2"/>
-      .BE_B2(BE_B[3:2]), // <input name="BE_B2" num_pins="2"/>
-      .ADDR_A2(ADDR_A), // <input name="ADDR_A2" num_pins="14"/>
-      .ADDR_B2(ADDR_B), // <input name="ADDR_B2" num_pins="14"/>
-      .WDATA_A2(WDATA_A2), // <input name="WDATA_A2" num_pins="18"/>
-      .WDATA_B2(WDATA_B2), // <input name="WDATA_B2" num_pins="18"/>
-      .RDATA_A2(DATA_OUT_A2), // <output name="RDATA_A2" num_pins="18"/>
-      .RDATA_B2(DATA_OUT_B2), // <output name="RDATA_B2" num_pins="18"/>
-      .FLUSH2(1'b0) // <input name="FLUSH2" num_pins="1"/>
+      .WEN_A1(WEN_A),
+      .WEN_B1(WEN_B),
+      .REN_A1(REN_A),
+      .REN_B1(REN_B),
+      .CLK_A1(CLK_A),
+      .CLK_B1(CLK_B),
+      .BE_A1(BE_A[1:0]),
+      .BE_B1(BE_B[1:0]),
+      .ADDR_A1(ADDR_A),
+      .ADDR_B1(ADDR_B),
+      .WDATA_A1(WDATA_A1),
+      .WDATA_B1(WDATA_B1),
+      .RDATA_A1(DATA_OUT_A1),
+      .RDATA_B1(DATA_OUT_B1),
+      .FLUSH1(1'b0),
+      .WEN_A2(WEN_A),
+      .WEN_B2(WEN_B),
+      .REN_A2(REN_A),
+      .REN_B2(REN_B),
+      .CLK_A2(CLK_A),
+      .CLK_B2(CLK_B),
+      .BE_A2(BE_A[3:2]),
+      .BE_B2(BE_B[3:2]),
+      .ADDR_A2(ADDR_A[13:0]),
+      .ADDR_B2(ADDR_B[13:0]),
+      .WDATA_A2(WDATA_A2),
+      .WDATA_B2(WDATA_B2),
+      .RDATA_A2(DATA_OUT_A2),
+      .RDATA_B2(DATA_OUT_B2),
+      .FLUSH2(1'b0)
   );
   /*
   initial 
