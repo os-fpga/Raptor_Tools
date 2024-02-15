@@ -27,7 +27,7 @@ struct EditingTool : public ScriptPass
 	void help() override
     {
         log("\n");
-        log("This command runs power extraction for RapidSilicon FPGAs\n");
+        log("This command runs Netlist editing tool\n");
         log("\n");
         log("    -verilog <file>\n");
         log("        Write the design to the specified verilog file. writing of an output file\n");
@@ -54,6 +54,7 @@ struct EditingTool : public ScriptPass
 		std::cout << "Execute Function override" << std::endl;
 
 		size_t argidx;
+		// TODO: Will send the arguments and test after parsing is done 
         for (argidx = 1; argidx < args.size(); argidx++) {
 			if ((args[argidx] == "-o" || args[argidx] == "--out") && argidx + 1 < args.size()) {
                 interface_file = args[++argidx];
@@ -76,16 +77,20 @@ struct EditingTool : public ScriptPass
     {
 		std::cout << "Run Script" << std::endl;
 
-		RTLIL::Module *module = _design->addModule("\\absval");
-        log("Name of this module: %s\n", log_id(module));
+		for (auto mod : _design->modules())
+		{
+			// Iterate over all cells in the module
+			
+    		for (auto cell :  mod->cells()) {
+    		    if (cell->type == RTLIL::escape_id("I_BUF")) {
+					// Print the instance and module name
+					log("Instance name: %s  of Module: %s\n ", log_id(cell->name), log_id(cell->type));
+				}
+    		}
+		}
+
+		
 		
 		
 	}
 }EditingTool;
-
-int prune_verilog(const char *file_name, gb_constructs &gb,
-				const std::string &device_name) {
-	std::cout << "Just started working on the tool" << std::endl;
-	gb_constructs_data gb_mods_data;
-	return 0; // Status OK
-}
