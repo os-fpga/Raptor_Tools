@@ -681,7 +681,7 @@ public:
           ofs << line << "\n";
           continue;
         }
-      } else if (verilog_dsp_int_names.find(tokens[0]) !=
+      } else if (false && verilog_dsp_int_names.find(tokens[0]) !=
                  end(verilog_dsp_int_names)) {
         within_rs_dsp = true;
         hdr = verilog_dsp_int_names[tokens[0]];

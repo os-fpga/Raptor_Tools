@@ -803,16 +803,10 @@ module accum_output_registered_iverilog (
 
 
     //Cell instances
-    DSP38 #(
-        .DSP_MODE("MULTIPLY_ACCUMULATE"),
-        .OUTPUT_REG_EN("TRUE"),
-        .INPUT_REG_EN("FALSE"),
-        .COEFF_0(20'b00000000000000000000),
-        .COEFF_1(20'b00000000000000000000),
-        .COEFF_2(20'b00000000000000000000),
-        .COEFF_3(20'b00000000000000000000)
+    RS_DSP_MULTACC_REGOUT #(
+        .MODE_BITS(80'b00000000000000000000000000000000000000000000000000000000000000000000000000000000)
     ) \RS_DSP_MULTACC_REGOUT_z_out[36]  (
-        .A({ 
+        .a({
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_0_19 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_0_18 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_0_17 ,
@@ -834,7 +828,7 @@ module accum_output_registered_iverilog (
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_0_1 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_0_0 
          }),
-        .B({ 
+        .b({
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_1_17 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_1_16 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_1_15 ,
@@ -854,17 +848,17 @@ module accum_output_registered_iverilog (
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_1_1 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_1_0 
          }),
-        .CLK(\RS_DSP_MULTACC_REGOUT_z_out[36]_clock_0_0 ), 
-        .FEEDBACK({ 
+        .clk(\RS_DSP_MULTACC_REGOUT_z_out[36]_clock_0_0 ),
+        .feedback({
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_2_2 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_2_1 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_2_0 
          }),
-        .LOAD_ACC(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_4_0 ), 
-        .RESET(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_7_0 ),
-        .ROUND(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_10_0 ), 
-        .SATURATE(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_8_0 ),
-        .SHIFT_RIGHT({ 
+        .load_acc(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_4_0 ),
+        .lreset(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_7_0 ),
+        .round(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_10_0 ),
+        .saturate_enable(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_8_0 ),
+        .shift_right({
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_5 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_4 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_3 ,
@@ -872,10 +866,10 @@ module accum_output_registered_iverilog (
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_1 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_input_9_0 
          }),
-        .SUBTRACT(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_3_0 ), 
-        .UNSIGNED_A(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_5_0 ), 
-        .UNSIGNED_B(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_6_0 ), 
-        .Z({ 
+        .subtract(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_3_0 ),
+        .unsigned_a(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_5_0 ),
+        .unsigned_b(\RS_DSP_MULTACC_REGOUT_z_out[36]_input_6_0 ),
+        .z({
             \RS_DSP_MULTACC_REGOUT_z_out[36]_output_0_37 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_output_0_36 ,
             \RS_DSP_MULTACC_REGOUT_z_out[36]_output_0_35 ,

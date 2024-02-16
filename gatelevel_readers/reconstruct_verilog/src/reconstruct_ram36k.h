@@ -321,10 +321,20 @@ struct TDP_RAM36K_instance {
       if (port_connections.find(cn.second) != port_connections.end()) {
         ofs << port_connections[cn.second];
       } else {
-        // std::cout << "WARN: you did not connect " << cn.second
-        //           << " from TDP_RAM36K so I can connect " << cn.first
+        // std::cout << "WARN: Un-connected " << cn.second
+        //           << " from TDP_RAM36K then no connection for " << cn.first
         //           << " from RS_TDP36K" << std::endl;
       }
+      // for (auto &force : port_connections) {
+      //   if (TDP_RAM36K_to_RS_TDP36K_collapsed_assigns.find(force.first) ==
+      //       end(TDP_RAM36K_to_RS_TDP36K_collapsed_assigns)) {
+      //     std::cout << "WARN: Critical forcing the connection of missing port
+      //     "
+      //               << force.first << " in cell RS_TDP36K to " <<
+      //               force.second
+      //               << std::endl;
+      //   }
+      // }
     }
     ofs << std::endl;
     ofs << ".param MODE_BITS " << get_MODE_BITS() << std::endl;
