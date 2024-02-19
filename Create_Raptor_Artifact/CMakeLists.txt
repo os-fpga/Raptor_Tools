@@ -115,11 +115,20 @@ target_include_directories(Encryption_method
 )
 target_link_libraries(Encryption_method OpenSSL::Crypto)
 
+# Use swap keys when on private fork of Raptor
+if(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../projects/encryptionKeys/public_key.pem)
+	set(ENCRYPTION_EXE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../build/Backend/OpenFPGA/vtr-verilog-to-routing/libs/libencrypt/encrypt)
+	set(PUBLIC_KEY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../../projects/encryptionKeys/public_key.pem)
+else()
+	set(ENCRYPTION_EXE_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/encrypt)
+	set(PUBLIC_KEY_PATH ${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key.pem)
+endif()
+
 # encrypt and delete
 add_custom_command(TARGET Encryption_method POST_BUILD
     COMMENT "---    Encrypt XML files and copy README to top DIR"
     # execute encrypt_device.cmake script
-    COMMAND ${CMAKE_COMMAND} -DENCRYPT_EXE="${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/encrypt" -DPUBLIC_KEY="${CMAKE_CURRENT_SOURCE_DIR}/Encryption_method/public_key.pem" -DDEVICES_LIST="${RS_DEVICES}"  -P ${CMAKE_CURRENT_SOURCE_DIR}/encrypt_devic.cmake
+    COMMAND ${CMAKE_COMMAND} -DENCRYPT_EXE="${ENCRYPTION_EXE_PATH}" -DPUBLIC_KEY="${PUBLIC_KEY_PATH}" -DDEVICES_LIST="${RS_DEVICES}"  -P ${CMAKE_CURRENT_SOURCE_DIR}/encrypt_devic.cmake
                          
     # below command will delete the files
     COMMAND ${CMAKE_COMMAND} -E remove -f  ${RS_DEVICES}
