@@ -43,6 +43,7 @@ add_custom_target(install_licensecc ALL
 add_dependencies(install_licensecc licensecc_static)
 
 # Custom command to run licensing_feature.py script
+# it is commented since it is no longer used. If needed then uncomment each line have "generate_license_manager_hpp"
 add_custom_command(
     OUTPUT License_manager.hpp
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py --xml_filepath ${XML_FILE} --feature_txt_path ${FEATURES_TXT} 
@@ -52,7 +53,7 @@ add_custom_command(
 )
 
 # Custom target to ensure License_manager.hpp is generated before compiling the library
-add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
+#add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
 
 # Define targets
 #add_executable(example src/example.cpp License_manager.cpp)
@@ -60,7 +61,7 @@ add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
 
 # Ensure License_manager.hpp is generated before building these targets
 add_library(rs_licenseManager License_manager.cpp)
-add_dependencies(rs_licenseManager generate_license_manager_hpp)
+#add_dependencies(rs_licenseManager generate_license_manager_hpp)
 
 # Link libraries
 cmake_policy(SET CMP0028 NEW)

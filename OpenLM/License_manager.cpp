@@ -68,6 +68,9 @@ bool License_Manager::licenseCheckout(const string &productName) {
         result = acquire_license(&callerInfo, &licLocation, &licenseInfo);
         if (result == LICENSE_OK) {
             cout << productName.c_str() << "  is licensed" << endl;
+            if (!licenseInfo.linked_to_pc) {
+            cout << "No hardware signature in license file. This is a 'demo' license that works on every PC." << endl;
+            }
             return true;
         } else {
             cout << productName.c_str() << "  is NOT licensed because " << stringByEventType.at(result) << endl;
