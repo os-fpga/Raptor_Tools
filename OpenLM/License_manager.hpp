@@ -21,7 +21,7 @@ public:
     };
 
     map<License_Manager::LicensedProductName, string> licensedProductNameMap = {
-        {License_Manager::LicensedProductName::DE, "de"}
+        {License_Manager::LicensedProductName::DE, "DE"}
     };
 
     License_Manager(LicensedProductName licensedProductName);
@@ -41,7 +41,7 @@ public:
     };
 
     map<string, LicensedProductName> licensedProductNameEnumMap = {
-        {"de", License_Manager::LicensedProductName::DE}
+        {"DE", License_Manager::LicensedProductName::DE}
     };
 
     ~License_Manager();
