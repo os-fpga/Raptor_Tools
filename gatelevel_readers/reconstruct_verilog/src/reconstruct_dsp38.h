@@ -47,7 +47,8 @@ struct dsp38_instance {
 
   std::string get_MODE_BITS() {
     return parameters["COEFF_0"] + parameters["COEFF_1"] +
-           parameters["COEFF_2"] + parameters["COEFF_3"];
+           parameters["COEFF_2"] + parameters["COEFF_3"] + std::string("0000") +
+           std::string("0");
   }
 
   std::string get_block_key() {

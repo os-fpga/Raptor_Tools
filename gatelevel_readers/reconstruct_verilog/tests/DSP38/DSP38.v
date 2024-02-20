@@ -84,7 +84,7 @@ module DSP38 #(
     if (output_select == 3'b000 && input_reg == 1'b1)
     begin
       RS_DSP_MULT_REGIN # (
-                          .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                          .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                         ) RS_DSP_MULT_REGIN (
                           .a(A),
                           .b(B),
@@ -99,7 +99,7 @@ module DSP38 #(
     else if (output_select == 3'b001 && input_reg == 1'b0)
     begin
       RS_DSP_MULT_REGOUT # (
-                           .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                           .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                          ) RS_DSP_MULT_REGOUT (
                            .a(A),
                            .b(B),
@@ -114,7 +114,7 @@ module DSP38 #(
     else if (output_select == 3'b001 && input_reg == 1'b1)
     begin
       RS_DSP_MULT_REGIN_REGOUT # (
-                                 .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                                 .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                                ) RS_DSP_MULT_REGIN_REGOUT (
                                  .a(A),
                                  .b(B),
@@ -129,7 +129,7 @@ module DSP38 #(
     else if (output_select == 3'b010 && input_reg == 1'b0)
     begin
       RS_DSP_MULTADD # (
-                       .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                       .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                      ) RS_DSP_MULTADD (
                        .a(A),
                        .b(B),
@@ -151,7 +151,7 @@ module DSP38 #(
     else if (output_select == 3'b010 && input_reg == 1'b1)
     begin
       RS_DSP_MULTADD_REGIN # (
-                             .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                             .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                            ) RS_DSP_MULTADD_REGIN (
                              .a(A),
                              .b(B),
@@ -173,7 +173,7 @@ module DSP38 #(
     else if (output_select == 3'b011 && input_reg == 1'b0)
     begin
       RS_DSP_MULTADD_REGOUT # (
-                              .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                              .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                             ) RS_DSP_MULTADD_REGOUT (
                               .a(A),
                               .b(B),
@@ -195,7 +195,7 @@ module DSP38 #(
     else if (output_select == 3'b011 && input_reg == 1'b1)
     begin
       RS_DSP_MULTADD_REGIN_REGOUT # (
-                                    .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                                    .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                                   ) RS_DSP_MULTADD_REGIN_REGOUT (
                                     .a(A),
                                     .b(B),
@@ -217,7 +217,7 @@ module DSP38 #(
     else if (output_select == 3'b100 && input_reg == 1'b0)
     begin
       RS_DSP_MULTACC # (
-                       .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                       .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                      ) RS_DSP_MULTACC (
                        .a(A),
                        .b(B),
@@ -237,7 +237,7 @@ module DSP38 #(
     else if (output_select == 3'b100 && input_reg == 1'b1)
     begin
       RS_DSP_MULTACC_REGIN # (
-                             .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                             .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                            ) RS_DSP_MULTACC_REGIN (
                              .a(A),
                              .b(B),
@@ -257,7 +257,7 @@ module DSP38 #(
     else if (output_select == 3'b101 && input_reg == 1'b0)
     begin
       RS_DSP_MULTACC_REGOUT # (
-                              .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                              .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                             ) RS_DSP_MULTACC_REGOUT (
                               .a(A),
                               .b(B),
@@ -277,7 +277,7 @@ module DSP38 #(
     else if (output_select == 3'b101 && input_reg == 1'b1)
     begin
       RS_DSP_MULTACC_REGIN_REGOUT # (
-                                    .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                                    .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                                   ) RS_DSP_MULTACC_REGIN_REGOUT (
                                     .a(A),
                                     .b(B),
@@ -297,7 +297,7 @@ module DSP38 #(
     else
     begin
       RS_DSP_MULT # (
-                    .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3})
+                    .MODE_BITS({COEFF_0, COEFF_1, COEFF_2, COEFF_3, 4'bxxxx, 1'b0})
                   ) RS_DSP_MULT (
                     .a(A),
                     .b(B),
