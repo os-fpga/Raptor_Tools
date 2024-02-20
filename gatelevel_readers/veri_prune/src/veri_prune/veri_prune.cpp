@@ -40,16 +40,37 @@ struct EditingTool : public ScriptPass
     string netlist_file;
 	string interface_file;
 	string wrapper_file;
+	vector<Cell*> remove_prims;
    
 	RTLIL::Design *_design;
 	#ifdef GB_CONSTRUCTS_DATA
 		gb_constructs_data gb_mods_data;
 	#endif
 
+	gb_mods_default gb;
+
 	void clear_flags() override
     {
         netlist_file = "";
     }
+
+	std::string remove_backslashes(const std::string& input) {
+	    std::string result;
+	    for (char c : input) {
+	        if (c != '\\') {
+	            result += c;
+	        }
+	    }
+	    return result;
+	}
+
+	void delete_cells(Module* module, vector<Cell*> cells)
+	{
+		for (auto cell : cells)
+		{
+			module->remove(cell);
+		}
+	}
 
 	void execute(std::vector<std::string> args, RTLIL::Design *design) override
 	{
@@ -72,21 +93,24 @@ struct EditingTool : public ScriptPass
             break;
         }
 		extra_args(args, argidx, design);
+
+		Module* original_mod = _design->top_module();
+		for (auto cell :  original_mod->cells())
+		{
+			string module_name = remove_backslashes(cell->type.str());
+			if(std::find(gb.primitives.begin(), gb.primitives.end(), module_name) != gb.primitives.end())
+			{
+				remove_prims.push_back(cell);
+			}
+		}
+
+		delete_cells(original_mod, remove_prims);
+
 		run_script(design);
 	}
 
 	void script() override
     {
-		std::cout << "Run Script" << std::endl;
-		for (auto mod : _design->modules())
-		{
-			// Iterate over all cells in the module
-    		for (auto cell :  mod->cells()) {
-    		    if (cell->type == RTLIL::escape_id("I_BUF")) {
-					// Print the instance and module name
-					log("Instance name: %s  of Module: %s\n ", log_id(cell->name), log_id(cell->type));
-				}
-    		}
-		}	
+		std::cout << "Run Script" << std::endl;	
 	}
 }EditingTool;
