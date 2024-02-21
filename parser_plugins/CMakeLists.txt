@@ -6,9 +6,6 @@ cmake_minimum_required(VERSION 3.20)
 
 set (BUILD_TYPE_STRING Engineering)
 if (PRODUCTION_BUILD)
-  message("Production Build type set to ON")
-  set (PRODUCTION_BUILD_FLAG "-DPRODUCTION_BUILD=1")
-  add_definitions(-DPRODUCTION_BUILD)
   set (BUILD_TYPE_STRING Production)
 endif(PRODUCTION_BUILD)
 
@@ -50,6 +47,12 @@ if (RAPTOR)
   set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
   set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys_verific_rs/yosys/yosys-config)
   set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../../${BUILD_DIR}/bin/HDL_simulator/GHDL/bin/ghdl)
+elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../yosys)
+  #message(STATUS "********* using Yosys from yosys_verific_rs level")
+  set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/../../yosys/)
+  set(YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys/yosys-config)
+  set(GHDL_YOSYS_CONFIG ${PROJECT_SOURCE_DIR}/../../yosys/yosys-config)
+  set(GHDL_BIN_PATH ${PROJECT_SOURCE_DIR}/../HDL_simulator/build/bin/HDL_simulator/GHDL/bin/ghdl)
 else()
   set(YOSYS_PATH ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys/)
   # Do not set YOSYS_CONFIG in this case
@@ -64,6 +67,12 @@ message("GHDL_BIN_PATH:" ${GHDL_BIN_PATH})
 if (RAPTOR)
   FILE(COPY ${PROJECT_SOURCE_DIR}/include/synlig_simplify.cc
        DESTINATION ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys_mod/)
+
+elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../yosys)
+  FILE(COPY ${PROJECT_SOURCE_DIR}/include/synlig_simplify.cc
+       DESTINATION ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys_mod/)
+else()
+    message(STATUS "No copying synlig_simplify.cc as synling yosys will be used")
 endif()
 
 # TODO: The best solution would be to do the following:
