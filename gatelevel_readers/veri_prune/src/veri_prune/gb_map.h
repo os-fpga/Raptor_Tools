@@ -36,3 +36,4 @@ struct gb_mods_default
           {"CLK_OUT", OUT_DIR}, {"Q", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", IN_DIR}, 
           {"CHANNEL_BOND_SYNC_OUT", OUT_DIR}}}};
 };
+#endif
