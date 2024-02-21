@@ -2,11 +2,11 @@
 # Read source files
 read_verilog -sv ../../../../../yosys-rs-plugin/genesis3/FPGA_PRIMITIVES_MODELS/blackbox_models/cell_sim_blackbox.v
 verilog_defines 
-read_verilog ./rtl/primitive_example_design_1.v
+read_verilog ./rtl/primitive_example_design_6.v
 
 
 # Technology mapping
-hierarchy -top primitive_example_design_1
+hierarchy -top primitive_example_design_6
 
 
 plugin -i synth-rs
@@ -15,5 +15,5 @@ synth_rs -tech genesis3 -de -goal delay -no_iobuf -effort high -carry auto -new_
 
 #plugin -i veriprune
 #veri_prune
-write_verilog -noexpr -nodec -v primitive_example_design_1_post_synth.v
-write_blif -param primitive_example_design_1_post_synth.eblif
+write_verilog -noexpr -nodec -v primitive_example_design_6_post_synth.v
+write_blif -param primitive_example_design_6_post_synth.eblif

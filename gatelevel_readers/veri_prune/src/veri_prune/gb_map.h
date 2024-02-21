@@ -11,6 +11,8 @@
 
 struct gb_mods_default
 {
+    std::vector<std::string> primitives = {"CLK_BUF", "I_BUF", "I_BUF_DS", "I_DDR", "I_SERDES", "PLL", "IO_BUF", 
+        "IO_BUF_DS", "O_BUF", "O_BUFT", "O_BUFT_DS", "O_DDR", "O_SERDES"};
     std::vector<std::pair<std::string, std::map<std::string, int>>> gb_mods = {{"CLK_BUF", {{"I", IN_DIR}, {"O", OUT_CLK}}}, 
         {"I_BUF",{{"I", IN_DIR}, {"C",IN_CLK}, {"O", OUT_DIR}}},
         {"I_BUF_DS", {{"OE",IN_DIR}, {"I_N",IN_DIR}, {"I_P",IN_DIR}, {"O",OUT_DIR}}},
@@ -34,5 +36,4 @@ struct gb_mods_default
           {"CLK_OUT", OUT_DIR}, {"Q", OUT_DIR}, {"DLY_TAP_VALUE", OUT_DIR}, {"CHANNEL_BOND_SYNC_IN", IN_DIR}, 
           {"CHANNEL_BOND_SYNC_OUT", OUT_DIR}}}};
 };
-
-#endif // DEVICE_PRIMITIVES_DATA_H
+#endif
