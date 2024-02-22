@@ -54,17 +54,13 @@ bool License_Manager::licenseCheckout(const string &productName) {
 
     if (result == LICENSE_OK) {
         cout << "License for Raptor software OK" << endl;
-        CallerInformations callerInfo;        
-        strncpy(callerInfo.feature_name, featureName.c_str(), sizeof(callerInfo.feature_name) - 1);
-        callerInfo.feature_name[sizeof(callerInfo.feature_name) - 1] = '\0';
-        /*
-        // turn on below lines for debug 
-        cout << "Copied feature name: " << callerInfo.feature_name << endl;
-        cout << "Length of callerInfo.feature_name: " << strlen(callerInfo.feature_name) << endl;
-        cout << "Length of productName: " << featureName.length() << endl;
-        cout << "productNmae is "  << featureName.c_str() << endl;
-        */
-        //CallerInformations callerInfo = {"\0", "MPW1"};  // another way to send call to CallerInformations
+        CallerInformations callerInfo; 
+        auto it = DeviceMapping.find(productName);
+        if (it != DeviceMapping.end()) {
+            strcpy(callerInfo.feature_name, it->second);
+            } else {
+                    return false; 
+            }
         result = acquire_license(&callerInfo, &licLocation, &licenseInfo);
         if (result == LICENSE_OK) {
             cout << productName.c_str() << "  is licensed" << endl;
@@ -88,16 +84,5 @@ bool License_Manager::licenseCheckout(const string &productName) {
         return false;
     }
 }
-
-
-const vector<string> License_Manager::split_string(const string &licensePositions, char splitchar) {
-	std::stringstream streamToSplit(licensePositions);
-	std::string segment;
-	std::vector<string> seglist;
-
-	while (std::getline(streamToSplit, segment, splitchar)) {
-		seglist.push_back(segment);
-	}
-	return seglist;
-}
 License_Manager::~License_Manager(){}
+

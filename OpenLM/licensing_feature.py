@@ -51,20 +51,19 @@ def create_cpp_header(device_names, header_file_path):
         file.write("class License_Manager {\n")
         file.write("public:\n\n")
         file.write("    enum class LicensedProductName {\n")
-        for name in device_names:
-            file.write(f"        {name},\n")
         file.write(f"        DE,\n")    
         file.write("    };\n\n")
         file.write("    map<License_Manager::LicensedProductName, string> licensedProductNameMap = {\n")
+        file.write(f"        {{License_Manager::LicensedProductName::DE, \"DE\"}}\n")
+        file.write("    };\n\n")
+        file.write("   unordered_map<std::string, const char*> DeviceMapping = {\n") 
         for i, name in enumerate(device_names):              
             enum_name = 'RS' + name if name[0].isdigit() else name  # Prepend 'RS' if name starts with a digit
-            file.write(f"        {{License_Manager::LicensedProductName::{enum_name}, \"{name}\"}},\n")
-        file.write(f"        {{License_Manager::LicensedProductName::DE, \"de\"}}\n")
-        file.write("    };\n\n")      
+            file.write(f"        {{\"{name}\" , \"\\0{enum_name}\"}},\n")
+        file.write("    };\n\n")     
         file.write("    License_Manager(LicensedProductName licensedProductName);\n")
         file.write("    License_Manager(string licensedProductName);\n")
         file.write("    bool licenseCheckout(const string &productName);\n")
-        file.write("    const vector<string> split_string(const string& stringToBeSplit, const char splitchar);\n")
         file.write("    struct LicenseFatalException : public exception {\n")
         file.write("        const char *what() const throw() {\n")
         file.write("            return \"License was not acquired due to a fatal error\";\n")
@@ -76,11 +75,8 @@ def create_cpp_header(device_names, header_file_path):
         file.write("        }\n")
         file.write("    };\n\n")
         file.write("    map<string, LicensedProductName> licensedProductNameEnumMap = {\n")
-        for i, name in enumerate(device_names):              
-            enum_name = 'RS' + name if name[0].isdigit() else name  # Prepend 'RS' if name starts with a digit
-            separator = "," if i < len(device_names) - 1 else ""
-            file.write(f"        {{\"{name}\", License_Manager::LicensedProductName::{enum_name}}}{separator}\n")       
-        file.write("    };\n\n")
+        file.write(f"        {{\"DE\", License_Manager::LicensedProductName::DE}}")       
+        file.write("    \n};\n\n")
         file.write("    ~License_Manager();\n")
         file.write("private:\n")
         file.write("    License_Manager();\n")
