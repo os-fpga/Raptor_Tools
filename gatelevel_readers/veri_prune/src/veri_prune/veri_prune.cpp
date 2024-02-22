@@ -4,7 +4,6 @@
 #include <regex>
 #include <set>
 
-#include "gb_map.h"
 #include "kernel/celltypes.h"
 #include "backends/rtlil/rtlil_backend.h"
 #include "kernel/log.h"
@@ -369,7 +368,7 @@ struct EditingTool : public ScriptPass
 				&& interface_wires.find(wire_name) == interface_wires.end())
 			{
 				del_wrapper_wires.insert(wire);
-			} else{
+			} else {
 				if(orig_inst_conns.find(wire_name) != orig_inst_conns.end())
 				{
 					orig_mod_inst->setPort(wire_name, conn);
