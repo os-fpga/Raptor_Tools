@@ -1,0 +1,318 @@
+{
+    "IO_Instances": {
+        "clk_buf_inst": {
+            "module": "I_BUF",
+            "ports": {
+                "EN": {
+                    "Actual": "ibuf1_en",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "clk",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "O": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "clk_buf_out",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "ibuf_inst1": {
+            "module": "I_BUF",
+            "ports": {
+                "EN": {
+                    "Actual": "ibuf2_en",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "in",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "i_buf_out",
+                    "lsb": 0,
+                    "msb": 2
+                }
+            }
+        },
+        "ibuf_inst2": {
+            "module": "I_BUF",
+            "ports": {
+                "EN": {
+                    "Actual": "ibuf3_en",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "in",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "i_buf_out",
+                    "lsb": 0,
+                    "msb": 2
+                }
+            }
+        },
+        "ibuf_inst3": {
+            "module": "I_BUF",
+            "ports": {
+                "EN": {
+                    "Actual": "ibuf4_en",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "in",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "i_buf_out",
+                    "lsb": 0,
+                    "msb": 2
+                }
+            }
+        },
+        "ibuf_inst4": {
+            "module": "I_BUF",
+            "ports": {
+                "EN": {
+                    "Actual": "ibuf5_en",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "rst",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "O": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "rst_i_buf_out",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "iddr_ist1": {
+            "module": "I_DDR",
+            "ports": {
+                "C": {
+                    "FUNC": "IN_CLK",
+                    "Actual": "clk_buf_out",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "D": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "i_buf_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "E": {
+                    "Actual": "iddr_en",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "Q": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "_2_",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "Q": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "iddr_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "R": {
+                    "FUNC": "IN_RESET",
+                    "Actual": "rst",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "iddr_ist2": {
+            "module": "I_DDR",
+            "ports": {
+                "C": {
+                    "FUNC": "IN_CLK",
+                    "Actual": "clk_buf_out",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "D": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "i_buf_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "E": {
+                    "Actual": "iddr_en",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "Q": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "_1_",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "Q": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "iddr_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "R": {
+                    "FUNC": "IN_RESET",
+                    "Actual": "rst",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "iddr_ist3": {
+            "module": "I_DDR",
+            "ports": {
+                "C": {
+                    "FUNC": "IN_CLK",
+                    "Actual": "clk_buf_out",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "D": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "i_buf_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "E": {
+                    "Actual": "iddr_en",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "Q": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "_0_",
+                    "lsb": 0,
+                    "msb": 0
+                },
+                "Q": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "iddr_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "R": {
+                    "FUNC": "IN_RESET",
+                    "Actual": "rst",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "o_buft_inst1": {
+            "module": "O_BUFT_DS",
+            "ports": {
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "dffre_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O_N": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "q_p",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O_P": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "q_p",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "T": {
+                    "Actual": "obuft_ds_en1",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "o_buft_inst2": {
+            "module": "O_BUFT_DS",
+            "ports": {
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "dffre_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O_N": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "q_p",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O_P": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "q_p",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "T": {
+                    "Actual": "obuft_ds_en2",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        },
+        "o_buft_inst3": {
+            "module": "O_BUFT_DS",
+            "ports": {
+                "I": {
+                    "FUNC": "IN_DIR",
+                    "Actual": "dffre_out",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O_N": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "q_p",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "O_P": {
+                    "FUNC": "OUT_DIR",
+                    "Actual": "q_p",
+                    "lsb": 0,
+                    "msb": 2
+                },
+                "T": {
+                    "Actual": "obuft_ds_en3",
+                    "lsb": 0,
+                    "msb": 0
+                }
+            }
+        }
+    }
+}
