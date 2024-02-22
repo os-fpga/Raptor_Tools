@@ -116,6 +116,27 @@ struct EditingTool : public ScriptPass
     	}
 	}
 
+	void process_wire(Cell* cell, const IdString& portName, RTLIL::Wire* wire)
+	{
+		if (cell->input(portName))
+		{
+			if(wire->port_input)
+			{
+				inputs.insert(wire->name.str());
+			} else {
+				new_outs.insert(wire->name.str());
+			}
+		} else if (cell->output(portName))
+		{
+			if(wire->port_output)
+			{
+				outputs.insert(wire->name.str());
+			} else {
+				new_ins.insert(wire->name.str());
+			}
+		}
+	}
+
 	void execute(std::vector<std::string> args, RTLIL::Design *design) override
 	{
 		std::string run_from, run_to;
@@ -162,23 +183,7 @@ struct EditingTool : public ScriptPass
 						RTLIL::Wire* wire = actual.as_chunk().wire;
 						if(wire != NULL)
 						{
-							if (cell->input(portName))
-							{
-								if(wire->port_input)
-								{
-									inputs.insert(wire->name.str());
-								} else {
-									new_outs.insert(wire->name.str());
-								}
-							} else if (cell->output(portName))
-							{
-								if(wire->port_output)
-								{
-									outputs.insert(wire->name.str());
-								} else {
-									new_ins.insert(wire->name.str());
-								}
-							}
+							process_wire(cell, portName, wire);
 						}
 					} else{
 						for (auto it = actual.chunks().rbegin(); 
@@ -187,23 +192,7 @@ struct EditingTool : public ScriptPass
 							RTLIL::Wire* wire = (*it).wire;
 							if(wire != NULL)
 							{
-								if (cell->input(portName))
-								{
-									if(wire->port_input)
-									{
-										inputs.insert(wire->name.str());
-									} else {
-										new_outs.insert(wire->name.str());
-									}
-								} else if (cell->output(portName))
-								{
-									if(wire->port_output)
-									{
-										outputs.insert(wire->name.str());
-									} else {
-										new_ins.insert(wire->name.str());
-									}
-								}
+								process_wire(cell, portName, wire);
 							}
 						}
 					}
