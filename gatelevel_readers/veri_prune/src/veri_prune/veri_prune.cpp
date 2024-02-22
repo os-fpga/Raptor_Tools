@@ -50,6 +50,7 @@ struct EditingTool : public ScriptPass
 	std::unordered_set<std::string> outputs;
 	std::unordered_set<std::string> orig_inst_conns;
 	std::unordered_set<std::string> interface_inst_conns;
+	std::unordered_set<std::string> keep_wires;
 	std::unordered_set<Wire*> wires_interface;
 	std::unordered_set<Wire*> del_ins;
 	std::unordered_set<Wire*> del_outs;
@@ -90,7 +91,11 @@ struct EditingTool : public ScriptPass
 	{
 		for (auto wire : wires)
 		{
-			module->remove({wire});
+			std::string wire_name = wire->name.str();
+			if(keep_wires.find(wire_name) == keep_wires.end())
+			{
+				module->remove({wire});
+			}
 		}
 	}
 
@@ -203,6 +208,30 @@ struct EditingTool : public ScriptPass
 						}
 					}
 				}
+			} else {
+				for(auto conn : cell->connections())
+				{
+					IdString portName = conn.first;
+                	RTLIL::SigSpec actual = conn.second;
+					if (actual.is_chunk())
+					{
+						RTLIL::Wire* wire = actual.as_chunk().wire;
+						if(wire != NULL)
+						{
+							keep_wires.insert(wire->name.str());
+						}
+					} else{
+						for (auto it = actual.chunks().rbegin(); 
+                        	it != actual.chunks().rend(); ++it)
+						{
+							RTLIL::Wire* wire = (*it).wire;
+							if(wire != NULL)
+							{
+								keep_wires.insert(wire->name.str());
+							}
+						}
+					}
+				}
 			}
 		}
 
@@ -237,6 +266,23 @@ struct EditingTool : public ScriptPass
 			{
 				del_outs.insert(wire);
 				continue;
+			}
+		}
+
+		for (auto &conn : original_mod->connections())
+		{
+			std::vector<RTLIL::SigBit> conn_lhs = conn.first.to_sigbit_vector();
+			std::vector<RTLIL::SigBit> conn_rhs = conn.second.to_sigbit_vector();
+			for (size_t i = 0; i < conn_lhs.size(); i++)
+			{
+				if (conn_lhs[i].wire != nullptr)
+				{
+					keep_wires.insert(conn_lhs[i].wire->name.str());
+				}
+				if (conn_rhs[i].wire != nullptr)
+				{
+					keep_wires.insert(conn_rhs[i].wire->name.str());
+				}
 			}
 		}
 
