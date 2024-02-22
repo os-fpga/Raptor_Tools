@@ -40,6 +40,8 @@ struct EditingTool : public ScriptPass
 	std::string netlist_file;
 	std::string interface_file;
 	std::string wrapper_file;
+	std::string cell_lib;
+	std::vector<std::string> primitives;
 	std::vector<Cell*> remove_prims;
 	std::vector<Cell*> remove_non_prims;
 	std::vector<Cell*> remove_wrapper_cells;
@@ -58,11 +60,7 @@ struct EditingTool : public ScriptPass
 	std::unordered_set<Wire*> del_wrapper_wires;
    
 	RTLIL::Design *_design;
-	#ifdef GB_CONSTRUCTS_DATA
-		gb_constructs_data gb_mods_data;
-	#endif
-
-	gb_mods_default gb;
+	primitives_data io_prim;
 
 	void clear_flags() override
     {
@@ -138,6 +136,8 @@ struct EditingTool : public ScriptPass
             break;
         }
 		extra_args(args, argidx, design);
+		cell_lib = "genesis3";
+		primitives = io_prim.get_primitives(cell_lib);
 
 		Module* original_mod = _design->top_module();
 		std::string original_mod_name = remove_backslashes(_design->top_module()->name.str());
@@ -150,7 +150,7 @@ struct EditingTool : public ScriptPass
 		for (auto cell :  original_mod->cells())
 		{
 			string module_name = remove_backslashes(cell->type.str());
-			if(std::find(gb.primitives.begin(), gb.primitives.end(), module_name) != gb.primitives.end())
+			if(std::find(primitives.begin(), primitives.end(), module_name) != primitives.end())
 			{
 				remove_prims.push_back(cell);
 				for(auto conn : cell->connections())
@@ -296,7 +296,7 @@ struct EditingTool : public ScriptPass
 		for (auto cell :  interface_mod->cells())
 		{
 			string module_name = remove_backslashes(cell->type.str());
-			if(std::find(gb.primitives.begin(), gb.primitives.end(), module_name) == gb.primitives.end())
+			if(std::find(primitives.begin(), primitives.end(), module_name) == primitives.end())
 			{
 				remove_non_prims.push_back(cell);
 			}

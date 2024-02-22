@@ -12,53 +12,21 @@
 
 using namespace std;
 
-struct Connection {
-    std::string signal;
-    std::map<std::string, std::string> ports;
-    std::string module;
-    std::string instance;
-};
-
-struct orig_io
+struct primitives_data
 {
-    std::string io_name;
-    int         lsb;
-    int         msb;
-    unsigned dir;
-};
+    std::map<std::string, std::vector<std::string>> io_primitives = {{"genesis3", 
+        {"CLK_BUF", "I_BUF", "I_BUF_DS", "I_DDR", "I_DELAY", "I_SERDES", "O_BUF", "O_BUFT", "O_BUFT_DS",
+         "O_BUF_DS", "O_DDR", "O_DELAY", "O_SERDES", "O_SERDES_CLK", "PLL"}}};
 
-struct gb_constructs
-{
-    std::vector<std::pair<std::string, int>> mod_ios;
-    std::vector<std::string> mod_clks;
-    std::vector<std::string> clk_in;
-    std::vector<std::string> intf_ins;
-    std::vector<std::string> intf_outs;
-    std::vector<std::pair<std::string, std::vector<int>>> indexed_mod_ios;
-    std::vector<std::pair<std::string, std::vector<int>>> indexed_mod_clks;
-    std::vector<std::pair<std::string, std::vector<int>>> indexed_intf_ins;
-    std::vector<std::pair<std::string, std::vector<int>>> indexed_intf_outs;
-    std::vector<std::string> intf_inouts;
-    std::vector<std::string> mod_ports;
-    std::vector<std::string> top_ports;
-    std::vector<std::string> prefs;
-    std::unordered_set<std::string> assign_nets;
-    std::unordered_set<std::string> inst_nets;
-    std::unordered_set<std::string> del_ports;
-    std::unordered_set<std::string> intf_ports;
-    std::vector<std::string> gb_insts;
-    std::vector<std::string> normal_insts;
-    std::unordered_set<std::string> intf_ios;
-    std::unordered_set<std::string> top_ios;
-    std::vector<std::string> remove_intf_nets;
-    std::vector<std::string> remove_top_nets;
-    char *mod_str;
-    char *intf_mod_str;
-    char *top_mod_str;
-    std::string interface_data_dump;
-    bool contains_io_prem = false;
+    // Function to get the primitive names for a specific cell library
+    std::vector<std::string> get_primitives(const std::string& lib) {
+        std::vector<std::string> primitive_names;
+        auto it = io_primitives.find(lib);
+        if (it != io_primitives.end()) {
+            primitive_names = it->second;
+        }
+        return primitive_names;
+    }
 };
-int write_sdc(const std::string& example_file, const std::string& arg2, const std::string& arg3, gb_constructs &gb);
-int prune_verilog (const char *file_name, gb_constructs &gb, const std::string& device_name);
 
 #endif
