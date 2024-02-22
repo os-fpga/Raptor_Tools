@@ -321,7 +321,10 @@ struct EditingTool : public ScriptPass
 		}
 
 		interface_mod->connections_.clear();
-		delete_wires(interface_mod, del_interface_wires);
+		for (auto wire : del_interface_wires)
+		{
+			interface_mod->remove({wire});
+		}
 		interface_mod->fixup_ports();
 
 		for (auto cell :  wrapper_mod->cells()) {
@@ -380,7 +383,10 @@ struct EditingTool : public ScriptPass
 			}
 		}
 
-		delete_wires(wrapper_mod, del_wrapper_wires);
+		for (auto wire : del_wrapper_wires)
+		{
+			wrapper_mod->remove({wire});
+		}
 
 		wrapper_mod->fixup_ports();
 
