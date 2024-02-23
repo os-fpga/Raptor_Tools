@@ -316,7 +316,7 @@ struct TDP_RAM18KX2_instance {
     return false;
   }
 
-  std::string extract_sram1(const std::string &init,
+  static std::string extract_sram1(const std::string &init,
                             const std::string &parity) {
     std::string sram(18432, '0');
 
@@ -328,7 +328,7 @@ struct TDP_RAM18KX2_instance {
     return sram;
   }
 
-  std::string extract_sram2(const std::string &init,
+  static std::string extract_sram2(const std::string &init,
                             const std::string &parity) {
     std::string sram(18432, '0');
 
@@ -340,12 +340,22 @@ struct TDP_RAM18KX2_instance {
     return sram;
   }
 
-  std::string get_init_i1(const std::string &init1, const std::string &parity1,
-                          const std::string &init2,
-                          const std::string &parity2) {
+  static std::string get_init_i1(std::string &init1, std::string &parity1,
+                        std::string &init2, std::string &parity2) {
+  std::reverse(begin(init1), end(init1));
+  std::reverse(begin(parity1), end(parity1));
+  std::reverse(begin(init2), end(init2));
+  std::reverse(begin(parity2), end(parity2));
+  std::string res =
+      extract_sram1(init1, parity1) + extract_sram2(init2, parity2);
+  std::reverse(begin(init1), end(init1));
+  std::reverse(begin(parity1), end(parity1));
+  std::reverse(begin(init2), end(init2));
+  std::reverse(begin(parity2), end(parity2));
+  std::reverse(begin(res), end(res));
+  return res;
+}
 
-    return extract_sram2(init2, parity2) + extract_sram1(init1, parity1);
-  }
   void print(std::ostream &ofs, unsigned cnt) {
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";
