@@ -37,16 +37,7 @@ def create_cpp_header(device_names, header_file_path):
     with open(header_file_path, 'w') as file:
         file.write("#pragma once\n\n")
         file.write("#include <iostream>\n")
-        file.write("#include <vector>\n")
-        file.write("#include <map>\n")
-        file.write("#include <cstdlib>\n")
-        file.write("#include <unordered_map>\n")
-        file.write("#include <licensecc/licensecc.h>\n")
-        file.write("#include <fstream>\n")
-        file.write("#include <string.h>\n")
-        file.write("#include <iomanip>\n")
-        file.write("#include <sstream>\n")
-        file.write("#include <string>\n")
+        file.write("#include \"License_manager.hpp\"\n")
         file.write("using namespace std;\n\n")
         file.write("\n\n")
         file.write("const unordered_map<int, string> stringByEventType = {\n")
@@ -62,20 +53,7 @@ def create_cpp_header(device_names, header_file_path):
         file.write("\t{IDENTIFIERS_MISMATCH, \"Calculated identifier and the one provided in license didn't match\"}\n")
         file.write("};\n")
         file.write("\n\n")
-        file.write("class License_Manager {\n")
-        file.write("public:\n\n")
-        file.write("    enum class LicensedProductName {\n")
-        file.write(f"        DE,\n")    
-        file.write("    };\n\n")
-        file.write("    map<License_Manager::LicensedProductName, string> licensedProductNameMap = {\n")
-        file.write(f"        {{License_Manager::LicensedProductName::DE, \"DE\"}}\n")
-        file.write("    };\n\n")   
-
-        file.write("    License_Manager(LicensedProductName licensedProductName);\n")
-        file.write("    License_Manager(string licensedProductName);\n")
-
-        file.write("    \n\n") 
-        file.write("    bool licenseCheckout(const string &productName) {\n")
+        file.write("    bool License_Manager::licenseCheckout(const string &productName) {\n")
         file.write("        LicenseLocation licLocation = {" + 'LICENSE_PATH' + "};\n")
         file.write("        LicenseInfo licenseInfo;\n")
         file.write("        size_t pc_id_sz = LCC_API_PC_IDENTIFIER_SIZE + 1;\n")
@@ -119,24 +97,6 @@ def create_cpp_header(device_names, header_file_path):
         file.write("        }\n")
         file.write("        }\n")
 
-        file.write("    struct LicenseFatalException : public exception {\n")
-        file.write("        const char *what() const throw() {\n")
-        file.write("            return \"License was not acquired due to a fatal error\";\n")
-        file.write("        }\n")
-        file.write("    };\n\n")
-        file.write("    struct LicenseCorrectableException : public exception {\n")
-        file.write("        const char *what() const throw() {\n")
-        file.write("            return \"License was not acquired due to a correctable error\";\n")
-        file.write("        }\n")
-        file.write("    };\n\n")
-        file.write("    map<string, LicensedProductName> licensedProductNameEnumMap = {\n")
-        file.write(f"        {{\"DE\", License_Manager::LicensedProductName::DE}}")       
-        file.write("    \n};\n\n")
-        file.write("    ~License_Manager();\n")
-        file.write("private:\n")
-        file.write("    License_Manager();\n")
-        file.write("};\n")
-
 def main ():
     parser = argparse.ArgumentParser()
     parser.add_argument('--xml_filepath',
@@ -147,7 +107,7 @@ def main ():
     print("XML file that will be update:\n\t\t",args.XML_filepath)
     print("features.txt file path:\n\t\t",args.features_txt)
     file_paths = [args.XML_filepath, args.features_txt]  # Replace with actual paths
-    header_file_path = 'License_manager.hpp'  # Path to the header file
+    header_file_path = 'License_devices.cpp'  # Path to the header file
     device_names = extract_device_names(file_paths)
     create_cpp_header(device_names, header_file_path)
     print(f"Header file created at {header_file_path}")

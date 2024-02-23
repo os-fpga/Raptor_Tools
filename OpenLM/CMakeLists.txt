@@ -49,22 +49,22 @@ add_dependencies(install_licensecc licensecc_static)
 
 # Custom command to run licensing_feature.py script
 add_custom_command(
-    OUTPUT License_manager.hpp
+    OUTPUT License_devices.cpp
     COMMAND python3 ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py --xml_filepath ${XML_FILE} --feature_txt_path ${FEATURES_TXT} 
     DEPENDS ${CMAKE_CURRENT_SOURCE_DIR}/licensing_feature.py
-    COMMENT "Generating License_manager.hpp from licensing_feature.py"
+    COMMENT "Generating License_devices.cpp from licensing_feature.py"
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
-# Custom target to ensure License_manager.hpp is generated before compiling the library
-add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
+# Custom target to ensure License_devices.cpp is generated before compiling the library
+add_custom_target(generate_license_manager_hpp DEPENDS License_devices.cpp)
 
 # Define targets
 #add_executable(example src/example.cpp License_manager.cpp)
 #add_dependencies(example generate_license_manager_hpp)
 
-# Ensure License_manager.hpp is generated before building these targets
-add_library(rs_licenseManager License_manager.cpp)
+# Ensure License_devices.cpp is generated before building these targets
+add_library(rs_licenseManager License_manager.cpp License_devices.cpp)
 add_dependencies(rs_licenseManager generate_license_manager_hpp)
 
 target_compile_options(rs_licenseManager PRIVATE
