@@ -33,6 +33,11 @@ cmake_policy(SET CMP0077 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) 
 # Add subdirectory for licensecc
 add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc)
+target_compile_options(licensecc_static PRIVATE
+    # Add any other desired compiler options here
+    -Wno-missing-field-initializers
+)
+
 
 # Custom target for installing licensecc
 add_custom_target(install_licensecc ALL
