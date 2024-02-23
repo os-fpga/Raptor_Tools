@@ -59,6 +59,7 @@ struct EditingTool : public ScriptPass
 	std::unordered_set<Wire*> del_wrapper_wires;
    
 	RTLIL::Design *_design;
+	RTLIL::Design* new_design = new RTLIL::Design;;
 	primitives_data io_prim;
 
 	void clear_flags() override
@@ -280,7 +281,6 @@ struct EditingTool : public ScriptPass
 
 		original_mod->fixup_ports();
 
-		design->add(interface_mod);
 		for (auto cell :  interface_mod->cells())
 		{
 			string module_name = remove_backslashes(cell->type.str());
@@ -389,14 +389,16 @@ struct EditingTool : public ScriptPass
 		}
 
 		wrapper_mod->fixup_ports();
+		
+		new_design->add(interface_mod->clone());
+		new_design->add(wrapper_mod->clone());
 
-		_design->add(wrapper_mod);
-
-		run_script(design);
+		run_script(new_design);
 	}
 
 	void script() override
     {
-		std::cout << "Run Script" << std::endl;	
+		std::cout << "Run Script" << std::endl;
+		run("write_verilog -noexpr -simple-lhs new.v");
 	}
 }EditingTool;
