@@ -64,7 +64,7 @@ def create_cpp_header(device_names, header_file_path):
         file.write("            cout << \"License for Raptor software OK\" << endl;\n")
         file.write("        \n")
         file.write("        CallerInformations callerInfo;\n")
-        file.write("        if (productName == \"MPW\") { \n")
+        file.write("        if (productName == \"MPW1\") { \n")
         file.write("            callerInfo = {\"\\0\", \"MPW1\"};\n")
         for i, name in enumerate(device_names):
             if name != "MPW1":
