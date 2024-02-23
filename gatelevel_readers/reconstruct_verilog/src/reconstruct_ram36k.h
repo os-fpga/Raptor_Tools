@@ -342,36 +342,34 @@ struct TDP_RAM36K_instance {
         << get_init_i1(parameters["INIT"], parameters["INIT_PARITY"])
         << std::endl;
   }
-  std::string extract_sram1(const std::string &init,
+  static std::string extract_sram1(const std::string &init,
                             const std::string &init_parity) {
-    if (init.size() < parameterSize["INIT"] ||
-        init_parity.size() < parameterSize["INIT_PARITY"]) {
-      return ""; // Not enough init size
-    }
     std::string sram1(18432, '0');
-
     for (int i = 0; i < 2048; i += 2) {
       sram1.replace((i * 9), 16, init.substr(i * 16, 16));
       sram1.replace(((i + 2) * 9) - 2, 2, init_parity.substr(i * 2, 2));
     }
-
     return sram1;
   }
-  std::string extract_sram2(const std::string &init,
+  static std::string extract_sram2(const std::string &init,
                             const std::string &init_parity) {
     std::string sram2(18432, '0');
-
     for (int i = 1; i < 2048; i += 2) {
       sram2.replace((i - 1) * 9, 16, init.substr(i * 16, 16));
       sram2.replace(((i + 1) * 9) - 2, 2, init_parity.substr(i * 2, 2));
     }
-
     return sram2;
   }
 
-  std::string get_init_i1(const std::string &init,
-                          const std::string &init_parity) {
-    return extract_sram2(init, init_parity) + extract_sram1(init, init_parity);
+  static std::string get_init_i1(std::string &init,
+                          std::string &init_parity) {
+    std::reverse(begin(init), end(init));
+    std::reverse(begin(init_parity), end(init_parity));                 
+    std::string res =  extract_sram1(init, init_parity) + extract_sram2(init, init_parity);
+    std::reverse(begin(init), end(init));
+    std::reverse(begin(init_parity), end(init_parity));  
+    std::reverse(begin(res), end(res));
+    return res;
   }
   std::unordered_map<std::string, std::string> port_connections;
 };
