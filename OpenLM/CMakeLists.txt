@@ -67,6 +67,14 @@ add_custom_target(generate_license_manager_hpp DEPENDS License_manager.hpp)
 add_library(rs_licenseManager License_manager.cpp)
 add_dependencies(rs_licenseManager generate_license_manager_hpp)
 
+target_compile_options(rs_licenseManager PRIVATE
+    # Add any other desired compiler options here
+    -Wno-missing-field-initializers
+)
+
+
+
+
 # Link libraries
 cmake_policy(SET CMP0028 NEW)
 target_link_libraries(rs_licenseManager licensecc_static)
