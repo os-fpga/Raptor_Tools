@@ -26,8 +26,9 @@ public:
 
     License_Manager(LicensedProductName licensedProductName);
     License_Manager(string licensedProductName);
+    
+
     bool licenseCheckout(const string &productName);
-    const vector<string> split_string(const string& stringToBeSplit, const char splitchar);
     struct LicenseFatalException : public exception {
         const char *what() const throw() {
             return "License was not acquired due to a fatal error";
@@ -41,8 +42,8 @@ public:
     };
 
     map<string, LicensedProductName> licensedProductNameEnumMap = {
-        {"DE", License_Manager::LicensedProductName::DE}
-    };
+        {"DE", License_Manager::LicensedProductName::DE}    
+};
 
     ~License_Manager();
 private:
