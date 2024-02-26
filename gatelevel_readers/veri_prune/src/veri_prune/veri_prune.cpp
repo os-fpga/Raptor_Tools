@@ -36,9 +36,7 @@ struct EditingTool : public ScriptPass
         log("\n");
     }
 
-	std::string netlist_file;
-	std::string interface_file;
-	std::string wrapper_file;
+	std::vector<std::string> wrapper_files;
 	std::string cell_lib;
 	std::set<std::string> primitives;
 	std::vector<Cell*> remove_prims;
@@ -64,7 +62,7 @@ struct EditingTool : public ScriptPass
 
 	void clear_flags() override
     {
-        netlist_file = "";
+        wrapper_files = {};
     }
 
 	std::string remove_backslashes(const std::string& input) {
@@ -137,6 +135,19 @@ struct EditingTool : public ScriptPass
 		}
 	}
 
+	bool is_flag(const std::string& arg) 
+	{
+		return !arg.empty() && arg[0] == '-';
+	}
+
+	std::string get_extension(const std::string& filename) {
+	    size_t dot_pos = filename.find_last_of('.');
+	    if (dot_pos != std::string::npos) {
+	        return filename.substr(dot_pos);
+	    }
+	    return ""; // If no extension found
+	}
+
 	void execute(std::vector<std::string> args, RTLIL::Design *design) override
 	{
 		std::string run_from, run_to;
@@ -146,17 +157,18 @@ struct EditingTool : public ScriptPass
 		size_t argidx;
 		// TODO: Will send the arguments and test after parsing is done 
         for (argidx = 1; argidx < args.size(); argidx++) {
-			if ((args[argidx] == "-o" || args[argidx] == "--out") && argidx + 1 < args.size()) {
-                interface_file = args[++argidx];
-                continue;
-            }
-			if ((args[argidx] == "-w" || args[argidx] == "--wrapper") && argidx + 1 < args.size()) {
-                wrapper_file = args[++argidx];
-                continue;
-            }
+			if (args[argidx] == "-w" && argidx + 1 < args.size())
+			{
+    		    size_t next_argidx = argidx + 1;
+    		    while (next_argidx < args.size() && !is_flag(args[next_argidx])) {
+    		        wrapper_files.push_back(args[next_argidx]);
+    		        ++next_argidx;
+    		    }
+    		    argidx = next_argidx - 1;
+				continue;
+    		}
             break;
         }
-		extra_args(args, argidx, design);
 		cell_lib = "genesis3";
 		primitives = io_prim.get_primitives(cell_lib);
 
@@ -399,6 +411,22 @@ struct EditingTool : public ScriptPass
 	void script() override
     {
 		std::cout << "Run Script" << std::endl;
-		run("write_verilog -noexpr -simple-lhs wr.v");
+		for(auto file : wrapper_files)
+		{
+			std::string extension = get_extension(file);
+			if (!extension.empty())
+			{
+				if(extension == ".v")
+				{
+					run("write_verilog -noexpr -simple-lhs " + file);
+					continue;
+				}
+				if(extension == ".eblif")
+				{
+					run("write_blif -param " + file);
+					continue;
+				}
+			}
+		}
 	}
 }EditingTool;
