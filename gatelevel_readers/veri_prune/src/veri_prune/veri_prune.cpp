@@ -40,7 +40,7 @@ struct EditingTool : public ScriptPass
 	std::string interface_file;
 	std::string wrapper_file;
 	std::string cell_lib;
-	std::vector<std::string> primitives;
+	std::set<std::string> primitives;
 	std::vector<Cell*> remove_prims;
 	std::vector<Cell*> remove_non_prims;
 	std::vector<Cell*> remove_wrapper_cells;
@@ -399,6 +399,6 @@ struct EditingTool : public ScriptPass
 	void script() override
     {
 		std::cout << "Run Script" << std::endl;
-		run("write_verilog -noexpr -simple-lhs new.v");
+		run("write_verilog -noexpr -simple-lhs wr.v");
 	}
 }EditingTool;
