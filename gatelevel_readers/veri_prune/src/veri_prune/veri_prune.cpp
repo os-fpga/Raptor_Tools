@@ -185,6 +185,7 @@ struct EditingTool : public ScriptPass
 			string module_name = remove_backslashes(cell->type.str());
 			if(std::find(primitives.begin(), primitives.end(), module_name) != primitives.end())
 			{
+				io_prim.contains_io_prem = true;
 				remove_prims.push_back(cell);
 				for(auto conn : cell->connections())
 				{
@@ -234,6 +235,10 @@ struct EditingTool : public ScriptPass
 					}
 				}
 			}
+		}
+		if(!io_prim.contains_io_prem)
+		{
+			return;
 		}
 
 		delete_cells(original_mod, remove_prims);
