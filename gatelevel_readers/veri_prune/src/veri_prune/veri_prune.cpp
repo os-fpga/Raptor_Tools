@@ -37,7 +37,7 @@ struct EditingTool : public ScriptPass
     }
 
 	std::vector<std::string> wrapper_files;
-	std::string cell_lib;
+	std::string tech;
 	std::set<std::string> primitives;
 	std::vector<Cell*> remove_prims;
 	std::vector<Cell*> remove_non_prims;
@@ -167,10 +167,13 @@ struct EditingTool : public ScriptPass
     		    argidx = next_argidx - 1;
 				continue;
     		}
+			if (args[argidx] == "-tech" && argidx + 1 < args.size())
+			{
+				tech = args[++argidx];
+			}
             break;
         }
-		cell_lib = "genesis3";
-		primitives = io_prim.get_primitives(cell_lib);
+		primitives = io_prim.get_primitives(tech);
 
 		Module* original_mod = _design->top_module();
 		std::string original_mod_name = remove_backslashes(_design->top_module()->name.str());
