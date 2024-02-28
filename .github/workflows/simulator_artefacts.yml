@@ -47,6 +47,7 @@ jobs:
             yum install -y gperf python3
             yum install -y help2man 
             yum install -y ccache
+            yum install -y perl-IPC-Cmd
 
         - name: Checkout code
           uses: actions/checkout@v3
