@@ -129,7 +129,7 @@ jobs:
                             export CI_BUILD_STAGE_NAME=test
                             export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator
                             export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/bin:$PATH
-                            ./ci/ci-install.bash
+                            ./ci/ci-script.bash
                   ;;
                       "iverilog")
                           git clone https://github.com/steveicarus/iverilog.git ${{ matrix.simulator }}  
