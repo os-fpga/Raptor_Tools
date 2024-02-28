@@ -125,12 +125,16 @@ jobs:
                             export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator
                             export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/bin:$PATH
                             verilator -V
+                            cd /tmp/Validation/RTL_testcases/iverilog_tests/adder_iverilog
                             verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
                             make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
                             obj_dir/Vadder_iverilog
                   ;;
                       "iverilog")
                           export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/iverilog/bin:$PATH
+                          iverilog -V
+                          cd /tmp/Validation/RTL_testcases/iverilog_tests/adder_iverilog
+                          ls -l
                           iverilog -g2012 *.v
                           vvp ./a.out
                   ;;
