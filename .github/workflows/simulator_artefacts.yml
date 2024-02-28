@@ -95,8 +95,8 @@ jobs:
                         make install
                         cd /opt/${{ matrix.simulator }}
                         ln -s share/verilator/include .
-                        ln -s ../share/verilator/bin/* .
-                        cd bin && ls -l
+                        cd bin && ln -s ../share/verilator/bin/* .
+                        ls -l
                         mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator /mnt
                         cp -rf /opt/${{ matrix.simulator }} $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                 ;;
