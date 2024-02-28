@@ -1,6 +1,7 @@
 name: 'Build Verilator and Iverilog'
 
 on:
+    push:    
     workflow_dispatch:
         inputs:
           Upload_as_Artefact:
