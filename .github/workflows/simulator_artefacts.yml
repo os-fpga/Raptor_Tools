@@ -90,6 +90,8 @@ jobs:
                 case "${{ matrix.simulator }}" in
                     "verilator")
                         autoconf
+                        export SYSTEMC_INCLUDE=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/systemc_2.3.3/include
+                        export SYSTEMC_LIBDIR=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/systemc_2.3.3/lib-linux64
                         ./configure --prefix=/opt/${{ matrix.simulator }}
                         make -j`nproc`
                         make install
