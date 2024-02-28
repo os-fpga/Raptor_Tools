@@ -128,7 +128,7 @@ jobs:
           uses: actions/upload-artifact@v3
           with:
               name: iverilog
-              path: cp -rf /opt/${{ matrix.simulator }}                
+              path: /opt/${{ matrix.simulator }}                
 
             
     Test_simulator:
