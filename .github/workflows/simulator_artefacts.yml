@@ -48,7 +48,7 @@ jobs:
             python3 -m pip install docopt
 
         - name: Checkout code
-          uses: actions/checkout@v4
+          uses: actions/checkout@v3
 
         - name: make workspace safe & fetch HDL simulator
           run: |
@@ -177,5 +177,4 @@ jobs:
                 ;;
                 esac
 
-                
                 
