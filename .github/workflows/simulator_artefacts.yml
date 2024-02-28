@@ -1,4 +1,4 @@
-name: 'Build Verilator and Iverilog'
+name: 'Snapshot Verilator & Iverilog Binaries'
 
 on:
     push:    
@@ -46,8 +46,6 @@ jobs:
             yum install -y git wget
             yum install -y gperf python3
             yum install -y help2man 
-            yum install -y ccache
-            yum install -y perl-IPC-Cmd
 
         - name: Checkout code
           uses: actions/checkout@v3
@@ -118,26 +116,23 @@ jobs:
 
         - name: Run Test ${{ matrix.simulator }} in /tmp
           run: |
-                set +e
                 source /opt/rh/devtoolset-11/enable
                 cd /tmp
+                git clone https://github.com/os-fpga/Validation.git
+                cd Validation/RTL_testcases/iverilog_tests/adder_iverilog
                 case "${{ matrix.simulator }}" in
                       "verilator")
-                            git clone https://github.com/verilator/verilator.git 
-                            cd ${{ matrix.simulator }}
-                            sed -i '/^VERILATOR_ROOT :=/ s/^/#/; /^export VERILATOR_ROOT/ s/^/#/' test_regress/Makefile
-                            export TESTS=dist-vlt-0
-                            export CI_OS_NAME=linux
-                            export CI_BUILD_STAGE_NAME=test
                             export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator
                             export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/bin:$PATH
-                            ./ci/ci-script.bash
+                            verilator -V
+                            verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
+                            make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
+                            obj_dir/Vadder_iverilog
                   ;;
                       "iverilog")
-                          git clone https://github.com/steveicarus/iverilog.git ${{ matrix.simulator }}  
-                          cd ${{ matrix.simulator }}
                           export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/iverilog/bin:$PATH
-                          bash .github/test.sh
+                          iverilog -g2012 *.v
+                          vvp ./a.out
                   ;;
                       *)
                       echo "Invalid value: ${{ matrix.simulator }}"
@@ -202,32 +197,28 @@ jobs:
           with:
             name: verilator              
 
-        - name: Clone & test ${{ matrix.simulator }} binaries
+        - name: Run Test ${{ matrix.simulator }} in /tmp
           run: |
                 cd /tmp
+                git clone https://github.com/os-fpga/Validation.git
+                cd Validation/RTL_testcases/iverilog_tests/adder_iverilog
                 case "${{ matrix.simulator }}" in
-                    "verilator")
-                        git clone https://github.com/verilator/verilator.git 
-                        cd ${{ matrix.simulator }}
-                        sed -i '/^VERILATOR_ROOT :=/ s/^/#/; /^export VERILATOR_ROOT/ s/^/#/' test_regress/Makefile
-                        export TESTS=dist-vlt-1
-                        export CI_OS_NAME=linux
-                        export CI_BUILD_STAGE_NAME=test
-                        export VERILATOR_ROOT=$GITHUB_WORKSPACE/verilator
-                        export PATH=$GITHUB_WORKSPACE/verilator/bin:$PATH
-                        verilator -V
-                        ./ci/ci-install.bash
-                ;;
-                    "iverilog")
-                        git clone https://github.com/steveicarus/iverilog.git ${{ matrix.simulator }}
-                        export PATH=$GITHUB_WORKSPACE/iverilog/bin:$PATH
-                        iverilog -V
-                        cd iverilog
-                        bash .github/test.sh
-                ;;
-                    *)
-                    echo "Invalid value: ${{ matrix.simulator }}"
-                ;;
+                      "verilator")
+                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/verilator
+                            export PATH=$GITHUB_WORKSPACE/verilator/bin:$PATH
+                            verilator -V
+                            verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
+                            make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
+                            obj_dir/Vadder_iverilog
+                  ;;
+                      "iverilog")
+                          export PATH=$GITHUB_WORKSPACE/iverilog/bin:$PATH
+                          iverilog -g2012 *.v
+                          vvp ./a.out
+                  ;;
+                      *)
+                      echo "Invalid value: ${{ matrix.simulator }}"
+                  ;;
                 esac
 
                 
