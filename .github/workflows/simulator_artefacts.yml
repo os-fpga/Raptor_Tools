@@ -119,13 +119,12 @@ jobs:
                 source /opt/rh/devtoolset-11/enable
                 cd /tmp
                 git clone https://github.com/os-fpga/Validation.git
-                cd Validation/RTL_testcases/iverilog_tests/adder_iverilog
+                cd Validation/RTL_testcases/iverilog_tests/adder_iverilog/rtl
                 case "${{ matrix.simulator }}" in
                       "verilator")
                             export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator
                             export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/bin:$PATH
                             verilator -V
-                            cd /tmp/Validation/RTL_testcases/iverilog_tests/adder_iverilog
                             verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
                             make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
                             obj_dir/Vadder_iverilog
@@ -133,7 +132,6 @@ jobs:
                       "iverilog")
                           export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/iverilog/bin:$PATH
                           iverilog -V
-                          cd /tmp/Validation/RTL_testcases/iverilog_tests/adder_iverilog
                           ls -l
                           iverilog -g2012 *.v
                           vvp ./a.out
@@ -205,7 +203,7 @@ jobs:
           run: |
                 cd /tmp
                 git clone https://github.com/os-fpga/Validation.git
-                cd Validation/RTL_testcases/iverilog_tests/adder_iverilog
+                cd Validation/RTL_testcases/iverilog_tests/adder_iverilog/rtl
                 case "${{ matrix.simulator }}" in
                       "verilator")
                             export VERILATOR_ROOT=$GITHUB_WORKSPACE/verilator
