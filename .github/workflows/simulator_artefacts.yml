@@ -1,7 +1,6 @@
 name: 'Snapshot Verilator & Iverilog Binaries'
-
 on:
-    push:    
+#    push:    
     workflow_dispatch:
         inputs:
           Upload_as_Artefact:
