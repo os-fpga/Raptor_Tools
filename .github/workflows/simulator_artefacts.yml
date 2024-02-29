@@ -149,14 +149,14 @@ jobs:
 
         - name: Upload Binaries ${{ matrix.simulator }}
           if: ${{ matrix.simulator == 'iverilog' }}
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
               name: BINiverilog
               path: /opt/${{ matrix.simulator }}.tar.gz  
 
         - name: Upload Binaries ${{ matrix.simulator }}
           if: ${{ matrix.simulator == 'verilator' }}
-          uses: actions/upload-artifact@v3
+          uses: actions/upload-artifact@v4
           with:
             name: BINverilator
             path: /opt/${{ matrix.simulator }}.tar.gz                
@@ -195,7 +195,7 @@ jobs:
 
         - name: Download Release
           #if: ${{ matrix.simulator == 'iverilog' }}
-          uses: actions/download-artifact@v3
+          uses: actions/download-artifact@v4
           with:
              pattern: BIN*
       
@@ -207,6 +207,7 @@ jobs:
 
         - name: Extract ${{ matrix.simulator }}
           run: |
+                ls -l
                 tar -xvzf $GITHUB_WORKSPACE/${{ matrix.simulator }}.tar.gz
 
         - name: Run Test ${{ matrix.simulator }} in /tmp
