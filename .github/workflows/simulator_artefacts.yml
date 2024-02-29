@@ -271,8 +271,8 @@ jobs:
 
             - name: zip HDL_simulator 
               run: |
-                    mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator /mnt
-                    mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/iverilog /mnt
+                    sudo mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator /mnt
+                    sudo mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/iverilog /mnt
                     cp -rf $GITHUB_WORKSPACE/verilator $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                     cp -rf $GITHUB_WORKSPACE/iverilog $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                     cd  $GITHUB_WORKSPACE/HDL_simulator/build/bin
