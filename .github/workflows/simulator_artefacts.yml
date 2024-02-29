@@ -151,14 +151,14 @@ jobs:
           if: ${{ matrix.simulator == 'iverilog' }}
           uses: actions/upload-artifact@v3
           with:
-              name: BINiverilog
+              name: iverilog
               path: /opt/${{ matrix.simulator }}.tar.gz  
 
         - name: Upload Binaries ${{ matrix.simulator }}
           if: ${{ matrix.simulator == 'verilator' }}
           uses: actions/upload-artifact@v3
           with:
-            name: BINverilator
+            name: verilator
             path: /opt/${{ matrix.simulator }}.tar.gz                
 
             
@@ -194,23 +194,23 @@ jobs:
                 make build
 
         - name: Download Release
-          #if: ${{ matrix.simulator == 'iverilog' }}
+          if: ${{ matrix.simulator == 'iverilog' }}
           uses: actions/download-artifact@v3
+          with:
+              name: iverilog
       
-#        - name: Download Release
-#          if: ${{ matrix.simulator == 'verilator' }}
-#          uses: actions/download-artifact@v3
-#          with:
-#            name: BINverilator              
+        - name: Download Release
+          if: ${{ matrix.simulator == 'verilator' }}
+          uses: actions/download-artifact@v3
+          with:
+            name: verilator              
 
         - name: Extract ${{ matrix.simulator }}
           run: |
-                ls -l
                 tar -xvzf $GITHUB_WORKSPACE/${{ matrix.simulator }}.tar.gz
 
         - name: Run Test ${{ matrix.simulator }} in /tmp
           run: |
-                ls -l
                 cd /tmp
                 git clone https://github.com/os-fpga/Validation.git
                 cd Validation/RTL_testcases/iverilog_tests/adder_iverilog/rtl
@@ -250,22 +250,24 @@ jobs:
               run: |
                     cd HDL_simulator
                     make build
-            
-            - name: Download Release
-              #if: ${{ matrix.simulator == 'iverilog' }}
+                
+            - name: Download Verilator
               uses: actions/download-artifact@v3
               with:
-                 pattern: BIN*
-                
-  #          - name: Download Release
-  #            if: ${{ matrix.simulator == 'verilator' }}
-  #            uses: actions/download-artifact@v3
-  #            with:
-  #              name: BINverilator              
+                name: verilator              
     
-            - name: Extract ${{ matrix.simulator }}
+            - name: Download Iverilog
+              uses: actions/download-artifact@v3
+              with:
+                  name: iverilog  
+                
+            - name: Extract
               run: |
-                  tar -xvzf $GITHUB_WORKSPACE/${{ matrix.simulator }}.tar.gz
+                    for file in $(ls -1 $GITHUB_WORKSPACE/*.tar.gz)
+                    do
+                    echo $file
+                    tar -xvf $file
+                    done
 
             - name: zip HDL_simulator 
               run: |
