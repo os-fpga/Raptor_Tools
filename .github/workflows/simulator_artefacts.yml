@@ -96,7 +96,7 @@ jobs:
                         make install
                         cd /opt/${{ matrix.simulator }}
                         tree
-                        ln -s share/verilator/include .
+                        #ln -s share/verilator/include .
                         cd bin #&& ln -s ../share/verilator/bin/* .
                         ls -l
                         mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator /mnt
@@ -129,8 +129,8 @@ jobs:
                 case "${{ matrix.simulator }}" in
                       "verilator")
                             source $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/setup_sim
-                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator
-                            export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/bin:$PATH
+                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/share/verilator
+                            export PATH=$VERILATOR_ROOT/bin:$PATH
                             verilator -V
                             verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
                             make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
