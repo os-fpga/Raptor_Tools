@@ -81,8 +81,9 @@ endif()
 #   add_custom_target(synlig_build ...)
 # and to make the targets depend on synlig lib, but the problem is json, capnp, common libraries that gets multiply defined at Raptor level.
 
-add_custom_target(synlig_build DEPENDS ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so)
 
+set(SURELOG_BUILD_TESTS OFF)
+set(SYNLIG_BUILD_TESTS OFF)
 set(SYNLIG_WITH_TCMALLOC OFF)
 set (SURELOG_WITH_TCMALLOC OFF)
 add_subdirectory(${PROJECT_SOURCE_DIR}/synlig)
@@ -114,11 +115,10 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/ghdl.so
     DEPENDS ${PROJECT_SOURCE_DIR}/ghdl-yosys-plugin/src/ghdl.cc
   )
   
-#add_dependencies(dummy_parser_plugins_lib synlig_build ghdl_plugin_build)
 add_dependencies(dummy_parser_plugins_lib ghdl_plugin_build)
 add_dependencies(synlig_copy synlig)
+add_dependencies(ghdl_plugin_build synlig)
 if (RAPTOR)
 else()
   add_dependencies(ghdl_plugin_build ghdl_install)
 endif()
-#add_dependencies(ghdl_plugin_build synlig_build)
