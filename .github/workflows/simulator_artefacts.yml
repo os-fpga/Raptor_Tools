@@ -44,7 +44,7 @@ jobs:
             yum install -y https://packages.endpointdev.com/rhel/7/os/x86_64/endpoint-repo.x86_64.rpm
             yum install -y git wget
             yum install -y gperf python3
-            yum install -y help2man 
+            yum install -y help2man  tree
 
         - name: Checkout code
           uses: actions/checkout@v3
@@ -57,7 +57,6 @@ jobs:
             tar xzf cmake-3.28.0-linux-x86_64.tar.gz
             ln -s $PWD/cmake-3.28.0-linux-x86_64/bin/cmake /usr/bin/cmake
             yum install -y bzip2-devel          
-
 
         - name: make workspace safe & fetch HDL simulator
           run: |
@@ -95,9 +94,9 @@ jobs:
                         make -j`nproc`
                         make install
                         cd /opt/${{ matrix.simulator }}
-                        ln -s share/verilator/include .
-                        cd bin && ln -s ../share/verilator/bin/* .
-                        ls -l
+                        #ln -s share/verilator/include .
+                        #cd bin && ln -s ../share/verilator/bin/* .
+                        #ls -l
                         mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator /mnt
                         cp -rf /opt/${{ matrix.simulator }} $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                         cd /opt && tar -cvzf ${{ matrix.simulator }}.tar.gz ${{ matrix.simulator }}
@@ -127,8 +126,8 @@ jobs:
                 cp ../sim/co_sim_tb/co_sim_adder_iverilog.v .
                 case "${{ matrix.simulator }}" in
                       "verilator")
-                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator
-                            export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/bin:$PATH
+                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator/share/verilator
+                            export PATH=$VERILATOR_ROOT/bin:$PATH
                             verilator -V
                             verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
                             make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
@@ -216,8 +215,8 @@ jobs:
                 cp ../sim/co_sim_tb/co_sim_adder_iverilog.v .
                 case "${{ matrix.simulator }}" in
                       "verilator")
-                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/verilator
-                            export PATH=$GITHUB_WORKSPACE/verilator/bin:$PATH
+                            export VERILATOR_ROOT=$GITHUB_WORKSPACE/verilator/share/verilator
+                            export PATH=$VERILATOR_ROOT/bin:$PATH
                             verilator -V
                             verilator -Wno-fatal -Wno-BLKANDNBLK --timing --build --main --exe *.v
                             make -j -C obj_dir/ -f Vadder_iverilog.mk Vadder_iverilog
