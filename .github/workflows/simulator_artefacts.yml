@@ -280,7 +280,7 @@ jobs:
             - name: Upload Release
               uses: softprops/action-gh-release@v1
               with:
-                files: ${{ github.workspace }}/HDL_simulator/build/bin/*.tar.gz
+                files: ${{ github.workspace }}/HDL_simulator/build/bin/*.tar.xz
                 repository: os-fpga/post_build_artifacts
                 token: ${{ secrets.upload_release }}
                 tag_name: v0.2
