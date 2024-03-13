@@ -275,12 +275,12 @@ jobs:
                     cp -rf $GITHUB_WORKSPACE/iverilog $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                     cd  $GITHUB_WORKSPACE/HDL_simulator/build/bin
                     today=`date +"%d%b_%Y"`
-                    tar -cvzf hdl_simulator_$today.tar.gz  HDL_simulator
+                    tar cJf hdl_simulator_$today.tar.xz  HDL_simulator
                     
             - name: Upload Release
               uses: softprops/action-gh-release@v1
               with:
-                files: ${{ github.workspace }}/HDL_simulator/build/bin/*.tar.gz
+                files: ${{ github.workspace }}/HDL_simulator/build/bin/*.tar.xz
                 repository: os-fpga/post_build_artifacts
                 token: ${{ secrets.upload_release }}
                 tag_name: v0.2
