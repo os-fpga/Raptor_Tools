@@ -57,7 +57,13 @@ jobs:
             curl -C - -O https://cmake.org/files/v3.28/cmake-3.28.0-linux-x86_64.tar.gz
             tar xzf cmake-3.28.0-linux-x86_64.tar.gz
             ln -s $PWD/cmake-3.28.0-linux-x86_64/bin/cmake /usr/bin/cmake
-            yum install -y bzip2-devel          
+            yum install -y bzip2-devel
+            cd /tmp
+            wget https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/gnat-2021-20210519-x86_64-linux-bin  -O gnat-bin
+            git clone https://github.com/AdaCore/gnat_community_install_script.git
+            cd gnat_community_install_script
+            sh install_package.sh  /tmp/gnat-bin  /opt/gnat com.adacore.gnat,com.adacore.libadalang
+            ls -l /opt/gnat/bin
 
         - name: make workspace safe & fetch HDL simulator
           run: |
@@ -117,6 +123,7 @@ jobs:
                         cd /opt && tar -cvzf ${{ matrix.simulator }}.tar.gz ${{ matrix.simulator }}
                 ;;
                     "GHDL") 
+                        export PATH=/opt/gnat/bin:$PATH
                         ./configure --prefix=/opt/${{ matrix.simulator }}
                         make -j`nproc`
                         make install
