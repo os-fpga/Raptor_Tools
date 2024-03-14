@@ -240,7 +240,7 @@ jobs:
                   ;;
                       "GHDL")
                           export PATH=$GITHUB_WORKSPACE/GHDL/bin:$PATH
-                          ghdl -V
+                          ghdl -v
                           
                   ;;
                       *)
