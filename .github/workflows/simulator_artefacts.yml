@@ -164,10 +164,10 @@ jobs:
                       "GHDL")
                           export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/GHDL/bin:$PATH
                           cd /tmp/Validation/RTL_testcases/GHDL_testcases
-                          pusd fpu_double && make run && popd
-                          pusd srl_fifo_16 && make run && popd
-                          pusd sigma_delta_dac_dual_loop && make run && popd
-                          pusd async_counter && make run && popd
+                          pushd fpu_double && make run && popd
+                          pushd srl_fifo_16 && make run && popd
+                          pushd sigma_delta_dac_dual_loop && make run && popd
+                          pushd async_counter && make run && popd
                   ;;
                       *)
                       echo "Invalid value: ${{ matrix.simulator }}"
@@ -245,10 +245,10 @@ jobs:
                       "GHDL")
                           export PATH=$GITHUB_WORKSPACE/GHDL/bin:$PATH
                           cd /tmp/Validation/RTL_testcases/GHDL_testcases
-                          pusd fpu_double && make run && popd
-                          pusd srl_fifo_16 && make run && popd
-                          pusd sigma_delta_dac_dual_loop && make run && popd
-                          pusd async_counter && make run && popd
+                          pushd fpu_double && make run && popd
+                          pushd srl_fifo_16 && make run && popd
+                          pushd sigma_delta_dac_dual_loop && make run && popd
+                          pushd async_counter && make run && popd
                           
                   ;;
                       *)
