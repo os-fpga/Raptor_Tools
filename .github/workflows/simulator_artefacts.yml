@@ -47,6 +47,7 @@ jobs:
             yum install -y gperf python3
             yum install -y help2man  tree zlib-devel
             yum install -y libxcb libxcb-devel xcb-util xcb-util-devel libxkbcommon-devel libxkbcommon-x11-devel
+            yum install -y xorg-x11-server-Xorg xorg-x11-xauth xorg-x11-apps
 
         - name: Checkout code
           uses: actions/checkout@v3
