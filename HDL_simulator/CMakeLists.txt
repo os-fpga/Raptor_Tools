@@ -32,9 +32,9 @@ project(HDL_Simulator)
 message(${PROJECT_SOURCE_DIR})
 
 set(FETCHCONTENT_QUIET FALSE)
-set(Release_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/hdl_simulator_10Mar_2024.tar.xz)
+set(Release_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/hdl_simulator_14Mar_2024.tar.xz)
 set(Destination_Dir ${PROJECT_SOURCE_DIR}/sim.tar.gz)
-set(expected_size 195865432)
+set(expected_size 198436968)
 set(DO_DOWNLOAD 0)
 set(DO_EXTRACTION 0)
 #set(expected_content_size )
@@ -94,6 +94,7 @@ if(${DO_EXTRACTION} EQUAL 1)
                  DEPENDS ${Destination_Dir}
                  BYPRODUCTS ${Extraction_dir}/HDL_simulator
                  COMMAND ${CMAKE_COMMAND} -E tar xzf ${Destination_Dir}
+ 		 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/setup_sim" "${Extraction_dir}/HDL_simulator/setup_sim"
                  WORKING_DIRECTORY ${Extraction_dir}
                  )
  else ()
