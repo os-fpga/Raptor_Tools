@@ -94,6 +94,7 @@ if(${DO_EXTRACTION} EQUAL 1)
                  DEPENDS ${Destination_Dir}
                  BYPRODUCTS ${Extraction_dir}/HDL_simulator
                  COMMAND ${CMAKE_COMMAND} -E tar xzf ${Destination_Dir}
+ 		 COMMAND ${CMAKE_COMMAND} -E copy "${CMAKE_CURRENT_SOURCE_DIR}/setup_sim" "${Extraction_dir}/HDL_simulator/setup_sim"
                  WORKING_DIRECTORY ${Extraction_dir}
                  )
  else ()
