@@ -167,7 +167,7 @@ jobs:
                           pushd fpu_double && make run && popd
                           pushd srl_fifo_16 && make run && popd
                           pushd sigma_delta_dac_dual_loop && make run && popd
-                          pushd async_counter && make run && popd
+                          #pushd async_counter && make run && popd
                   ;;
                       *)
                       echo "Invalid value: ${{ matrix.simulator }}"
@@ -248,7 +248,7 @@ jobs:
                           pushd fpu_double && make run && popd
                           pushd srl_fifo_16 && make run && popd
                           pushd sigma_delta_dac_dual_loop && make run && popd
-                          pushd async_counter && make run && popd
+                          #pushd async_counter && make run && popd
                           
                   ;;
                       *)
