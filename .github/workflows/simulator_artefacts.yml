@@ -129,6 +129,7 @@ jobs:
                         ./configure --prefix=/opt/${{ matrix.simulator }}
                         make -j`nproc`
                         make install
+                        cp /opt/gnat/lib/gcc/x86_64-pc-linux-gnu/10.3.1/rts-native/adalib/libgnat-2021.so /opt/${{ matrix.simulator }}/lib
                         mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/GHDL /mnt
                         cp -rf /opt/${{ matrix.simulator }} $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                         cd /opt && tar -cvzf ${{ matrix.simulator }}.tar.gz ${{ matrix.simulator }}
