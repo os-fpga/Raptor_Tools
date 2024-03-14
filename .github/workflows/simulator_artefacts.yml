@@ -276,7 +276,7 @@ jobs:
             - name: Download All sims binaries
               uses: actions/download-artifact@v3
               with:
-                path: $$GITHUB_WORKSPACE/latest_sims 
+                path: latest_sims 
                 
             - name: Extract
               run: |
