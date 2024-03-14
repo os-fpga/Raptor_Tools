@@ -26,6 +26,7 @@ jobs:
             simulator:
             - verilator
             - iverilog
+            - GHDL
 
         env:
           simulator: ${{ matrix.simulator }}
@@ -75,6 +76,9 @@ jobs:
                     "iverilog")
                         git clone https://github.com/steveicarus/iverilog.git ${{ matrix.simulator }}
                 ;;
+                    "GHDL")
+                        git clone https://github.com/ghdl/ghdl.git ${{ matrix.simulator }}
+                ;;
                     *)
                     echo "Invalid value: ${{ matrix.simulator }}"
                 ;;
@@ -112,6 +116,14 @@ jobs:
                         cp -rf /opt/${{ matrix.simulator }} $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                         cd /opt && tar -cvzf ${{ matrix.simulator }}.tar.gz ${{ matrix.simulator }}
                 ;;
+                    "GHDL") 
+                        ./configure --prefix=/opt/${{ matrix.simulator }}
+                        make -j`nproc`
+                        make install
+                        mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/GHDL /mnt
+                        cp -rf /opt/${{ matrix.simulator }} $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
+                        cd /opt && tar -cvzf ${{ matrix.simulator }}.tar.gz ${{ matrix.simulator }}
+                ;;
                     *)
                     echo "Invalid value: ${{ matrix.simulator }}"
                 ;;
@@ -140,25 +152,20 @@ jobs:
                           iverilog -g2012 *.v
                           vvp ./a.out
                   ;;
+                      "GHDL")
+                          export PATH=$GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/GHDL/bin:$PATH
+                          echo "plz wait"
+                  ;;
                       *)
                       echo "Invalid value: ${{ matrix.simulator }}"
                   ;;
                 esac
 
         - name: Upload Binaries ${{ matrix.simulator }}
-          if: ${{ matrix.simulator == 'iverilog' }}
           uses: actions/upload-artifact@v3
           with:
-              name: iverilog
-              path: /opt/${{ matrix.simulator }}.tar.gz  
-
-        - name: Upload Binaries ${{ matrix.simulator }}
-          if: ${{ matrix.simulator == 'verilator' }}
-          uses: actions/upload-artifact@v3
-          with:
-            name: verilator
-            path: /opt/${{ matrix.simulator }}.tar.gz                
-
+              name: ${{ matrix.simulator }}
+              path: /opt/${{ matrix.simulator }}.tar.gz
             
     Test_simulator:
         name:  Test-${{ matrix.simulator }}
@@ -173,6 +180,7 @@ jobs:
             simulator:
             - verilator
             - iverilog
+            - GHDL
 
         env:
           simulator: ${{ matrix.simulator }}
@@ -186,22 +194,15 @@ jobs:
         - name: Checkout code
           uses: actions/checkout@v4
 
-        - name: fetch HDL simulator
+        - name: fetch Previous HDL simulator
           run: |
                 cd HDL_simulator
                 make build
 
         - name: Download Release
-          if: ${{ matrix.simulator == 'iverilog' }}
           uses: actions/download-artifact@v3
           with:
-              name: iverilog
-      
-        - name: Download Release
-          if: ${{ matrix.simulator == 'verilator' }}
-          uses: actions/download-artifact@v3
-          with:
-            name: verilator              
+              name: ${{ matrix.simulator }}              
 
         - name: Extract ${{ matrix.simulator }}
           run: |
@@ -228,6 +229,11 @@ jobs:
                           iverilog -g2012 *.v
                           vvp ./a.out
                   ;;
+                      "GHDL")
+                          export PATH=$GITHUB_WORKSPACE/GHDL/bin:$PATH
+                          ghdl -V
+                          
+                  ;;
                       *)
                       echo "Invalid value: ${{ matrix.simulator }}"
                   ;;
@@ -244,35 +250,35 @@ jobs:
             - name: Checkout code
               uses: actions/checkout@v4
   
-            - name: fetch HDL simulator
+            - name: fetch Previous HDL simulator
               run: |
+                    mkdir latest_sims
                     cd HDL_simulator
                     make build
                 
-            - name: Download Verilator
+            - name: Download All sims binaries
               uses: actions/download-artifact@v3
               with:
-                name: verilator              
-    
-            - name: Download Iverilog
-              uses: actions/download-artifact@v3
-              with:
-                  name: iverilog  
+                path: $$GITHUB_WORKSPACE/latest_sims 
                 
             - name: Extract
               run: |
-                    for file in $(ls -1 $GITHUB_WORKSPACE/*.tar.gz)
+                    ls -l latest_sims
+                    for file in $(ls -1 $GITHUB_WORKSPACE/latest_sims/*/*.tar.gz)
                     do
                     echo $file
                     tar -xvf $file
                     done
+                    ls -l
 
             - name: zip HDL_simulator 
               run: |
                     sudo mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/verilator /mnt
                     sudo mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/iverilog /mnt
+                    sudo mv $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/GHDL /mnt
                     cp -rf $GITHUB_WORKSPACE/verilator $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                     cp -rf $GITHUB_WORKSPACE/iverilog $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
+                    cp -rf $GITHUB_WORKSPACE/GHDL $GITHUB_WORKSPACE/HDL_simulator/build/bin/HDL_simulator/
                     cd  $GITHUB_WORKSPACE/HDL_simulator/build/bin
                     today=`date +"%d%b_%Y"`
                     tar cJf hdl_simulator_$today.tar.xz  HDL_simulator
