@@ -2481,8 +2481,21 @@ struct dsp38_instance {
         ofs << innerCon.first << "=" << port_connections[innerCon.second]
             << " ";
       } else {
-        // std::cout << "Warn: Unconnrcted port " << innerCon.first << " from
+        // std::cerr << "Warn: Unconnrcted port " << innerCon.first << " from
         // cell "  << rs_prim << std::endl;
+      }
+    }
+    for (auto &outer : port_connections) {
+      if (prim_io_maps_dsp_to_rs_prim[rs_prim].find(outer.first) ==
+              end(prim_io_maps_dsp_to_rs_prim[rs_prim]) &&
+          outer.second != "$false" && outer.second != "$true") {
+        // Ports of the wrapper that are not connected in the inner instance
+        // should be connected only to constants (No illusion of passing a clck
+        // ... )
+        std::cerr
+            << "WARN: PRIM_RECONSTRUCT attemp to connect non existant port "
+            << outer.first << " to " << outer.second << " in primitive "
+            << rs_prim << " Ignored" << std::endl;
       }
     }
     ofs << std::endl;
