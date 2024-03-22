@@ -2470,7 +2470,7 @@ struct dsp19_instance {
         // should be connected only to constants (No illusion of passing a clck
         // ... )
         std::cerr
-            << "WARN: PRIM_RECONSTRUCT attemp to connect non existant port "
+            << "CRITICAL WARNING: PRIM_RECONSTRUCT attempt to connect non existant port "
             << outer.first << " to " << outer.second << " in primitive "
             << rs_prim << " Ignored" << std::endl;
       }
