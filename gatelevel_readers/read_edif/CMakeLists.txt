@@ -32,12 +32,15 @@ file(GLOB_RECURSE EXEC_SOURCE ./test/main.cpp)
 list(APPEND EXEC_SOURCE ${LIB_SOURCES})
 
 files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS ) #./src/*/*.h
-include_directories(PUBLIC ${LIB_INCLUDE_DIRS})
+#include_directories(PUBLIC ${LIB_INCLUDE_DIRS})
 
 # Create the library
 add_library(libreadedif
     ${LIB_SOURCES}
 )
+set(CXX_OPTS "-fPIC")
+target_compile_options(libreadedif PUBLIC ${CXX_OPTS})
+target_include_directories(libreadedif PUBLIC ${LIB_INCLUDE_DIRS})
 set_target_properties(libreadedif PROPERTIES PREFIX "") # Avoid extra 'lib' prefix
 
 # Add executable
