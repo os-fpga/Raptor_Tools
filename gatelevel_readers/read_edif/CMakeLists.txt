@@ -32,7 +32,6 @@ file(GLOB_RECURSE EXEC_SOURCE ./test/main.cpp)
 list(APPEND EXEC_SOURCE ${LIB_SOURCES})
 
 files_to_dirs(LIB_HEADERS LIB_INCLUDE_DIRS ) #./src/*/*.h
-#include_directories(PUBLIC ${LIB_INCLUDE_DIRS})
 
 # Create the library
 add_library(libreadedif
