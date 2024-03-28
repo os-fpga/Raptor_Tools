@@ -2,12 +2,14 @@ cmake_minimum_required(VERSION 3.7)
 
 project(LicenseManager CXX)
 
+# Uncomment below if using pre-compiled licenscc
+#set(LICENSECC_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install/lib/cmake/licensecc/")
+#set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
+#set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+
 # Set paths and variables
 set(GIT_SUBMODULE OFF)
-set(LICENSECC_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install/lib/cmake/licensecc/")
 set(LCC_PROJECT_NAME "Raptor")
-set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
 
 # inputs for licensing_feature.py
 if(RAPTOR)
@@ -38,7 +40,6 @@ target_compile_options(licensecc_static PRIVATE
     -Wno-missing-field-initializers
 )
 
-
 # Custom target for installing licensecc
 #add_custom_target(install_licensecc ALL
 #   COMMENT "Building and installing licensecc"
@@ -46,6 +47,11 @@ target_compile_options(licensecc_static PRIVATE
 #    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/licensecc
 #)
 #add_dependencies(install_licensecc licensecc_static)
+
+if(NOT EXISTS ${CMAKE_BINARY_DIR}/OPENLM_DIR/licensecc/extern/license-generator/src/license_generator/lccgen)
+  add_dependencies(lcc_base licensecc_static)
+  add_dependencies(license_generator_lib licensecc_static)
+endif()
 
 # Custom command to run licensing_feature.py script
 add_custom_command(
@@ -59,7 +65,7 @@ add_custom_command(
 # Custom target to ensure License_devices.cpp is generated before compiling the library
 add_custom_target(generate_license_manager_hpp DEPENDS License_devices.cpp)
 
-# Define targets
+# Uncomment below to build example
 #add_executable(example src/example.cpp License_manager.cpp)
 #add_dependencies(example generate_license_manager_hpp)
 
@@ -72,9 +78,6 @@ target_compile_options(rs_licenseManager PRIVATE
     # Add any other desired compiler options here
     -Wno-missing-field-initializers
 )
-
-
-
 
 # Link libraries
 cmake_policy(SET CMP0028 NEW)
