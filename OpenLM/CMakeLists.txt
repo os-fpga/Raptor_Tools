@@ -40,12 +40,12 @@ target_compile_options(licensecc_static PRIVATE
 
 
 # Custom target for installing licensecc
-add_custom_target(install_licensecc ALL
-    COMMENT "Building and installing licensecc"
-    COMMAND $(MAKE) install
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/licensecc
-)
-add_dependencies(install_licensecc licensecc_static)
+#add_custom_target(install_licensecc ALL
+#   COMMENT "Building and installing licensecc"
+#    COMMAND $(MAKE) install
+#    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/licensecc
+#)
+#add_dependencies(install_licensecc licensecc_static)
 
 # Custom command to run licensing_feature.py script
 add_custom_command(
@@ -79,7 +79,7 @@ target_compile_options(rs_licenseManager PRIVATE
 # Link libraries
 cmake_policy(SET CMP0028 NEW)
 target_link_libraries(rs_licenseManager licensecc_static)
-add_dependencies(rs_licenseManager install_licensecc)
+#add_dependencies(rs_licenseManager install_licensecc)
 #target_link_libraries(example licensecc_static)
 
 # path for privte key -s= /projects/Raptor/       projects folder is built in with exctuable in build folder
