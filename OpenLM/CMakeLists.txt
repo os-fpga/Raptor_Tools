@@ -34,7 +34,7 @@ endif()
 cmake_policy(SET CMP0077 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) 
 # Add subdirectory for licensecc
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc EXCLUDE_FROM_ALL)
 target_compile_options(licensecc_static PRIVATE
     # Add any other desired compiler options here
     -Wno-missing-field-initializers
@@ -47,11 +47,6 @@ target_compile_options(licensecc_static PRIVATE
 #    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/licensecc
 #)
 #add_dependencies(install_licensecc licensecc_static)
-
-if(NOT EXISTS ${CMAKE_BINARY_DIR}/OPENLM_DIR/licensecc/extern/license-generator/src/license_generator/lccgen)
-  add_dependencies(lcc_base licensecc_static)
-  add_dependencies(license_generator_lib licensecc_static)
-endif()
 
 # Custom command to run licensing_feature.py script
 add_custom_command(
