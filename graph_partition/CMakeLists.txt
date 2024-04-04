@@ -19,7 +19,7 @@ set(KAHYPAR_ENABLE_THREAD_PINNING OFF CACHE BOOL "Enables thread pinning in Mt-K
 set(KAHYPAR_ENABLE_ARCH_COMPILE_OPTIMIZATIONS OFF CACHE BOOL "Disable -mtune=native in KaHyPar" FORCE)
 set(KAHYPAR_ADD_ADDRESS_SANITIZER OFF CACHE BOOL "Disable ASAN in KaHyPar" FORCE)
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused -Wno-unused-parameter -Wno-undef -Wno-extra-semi" CACHE STRING "no annoying warnings" FORCE)
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused -Wno-unused-parameter -Wno-undef -Wno-extra-semi")
 
 FILE(COPY ${Boost_download_RS}
           DESTINATION
