@@ -2,12 +2,15 @@ cmake_minimum_required(VERSION 3.7)
 
 project(LicenseManager CXX)
 
-# Set paths and variables
-set(GIT_SUBMODULE OFF)
+if(LICENSECC_PRECOMPILED)
 set(LICENSECC_LOCATION "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install/lib/cmake/licensecc/")
-set(LCC_PROJECT_NAME "Raptor")
 set(CMAKE_INSTALL_PREFIX "${CMAKE_CURRENT_SOURCE_DIR}/licensecc/install")
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${CMAKE_CURRENT_SOURCE_DIR}/cmake/")
+endif()
+
+# Set paths and variables
+set(GIT_SUBMODULE OFF)
+set(LCC_PROJECT_NAME "Raptor")
 
 # inputs for licensing_feature.py
 if(RAPTOR)
@@ -32,20 +35,11 @@ endif()
 cmake_policy(SET CMP0077 NEW)
 set(CMAKE_POLICY_DEFAULT_CMP0077 NEW) 
 # Add subdirectory for licensecc
-add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc)
+add_subdirectory(${CMAKE_CURRENT_SOURCE_DIR}/licensecc EXCLUDE_FROM_ALL)
 target_compile_options(licensecc_static PRIVATE
     # Add any other desired compiler options here
     -Wno-missing-field-initializers
 )
-
-
-# Custom target for installing licensecc
-add_custom_target(install_licensecc ALL
-    COMMENT "Building and installing licensecc"
-    COMMAND $(MAKE) install
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}/licensecc
-)
-add_dependencies(install_licensecc licensecc_static)
 
 # Custom command to run licensing_feature.py script
 add_custom_command(
@@ -59,10 +53,6 @@ add_custom_command(
 # Custom target to ensure License_devices.cpp is generated before compiling the library
 add_custom_target(generate_license_manager_hpp DEPENDS License_devices.cpp)
 
-# Define targets
-#add_executable(example src/example.cpp License_manager.cpp)
-#add_dependencies(example generate_license_manager_hpp)
-
 # Ensure License_devices.cpp is generated before building these targets
 add_library(rs_licenseManager License_manager.cpp ${CMAKE_CURRENT_BINARY_DIR}/License_devices.cpp)
 add_dependencies(rs_licenseManager generate_license_manager_hpp)
@@ -73,16 +63,14 @@ target_compile_options(rs_licenseManager PRIVATE
     -Wno-missing-field-initializers
 )
 
-
-
-
 # Link libraries
 cmake_policy(SET CMP0028 NEW)
 target_link_libraries(rs_licenseManager licensecc_static)
-add_dependencies(rs_licenseManager install_licensecc)
-#target_link_libraries(example licensecc_static)
 
-# path for privte key -s= /projects/Raptor/       projects folder is built in with exctuable in build folder
-# -p /projects/Raptor/include/licensecc/Raptor/
+if(LICENSECC_EXAMPLE)
+add_executable(example src/example.cpp License_manager.cpp)
+add_dependencies(example generate_license_manager_hpp)
+target_link_libraries(example licensecc_static)
+endif()
 #generating FOEDAG_rs/projects/Raptor/include/licensecc/Raptor/public_key.h 
 #       and /FOEDAG_rs/projects/Raptor/private_key.rsa if they don't already exist
