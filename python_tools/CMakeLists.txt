@@ -22,7 +22,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 project(Litex)
 
-message(${PROJECT_SOURCE_DIR})
+message(STATUS "Python Virtual ENV: ${PROJECT_SOURCE_DIR}")
 # set download fetch URL as per OS
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     set(py_fatch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/python3.8_static_zlib_8march_2023.tar.gz")
@@ -111,10 +111,10 @@ file(MD5 ${req_file} CalculatedCheckSum)
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/litex_feb62023.tar.gz")
+set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/litex_24april_2024.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 83784561)
+set(litex_expected_size 100997218)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
 #------------------------------------------------------------------------------------
