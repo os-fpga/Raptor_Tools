@@ -723,7 +723,7 @@ bool simplify(Yosys::AST::AstNode *ast_node, bool const_fold, bool at_zero, bool
             // when $display()/$write() functions are used in an always block, simplify the expressions and
             // convert them to a special cell later in genrtlil
             for (auto node : ast_node->children)
-              while (node->simplify(true, false, false, stage, -1, false, false)) {
+              while (node->simplify(true, stage, -1, false)) {
                 }
             return false;
         }
@@ -3448,13 +3448,8 @@ skip_dynamic_range_lvalue_expansion:;
             }
 
             if (ast_node->str == "\\$sformatf") {
-                Yosys::AST::AstNode *node_string = ast_node->children[0];
-	        while (simplify(node_string, true, false, false, stage, width_hint, sign_hint, false)) { }
-		if (node_string->type != Yosys::AST::AST_CONSTANT)
-		   log_file_error(ast_node->filename, ast_node->location.first_line, "Failed to evaluate system function `%s' with non-constant 1st argument.\n", ast_node->str.c_str());
-		std::string sformat = node_string->bitsAsConst().decode_string();
-	        std::string sout = ast_node->process_format_str(sformat, 1, stage, width_hint, sign_hint);
-		newNode = ast_node->mkconst_str(sout); 
+                Fmt fmt= ast_node->processFormat(stage, /*sformat_like=*/true);
+                newNode = ast_node->mkconst_str(fmt.render());
                 goto apply_newNode;
             }
 
