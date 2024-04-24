@@ -22,7 +22,7 @@ endif(NOT CMAKE_BUILD_TYPE)
 
 project(Litex)
 
-message(${PROJECT_SOURCE_DIR})
+message(STATUS "Python Virtual ENV: ${PROJECT_SOURCE_DIR}")
 # set download fetch URL as per OS
 if (${CMAKE_SYSTEM_NAME} STREQUAL "Linux")
     set(py_fatch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/python3.8_static_zlib_8march_2023.tar.gz")
