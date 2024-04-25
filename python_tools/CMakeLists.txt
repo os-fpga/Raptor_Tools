@@ -111,10 +111,10 @@ file(MD5 ${req_file} CalculatedCheckSum)
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/litex_24april_2024.tar.gz")
+set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/litex_25April_2024.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 100997218)
+set(litex_expected_size 83783935)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
 #------------------------------------------------------------------------------------
