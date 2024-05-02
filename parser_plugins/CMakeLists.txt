@@ -64,17 +64,6 @@ message("YOSYS_PATH:" ${YOSYS_PATH})
 message("YOSYS_CONFIG:" ${YOSYS_CONFIG})
 message("GHDL_BIN_PATH:" ${GHDL_BIN_PATH})
 
-if (RAPTOR)
-  FILE(COPY ${PROJECT_SOURCE_DIR}/include/synlig_simplify.cc
-       DESTINATION ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys_mod/)
-
-elseif(EXISTS ${CMAKE_CURRENT_SOURCE_DIR}/../../yosys)
-  FILE(COPY ${PROJECT_SOURCE_DIR}/include/synlig_simplify.cc
-       DESTINATION ${PROJECT_SOURCE_DIR}/synlig/third_party/yosys_mod/)
-else()
-    message(STATUS "No copying synlig_simplify.cc as synling yosys will be used")
-endif()
-
 # TODO: The best solution would be to do the following:
 #   add_sybsystem(synlig_plugin)
 # instead of the current: 
