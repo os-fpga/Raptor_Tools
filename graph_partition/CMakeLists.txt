@@ -34,18 +34,11 @@ FILE(COPY ${TBB_download_RS}
 message(STATUS "+++++++++++++++ CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "+++++++++++++++ CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
 
-# Read the contents of the CMakeLists.txt file
 file(READ ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/lib/CMakeLists.txt FILE_CONTENTS)
-
-# Check if the file does not already contain the desired target_link_libraries line
 if(NOT "${FILE_CONTENTS}" MATCHES "target_link_libraries\\(mtkahypar mini_boost\\)")
-    # Replace the existing target_link_libraries line with the new one
     string(REPLACE "target_link_libraries(mtkahypar Boost::program_options)" "target_link_libraries(mtkahypar mini_boost)" MODIFIED_CONTENTS "${FILE_CONTENTS}")
-
-    # Write the modified contents back to the CMakeLists.txt file
     file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/lib/CMakeLists.txt "${MODIFIED_CONTENTS}")
 endif()
-
 
 if(RAPTOR)
     # need to move the findtbb.cmake to OpenFPGA as well so both look for tbb using same regex
