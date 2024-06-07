@@ -18,6 +18,7 @@ set(KAHYPAR_DOWNLOAD_TBB ON CACHE BOOL "Enable the Download of TBB" FORCE)
 set(KAHYPAR_ENABLE_THREAD_PINNING OFF CACHE BOOL "Enables thread pinning in Mt-KaHyPar." FORCE)
 set(KAHYPAR_ENABLE_ARCH_COMPILE_OPTIMIZATIONS OFF CACHE BOOL "Disable -mtune=native in KaHyPar" FORCE)
 set(KAHYPAR_ADD_ADDRESS_SANITIZER OFF CACHE BOOL "Disable ASAN in KaHyPar" FORCE)
+set(KAHYPAR_PYTHON OFF CACHE BOOL "Disable ASAN in KaHyPar" FORCE)
 
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wno-unused -Wno-unused-parameter -Wno-undef -Wno-extra-semi")
 
@@ -32,6 +33,12 @@ FILE(COPY ${TBB_download_RS}
 
 message(STATUS "+++++++++++++++ CMAKE_CURRENT_BINARY_DIR: ${CMAKE_CURRENT_BINARY_DIR}")
 message(STATUS "+++++++++++++++ CMAKE_BINARY_DIR: ${CMAKE_BINARY_DIR}")
+
+file(READ ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/lib/CMakeLists.txt FILE_CONTENTS)
+if(NOT "${FILE_CONTENTS}" MATCHES "target_link_libraries\\(mtkahypar mini_boost\\)")
+    string(REPLACE "target_link_libraries(mtkahypar Boost::program_options)" "target_link_libraries(mtkahypar mini_boost)" MODIFIED_CONTENTS "${FILE_CONTENTS}")
+    file(WRITE ${CMAKE_CURRENT_SOURCE_DIR}/mt-kahypar/lib/CMakeLists.txt "${MODIFIED_CONTENTS}")
+endif()
 
 if(RAPTOR)
     # need to move the findtbb.cmake to OpenFPGA as well so both look for tbb using same regex
