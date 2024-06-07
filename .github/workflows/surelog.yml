@@ -8,7 +8,7 @@ jobs:
   linux-gcc:
     name: ${{ matrix.mode }}
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
@@ -39,7 +39,7 @@ jobs:
         pip3 install psutil
 
     - name: Checkout code
-      uses: actions/checkout@v3
+      uses: actions/checkout@v4
       with:
         submodules: true
         fetch-depth: 1

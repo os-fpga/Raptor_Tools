@@ -8,7 +8,7 @@ jobs:
   linux-gcc:
     name: ${{ matrix.mode }}
 
-    runs-on: ubuntu-20.04
+    runs-on: ubuntu-latest
     defaults:
       run:
         shell: bash
@@ -28,7 +28,7 @@ jobs:
         access_token: ${{ github.token }}
 
     - name: Checkout code
-      uses: actions/checkout@v3.2.0
+      uses: actions/checkout@v4
       with:
         fetch-depth: 0
         submodules: true
