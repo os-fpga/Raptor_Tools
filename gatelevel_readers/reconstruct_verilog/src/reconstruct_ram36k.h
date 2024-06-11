@@ -313,13 +313,13 @@ struct TDP_RAM36K_instance {
   };
   void print(std::ostream &ofs, unsigned cnt) {
     std::string rs_prim = "RS_TDP36K";
+    port_connections["$false"] = "$false";
+    port_connections["$true"] = "$true";
+    port_connections["$undef"] = "$undef";
     ofs << ".subckt " << rs_prim << " ";
     for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns) {
-      ofs << " " << cn.first << "=";
-      port_connections["$false"] = "$false";
-      port_connections["$true"] = "$true";
-      port_connections["$undef"] = "$undef";
       if (port_connections.find(cn.second) != port_connections.end()) {
+        ofs << " " << cn.first << "=";
         ofs << port_connections[cn.second];
       } else {
         // std::cout << "WARN: Un-connected " << cn.second
