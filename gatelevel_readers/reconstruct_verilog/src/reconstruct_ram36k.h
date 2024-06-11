@@ -318,6 +318,7 @@ struct TDP_RAM36K_instance {
       ofs << " " << cn.first << "=";
       port_connections["$false"] = "$false";
       port_connections["$true"] = "$true";
+      port_connections["$undef"] = "$undef";
       if (port_connections.find(cn.second) != port_connections.end()) {
         ofs << port_connections[cn.second];
       } else {
