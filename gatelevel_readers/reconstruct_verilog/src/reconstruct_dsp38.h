@@ -2474,6 +2474,9 @@ struct dsp38_instance {
 
   std::unordered_map<std::string, std::string> port_connections;
   void print(std::ostream &ofs) {
+    port_connections["$false"] = "$false";
+    port_connections["$true"] = "$true";
+    port_connections["$undef"] = "$undef";
     std::string rs_prim = RS_DSP_Primitives.at(get_block_key());
     ofs << ".subckt " << rs_prim << " ";
     for (auto &innerCon : prim_io_maps[rs_prim]) {
