@@ -184,6 +184,8 @@ endif ()
 # --------------------------------------------------------------------------------- 
 #                   ChatGPT VENV                                                   |
 #----------------------------------------------------------------------------------
+
+if(ENABLE_CHATGPT)
 # fetch URL for pre build ChatGPT virtual env tar
 set(chatgpt_env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.1/chatGPT_8april_2023.tar.gz")
 # set the name of file and folder to put the download
@@ -342,7 +344,7 @@ else()
         )
     endif()
 endif ()
-
+endif()
 
 
 if(NOT RAPTOR)
