@@ -317,11 +317,38 @@ struct TDP_RAM36K_instance {
     port_connections["$true"] = "$true";
     port_connections["$undef"] = "$undef";
     ofs << ".subckt " << rs_prim << " ";
-    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns) {
-      if (port_connections.find(cn.second) != port_connections.end()) {
-        ofs << " " << cn.first << "=";
-        ofs << port_connections[cn.second];
-      } else {
+    std::string known_clock;
+    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns)
+    {
+      if (port_connections.find(cn.second) != port_connections.end())
+      {
+        std::string high_conn = port_connections[cn.second];
+        if (cn.first.find("CLK") != std::string::npos)
+        {
+          if (high_conn != "$undef")
+          {
+            known_clock = high_conn;
+          }
+        }
+      }
+    }
+    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns)
+    {
+      if (port_connections.find(cn.second) != port_connections.end())
+      {
+        ofs << " " << cn.first;
+        std::string high_conn = port_connections[cn.second];
+        if (cn.first.find("CLK") != std::string::npos)
+        {
+          if (high_conn == "$undef")
+          {
+            // We cannot have undriven BRAM clock pins or clock pins driven by constants, clock pins have to be driven by clocks
+            high_conn = known_clock;
+          }
+        }
+        ofs << "=" << high_conn;
+      }
+      else {
         // std::cout << "WARN: Un-connected " << cn.second
         //           << " from TDP_RAM36K then no connection for " << cn.first
         //           << " from RS_TDP36K" << std::endl;
