@@ -2488,7 +2488,6 @@ struct dsp38_instance {
         {
           if (high_conn != "$undef")
           { 
-            // We cannot have undriven DSP clock pins or clock pins driven by constants, clock pins have to be driven by clocks
             known_clock = high_conn;
           }
         }
@@ -2502,6 +2501,7 @@ struct dsp38_instance {
         {
           if (high_conn == "$undef")
           {
+            // We cannot have undriven DSP clock pins or clock pins driven by constants, clock pins have to be driven by clocks
             high_conn = known_clock;
           }
         }
