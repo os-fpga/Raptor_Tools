@@ -2458,10 +2458,32 @@ struct dsp19_instance {
     std::string rs_prim = RS_DSP_Primitives.at(get_block_key());
     ofs << ".subckt " << rs_prim << " ";
     auto &cons = prim_io_maps[rs_prim];
+    std::string known_clock;
     for (auto &cn : cons) {
       if (port_connections.find(cn.second) != end(port_connections)) {
-        std::string at_prim = port_connections[cn.second];
-        ofs << cn.first << "=" << at_prim << " ";
+        std::string high_conn = port_connections[cn.second];
+        if (cn.first.find("CLK") != std::string::npos)
+        {
+          if (high_conn != "$undef")
+          {
+            known_clock = high_conn;
+          }
+        }
+      }
+    }
+    for (auto &cn : cons) {
+      if (port_connections.find(cn.second) != end(port_connections)) {
+        ofs << " " << cn.first;
+        std::string high_conn = port_connections[cn.second];
+        if (cn.first.find("CLK") != std::string::npos)
+        {
+          if (high_conn == "$undef")
+          {
+            // We cannot have undriven DSP clock pins or clock pins driven by constants, clock pins have to be driven by clocks
+            high_conn = known_clock;
+          }
+        }
+        ofs << "=" << high_conn;
       }
     }
     ofs << std::endl;

@@ -2479,13 +2479,33 @@ struct dsp38_instance {
     port_connections["$undef"] = "$undef";
     std::string rs_prim = RS_DSP_Primitives.at(get_block_key());
     ofs << ".subckt " << rs_prim << " ";
-    for (auto &innerCon : prim_io_maps[rs_prim]) {
-      if (port_connections.find(innerCon.second) != end(port_connections)) {
-        ofs << innerCon.first << "=" << port_connections[innerCon.second]
-            << " ";
-      } else {
-        // std::cerr << "Warn: Unconnrcted port " << innerCon.first << " from
-        // cell "  << rs_prim << std::endl;
+    std::string known_clock;
+    auto &cons = prim_io_maps[rs_prim];
+    for (auto &cn : cons) {
+      if (port_connections.find(cn.second) != end(port_connections)) {
+        std::string high_conn = port_connections[cn.second];
+        if (cn.first.find("CLK") != std::string::npos)
+        {
+          if (high_conn != "$undef")
+          { 
+            known_clock = high_conn;
+          }
+        }
+      }
+    }
+    for (auto &cn : cons) {
+      if (port_connections.find(cn.second) != end(port_connections)) {
+        ofs << " " << cn.first;
+        std::string high_conn = port_connections[cn.second];
+        if (cn.first.find("CLK") != std::string::npos)
+        {
+          if (high_conn == "$undef")
+          {
+            // We cannot have undriven DSP clock pins or clock pins driven by constants, clock pins have to be driven by clocks
+            high_conn = known_clock;
+          }
+        }
+        ofs << "=" << high_conn;
       }
     }
     for (auto &outer : port_connections) {
