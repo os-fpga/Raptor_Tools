@@ -8,7 +8,6 @@
  *
  * @copyright Copyright (c) 2024
  */
-#include "boost/multiprecision/cpp_int.hpp"
 #include <algorithm>
 #include <cstdlib>
 #include <fstream>
@@ -21,6 +20,8 @@
 #include <unordered_map>
 #include <unordered_set>
 #include <vector>
+
+#include "boost/multiprecision/cpp_int.hpp"
 
 using namespace boost::multiprecision;
 using namespace std;

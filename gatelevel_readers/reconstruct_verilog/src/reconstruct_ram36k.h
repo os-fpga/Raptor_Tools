@@ -9,8 +9,9 @@
  * @copyright Copyright (c) 2024
  */
 
-#include "reconstruct_utils.h"
 #include <set>
+
+#include "reconstruct_utils.h"
 
 struct TDP_RAM36K_instance {
   std::string str_1 = "00000000000000000000000000000001";
@@ -318,37 +319,40 @@ struct TDP_RAM36K_instance {
     port_connections["$undef"] = "$undef";
     ofs << ".subckt " << rs_prim << " ";
     std::string known_clock;
-    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns)
-    {
-      if (port_connections.find(cn.second) != port_connections.end())
-      {
+    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns) {
+      if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos)
-        {
-          if (high_conn != "$undef")
-          {
+        if (cn.first.find("CLK") != std::string::npos) {
+          if (high_conn != "$undef") {
             known_clock = high_conn;
+            break;
           }
         }
       }
     }
-    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns)
-    {
-      if (port_connections.find(cn.second) != port_connections.end())
-      {
-        ofs << " " << cn.first;
+    for (auto &cn : TDP_RAM36K_to_RS_TDP36K_collapsed_assigns) {
+      if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos)
-        {
-          if (high_conn == "$undef")
-          {
-            // We cannot have undriven BRAM clock pins or clock pins driven by constants, clock pins have to be driven by clocks
-            high_conn = known_clock;
+        if (cn.first.find("CLK") == std::string::npos) {
+          // Unconnected Data signals can be ommited from connection list,
+          // not tie-ing them off to $undef (Constant 0) benefits FMax
+          if (high_conn != "$undef") {
+            ofs << " " << cn.first;
+            ofs << "=" << high_conn;
+          }
+        } else {
+          ofs << " " << cn.first;
+          if (high_conn == "$undef") {
+            // We cannot have undriven BRAM clock pins nor clock pins driven by
+            // constants ($undef is constant 0), clock pins have to be driven by
+            // legal clocks. If the clock is assigned to $undef (Don't care) in
+            // the original netlist, any clock connected to the block will do.
+            ofs << "=" << known_clock;
+          } else {
+            ofs << "=" << high_conn;
           }
         }
-        ofs << "=" << high_conn;
-      }
-      else {
+      } else {
         // std::cout << "WARN: Un-connected " << cn.second
         //           << " from TDP_RAM36K then no connection for " << cn.first
         //           << " from RS_TDP36K" << std::endl;
@@ -371,7 +375,7 @@ struct TDP_RAM36K_instance {
         << std::endl;
   }
   static std::string extract_sram1(const std::string &init,
-                            const std::string &init_parity) {
+                                   const std::string &init_parity) {
     std::string sram1(18432, '0');
     for (int i = 0; i < 2048; i += 2) {
       sram1.replace((i * 9), 16, init.substr(i * 16, 16));
@@ -380,7 +384,7 @@ struct TDP_RAM36K_instance {
     return sram1;
   }
   static std::string extract_sram2(const std::string &init,
-                            const std::string &init_parity) {
+                                   const std::string &init_parity) {
     std::string sram2(18432, '0');
     for (int i = 1; i < 2048; i += 2) {
       sram2.replace((i - 1) * 9, 16, init.substr(i * 16, 16));
@@ -389,13 +393,13 @@ struct TDP_RAM36K_instance {
     return sram2;
   }
 
-  static std::string get_init_i1(std::string &init,
-                          std::string &init_parity) {
+  static std::string get_init_i1(std::string &init, std::string &init_parity) {
     std::reverse(begin(init), end(init));
-    std::reverse(begin(init_parity), end(init_parity));                 
-    std::string res =  extract_sram1(init, init_parity) + extract_sram2(init, init_parity);
+    std::reverse(begin(init_parity), end(init_parity));
+    std::string res =
+        extract_sram1(init, init_parity) + extract_sram2(init, init_parity);
     std::reverse(begin(init), end(init));
-    std::reverse(begin(init_parity), end(init_parity));  
+    std::reverse(begin(init_parity), end(init_parity));
     std::reverse(begin(res), end(res));
     return res;
   }

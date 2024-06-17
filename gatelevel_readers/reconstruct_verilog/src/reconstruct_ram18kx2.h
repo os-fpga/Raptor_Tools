@@ -317,7 +317,7 @@ struct TDP_RAM18KX2_instance {
   }
 
   static std::string extract_sram1(const std::string &init,
-                            const std::string &parity) {
+                                   const std::string &parity) {
     std::string sram(18432, '0');
 
     for (int i = 0; i < 1024; i++) {
@@ -329,7 +329,7 @@ struct TDP_RAM18KX2_instance {
   }
 
   static std::string extract_sram2(const std::string &init,
-                            const std::string &parity) {
+                                   const std::string &parity) {
     std::string sram(18432, '0');
 
     for (int i = 0; i < 1024; i++) {
@@ -341,20 +341,20 @@ struct TDP_RAM18KX2_instance {
   }
 
   static std::string get_init_i1(std::string &init1, std::string &parity1,
-                        std::string &init2, std::string &parity2) {
-  std::reverse(begin(init1), end(init1));
-  std::reverse(begin(parity1), end(parity1));
-  std::reverse(begin(init2), end(init2));
-  std::reverse(begin(parity2), end(parity2));
-  std::string res =
-      extract_sram1(init1, parity1) + extract_sram2(init2, parity2);
-  std::reverse(begin(init1), end(init1));
-  std::reverse(begin(parity1), end(parity1));
-  std::reverse(begin(init2), end(init2));
-  std::reverse(begin(parity2), end(parity2));
-  std::reverse(begin(res), end(res));
-  return res;
-}
+                                 std::string &init2, std::string &parity2) {
+    std::reverse(begin(init1), end(init1));
+    std::reverse(begin(parity1), end(parity1));
+    std::reverse(begin(init2), end(init2));
+    std::reverse(begin(parity2), end(parity2));
+    std::string res =
+        extract_sram1(init1, parity1) + extract_sram2(init2, parity2);
+    std::reverse(begin(init1), end(init1));
+    std::reverse(begin(parity1), end(parity1));
+    std::reverse(begin(init2), end(init2));
+    std::reverse(begin(parity2), end(parity2));
+    std::reverse(begin(res), end(res));
+    return res;
+  }
 
   void print(std::ostream &ofs, unsigned cnt) {
     std::string rs_prim = "RS_TDP36K";
@@ -363,38 +363,40 @@ struct TDP_RAM18KX2_instance {
     port_connections["$undef"] = "$undef";
     ofs << ".subckt " << rs_prim << " ";
     std::string known_clock;
-    for (auto &cn : TDP_RAM18KX2_to_RS_TDP36K_port_map_collapsed_internals)
-    {
-      if (port_connections.find(cn.second) != port_connections.end())
-      {
+    for (auto &cn : TDP_RAM18KX2_to_RS_TDP36K_port_map_collapsed_internals) {
+      if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos)
-        {
-          if (high_conn != "$undef")
-          {
+        if (cn.first.find("CLK") != std::string::npos) {
+          if (high_conn != "$undef") {
             known_clock = high_conn;
+            break;
           }
         }
       }
     }
-    for (auto &cn : TDP_RAM18KX2_to_RS_TDP36K_port_map_collapsed_internals)
-    {
-      if (port_connections.find(cn.second) != port_connections.end())
-      {
-        ofs << " " << cn.first;
+    for (auto &cn : TDP_RAM18KX2_to_RS_TDP36K_port_map_collapsed_internals) {
+      if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos)
-        {
-          if (high_conn == "$undef")
-          {
-            // We cannot have undriven BRAM clock pins or clock pins driven by constants, clock pins have to be driven by clocks
-            high_conn = known_clock;
+        if (cn.first.find("CLK") == std::string::npos) {
+          // Unconnected Data signals can be ommited from connection list,
+          // not tie-ing them off to $undef (Constant 0) benefits FMax
+          //if (high_conn != "$undef") {
+            ofs << " " << cn.first;
+            ofs << "=" << high_conn;
+          //}
+        } else {
+          ofs << " " << cn.first;
+          if (high_conn == "$undef") {
+            // We cannot have undriven BRAM clock pins nor clock pins driven by
+            // constants ($undef is constant 0), clock pins have to be driven by
+            // legal clocks. If the clock is assigned to $undef (Don't care) in
+            // the original netlist, any clock connected to the block will do.
+            ofs << "=" << known_clock;
+          } else {
+            ofs << "=" << high_conn;
           }
         }
-        ofs << "=" << high_conn;
-      }
-      else
-      {
+      } else {
         // std::cout << "WARN: Un-connected " << cn.second
         //           << " from TDP_RAM18x2 then no connection " << cn.first
         //           << " from RS_TDP36K" << std::endl;
@@ -417,6 +419,6 @@ struct TDP_RAM18KX2_instance {
         << get_init_i1(parameters["INIT1"], parameters["INIT1_PARITY"],
                        parameters["INIT2"], parameters["INIT2_PARITY"])
         << std::endl;
-    }
+  }
   std::unordered_map<std::string, std::string> port_connections;
 };
