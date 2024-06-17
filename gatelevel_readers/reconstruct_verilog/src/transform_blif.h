@@ -19,8 +19,8 @@ class Eblif_Transformer {
   std::vector<TDP_RAM36K_instance> TDP_RAM36K_instances;
   std::vector<dsp38_instance> dsp38_instances;
   std::vector<dsp19_instance> dsp19_instances;
-  std::unordered_map<std::string, std::string>
-  blifToCPlusPlusMap(const std::vector<std::string> &tokens) {
+  std::unordered_map<std::string, std::string> blifToCPlusPlusMap(
+      const std::vector<std::string> &tokens) {
     std::unordered_map<std::string, std::string> res;
     for (const std::string &token : tokens) {
       // Split each token using the '=' character
@@ -139,16 +139,14 @@ class Eblif_Transformer {
           "Can't generate an hexadecimal number out of an empty string"));
     }
     for (auto &d : s) {
-      if (d == 'z' || d == 'Z')
-        d = 'x';
+      if (d == 'z' || d == 'Z') d = 'x';
       if (!isxdigit(d) && d != 'x' && d != 'X')
         throw(std::invalid_argument("Non hexadigit in hexadecimal string" + s));
     }
     string res = "";
     res.reserve(4 * s.size());
     for (auto d : s) {
-      for (auto c : hexDecoder[d])
-        res.push_back(c);
+      for (auto c : hexDecoder[d]) res.push_back(c);
     }
     return res;
   }
@@ -173,7 +171,6 @@ class Eblif_Transformer {
     return res;
   }
   string bitsOfBigDecimal(string &s) {
-
     string res = "";
     int1024_t v = bigDecimalInteger(s);
     int1024_t r;
@@ -205,8 +202,7 @@ class Eblif_Transformer {
     if (rad_and_value[1] == 'b' || rad_and_value[1] == 'B') {
       bit_value = value;
       for (auto &d : bit_value) {
-        if (d == 'z' || d == 'Z')
-          d = 'x';
+        if (d == 'z' || d == 'Z') d = 'x';
         if ('1' != d && '0' != d && 'x' != d)
           throw(std::invalid_argument("Not valid bit value " + string(1, d) +
                                       " in " + exp));
@@ -232,8 +228,7 @@ class Eblif_Transformer {
     }
     // expand leading x s
     unsigned pos = 0;
-    while (pos < vec.size() && "0" == vec[pos])
-      ++pos;
+    while (pos < vec.size() && "0" == vec[pos]) ++pos;
     if (pos < vec.size() && "$undef" == vec[pos]) {
       for (unsigned idx = 0; idx < pos; ++idx) {
         vec[idx] = "$undef";
@@ -249,18 +244,15 @@ class Eblif_Transformer {
     unsigned p = 1;
     for (unsigned int i = 0; i < w; ++i) {
       int k = e & p;
-      if (k)
-        res[w - 1 - i] = 1;
+      if (k) res[w - 1 - i] = 1;
       p *= 2;
     }
     return res;
   }
   void simpleTruthTable(std::string tr, std::string w,
                         std::vector<std::vector<unsigned>> &vec) {
-    if (is_binary_param_(w))
-      w = "32'b" + w;
-    if (is_binary_param_(tr))
-      tr = "512'b" + tr;
+    if (is_binary_param_(w)) w = "32'b" + w;
+    if (is_binary_param_(tr)) tr = "512'b" + tr;
     unsigned long long width = veriValue(w);
     string stringRes;
     vector<string> v;
@@ -350,12 +342,13 @@ class Eblif_Transformer {
                                 {"LATCHNS", lut_port_map_LATCHNS},
                                 {"LATCHSRE", lut_port_map_LATCHSRE},
                                 {"LATCHNSRE", lut_port_map_LATCHNSRE}};
-  string mx = "179769313486231590772930519078902473361797697894230657273"
-              "430081157732675805500963132708477322407536021120113879871"
-              "393357658789768814416622492847430639474124377767893424865"
-              "485276302219601246094119453082952085005768838150682342462"
-              "881473913110540827237163350510684586298239947245938479716"
-              "304835356329624224137215";
+  string mx =
+      "179769313486231590772930519078902473361797697894230657273"
+      "430081157732675805500963132708477322407536021120113879871"
+      "393357658789768814416622492847430639474124377767893424865"
+      "485276302219601246094119453082952085005768838150682342462"
+      "881473913110540827237163350510684586298239947245938479716"
+      "304835356329624224137215";
   std::map<char, string> hexDecoder = {
       {'0', "0000"}, {'1', "0001"}, {'2', "0010"}, {'3', "0011"}, {'4', "0100"},
       {'5', "0101"}, {'6', "0110"}, {'7', "0111"}, {'8', "1000"}, {'9', "1001"},
@@ -368,8 +361,7 @@ class Eblif_Transformer {
         {"0100", '4'}, {"0101", '5'}, {"0110", '6'}, {"0111", '7'},
         {"1000", '8'}, {"1001", '9'}, {"1010", 'A'}, {"1011", 'B'},
         {"1100", 'C'}, {"1101", 'D'}, {"1110", 'E'}, {"1111", 'F'}};
-    if (hexEncoder.find(val) == end(hexEncoder))
-      return 'X';
+    if (hexEncoder.find(val) == end(hexEncoder)) return 'X';
     return hexEncoder[val];
   }
   std::unordered_map<std::string, std::string> verilog_dsp_int_names = {
@@ -410,7 +402,7 @@ class Eblif_Transformer {
        "    DSP38 #(\n        .DSP_MODE(\"MULTIPLY_ACCUMULATE\"),\n        "
        ".OUTPUT_REG_EN(\"TRUE\"),\n        .INPUT_REG_EN(\"TRUE\")"}};
 
-public:
+ public:
   void rs_transform_eblif(std::istream &ifs, std::ostream &ofs) {
     // port_case_compare();
     // return;
@@ -430,16 +422,14 @@ public:
       if (tokens.size() < 4) {
         if (tokens.size() == 3 && tokens[0] == ".param") {
           std::string par_name = tokens[1];
-          if (par_name.back() == '"')
-            par_name.pop_back();
+          if (par_name.back() == '"') par_name.pop_back();
           if (par_name.size() && par_name[0] == '"') {
             for (size_t idx = 0; idx < par_name.size() - 1; ++idx)
               par_name[idx] = par_name[idx + 1];
             par_name.pop_back();
           }
           std::string par_value = tokens[2];
-          if (par_value.back() == '"')
-            par_value.pop_back();
+          if (par_value.back() == '"') par_value.pop_back();
           if (par_value.size() && par_value[0] == '"') {
             for (size_t idx = 0; idx < par_value.size() - 1; ++idx)
               par_value[idx] = par_value[idx + 1];
@@ -595,8 +585,7 @@ public:
             for (uint i = 2; i < tokens.size(); ++i) {
               std::string s = std::string(1, tokens[i][0]);
               std::string port_conn = std::string(tokens[i]).substr(2);
-              if (s == "Q")
-                names.Y = port_conn; // output of the latch
+              if (s == "Q") names.Y = port_conn;  // output of the latch
               uint idx = latch_lut_port_conversion.at(tokens[1]).at(s)[2] - '0';
               int w_pos = -1;
               w_pos = idx;
@@ -667,11 +656,11 @@ public:
             mval.pop_back();
           }
           std::reverse(bck.begin(), bck.end());
-          if (mval.size() % 4) { // not divisible by 4
+          if (mval.size() % 4) {  // not divisible by 4
             ofs << line << "\n";
             continue;
           }
-          ofs << "        " <<tokens[0].substr(0, pos) << "'h";
+          ofs << "        " << tokens[0].substr(0, pos) << "'h";
           for (int i = 0; i < mval.size(); i += 4) {
             ofs << hexEncode(mval.substr(i, 4));
           }
@@ -682,7 +671,7 @@ public:
           continue;
         }
       } else if (false && verilog_dsp_int_names.find(tokens[0]) !=
-                 end(verilog_dsp_int_names)) {
+                              end(verilog_dsp_int_names)) {
         within_rs_dsp = true;
         hdr = verilog_dsp_int_names[tokens[0]];
       } else if (tokens[0] == "ADDER_CARRY") {
@@ -745,7 +734,6 @@ public:
   }
   void transform_files(std::string in_file, std::string out_file,
                        bool isblif = true) {
-
     std::ifstream ifs(in_file);
     std::ofstream ofs(out_file);
     if (isblif) {
@@ -777,8 +765,7 @@ public:
     if (ferror(pf)) {
       std::cerr << "Error reading the file!" << std::endl;
     }
-    if (close)
-      fclose(pf); // Close the memory stream.
+    if (close) fclose(pf);  // Close the memory stream.
   }
   inline FILE *open_and_transform_eblif(const char *filename) {
     // FILE* infile = std::fopen(filename, "r");

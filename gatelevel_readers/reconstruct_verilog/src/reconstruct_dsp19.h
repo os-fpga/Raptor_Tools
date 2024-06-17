@@ -8,12 +8,12 @@
  *
  * @copyright Copyright (c) 2024
  */
-#include "reconstruct_utils.h"
 #include <string>
 #include <unordered_map>
 
-struct dsp19_instance {
+#include "reconstruct_utils.h"
 
+struct dsp19_instance {
   std::unordered_map<std::string, std::string> RS_DSP_MULTADD_REGOUT_port_map =
       {{"subtract", "SUBTRACT"},
        {"shift_right[4]", "SHIFT_RIGHT[4]"},
@@ -2424,16 +2424,12 @@ struct dsp19_instance {
     if (parameters.find(par_name) != end(parameters)) {
       parameters[par_name] = value;
       if (par_name == "DSP_MODE") {
-        if (value == "MULTIPLY_ACCUMULATE")
-          parameters["accumulator"] = "1";
-        if (value == "MULTIPLY_ADD_SUB")
-          parameters["adder"] = "1";
+        if (value == "MULTIPLY_ACCUMULATE") parameters["accumulator"] = "1";
+        if (value == "MULTIPLY_ADD_SUB") parameters["adder"] = "1";
       } else if (par_name == "OUTPUT_REG_EN") {
-        if (value == "TRUE")
-          parameters["output_reg"] = "1";
+        if (value == "TRUE") parameters["output_reg"] = "1";
       } else if (par_name == "INPUT_REG_EN") {
-        if (value == "TRUE")
-          parameters["input_reg"] = "1";
+        if (value == "TRUE") parameters["input_reg"] = "1";
       }
       return true;
     }
@@ -2462,28 +2458,36 @@ struct dsp19_instance {
     for (auto &cn : cons) {
       if (port_connections.find(cn.second) != end(port_connections)) {
         std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos)
-        {
-          if (high_conn != "$undef")
-          {
+        if (cn.first.find("CLK") != std::string::npos) {
+          if (high_conn != "$undef") {
             known_clock = high_conn;
+            break;
           }
         }
       }
     }
     for (auto &cn : cons) {
-      if (port_connections.find(cn.second) != end(port_connections)) {
-        ofs << " " << cn.first;
+      if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos)
-        {
-          if (high_conn == "$undef")
-          {
-            // We cannot have undriven DSP clock pins or clock pins driven by constants, clock pins have to be driven by clocks
-            high_conn = known_clock;
+        if (cn.first.find("CLK") == std::string::npos) {
+          // Unconnected Data signals can be ommited from connection list,
+          // not tie-ing them off to $undef (Constant 0) benefits FMax
+          if (high_conn != "$undef") {
+            ofs << " " << cn.first;
+            ofs << "=" << high_conn;
+          }
+        } else {
+          ofs << " " << cn.first;
+          if (high_conn == "$undef") {
+            // We cannot have undriven DSP clock pins nor clock pins driven by
+            // constants ($undef is constant 0), clock pins have to be driven by
+            // legal clocks. If the clock is assigned to $undef (Don't care) in
+            // the original netlist, any clock connected to the block will do.
+            ofs << "=" << known_clock;
+          } else {
+            ofs << "=" << high_conn;
           }
         }
-        ofs << "=" << high_conn;
       }
     }
     ofs << std::endl;
@@ -2494,10 +2498,10 @@ struct dsp19_instance {
         // Ports of the wrapper that are not connected in the inner instance
         // should be connected only to constants (No illusion of passing a clck
         // ... )
-        std::cerr
-            << "CRITICAL WARNING: PRIM_RECONSTRUCT attempt to connect non existant port "
-            << outer.first << " to " << outer.second << " in primitive "
-            << rs_prim << " Ignored" << std::endl;
+        std::cerr << "CRITICAL WARNING: PRIM_RECONSTRUCT attempt to connect "
+                     "non existant port "
+                  << outer.first << " to " << outer.second << " in primitive "
+                  << rs_prim << " Ignored" << std::endl;
       }
     }
     ofs << ".param MODE_BITS " << get_MODE_BITS() << std::endl;
