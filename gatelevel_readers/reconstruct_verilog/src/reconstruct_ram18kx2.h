@@ -380,10 +380,10 @@ struct TDP_RAM18KX2_instance {
         if (cn.first.find("CLK") == std::string::npos) {
           // Unconnected Data signals can be ommited from connection list,
           // not tie-ing them off to $undef (Constant 0) benefits FMax
-          //if (high_conn != "$undef") {
+          if (high_conn != "$undef") {
             ofs << " " << cn.first;
             ofs << "=" << high_conn;
-          //}
+          }
         } else {
           ofs << " " << cn.first;
           if (high_conn == "$undef") {
