@@ -2447,7 +2447,7 @@ struct dsp19_instance {
            std::string("0000") + std::string("1");
   }
   std::unordered_map<std::string, std::string> port_connections;
-  void print(std::ostream &ofs, const std::string& dont_care_clock) {
+  void print(std::ostream &ofs, const std::string &dont_care_clock) {
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";
     port_connections["$undef"] = "$undef";
@@ -2469,7 +2469,7 @@ struct dsp19_instance {
             // the original netlist, any clock connected to the block will do.
             if (dont_care_clock.empty())
               ofs << "=" << high_conn;
-            else 
+            else
               ofs << "=" << dont_care_clock;
           } else {
             ofs << "=" << high_conn;

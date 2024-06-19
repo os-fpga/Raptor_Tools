@@ -362,13 +362,15 @@ struct TDP_RAM18KX2_instance {
     port_connections["$true"] = "$true";
     port_connections["$undef"] = "$undef";
     ofs << ".subckt " << rs_prim << " ";
-    std::string known_clock;
+    std::string dont_care_clock;
+    // Find a clock already connected to the BRAM to be used as don't care clock
+    // for other unconnected clocks
     for (auto &cn : TDP_RAM18KX2_to_RS_TDP36K_port_map_collapsed_internals) {
       if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
         if (cn.first.find("CLK") != std::string::npos) {
           if (high_conn != "$undef") {
-            known_clock = high_conn;
+            dont_care_clock = high_conn;
             break;
           }
         }
@@ -391,7 +393,7 @@ struct TDP_RAM18KX2_instance {
             // constants ($undef is constant 0), clock pins have to be driven by
             // legal clocks. If the clock is assigned to $undef (Don't care) in
             // the original netlist, any clock connected to the block will do.
-            ofs << "=" << known_clock;
+            ofs << "=" << dont_care_clock;
           } else {
             ofs << "=" << high_conn;
           }
