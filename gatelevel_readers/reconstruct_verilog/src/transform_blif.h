@@ -459,8 +459,8 @@ class Eblif_Transformer {
       }
     }
     if (dont_care_dsp_clock.empty()) {
-      // Prefers a clock already connected to a DSP, but will settle for a clock
-      // connected to a DFF
+      // Prefers a clock already connected to a DSP or BRAM, but will settle for
+      // a clock connected to a DFF
       dont_care_dsp_clock = dont_care_dff_clock;
     }
     // Rewind stream
