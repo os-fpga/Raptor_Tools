@@ -312,7 +312,7 @@ struct TDP_RAM36K_instance {
                             write_mode_B + std::string(27, '0');
     return MODE_BITS;
   };
-  void print(std::ostream &ofs, unsigned cnt) {
+  void print(std::ostream &ofs) {
     std::string rs_prim = "RS_TDP36K";
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";
