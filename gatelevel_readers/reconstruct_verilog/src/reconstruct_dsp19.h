@@ -2447,35 +2447,19 @@ struct dsp19_instance {
            std::string("0000") + std::string("1");
   }
   std::unordered_map<std::string, std::string> port_connections;
-  void print(std::ostream &ofs) {
+  void print(std::ostream &ofs, const std::string& dont_care_clock) {
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";
     port_connections["$undef"] = "$undef";
     std::string rs_prim = RS_DSP_Primitives.at(get_block_key());
     ofs << ".subckt " << rs_prim << " ";
     auto &cons = prim_io_maps[rs_prim];
-    std::string known_clock;
-    for (auto &cn : cons) {
-      if (port_connections.find(cn.second) != end(port_connections)) {
-        std::string high_conn = port_connections[cn.second];
-        if (cn.first.find("CLK") != std::string::npos) {
-          if (high_conn != "$undef") {
-            known_clock = high_conn;
-            break;
-          }
-        }
-      }
-    }
     for (auto &cn : cons) {
       if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
         if (cn.first.find("CLK") == std::string::npos) {
-          // Unconnected Data signals can be ommited from connection list,
-          // not tie-ing them off to $undef (Constant 0) benefits FMax
-          if (high_conn != "$undef") {
-            ofs << " " << cn.first;
-            ofs << "=" << high_conn;
-          }
+          ofs << " " << cn.first;
+          ofs << "=" << high_conn;
         } else {
           ofs << " " << cn.first;
           if (high_conn == "$undef") {
@@ -2483,7 +2467,10 @@ struct dsp19_instance {
             // constants ($undef is constant 0), clock pins have to be driven by
             // legal clocks. If the clock is assigned to $undef (Don't care) in
             // the original netlist, any clock connected to the block will do.
-            ofs << "=" << known_clock;
+            if (dont_care_clock.empty())
+              ofs << "=" << high_conn;
+            else 
+              ofs << "=" << dont_care_clock;
           } else {
             ofs << "=" << high_conn;
           }

@@ -356,7 +356,7 @@ struct TDP_RAM18KX2_instance {
     return res;
   }
 
-  void print(std::ostream &ofs, unsigned cnt) {
+  void print(std::ostream &ofs) {
     std::string rs_prim = "RS_TDP36K";
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";

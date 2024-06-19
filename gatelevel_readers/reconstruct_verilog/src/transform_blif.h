@@ -19,6 +19,7 @@ class Eblif_Transformer {
   std::vector<TDP_RAM36K_instance> TDP_RAM36K_instances;
   std::vector<dsp38_instance> dsp38_instances;
   std::vector<dsp19_instance> dsp19_instances;
+  std::string dont_care_clock;
   std::unordered_map<std::string, std::string> blifToCPlusPlusMap(
       const std::vector<std::string> &tokens) {
     std::unordered_map<std::string, std::string> res;
@@ -408,6 +409,48 @@ class Eblif_Transformer {
     // return;
     std::string last_ckt = "";
     std::string line;
+
+    // Find a clock to use for "don't care" clocks
+    while (std::getline(ifs, line)) {
+      std::string ln(line);
+      while ('\\' == ln.back() && std::getline(ifs, line)) {
+        ln.pop_back();
+        ln += " " + line;
+      }
+      auto tokens = split_on_space(ln);
+      if (!tokens.size()) {
+        ofs << line << "\n";
+        continue;
+      }
+      if (tokens[0] == ".subckt") {
+        last_ckt = "";
+        std::string name = tokens[1];
+        std::transform(name.begin(), name.end(), name.begin(), ::tolower);
+        if (name.find("dsp38") != std::string::npos || 
+            name.find("dsp19") != std::string::npos || 
+            name.find("tdp_ram18kx2") != std::string::npos || 
+            name.find("tdp_ram36k") != std::string::npos) {
+          auto pairs = blifToCPlusPlusMap(tokens);
+          for (auto it : pairs) {
+            if (it.first.find("CLK") != std::string::npos) {
+              if (it.second != "$undef") {
+                dont_care_clock = it.second;
+                break;
+              }
+            }
+          }
+          if (!dont_care_clock.empty()) {
+            break;
+          }
+        }
+      }
+    }
+
+    // Rewind stream
+    line = "";
+    ifs.clear();
+    ifs.seekg(0);
+
     while (std::getline(ifs, line)) {
       std::string ln(line);
       while ('\\' == ln.back() && std::getline(ifs, line)) {
@@ -450,20 +493,17 @@ class Eblif_Transformer {
             ofs << ln << "\n";
           }
         } else if (tokens[0] == ".end") {
-          unsigned int cnt = 0;
           for (auto &ds : dsp38_instances) {
-            ds.print(ofs);
+            ds.print(ofs, dont_care_clock);
           }
           for (auto &ds : dsp19_instances) {
-            ds.print(ofs);
+            ds.print(ofs, dont_care_clock);
           }
           for (auto &rm : TDP_RAM18KX2_instances) {
-            cnt++;
-            rm.print(ofs, cnt);
+            rm.print(ofs);
           }
           for (auto &rm : TDP_RAM36K_instances) {
-            cnt++;
-            rm.print(ofs, cnt);
+            rm.print(ofs);
           }
 
           ofs << ln << "\n";
@@ -600,20 +640,20 @@ class Eblif_Transformer {
             }
             ofs << "\n";
           }
-        } else if (name.find("dsp38") == 0) {
+        } else if (name.find("dsp38") != std::string::npos) {
           last_ckt = "dsp38";
           dsp38_instances.push_back(dsp38_instance());
           dsp38_instances.back().port_connections = blifToCPlusPlusMap(tokens);
-        } else if (name.find("dsp19") == 0) {
+        } else if (name.find("dsp19") != std::string::npos) {
           last_ckt = "dsp19";
           dsp19_instances.push_back(dsp19_instance());
           dsp19_instances.back().port_connections = blifToCPlusPlusMap(tokens);
-        } else if (name.find("tdp_ram18kx2") == 0) {
+        } else if (name.find("tdp_ram18kx2") != std::string::npos) {
           last_ckt = "tdp_ram18kx2";
           TDP_RAM18KX2_instances.push_back(TDP_RAM18KX2_instance());
           TDP_RAM18KX2_instances.back().port_connections =
               blifToCPlusPlusMap(tokens);
-        } else if (name.find("tdp_ram36k") == 0) {
+        } else if (name.find("tdp_ram36k") != std::string::npos) {
           last_ckt = "tdp_ram36k";
           TDP_RAM36K_instances.push_back(TDP_RAM36K_instance());
           TDP_RAM36K_instances.back().port_connections =
@@ -732,18 +772,6 @@ class Eblif_Transformer {
       }
     }
   }
-  void transform_files(std::string in_file, std::string out_file,
-                       bool isblif = true) {
-    std::ifstream ifs(in_file);
-    std::ofstream ofs(out_file);
-    if (isblif) {
-      rs_transform_eblif(ifs, ofs);
-    } else {
-      rs_transform_verilog(ifs, ofs);
-    }
-    ifs.close();
-    ofs.close();
-  }
   void printFileContents(FILE *pf, FILE *pfout = nullptr, bool close = false) {
     if (!pf) {
       std::cerr << "Invalid file pointer!" << std::endl;
@@ -766,19 +794,5 @@ class Eblif_Transformer {
       std::cerr << "Error reading the file!" << std::endl;
     }
     if (close) fclose(pf);  // Close the memory stream.
-  }
-  inline FILE *open_and_transform_eblif(const char *filename) {
-    // FILE* infile = std::fopen(filename, "r");
-    // int fd = fileno(infile);
-    std::ifstream fstr;
-    fstr.open(filename);
-    std::stringstream ss;
-    ss << "";
-    // Call transform function
-    rs_transform_eblif(fstr, ss);
-    std::string data = ss.str();
-    FILE *infile = fmemopen((void *)data.c_str(), data.size(), "r");
-    printFileContents(infile);
-    return infile;
   }
 };
