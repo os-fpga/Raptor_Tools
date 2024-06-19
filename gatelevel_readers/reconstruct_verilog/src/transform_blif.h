@@ -19,7 +19,7 @@ class Eblif_Transformer {
   std::vector<TDP_RAM36K_instance> TDP_RAM36K_instances;
   std::vector<dsp38_instance> dsp38_instances;
   std::vector<dsp19_instance> dsp19_instances;
-  std::string dont_care_clock;
+  std::string dont_care_dsp_clock;
   std::unordered_map<std::string, std::string> blifToCPlusPlusMap(
       const std::vector<std::string> &tokens) {
     std::unordered_map<std::string, std::string> res;
@@ -410,7 +410,8 @@ class Eblif_Transformer {
     std::string last_ckt = "";
     std::string line;
 
-    // Find a clock to use for "don't care" clocks
+    // Find a clock to use for "don't care" DSP clocks
+    std::string dont_care_dff_clock;
     while (std::getline(ifs, line)) {
       std::string ln(line);
       while ('\\' == ln.back() && std::getline(ifs, line)) {
@@ -426,26 +427,42 @@ class Eblif_Transformer {
         last_ckt = "";
         std::string name = tokens[1];
         std::transform(name.begin(), name.end(), name.begin(), ::tolower);
-        if (name.find("dsp38") != std::string::npos || 
-            name.find("dsp19") != std::string::npos || 
-            name.find("tdp_ram18kx2") != std::string::npos || 
+        if (name.find("dsp38") != std::string::npos ||
+            name.find("dsp19") != std::string::npos ||
+            name.find("tdp_ram18kx2") != std::string::npos ||
             name.find("tdp_ram36k") != std::string::npos) {
           auto pairs = blifToCPlusPlusMap(tokens);
           for (auto it : pairs) {
             if (it.first.find("CLK") != std::string::npos) {
               if (it.second != "$undef") {
-                dont_care_clock = it.second;
+                dont_care_dsp_clock = it.second;
                 break;
               }
             }
           }
-          if (!dont_care_clock.empty()) {
+          if (!dont_care_dsp_clock.empty()) {
             break;
+          }
+        } else if (name.find("dff") != std::string::npos) {
+          if (dont_care_dff_clock.empty()) {
+            auto pairs = blifToCPlusPlusMap(tokens);
+            for (auto it : pairs) {
+              if (it.first == "C") {
+                if (it.second != "$undef") {
+                  dont_care_dff_clock = it.second;
+                  break;
+                }
+              }
+            }
           }
         }
       }
     }
-
+    if (dont_care_dsp_clock.empty()) {
+      // Prefers a clock already connected to a DSP or BRAM, but will settle for
+      // a clock connected to a DFF
+      dont_care_dsp_clock = dont_care_dff_clock;
+    }
     // Rewind stream
     line = "";
     ifs.clear();
@@ -494,10 +511,10 @@ class Eblif_Transformer {
           }
         } else if (tokens[0] == ".end") {
           for (auto &ds : dsp38_instances) {
-            ds.print(ofs, dont_care_clock);
+            ds.print(ofs, dont_care_dsp_clock);
           }
           for (auto &ds : dsp19_instances) {
-            ds.print(ofs, dont_care_clock);
+            ds.print(ofs, dont_care_dsp_clock);
           }
           for (auto &rm : TDP_RAM18KX2_instances) {
             rm.print(ofs);

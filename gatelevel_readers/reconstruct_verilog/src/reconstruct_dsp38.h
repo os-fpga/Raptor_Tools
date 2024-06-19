@@ -2468,7 +2468,7 @@ struct dsp38_instance {
           {"RS_DSP_MULT_REGIN", RS_DSP_MULT_REGIN_DSP_to_RS}};
 
   std::unordered_map<std::string, std::string> port_connections;
-  void print(std::ostream &ofs, const std::string& dont_care_clock) {
+  void print(std::ostream &ofs, const std::string &dont_care_clock) {
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";
     port_connections["$undef"] = "$undef";
@@ -2479,8 +2479,8 @@ struct dsp38_instance {
       if (port_connections.find(cn.second) != port_connections.end()) {
         std::string high_conn = port_connections[cn.second];
         if (cn.first.find("CLK") == std::string::npos) {
-            ofs << " " << cn.first;
-            ofs << "=" << high_conn;
+          ofs << " " << cn.first;
+          ofs << "=" << high_conn;
         } else {
           ofs << " " << cn.first;
           if (high_conn == "$undef") {
@@ -2490,7 +2490,7 @@ struct dsp38_instance {
             // the original netlist, any clock connected to the block will do.
             if (dont_care_clock.empty())
               ofs << "=" << high_conn;
-            else 
+            else
               ofs << "=" << dont_care_clock;
           } else {
             ofs << "=" << high_conn;
