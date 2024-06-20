@@ -6,6 +6,7 @@ cocotb-bus==0.1.1
 cocotb-test==0.2.1
 cocotbext-axi==0.1.18
 cocotbext-uart==0.1.2
+cocotbext-eth==0.1.22
 git+https://github.com/litex-hub/pythondata-cpu-vexriscv.git#egg=pythondata-cpu-vexriscv
 git+https://github.com/enjoy-digital/liteeth.git#egg=liteeth
 git+https://github.com/enjoy-digital/litedram.git#egg=litedram

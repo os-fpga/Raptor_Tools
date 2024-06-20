@@ -105,16 +105,16 @@ endif()
 
 # requirements.txt file
 set(req_file ${PROJECT_SOURCE_DIR}/requirements.txt)
-set(expected_req_txt_md5 "4115eaaf76c3f3de0fbd18c959b31159")
+set(expected_req_txt_md5 "a299e02188be531de9f37039ccfc311e")
 # calculated md5sum of requirements.txt
 file(MD5 ${req_file} CalculatedCheckSum)
 #list of packages separated by comma
 set(packages_for_venv "https://github.com/enjoy-digital/litex,https://github.com/m-labs/migen" )
 # fetch URL for virtual env tar
-set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/litex_25April_2024.tar.gz")
+set(env_fetch_url "https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/litex_20june2024.tar.gz")
 # set the name of file and folder to put the download
 set(litex_env_zip ${PROJECT_SOURCE_DIR}/litex_env.zip)
-set(litex_expected_size 83783935)
+set(litex_expected_size 83856230)
 set(DO_DOWNLOAD_LX 0)
 set(DO_EXTRACTION_LX 0)
 #------------------------------------------------------------------------------------
