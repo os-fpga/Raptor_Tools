@@ -9,6 +9,8 @@ fi
 export LD_LIBRARY_PATH=$TOP_DIR/GHDL/lib:$LD_LIBRARY_PATH
 export SYSTEMC_INCLUDE=$TOP_DIR/systemc_2.3.3/include
 export SYSTEMC_LIBDIR=$TOP_DIR/systemc_2.3.3/lib-linux64
+export SYSTEMC_HOME=$TOP_DIR/systemc_2.3.3/
+export VERILATOR_HOME=$TOP_DIR/verilator/
 export LD_LIBRARY_PATH=$TOP_DIR/systemc_2.3.3/lib-linux64:$LD_LIBRARY_PATH
 export PATH=$TOP_DIR/verilator/share/verilator/bin:$PATH
 export LIBRARY_PATH=/usr/lib/x86_64-linux-gnu:$LIBRARY_PATH
