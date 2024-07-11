@@ -626,6 +626,16 @@ class Eblif_Transformer {
           }
           names.INIT_VALUE = init_tokens[2];
           names.print_names(ofs, this);
+        } else if (name.find("o_fab") == 0) {
+          ofs << ".names ";
+          for (uint idx = 2; idx < tokens.size(); ++idx) {
+              std::string s = tokens[idx];
+              s = s.substr(s.find_first_of("=") + 1, std::string::npos);
+              ofs << s << " ";
+          }
+          ofs << "\n";
+          ofs << "1 1";
+          ofs << "\n";
         } else if (name.find("latch") == 0) {
           try {
             // Implement a latch using a lut (if possible : well written from
