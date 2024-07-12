@@ -626,7 +626,7 @@ class Eblif_Transformer {
           }
           names.INIT_VALUE = init_tokens[2];
           names.print_names(ofs, this);
-        } else if (name.find("o_fab") == 0) {
+        } else if ((name.find("o_fab") == 0) || (name.find("i_fab") == 0)) {
           ofs << ".names ";
           for (uint idx = 2; idx < tokens.size(); ++idx) {
               std::string s = tokens[idx];
