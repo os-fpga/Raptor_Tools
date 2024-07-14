@@ -404,7 +404,7 @@ class Eblif_Transformer {
        ".OUTPUT_REG_EN(\"TRUE\"),\n        .INPUT_REG_EN(\"TRUE\")"}};
 
  public:
-  void rs_transform_eblif(std::istream &ifs, std::ostream &ofs) {
+  bool rs_transform_eblif(std::istream &ifs, std::ostream &ofs) {
     // port_case_compare();
     // return;
     std::string last_ckt = "";
@@ -511,10 +511,14 @@ class Eblif_Transformer {
           }
         } else if (tokens[0] == ".end") {
           for (auto &ds : dsp38_instances) {
-            ds.print(ofs, dont_care_dsp_clock);
+            if (!ds.print(ofs, dont_care_dsp_clock)) {
+              return false;
+            }
           }
           for (auto &ds : dsp19_instances) {
-            ds.print(ofs, dont_care_dsp_clock);
+            if (!ds.print(ofs, dont_care_dsp_clock)) {
+              return false;
+            }
           }
           for (auto &rm : TDP_RAM18KX2_instances) {
             rm.print(ofs);
@@ -695,6 +699,7 @@ class Eblif_Transformer {
         ofs << line << "\n";
       }
     }
+    return true;
   }
   void rs_transform_verilog(std::istream &ifs, std::ostream &ofs) {
     std::string line;

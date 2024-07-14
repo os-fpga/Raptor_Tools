@@ -2468,7 +2468,7 @@ struct dsp38_instance {
           {"RS_DSP_MULT_REGIN", RS_DSP_MULT_REGIN_DSP_to_RS}};
 
   std::unordered_map<std::string, std::string> port_connections;
-  void print(std::ostream &ofs, const std::string &dont_care_clock) {
+  bool print(std::ostream &ofs, const std::string &dont_care_clock) {
     port_connections["$false"] = "$false";
     port_connections["$true"] = "$true";
     port_connections["$undef"] = "$undef";
@@ -2501,17 +2501,17 @@ struct dsp38_instance {
     for (auto &outer : port_connections) {
       if (prim_io_maps_dsp_to_rs_prim[rs_prim].find(outer.first) ==
               end(prim_io_maps_dsp_to_rs_prim[rs_prim]) &&
-          outer.second != "$false" && outer.second != "$true") {
+          outer.second != "$false" && outer.second != "$true" && outer.second != "$undef" && outer.first != "CLK") {
         // Ports of the wrapper that are not connected in the inner instance
-        // should be connected only to constants (No illusion of passing a clck
-        // ... )
-        std::cerr << "CRITICAL WARNING: PRIM_RECONSTRUCT attempt to connect "
-                     "non existant port "
-                  << outer.first << " to " << outer.second << " in primitive "
-                  << rs_prim << " Ignored" << std::endl;
+        // should be connected only to constants.
+        // CLK is an exception, no matter the mode, a CLK has to be send to a DSP (HW limitation)
+        std::cerr << "ERROR: Attempting to connect non existant port \""
+                  << outer.first << "\" to net \"" << outer.second << "\" in primitive DSP38 while in DSP_MODE \"" << parameters["DSP_MODE"] << "\", under that mode, that port is not available." << std::endl;
+        return false;
       }
     }
     ofs << std::endl;
     ofs << ".param MODE_BITS " << get_MODE_BITS() << std::endl;
+    return true;
   }
 };
