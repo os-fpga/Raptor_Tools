@@ -344,7 +344,7 @@ struct TDP_RAM36K_instance {
           }
         } else {
           ofs << " " << cn.first;
-          if (high_conn == "$undef") {
+          if (high_conn == "$undef" || high_conn == "$false" || high_conn == "$true") {
             // We cannot have undriven BRAM clock pins nor clock pins driven by
             // constants ($undef is constant 0), clock pins have to be driven by
             // legal clocks. If the clock is assigned to $undef (Don't care) in
