@@ -97,9 +97,11 @@ endif()
 # surelog_generated_SRC
 set(bitblast_SRC
   ${PROJECT_SOURCE_DIR}/src/main.cpp
+  ${PROJECT_SOURCE_DIR}/src/NetlistPrettyPrinter.cpp
 )
 
-add_executable(bitblast-bin ${PROJECT_SOURCE_DIR}/src/main.cpp)
+add_executable(bitblast-bin ${bitblast_SRC})
+
 set_target_properties(bitblast-bin PROPERTIES OUTPUT_NAME bitblast)
 
 # Raptor builds synlig which builds Surelog and UHDM, but it does not "install" them on the system.
