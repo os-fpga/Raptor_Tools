@@ -111,7 +111,8 @@ set_target_properties(bitblast-bin PROPERTIES OUTPUT_NAME bitblast)
 
 target_include_directories(bitblast-bin PUBLIC
                            ../parser_plugins/synlig/third_party/surelog/include
-                           ../parser_plugins/synlig/build/third_party/surelog/generated/include)
+                           ../parser_plugins/synlig/build/third_party/surelog/generated/include
+                           ../parser_plugins/synlig/build/third_party/surelog/third_party/UHDM/generated)
 
 
 set(CMAKE_FIND_LIBRARY_SUFFIXES .a)
