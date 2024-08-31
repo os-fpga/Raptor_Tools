@@ -63,4 +63,6 @@ jobs:
       run: |
         cd parser_plugins
         make CPU_CORES=2
+        cd ..
+        cd netlist_bitblast
 

@@ -101,6 +101,12 @@ set(bitblast_SRC
 
 add_executable(bitblast-bin ${PROJECT_SOURCE_DIR}/src/main.cpp)
 set_target_properties(bitblast-bin PROPERTIES OUTPUT_NAME bitblast)
+
+# Raptor builds synlig which builds Surelog and UHDM, but it does not "install" them on the system.
+# The usual cmake package discovery does not work for Surelog if Surelog is not installed.
+# Here we manually configure the header search path and the library binding which otherwize would be taken care by 
+#  find_package(Surelog)
+
 target_include_directories(bitblast-bin PUBLIC
                            ../parser_plugins/synlig/third_party/surelog/include
                            ../parser_plugins/synlig/build/third_party/surelog/generated/include)
