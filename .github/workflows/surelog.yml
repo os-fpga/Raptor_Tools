@@ -66,3 +66,5 @@ jobs:
         cd ..
         cd netlist_bitblast
         make CPU_CORES=2
+        make test
+

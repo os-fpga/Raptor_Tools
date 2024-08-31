@@ -54,3 +54,6 @@ run-cmake-release:
 
 run-cmake-debug:
 	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_RULE_MESSAGES=$(RULE_MESSAGES) $(ADDITIONAL_CMAKE_OPTIONS) -S . -B build
+
+test: release
+	build/bin/bitblast tests/gen_clk/fabric_dut_post_route.v
