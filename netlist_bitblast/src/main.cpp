@@ -25,6 +25,7 @@
 #include <Surelog/SourceCompile/SymbolTable.h>
 
 #include <uhdm/uhdm.h>
+#include "NetlistPrettyPrinter.h"
 
 int main(int argc, const char** argv) {
   
