@@ -33,9 +33,9 @@ project(RaptorInstaller DESCRIPTION "Raptor installer")
 
 set(FETCHCONTENT_QUIET FALSE)
 #set(RAPTOR_INSTALL_PATH_V ${RAPTOR_INSTALL_PATH}/../os-fpga/Raptor/${RELEASE_VERSION})
-set(EXT_LIBS_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/external_libs_6May24.tar.gz)
+set(EXT_LIBS_URL https://github.com/os-fpga/post_build_artifacts/releases/download/v0.2/external_libs_1sept2024.tar.gz)
 set(Destination_Dir ${CMAKE_CURRENT_SOURCE_DIR}/external_libs.tar.gz)
-set(expected_size 199885804)
+set(expected_size 199965108)
 
 # Raptor Install Path,
 if (NOT RAPTOR_INSTALL_PATH)
@@ -97,6 +97,7 @@ if(NOT EXISTS ${RAPTOR_INSTALL_PATH}/external_libs)
     message(STATUS "---     Extracting External Libs")
     execute_process (
             COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
+	    COMMAND ${CMAKE_COMMAND} -E rename ${RAPTOR_INSTALL_PATH}/external_libs/lib/zip ${RAPTOR_INSTALL_PATH}/bin/zip
                                 WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}
     )
 else()
