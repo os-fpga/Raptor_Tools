@@ -99,7 +99,7 @@ if(NOT EXISTS ${RAPTOR_INSTALL_PATH}/external_libs)
             COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
                                 WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}
     )
-    file(RENAME ${RAPTOR_INSTALL_PATH}/external_libs/lib/zip ${RAPTOR_INSTALL_PATH}/bin/zip)
+     file(RENAME ${RAPTOR_INSTALL_PATH}/external_libs/lib/zip ${RAPTOR_INSTALL_PATH}/share/envs/litex/bin/zip)
 else()
     message(STATUS "---     Extracted Content present so skipping it")
 endif()
