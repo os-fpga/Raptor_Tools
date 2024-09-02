@@ -97,9 +97,9 @@ if(NOT EXISTS ${RAPTOR_INSTALL_PATH}/external_libs)
     message(STATUS "---     Extracting External Libs")
     execute_process (
             COMMAND ${CMAKE_COMMAND} -E tar xvzf ${Destination_Dir}
-	    COMMAND ${CMAKE_COMMAND} -E rename ${RAPTOR_INSTALL_PATH}/external_libs/lib/zip ${RAPTOR_INSTALL_PATH}/bin/zip
                                 WORKING_DIRECTORY ${RAPTOR_INSTALL_PATH}
     )
+    file(RENAME ${RAPTOR_INSTALL_PATH}/external_libs/lib/zip ${RAPTOR_INSTALL_PATH}/bin/zip)
 else()
     message(STATUS "---     Extracted Content present so skipping it")
 endif()
