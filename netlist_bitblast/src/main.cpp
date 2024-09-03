@@ -43,8 +43,8 @@ int main(int argc, const char** argv) {
   clp->setwritePpOutput(true);
   clp->setParse(true);
   clp->setCompile(true);
-  clp->setElaborate(true);  // Request Surelog instance tree elaboration
   clp->setElabUhdm(false);   // Request (Not) UHDM Uniquification/Elaboration
+  clp->setElaborate(true);  // Request Surelog instance tree elaboration
   bool success = clp->parseCommandLine(argc, argv);
   errors->printMessages(clp->muteStdout());
 
