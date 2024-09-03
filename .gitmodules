@@ -19,3 +19,6 @@
 [submodule "OpenLM/licensecc"]
 	path = OpenLM/licensecc
 	url = https://github.com/open-license-manager/licensecc.git
+[submodule "netlist_bitblast/lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS"]
+	path = netlist_bitblast/lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS
+	url = https://github.com/os-fpga/FPGA_PRIMITIVES_MODELS.git
