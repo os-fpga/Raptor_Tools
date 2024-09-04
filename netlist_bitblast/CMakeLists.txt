@@ -100,6 +100,7 @@ set(bitblast_SRC
   ${PROJECT_SOURCE_DIR}/src/NetlistPrettyPrinter.cpp
   ${PROJECT_SOURCE_DIR}/src/BitBlaster.cpp
   ${PROJECT_SOURCE_DIR}/src/Utils.cpp
+  ${PROJECT_SOURCE_DIR}/src/SDFEditor.cpp
 )
 
 add_executable(bitblast-bin ${bitblast_SRC})
