@@ -56,5 +56,10 @@ run-cmake-debug:
 	cmake -DCMAKE_BUILD_TYPE=Debug -DCMAKE_INSTALL_PREFIX=$(PREFIX) -DCMAKE_RULE_MESSAGES=$(RULE_MESSAGES) $(ADDITIONAL_CMAKE_OPTIONS) -S . -B build
 
 test: release
-	build/bin/bitblast -DSYNTHESIS=1 tests/gen_clk/fabric_dut_post_route.v -v lib/pnr/genesis3/primitives.v -y lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/verilog/ -top fabric_dut -bitblast -write bitblasted.v
+	build/bin/bitblast -DSYNTHESIS=1 tests/gen_clk/fabric_dut_post_route.v \
+	  -v lib/pnr/genesis3/primitives.v \
+	  -y lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/verilog/ \
+	  -sdf_in tests/gen_clk/fabric_dut_post_route.sdf \
+	  -sdf_out fabric_dut_post_route.sdf \
+	  -top fabric_dut -bitblast -write bitblasted.v
 	build/bin/bitblast bitblasted.v -v lib/pnr/genesis3/primitives.v -y lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/verilog/ -top fabric_dut -nonote -noinfo

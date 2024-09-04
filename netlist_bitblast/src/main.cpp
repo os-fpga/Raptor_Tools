@@ -47,13 +47,18 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 #include "BitBlaster.h"
 #include "NetlistPrettyPrinter.h"
+#include "SDFEditor.h"
 
 int main(int argc, const char **argv) {
   if (argc < 2) return 0;
 
-  std::string output_file;
-  // Read Surelog command line
+  std::string verilog_output_file;
+  std::string sdf_input_file;
+  std::string sdf_output_file;
+  // Reads normal Surelog command line for project definition
+  // Extra options :
   // -write <file> : Outputs the bitblasted netlist into file <file>
+  // -sdf <file>   : SDF file to edit
   // -bitblast     : Bitblast the datastructure
   int32_t code = 0;
   bool bitblast = false;
@@ -62,7 +67,15 @@ int main(int argc, const char **argv) {
   for (int i = 0; i < argc; i++) {
     std::string arg = argv[i];
     if (arg == "-write") {
-      output_file = argv[i + 1];
+      verilog_output_file = argv[i + 1];
+      argv[i] = empty.c_str();
+      argv[i + 1] = empty.c_str();
+    } else if (arg == "-sdf_in") {
+      sdf_input_file = argv[i + 1];
+      argv[i] = empty.c_str();
+      argv[i + 1] = empty.c_str();
+    } else if (arg == "-sdf_out") {
+      sdf_output_file = argv[i + 1];
       argv[i] = empty.c_str();
       argv[i + 1] = empty.c_str();
     } else if (arg == "-bitblast") {
@@ -101,19 +114,24 @@ int main(int argc, const char **argv) {
   if (bitblast) {
     BITBLAST::BitBlaster *blaster = new BITBLAST::BitBlaster();
     blaster->bitBlast(UhdmDesignFromVpiHandle(vpi_design));
+    BITBLAST::SDFEditor *editor = new BITBLAST::SDFEditor();
+    if (!sdf_input_file.empty() && !sdf_output_file.empty()) {
+      editor->edit(blaster, sdf_input_file, sdf_output_file);
+    }
     delete blaster;
+    delete editor;
   }
 
-  if (!output_file.empty()) {
+  if (!verilog_output_file.empty()) {
     BITBLAST::NetlistPrettyPrinter *printer =
         new BITBLAST::NetlistPrettyPrinter();
     std::string result =
         printer->prettyPrint(UhdmDesignFromVpiHandle(vpi_design));
     delete printer;
 
-    std::cout << "DESIGN:\n" << result << "\n";
+    //std::cout << "DESIGN:\n" << result << "\n";
 
-    std::ofstream ofs(output_file);
+    std::ofstream ofs(verilog_output_file);
     if (ofs.good()) {
       ofs << result;
       ofs << std::flush;

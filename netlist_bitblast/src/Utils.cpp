@@ -70,4 +70,47 @@ std::vector<std::string> Utils::tokenize(std::string_view str,
   return result;
 }
 
+// Split off the next view split with "separator" character.
+// Modifies "src" to contain the remaining string.
+// If "src" is exhausted, returned string-view will have data() == nullptr.
+static std::string_view SplitNext(std::string_view* src, char separator) {
+  if (src->empty()) return {nullptr, 0};  // Done.
+
+  const auto pos = src->find_first_of(separator);
+  const auto part_len = (pos != std::string_view::npos) ? pos + 1 : src->size();
+  std::string_view result = src->substr(0, part_len);
+  src->remove_prefix(part_len);
+  return result;
+}
+
+std::string_view Utils::getLineInString(std::string_view text, int line) {
+  if (line < 1) return "";
+
+  std::string_view s;
+  while (line && (s = SplitNext(&text, '\n'), s.data()) != nullptr) {
+    --line;
+  }
+  return s;
+}
+
+std::vector<std::string_view> Utils::splitLines(std::string_view text) {
+  std::vector<std::string_view> result;
+  std::string_view s;
+  while ((s = SplitNext(&text, '\n'), s.data()) != nullptr) {
+    result.push_back(s);
+  }
+  return result;
+}
+
+std::string Utils::replaceAll(std::string_view str, std::string_view from,
+                                    std::string_view to) {
+  size_t start_pos = 0;
+  std::string result(str);
+  while ((start_pos = result.find(from, start_pos)) != std::string::npos) {
+    result.replace(start_pos, from.length(), to);
+    start_pos += to.length();  // Handles case where 'to' is a substr of 'from'
+  }
+  return result;
+}
+
 }  // namespace BITBLAST
