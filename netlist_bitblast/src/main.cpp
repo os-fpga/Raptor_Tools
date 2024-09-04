@@ -51,16 +51,16 @@ int main(int argc, const char **argv) {
   if (argc < 2) return 0;
 
   std::string output_file;
-  // Read Surelog command line 
+  // Read Surelog command line
   // -bitblast <file> : Outputs the bitblasted netlist into file <file>
   int32_t code = 0;
   SURELOG::SymbolTable *const symbolTable = new SURELOG::SymbolTable();
   for (int i = 0; i < argc; i++) {
     std::string arg = argv[i];
     if (arg == "-bitblast") {
-      output_file = argv[i+1];
+      output_file = argv[i + 1];
       argv[i] = strdup("");
-      argv[i+1] = strdup("");
+      argv[i + 1] = strdup("");
     }
   }
 
@@ -91,20 +91,17 @@ int main(int argc, const char **argv) {
 
   if (vpi_design == nullptr) return code;
 
-  if (!output_file.empty())
-  {
+  if (!output_file.empty()) {
     BITBLAST::NetlistPrettyPrinter *printer =
         new BITBLAST::NetlistPrettyPrinter();
     std::string result =
         printer->prettyPrint(UhdmDesignFromVpiHandle(vpi_design));
     delete printer;
 
-    std::cout << "DESIGN:\n"
-              << result << "\n";
+    std::cout << "DESIGN:\n" << result << "\n";
 
     std::ofstream ofs(output_file);
-    if (ofs.good())
-    {
+    if (ofs.good()) {
       ofs << result;
       ofs << std::flush;
       ofs.close();
