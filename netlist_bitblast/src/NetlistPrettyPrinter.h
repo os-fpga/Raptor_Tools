@@ -45,6 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <unistd.h>
 #endif
 
+#include <uhdm/uhdm.h>
+
 #include <filesystem>
 #include <iostream>
 #include <map>
@@ -54,9 +56,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 namespace BITBLAST {
 
 class NetlistPrettyPrinter {
+ public:
+  std::string prettyPrint(const UHDM::any *handle);
 
+ protected:
+  void prettyPrint(UHDM::Serializer &s, const UHDM::any *object,
+                   uint32_t indent, std::ostream &out);
+
+ private:
+  UHDM::design *m_design = nullptr;
 };
 
-}
+}  // namespace BITBLAST
 
 #endif
