@@ -106,38 +106,42 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
       } else {
         out << removeLibName(c->VpiDefName());
         out << " ";
-        out << escapeName(c->VpiName());
         if (c->Param_assigns()) {
-          out << "#(";
+          out << "#(\n";
           int nbParams = c->Param_assigns()->size();
           int index = 0;
           for (param_assign *p : *c->Param_assigns()) {
-            prettyPrint(s, p, 0, out);
+            prettyPrint(s, p, 4, out);
             index++;
             if (index < nbParams) out << ", ";
+            out << "\n";
           }
-          out << ")";
+          out << "    )";
         }
-        out << "(";
+        out << " ";
+        out << escapeName(c->VpiName());
+        out << " ";
+        out << "(\n";
         if (c->Ports()) {
           int nbPorts = c->Ports()->size();
           int index = 0;
           for (port *p : *c->Ports()) {
-            out << "." << p->VpiName() << "(" ;
+            out << "    ." << p->VpiName() << "(" ;
             ExprEval eval;
             std::stringstream outtmp;
-            eval.prettyPrint(s, p->High_conn(), 0, outtmp);
+            eval.prettyPrint(s, p->High_conn(),0, outtmp);
             std::string tmps = outtmp.str();
             tmps = escapeName(tmps);
             out << tmps;
             out << ")";
             index++;
             if (index < nbPorts) out << ", ";
+            out << "\n";
           }
         }
-        out << ")";
+        out << "    )";
         out << ";";
-        out << "\n";
+        out << "\n\n";
       }
       break;
     }
@@ -177,9 +181,10 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
       param_assign* p = (param_assign*) object;
       any* lhs = p->Lhs();
       any* rhs = p->Rhs();
-      out << lhs->VpiName() << "=";
+      out << "." << lhs->VpiName() << "(";
       ExprEval eval;
       eval.prettyPrint(s, rhs, 0, out);
+      out << ")";
       break;
     }
     default: {
