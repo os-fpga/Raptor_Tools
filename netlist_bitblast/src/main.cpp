@@ -50,9 +50,19 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 int main(int argc, const char **argv) {
   if (argc < 2) return 0;
 
-  // Read command line, compile a design, use -parse argument
+  std::string output_file;
+  // Read Surelog command line 
+  // -bitblast <file> : Outputs the bitblasted netlist into file <file>
   int32_t code = 0;
   SURELOG::SymbolTable *const symbolTable = new SURELOG::SymbolTable();
+  for (int i = 0; i < argc; i++) {
+    std::string arg = argv[i];
+    if (arg == "-bitblast") {
+      output_file = argv[i+1];
+      argv[i] = strdup("");
+      argv[i+1] = strdup("");
+    }
+  }
 
   SURELOG::ErrorContainer *const errors =
       new SURELOG::ErrorContainer(symbolTable);
@@ -81,13 +91,25 @@ int main(int argc, const char **argv) {
 
   if (vpi_design == nullptr) return code;
 
-  BITBLAST::NetlistPrettyPrinter *printer =
-      new BITBLAST::NetlistPrettyPrinter();
-  std::string result =
-      printer->prettyPrint(UhdmDesignFromVpiHandle(vpi_design));
-  delete printer;
+  if (!output_file.empty())
+  {
+    BITBLAST::NetlistPrettyPrinter *printer =
+        new BITBLAST::NetlistPrettyPrinter();
+    std::string result =
+        printer->prettyPrint(UhdmDesignFromVpiHandle(vpi_design));
+    delete printer;
 
-  std::cout << "DESIGN:\n" << result << "\n";
+    std::cout << "DESIGN:\n"
+              << result << "\n";
+
+    std::ofstream ofs(output_file);
+    if (ofs.good())
+    {
+      ofs << result;
+      ofs << std::flush;
+      ofs.close();
+    }
+  }
 
   // Do not delete these objects until you are done with UHDM
   SURELOG::shutdown_compiler(compiler);
