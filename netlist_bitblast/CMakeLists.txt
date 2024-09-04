@@ -36,10 +36,6 @@ set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 set(BITBLAST_BUILD_TYPE ${CMAKE_BUILD_TYPE})
 message("Building BITBLAST")
 
-if(WITH_LIBCXX)
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -stdlib=libc++")
-endif()
-
 set(WITH_STATIC_CRT OFF CACHE BOOL "Use Static CRT")
 
 # NOTE: Set the global output directories after the subprojects have had their go at it
