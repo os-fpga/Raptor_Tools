@@ -34,6 +34,15 @@ using namespace UHDM;
 
 namespace BITBLAST {
 
+std::string NetlistPrettyPrinter::escapeName(std::string_view name) {
+  std::string result = std::string(name);
+  if (result.find("$") != std::string::npos) {
+    result = "\\" + result + " ";
+  }
+
+  return result;
+}
+
 std::string NetlistPrettyPrinter::prettyPrint(const UHDM::any *handle) {
   if (handle == nullptr) {
     std::cout << "NULL HANDLE\n";
@@ -77,7 +86,10 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         index++;
         if (index < nbPorts) out << ", ";
       }
-      out << ");";
+      out << ");\n";
+      for (net *p : *c->Nets()) {
+        prettyPrint(s, p, 0, out);
+      }
       out << "\n";
       out << "endmodule";
       out << "\n";
@@ -90,16 +102,34 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         out << "input ";
       } else if (type == vpiOutput) {
         out << "output ";
-      } else if (type == vpiInput) {
+      } else if (type == vpiInout) {
         out << "inout ";
       } else {
         out << "unknown:" << type;
       }
-      out << p->VpiName();
+      out << escapeName(p->VpiName());
+      break;
+    }
+    case UHDM_OBJECT_TYPE::uhdmlogic_net: {
+      logic_net *n = (logic_net *)object;
+      uint32_t type = n->VpiNetType();
+      if (type == 0) {
+        // Implicit type
+        out << "wire ";
+      } else if (type == vpiWire) {
+        out << "wire ";
+      } else if (type == vpiReg) {
+        out << "reg ";
+      } else {
+        std::cout << "NOT HANDLED NET TYPE: " << type << "\n";
+      }
+      out << escapeName(n->VpiName());
+      out << ";\n";
       break;
     }
     default: {
-      std::cout << "NOT HANDLED HANDLE\n";
+      std::cout << "NOT HANDLED HANDLE: " << UhdmName(object->UhdmType())
+                << "\n";
       break;
     }
   }
