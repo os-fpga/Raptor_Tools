@@ -18,8 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef NETLIST_PRETTY_PRINTER_H
-#define NETLIST_PRETTY_PRINTER_H
+#ifndef BIT_BLASTER_H
+#define BIT_BLASTER_H
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || \
     defined(_MSC_VER) || defined(__CYGWIN__)
@@ -55,18 +55,14 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BITBLAST {
 
-class NetlistPrettyPrinter {
+class BitBlaster {
  public:
-  std::string prettyPrint(const UHDM::any *handle);
+  bool bitBlast(const UHDM::any *handle);
 
  protected:
-  void prettyPrint(UHDM::Serializer &s, const UHDM::any *object,
-                   uint32_t indent, std::ostream &out);
 
  private:
   UHDM::design *m_design = nullptr;
-  bool m_printed_interconnect = false;
-  bool m_printed_cell_instances = false;
 };
 
 }  // namespace BITBLAST
