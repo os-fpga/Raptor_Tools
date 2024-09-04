@@ -118,27 +118,35 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         std::string name = removeLibName(c->VpiName());
         out << name;
         out << " (\n";
-        int nbPorts = c->Ports()->size();
-        int index = 0;
-        for (port *p : *c->Ports()) {
-          prettyPrint(s, p, 4, out);
-          index++;
-          if (index < nbPorts) out << ",\n";
+        if (c->Ports()) {
+          int nbPorts = c->Ports()->size();
+          int index = 0;
+          for (port *p : *c->Ports()) {
+            prettyPrint(s, p, 4, out);
+            index++;
+            if (index < nbPorts) out << ",\n";
+          }
         }
         out << "\n);\n";
         out << "\n";
         out << "    //Wires\n";
-        for (net *p : *c->Nets()) {
-          prettyPrint(s, p, 4, out);
+        if (c->Nets()) {
+          for (net *p : *c->Nets()) {
+            prettyPrint(s, p, 4, out);
+          }
+          out << "\n";
         }
-        out << "\n";
-        out << "    //IO assignments\n";
-        for (cont_assign *as : *c->Cont_assigns()) {
-          prettyPrint(s, as, 4, out);
+        if (c->Cont_assigns()) {
+          out << "    //IO assignments\n";
+          for (cont_assign *as : *c->Cont_assigns()) {
+            prettyPrint(s, as, 4, out);
+          }
+          out << "\n";
         }
-        out << "\n";
-        for (module_inst *m : *c->Modules()) {
-          prettyPrint(s, m, 4, out);
+        if (c->Modules()) {
+          for (module_inst *m : *c->Modules()) {
+            prettyPrint(s, m, 4, out);
+          }
         }
         out << "\n";
         out << "endmodule";
@@ -190,7 +198,31 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
             std::stringstream outtmp;
             eval.prettyPrint(s, p->High_conn(), 0, outtmp);
             std::string tmps = outtmp.str();
-            if (tmps.find("{") == std::string::npos) {
+            if (tmps.empty()) {
+              UHDM_OBJECT_TYPE high_conn_type = p->High_conn()->UhdmType();
+              if (high_conn_type == uhdmconstant) {
+                // Must be missing the vpiDecompile field
+                constant *c = (constant *)p->High_conn();
+                std::string result = std::to_string(c->VpiSize());
+                out << result;
+                out << "'";
+                int type = c->VpiConstType();
+                if (type == vpiBinaryConst) {
+                  out << "b";
+                } else if (type == vpiHexConst) {
+                  out << "h";
+                } else if (type == vpiIntConst) {
+                  out << "d";
+                }
+                std::string val = std::string(c->VpiValue());
+                val = val.substr(val.find(":") + 1);
+                out << val;
+              } else {
+                std::cerr << "NOT HANDLED HIGH CONN TYPE: " << high_conn_type
+                          << "\n";
+                exit(1);
+              }
+            } else if (tmps.find("{") == std::string::npos) {
               tmps = escapeName(tmps);
               out << tmps;
             } else {
