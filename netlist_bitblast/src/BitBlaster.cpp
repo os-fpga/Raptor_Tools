@@ -18,7 +18,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Utils.h"
 #include "BitBlaster.h"
 
 #include <uhdm/ElaboratorListener.h>
@@ -30,12 +29,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <uhdm/uhdm_forward_decl.h>
 #include <uhdm/uhdm_types.h>
 
+#include "Utils.h"
+
 using namespace UHDM;
 
 namespace BITBLAST {
 
 bool BitBlaster::bitBlast(const UHDM::any *object) {
   if (object == nullptr) return false;
+  Serializer *s = object->GetSerializer();
   UHDM::UHDM_OBJECT_TYPE type = object->UhdmType();
   switch (type) {
     case UHDM_OBJECT_TYPE::uhdmdesign: {
@@ -56,6 +58,59 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
         }
       } else {
         std::string cellName = Utils::removeLibName(c->VpiDefName());
+        if (cellName == "LUT_K") {
+          uint64_t k = 0;
+          if (c->Param_assigns()) {
+            for (param_assign *p : *c->Param_assigns()) {
+              any *lhs = p->Lhs();
+              any *rhs = p->Rhs();
+              if (lhs->VpiName() == "K") {
+                ExprEval eval;
+                k = eval.getValue((expr *)rhs);
+              }
+            }
+          }
+          std::string blastedName = "LUT_K" + std::to_string(k);
+          c->VpiDefName(blastedName);
+          if (auto origPorts = c->Ports()) {
+            VectorOfport *newPorts = s->MakePortVec();
+            for (port *p : *origPorts) {
+              any *lowc = p->Low_conn();
+              if (lowc->VpiName() == "in") {
+                any *highc = p->High_conn();
+                UHDM_OBJECT_TYPE high_conn_type = highc->UhdmType();
+                if (high_conn_type == uhdmconstant) {
+                  constant *c = (constant *)highc;
+                  ExprEval eval;
+                  uint64_t val = eval.getValue(c);
+                  for (int i = 0; i < k; i++) {
+                    port *np = s->MakePort();
+                    np->VpiName("in" + std::to_string(i));
+                    constant *cn = s->MakeConstant();
+                    cn->VpiSize(1);
+                    cn->VpiConstType(vpiBinaryConst);
+                    cn->VpiValue("BIN:" + std::to_string(val &= i));
+                    np->High_conn(cn);
+                    newPorts->push_back(np);
+                  }
+                } else if (high_conn_type == uhdmoperation) {
+                  operation *oper = (operation *)highc;
+                  int index = 0;
+                  for (any *op : *oper->Operands()) {
+                    port *np = s->MakePort();
+                    np->VpiName("in" + std::to_string(index));
+                    np->High_conn(op);
+                    newPorts->push_back(np);
+                    index++;
+                  }
+                }
+              } else {
+                newPorts->push_back(p);
+              }
+            }
+            c->Ports(newPorts);
+          }
+        }
       }
       break;
     }

@@ -60,7 +60,6 @@ class BitBlaster {
   bool bitBlast(const UHDM::any *handle);
 
  protected:
-
  private:
   UHDM::design *m_design = nullptr;
 };
