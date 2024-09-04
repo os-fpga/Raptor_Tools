@@ -46,21 +46,28 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <uhdm/uhdm.h>
 
 #include "NetlistPrettyPrinter.h"
+#include "BitBlaster.h"
 
 int main(int argc, const char **argv) {
   if (argc < 2) return 0;
 
   std::string output_file;
   // Read Surelog command line
-  // -bitblast <file> : Outputs the bitblasted netlist into file <file>
+  // -write <file> : Outputs the bitblasted netlist into file <file>
+  // -bitblast     : Bitblast the datastructure
   int32_t code = 0;
+  bool bitblast = false;
   SURELOG::SymbolTable *const symbolTable = new SURELOG::SymbolTable();
+  std::string empty;
   for (int i = 0; i < argc; i++) {
     std::string arg = argv[i];
-    if (arg == "-bitblast") {
+    if (arg == "-write") {
       output_file = argv[i + 1];
-      argv[i] = strdup("");
-      argv[i + 1] = strdup("");
+      argv[i] = empty.c_str();
+      argv[i + 1] = empty.c_str();
+    } else if (arg == "-bitblast") {
+      bitblast = true;
+      argv[i] = empty.c_str();
     }
   }
 
@@ -90,6 +97,12 @@ int main(int argc, const char **argv) {
   errors->printStats(stats, false);
 
   if (vpi_design == nullptr) return code;
+
+  if (bitblast) {
+    BITBLAST::BitBlaster* blaster = new BITBLAST::BitBlaster();
+    blaster->bitBlast(UhdmDesignFromVpiHandle(vpi_design));
+    delete blaster;
+  }
 
   if (!output_file.empty()) {
     BITBLAST::NetlistPrettyPrinter *printer =

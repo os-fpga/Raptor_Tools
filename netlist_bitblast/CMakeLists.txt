@@ -98,6 +98,8 @@ endif()
 set(bitblast_SRC
   ${PROJECT_SOURCE_DIR}/src/main.cpp
   ${PROJECT_SOURCE_DIR}/src/NetlistPrettyPrinter.cpp
+  ${PROJECT_SOURCE_DIR}/src/BitBlaster.cpp
+  ${PROJECT_SOURCE_DIR}/src/Utils.cpp
 )
 
 add_executable(bitblast-bin ${bitblast_SRC})

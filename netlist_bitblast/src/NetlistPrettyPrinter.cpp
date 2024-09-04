@@ -18,7 +18,7 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-
+#include "Utils.h"
 #include "NetlistPrettyPrinter.h"
 
 #include <uhdm/ElaboratorListener.h>
@@ -33,54 +33,6 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 using namespace UHDM;
 
 namespace BITBLAST {
-
-std::string NetlistPrettyPrinter::escapeName(std::string_view name) {
-  std::string result = std::string(name);
-  result = "\\" + result + " ";
-  return result;
-}
-
-std::string NetlistPrettyPrinter::removeLibName(std::string_view name) {
-  std::string result = std::string(name);
-  result = result.substr(name.find("@") + 1);
-  return result;
-}
-
-std::string NetlistPrettyPrinter::printSpaces(uint32_t nb) {
-  std::string result;
-  for (uint32_t i = 0; i < nb; i++) {
-    result += " ";
-  }
-  return result;
-}
-
-void NetlistPrettyPrinter::tokenize(std::string_view str,
-                                    std::string_view separator,
-                                    std::vector<std::string> &result,
-                                    bool skipEmpty) {
-  std::string::size_type pos{0};
-  const auto sepSize = separator.size();
-  const auto stringSize = str.size();
-  std::string tmp;
-  std::string::size_type n = str.find(separator, pos);
-  while (n != std::string::npos) {
-    tmp = str.substr(pos, n - pos);
-    if (!(tmp.empty() && skipEmpty)) result.push_back(tmp);
-    pos = n + sepSize;
-    n = str.find(separator, pos);
-  }
-  if (pos < stringSize) {  // put last part
-    tmp = str.substr(pos, stringSize - pos);
-    if (!(tmp.empty() && skipEmpty)) result.push_back(tmp);
-  }
-}
-
-std::vector<std::string> NetlistPrettyPrinter::tokenize(
-    std::string_view str, std::string_view separator, bool skipEmpty) {
-  std::vector<std::string> result;
-  tokenize(str, separator, result, skipEmpty);
-  return result;
-}
 
 std::string NetlistPrettyPrinter::prettyPrint(const UHDM::any *handle) {
   if (handle == nullptr) {
@@ -115,7 +67,7 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
       if (c->VpiTopModule()) {
         out << "`timescale 1ns/1ps\n";
         out << "module ";
-        std::string name = removeLibName(c->VpiName());
+        std::string name = Utils::removeLibName(c->VpiName());
         out << name;
         out << " (\n";
         if (c->Ports()) {
@@ -152,19 +104,19 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         out << "endmodule";
         out << "\n";
       } else {
-        std::string cellName = removeLibName(c->VpiDefName());
+        std::string cellName = Utils::removeLibName(c->VpiDefName());
         if (cellName == "fpga_interconnect") {
           if (!m_printed_interconnect) {
             out << "//Interconnect\n";
-            out << printSpaces(indent);
+            out << Utils::printSpaces(indent);
             m_printed_interconnect = true;
           }
         }
         if (cellName != "fpga_interconnect") {
           if (!m_printed_cell_instances) {
-            out << "\n" << printSpaces(indent);
+            out << "\n" << Utils::printSpaces(indent);
             out << "//Cell instances\n";
-            out << printSpaces(indent);
+            out << Utils::printSpaces(indent);
             m_printed_cell_instances = true;
           }
         }
@@ -186,7 +138,7 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
           out << "    )";
         }
         out << " ";
-        out << escapeName(c->VpiName());
+        out << Utils::escapeName(c->VpiName());
         out << " ";
         out << "(\n";
         if (c->Ports()) {
@@ -223,26 +175,26 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
                 exit(1);
               }
             } else if (tmps.find("{") == std::string::npos) {
-              tmps = escapeName(tmps);
+              tmps = Utils::escapeName(tmps);
               out << tmps;
             } else {
               tmps.erase(0, 1);
               tmps.erase(tmps.size() - 1);
               out << "{\n";
-              std::vector<std::string> tokens = tokenize(tmps, ",");
+              std::vector<std::string> tokens = Utils::tokenize(tmps, ",");
               int nbTokens = tokens.size();
               int index = 0;
               for (auto token : tokens) {
-                out << printSpaces(12);
+                out << Utils::printSpaces(12);
                 if (token[0] == '1')
                   out << token;
                 else
-                  out << escapeName(token);
+                  out << Utils::escapeName(token);
                 index++;
                 if (index < nbTokens) out << ",";
                 out << "\n";
               }
-              out << printSpaces(8) << " }";
+              out << Utils::printSpaces(8) << " }";
             }
             out << ")";
             index++;
@@ -268,7 +220,7 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
       } else {
         out << "unknown:" << type;
       }
-      out << escapeName(p->VpiName());
+      out << Utils::escapeName(p->VpiName());
       break;
     }
     case UHDM_OBJECT_TYPE::uhdmlogic_net: {
@@ -285,7 +237,7 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         std::cerr << "NOT HANDLED NET TYPE: " << type << "\n";
         exit(1);
       }
-      out << escapeName(n->VpiName());
+      out << Utils::escapeName(n->VpiName());
       out << ";\n";
       break;
     }
@@ -306,13 +258,13 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
       std::stringstream outtmp;
       eval.prettyPrint(s, cont->Lhs(), 0, outtmp);
       std::string tmps = outtmp.str();
-      tmps = escapeName(tmps);
+      tmps = Utils::escapeName(tmps);
       out << tmps;
       out << " = ";
       std::stringstream outtmp1;
       eval.prettyPrint(s, cont->Rhs(), 0, outtmp1);
       tmps = outtmp1.str();
-      tmps = escapeName(tmps);
+      tmps = Utils::escapeName(tmps);
       out << tmps;
       out << ";\n";
       break;
