@@ -121,11 +121,6 @@ find_library(UHDM_LIB    NAMES uhdm    PATHS ${SURELOG_BASE}/third_party/UHDM/li
 find_library(CAPNP_LIB   NAMES capnp   PATHS ${SURELOG_BASE}/third_party/UHDM/third_party/capnproto/c++/src/capnp/)
 find_library(KJ_LIB      NAMES kj      PATHS ${SURELOG_BASE}/third_party/UHDM/third_party/capnproto/c++/src/kj/)
 find_library(ANTLR_LIB   NAMES antlr4-runtime PATHS ${SURELOG_BASE}/third_party/antlr4/runtime/Cpp/runtime/)
-message (${SURELOG_LIB})
-message (${UHDM_LIB})
-message (${CAPNP_LIB})
-message (${KJ_LIB})
-message (${ANTLR_LIB})
 
 target_link_libraries(bitblast-bin ${SURELOG_LIB})
 target_link_libraries(bitblast-bin ${UHDM_LIB})
