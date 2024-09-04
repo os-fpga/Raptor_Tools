@@ -71,6 +71,7 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             }
           }
           std::string blastedName = "LUT_K" + std::to_string(k);
+          m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
             VectorOfport *newPorts = s->MakePortVec();
@@ -83,7 +84,7 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
                   constant *c = (constant *)highc;
                   ExprEval eval;
                   uint64_t val = eval.getValue(c);
-                  for (int i = 0; i < k; i++) {
+                  for (uint64_t i = 0; i < k; i++) {
                     port *np = s->MakePort();
                     np->VpiName("in" + std::to_string(i));
                     constant *cn = s->MakeConstant();
@@ -122,6 +123,16 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
     }
   }
   return true;
+}
+
+static std::string empty;
+const std::string& BitBlaster::getCellType(const std::string& instance) {
+   std::map<std::string, std::string>::iterator itr = m_instanceCellMap.find(instance);
+  if (itr == m_instanceCellMap.end()) {
+    return empty;
+  } else {
+    return (*itr).second;
+  }
 }
 
 }  // namespace BITBLAST

@@ -18,8 +18,8 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#ifndef UTILS_H
-#define UTILS_H
+#ifndef SDF_EDITOR_H
+#define SDF_EDITOR_H
 
 #if defined(_WIN32) || defined(__WIN32__) || defined(WIN32) || \
     defined(_MSC_VER) || defined(__CYGWIN__)
@@ -53,30 +53,16 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <string>
 #include <vector>
 
+#include "BitBlaster.h"
 namespace BITBLAST {
 
-class Utils {
+class SDFEditor {
  public:
-  static std::string escapeName(std::string_view name);
-  static std::string removeLibName(std::string_view name);
-  static std::string printSpaces(uint32_t nb);
-  static void tokenize(std::string_view str, std::string_view separator,
-                       std::vector<std::string> &result, bool skipEmpty = true);
-  static std::vector<std::string> tokenize(std::string_view str,
-                                           std::string_view separator,
-                                           bool skipEmpty = true);
-  // Split input text into lines at '\n'. This separator is included in the
-  // returned lines; the last line in text might not have a newline so might
-  // not be included.
-  static std::vector<std::string_view> splitLines(std::string_view text);    
+  bool edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
+            std::filesystem::path sdfOutputFile);
 
-  // Given a large input, return the content of line number "line".
-  // Lines are 1 indexed.
-  static std::string_view getLineInString(std::string_view text, int line);   
-
-  // In given string "str", replace all occurences of "from" with "to"
-  static std::string replaceAll(std::string_view str, std::string_view from,
-                                std::string_view to);                                 
+ protected:
+ private:
 };
 
 }  // namespace BITBLAST
