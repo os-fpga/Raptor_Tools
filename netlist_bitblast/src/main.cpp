@@ -45,8 +45,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <Surelog/SourceCompile/SymbolTable.h>
 #include <uhdm/uhdm.h>
 
-#include "NetlistPrettyPrinter.h"
 #include "BitBlaster.h"
+#include "NetlistPrettyPrinter.h"
 
 int main(int argc, const char **argv) {
   if (argc < 2) return 0;
@@ -99,7 +99,7 @@ int main(int argc, const char **argv) {
   if (vpi_design == nullptr) return code;
 
   if (bitblast) {
-    BITBLAST::BitBlaster* blaster = new BITBLAST::BitBlaster();
+    BITBLAST::BitBlaster *blaster = new BITBLAST::BitBlaster();
     blaster->bitBlast(UhdmDesignFromVpiHandle(vpi_design));
     delete blaster;
   }

@@ -43,10 +43,8 @@ std::string Utils::printSpaces(uint32_t nb) {
   return result;
 }
 
-void Utils::tokenize(std::string_view str,
-                                    std::string_view separator,
-                                    std::vector<std::string> &result,
-                                    bool skipEmpty) {
+void Utils::tokenize(std::string_view str, std::string_view separator,
+                     std::vector<std::string> &result, bool skipEmpty) {
   std::string::size_type pos{0};
   const auto sepSize = separator.size();
   const auto stringSize = str.size();
@@ -64,11 +62,12 @@ void Utils::tokenize(std::string_view str,
   }
 }
 
-std::vector<std::string> Utils::tokenize(
-    std::string_view str, std::string_view separator, bool skipEmpty) {
+std::vector<std::string> Utils::tokenize(std::string_view str,
+                                         std::string_view separator,
+                                         bool skipEmpty) {
   std::vector<std::string> result;
   tokenize(str, separator, result, skipEmpty);
   return result;
 }
 
-}
+}  // namespace BITBLAST

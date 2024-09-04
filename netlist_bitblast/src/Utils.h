@@ -57,15 +57,14 @@ namespace BITBLAST {
 
 class Utils {
  public:
- 
   static std::string escapeName(std::string_view name);
   static std::string removeLibName(std::string_view name);
   static std::string printSpaces(uint32_t nb);
   static void tokenize(std::string_view str, std::string_view separator,
-                std::vector<std::string> &result, bool skipEmpty = true);
+                       std::vector<std::string> &result, bool skipEmpty = true);
   static std::vector<std::string> tokenize(std::string_view str,
-                                    std::string_view separator,
-                                    bool skipEmpty = true);
+                                           std::string_view separator,
+                                           bool skipEmpty = true);
 };
 
 }  // namespace BITBLAST

@@ -18,7 +18,6 @@ GNU General Public License for more details.
 You should have received a copy of the GNU General Public License
 along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
-#include "Utils.h"
 #include "NetlistPrettyPrinter.h"
 
 #include <uhdm/ElaboratorListener.h>
@@ -29,6 +28,8 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <uhdm/uhdm.h>
 #include <uhdm/uhdm_forward_decl.h>
 #include <uhdm/uhdm_types.h>
+
+#include "Utils.h"
 
 using namespace UHDM;
 
@@ -175,7 +176,7 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
                 exit(1);
               }
             } else if (tmps.find("{") == std::string::npos) {
-              tmps = Utils::escapeName(tmps);
+              if (tmps[0] != '1') tmps = Utils::escapeName(tmps);
               out << tmps;
             } else {
               tmps.erase(0, 1);
