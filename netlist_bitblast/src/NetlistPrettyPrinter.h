@@ -65,8 +65,17 @@ class NetlistPrettyPrinter {
 
   std::string escapeName(std::string_view name);
   std::string removeLibName(std::string_view name);
+  std::string printSpaces(uint32_t nb);
+  void tokenize(std::string_view str, std::string_view separator,
+                std::vector<std::string> &result, bool skipEmpty = true);
+  std::vector<std::string> tokenize(std::string_view str,
+                                    std::string_view separator,
+                                    bool skipEmpty = true);
+
  private:
   UHDM::design *m_design = nullptr;
+  bool m_printed_interconnect = false;
+  bool m_printed_cell_instances = false;
 };
 
 }  // namespace BITBLAST
