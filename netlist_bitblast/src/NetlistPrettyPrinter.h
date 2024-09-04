@@ -64,7 +64,7 @@ class NetlistPrettyPrinter {
                    uint32_t indent, std::ostream &out);
 
   std::string escapeName(std::string_view name);
-
+  std::string removeLibName(std::string_view name);
  private:
   UHDM::design *m_design = nullptr;
 };

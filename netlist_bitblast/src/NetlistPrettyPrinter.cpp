@@ -39,9 +39,14 @@ std::string NetlistPrettyPrinter::escapeName(std::string_view name) {
   if (result.find("$") != std::string::npos) {
     result = "\\" + result + " ";
   }
-
   return result;
 }
+
+ std::string NetlistPrettyPrinter::removeLibName(std::string_view name) {
+  std::string result = std::string(name);
+  result = result.substr(name.find("@") + 1);
+  return result;
+ }
 
 std::string NetlistPrettyPrinter::prettyPrint(const UHDM::any *handle) {
   if (handle == nullptr) {
@@ -73,26 +78,67 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
     }
     case UHDM_OBJECT_TYPE::uhdmmodule_inst: {
       module_inst *c = (module_inst *)object;
-      out << "`timescale 1ns/1ps\n";
-      out << "module ";
-      std::string name = std::string(c->VpiName());
-      name = name.substr(name.find("@") + 1);
-      out << name;
-      out << "(";
-      int nbPorts = c->Ports()->size();
-      int index = 0;
-      for (port *p : *c->Ports()) {
-        prettyPrint(s, p, 0, out);
-        index++;
-        if (index < nbPorts) out << ", ";
+      if (c->VpiTopModule()) {
+        out << "`timescale 1ns/1ps\n";
+        out << "module ";
+        std::string name = removeLibName(c->VpiName());
+        out << name;
+        out << "(";
+        int nbPorts = c->Ports()->size();
+        int index = 0;
+        for (port *p : *c->Ports()) {
+          prettyPrint(s, p, 0, out);
+          index++;
+          if (index < nbPorts) out << ", ";
+        }
+        out << ");\n";
+        out << "\n";
+        for (net *p : *c->Nets()) {
+          prettyPrint(s, p, 2, out);
+        }
+        out << "\n";
+        for (module_inst *m : *c->Modules()) {
+          prettyPrint(s, m, 2, out);
+        }
+        out << "\n";
+        out << "endmodule";
+        out << "\n";
+      } else {
+        out << removeLibName(c->VpiDefName());
+        out << " ";
+        out << escapeName(c->VpiName());
+        if (c->Param_assigns()) {
+          out << "#(";
+          int nbParams = c->Param_assigns()->size();
+          int index = 0;
+          for (param_assign *p : *c->Param_assigns()) {
+            prettyPrint(s, p, 0, out);
+            index++;
+            if (index < nbParams) out << ", ";
+          }
+          out << ")";
+        }
+        out << "(";
+        if (c->Ports()) {
+          int nbPorts = c->Ports()->size();
+          int index = 0;
+          for (port *p : *c->Ports()) {
+            out << "." << p->VpiName() << "(" ;
+            ExprEval eval;
+            std::stringstream outtmp;
+            eval.prettyPrint(s, p->High_conn(), 0, outtmp);
+            std::string tmps = outtmp.str();
+            tmps = escapeName(tmps);
+            out << tmps;
+            out << ")";
+            index++;
+            if (index < nbPorts) out << ", ";
+          }
+        }
+        out << ")";
+        out << ";";
+        out << "\n";
       }
-      out << ");\n";
-      for (net *p : *c->Nets()) {
-        prettyPrint(s, p, 0, out);
-      }
-      out << "\n";
-      out << "endmodule";
-      out << "\n";
       break;
     }
     case UHDM_OBJECT_TYPE::uhdmport: {
@@ -125,6 +171,15 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
       }
       out << escapeName(n->VpiName());
       out << ";\n";
+      break;
+    }
+    case UHDM_OBJECT_TYPE::uhdmparam_assign: {
+      param_assign* p = (param_assign*) object;
+      any* lhs = p->Lhs();
+      any* rhs = p->Rhs();
+      out << lhs->VpiName() << "=";
+      ExprEval eval;
+      eval.prettyPrint(s, rhs, 0, out);
       break;
     }
     default: {
