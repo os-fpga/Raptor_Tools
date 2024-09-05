@@ -90,7 +90,7 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
                     constant *cn = s->MakeConstant();
                     cn->VpiSize(1);
                     cn->VpiConstType(vpiBinaryConst);
-                    cn->VpiValue("BIN:" + std::to_string(val &= i));
+                    cn->VpiValue("BIN:" + std::to_string(val &= (1 << i)));
                     np->High_conn(cn);
                     newPorts->push_back(np);
                   }
