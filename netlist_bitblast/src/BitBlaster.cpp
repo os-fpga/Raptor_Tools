@@ -126,8 +126,9 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
 }
 
 static std::string empty;
-const std::string& BitBlaster::getCellType(const std::string& instance) {
-   std::map<std::string, std::string>::iterator itr = m_instanceCellMap.find(instance);
+const std::string &BitBlaster::getCellType(const std::string &instance) {
+  std::map<std::string, std::string>::iterator itr =
+      m_instanceCellMap.find(instance);
   if (itr == m_instanceCellMap.end()) {
     return empty;
   } else {

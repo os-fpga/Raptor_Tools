@@ -71,10 +71,12 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         std::string name = Utils::removeLibName(c->VpiName());
         out << name;
         out << " (\n";
+        std::set<std::string> ports;
         if (c->Ports()) {
           int nbPorts = c->Ports()->size();
           int index = 0;
           for (port *p : *c->Ports()) {
+            ports.insert(Utils::escapeName(p->VpiName()));
             prettyPrint(s, p, 4, out);
             index++;
             if (index < nbPorts) out << ",\n";
@@ -84,8 +86,9 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         out << "\n";
         out << "    //Wires\n";
         if (c->Nets()) {
-          for (net *p : *c->Nets()) {
-            prettyPrint(s, p, 4, out);
+          for (net *n : *c->Nets()) {
+            if (ports.find(Utils::escapeName(n->VpiName())) == ports.end())
+              prettyPrint(s, n, 4, out);
           }
           out << "\n";
         }

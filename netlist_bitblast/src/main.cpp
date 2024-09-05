@@ -129,7 +129,7 @@ int main(int argc, const char **argv) {
         printer->prettyPrint(UhdmDesignFromVpiHandle(vpi_design));
     delete printer;
 
-    //std::cout << "DESIGN:\n" << result << "\n";
+    // std::cout << "DESIGN:\n" << result << "\n";
 
     std::ofstream ofs(verilog_output_file);
     if (ofs.good()) {

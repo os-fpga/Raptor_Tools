@@ -68,15 +68,15 @@ class Utils {
   // Split input text into lines at '\n'. This separator is included in the
   // returned lines; the last line in text might not have a newline so might
   // not be included.
-  static std::vector<std::string_view> splitLines(std::string_view text);    
+  static std::vector<std::string_view> splitLines(std::string_view text);
 
   // Given a large input, return the content of line number "line".
   // Lines are 1 indexed.
-  static std::string_view getLineInString(std::string_view text, int line);   
+  static std::string_view getLineInString(std::string_view text, int line);
 
   // In given string "str", replace all occurences of "from" with "to"
   static std::string replaceAll(std::string_view str, std::string_view from,
-                                std::string_view to);                                 
+                                std::string_view to);
 };
 
 }  // namespace BITBLAST
