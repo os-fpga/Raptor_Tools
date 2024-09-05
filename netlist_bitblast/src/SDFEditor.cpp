@@ -21,9 +21,10 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include "SDFEditor.h"
 
 #include <filesystem>
+#include <fstream>
 #include <iostream>
 #include <sstream>
-#include <fstream>
+
 #include "Utils.h"
 
 namespace BITBLAST {
@@ -54,13 +55,14 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
     tmp = Utils::replaceAll(tmp, "\"dffre\"", "\"DFFRE\"");
     tmp = Utils::replaceAll(tmp, "\"dffnre\"", "\"DFFNRE\"");
     if (tmp.find("(CELLTYPE ") != std::string::npos) {
-      std::string line_plus1 = std::string(lines[i+1]);
+      std::string line_plus1 = std::string(lines[i + 1]);
       auto itr = line_plus1.find("(INSTANCE ");
       std::string instance = line_plus1.substr(itr + 10);
-      instance = instance.substr(0, instance.size()-2);
+      instance = instance.substr(0, instance.size() - 2);
       instance = Utils::replaceAll(instance, "\\", "");
       std::string cellType = blaster->getCellType(instance);
-      //std::cout << "INSTANCE: " << instance << " CELL: " << cellType << std::endl;
+      // std::cout << "INSTANCE: " << instance << " CELL: " << cellType <<
+      // std::endl;
       if (!cellType.empty()) {
         tmp = Utils::replaceAll(tmp, "LUT_K", cellType);
       }
@@ -70,7 +72,8 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
 
   std::ofstream output(sdfOutputFile.string());
   if (!output.good()) {
-    std::cerr << "Can't create SDF file: " << sdfOutputFile.string() << std::endl
+    std::cerr << "Can't create SDF file: " << sdfOutputFile.string()
+              << std::endl
               << std::flush;
     exit(1);
   }

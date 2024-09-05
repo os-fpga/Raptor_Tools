@@ -52,17 +52,17 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <map>
 #include <string>
 #include <vector>
-#include <map>
 
 namespace BITBLAST {
 
 class BitBlaster {
  public:
-  bool bitBlast(const UHDM::any *handle);
+  bool bitBlast(const UHDM::any* handle);
   const std::string& getCellType(const std::string& instance);
+
  protected:
  private:
-  UHDM::design *m_design = nullptr;
+  UHDM::design* m_design = nullptr;
   std::map<std::string, std::string> m_instanceCellMap;
 };
 

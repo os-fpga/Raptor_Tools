@@ -44,7 +44,7 @@ std::string Utils::printSpaces(uint32_t nb) {
 }
 
 void Utils::tokenize(std::string_view str, std::string_view separator,
-                     std::vector<std::string> &result, bool skipEmpty) {
+                     std::vector<std::string>& result, bool skipEmpty) {
   std::string::size_type pos{0};
   const auto sepSize = separator.size();
   const auto stringSize = str.size();
@@ -103,7 +103,7 @@ std::vector<std::string_view> Utils::splitLines(std::string_view text) {
 }
 
 std::string Utils::replaceAll(std::string_view str, std::string_view from,
-                                    std::string_view to) {
+                              std::string_view to) {
   size_t start_pos = 0;
   std::string result(str);
   while ((start_pos = result.find(from, start_pos)) != std::string::npos) {
