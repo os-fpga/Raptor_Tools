@@ -122,11 +122,22 @@ find_library(CAPNP_LIB   NAMES capnp   PATHS ${SURELOG_BASE}/third_party/UHDM/th
 find_library(KJ_LIB      NAMES kj      PATHS ${SURELOG_BASE}/third_party/UHDM/third_party/capnproto/c++/src/kj/)
 find_library(ANTLR_LIB   NAMES antlr4-runtime PATHS ${SURELOG_BASE}/third_party/antlr4/runtime/Cpp/runtime/)
 
-target_link_libraries(bitblast-bin ${SURELOG_LIB})
-target_link_libraries(bitblast-bin ${UHDM_LIB})
-target_link_libraries(bitblast-bin ${ANTLR_LIB})
-target_link_libraries(bitblast-bin ${CAPNP_LIB})
-target_link_libraries(bitblast-bin ${KJ_LIB})
-target_link_libraries(bitblast-bin z)
+target_link_libraries(bitblast-bin PRIVATE ${SURELOG_LIB})
+target_link_libraries(bitblast-bin PRIVATE ${UHDM_LIB})
+target_link_libraries(bitblast-bin PRIVATE ${ANTLR_LIB})
+target_link_libraries(bitblast-bin PRIVATE ${CAPNP_LIB})
+target_link_libraries(bitblast-bin PRIVATE ${KJ_LIB})
+target_link_libraries(bitblast-bin PRIVATE z)
+
+if (UNIX)
+  target_link_libraries(bitblast-bin PRIVATE dl)
+  target_link_libraries(bitblast-bin PRIVATE util)
+  target_link_libraries(bitblast-bin PRIVATE m)
+  target_link_libraries(bitblast-bin PRIVATE pthread)
+endif()
+
+if (CMAKE_SYSTEM_NAME MATCHES "Linux")
+  target_link_libraries(bitblast-bin PRIVATE rt)
+endif()
 
 include(GNUInstallDirs)
