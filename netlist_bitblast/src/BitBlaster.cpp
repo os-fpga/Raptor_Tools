@@ -35,6 +35,69 @@ using namespace UHDM;
 
 namespace BITBLAST {
 
+
+void blastPorts(const VectorOfport * origPorts, VectorOfport * newPorts, Serializer& s) {
+  for (port *p : *origPorts)
+  {
+    any *lowc = p->Low_conn();
+    std::string_view port_name = lowc->VpiName();
+    const ref_typespec* port_reftps = p->Typespec();
+    const typespec* port_tps = port_reftps->Actual_typespec();
+    uint64_t k = 1;
+    if (port_tps->UhdmType() == uhdmlogic_typespec) {
+      logic_typespec* ltps =(logic_typespec*) port_tps;
+      bool invalidValue = false;
+      if (ltps->Ranges()) {
+         ExprEval eval;
+         k = eval.size( ltps, invalidValue,nullptr, p, true);
+      }
+    }
+    if (k > 1)
+    {
+      any *highc = p->High_conn();
+      UHDM_OBJECT_TYPE high_conn_type = highc->UhdmType();
+      if (high_conn_type == uhdmconstant)
+      {
+        constant *c = (constant *)highc;
+        ExprEval eval;
+        uint64_t val = eval.getValue(c);
+        for (uint64_t i = 0; i < k; i++)
+        {
+          port *np = s.MakePort();
+          np->VpiName(std::string(port_name) + std::to_string(i));
+          constant *cn = s.MakeConstant();
+          cn->VpiSize(1);
+          cn->VpiConstType(vpiBinaryConst);
+          cn->VpiValue("BIN:" + std::to_string(val &= (1 << i)));
+          np->High_conn(cn);
+          newPorts->push_back(np);
+        }
+      }
+      else if (high_conn_type == uhdmoperation)
+      {
+        operation *oper = (operation *)highc;
+        int index = 0;
+        if (oper->Operands()) {
+          for (any *op : *oper->Operands())
+          {
+            port *np = s.MakePort();
+            np->VpiName(std::string(port_name) + std::to_string(index));
+            np->High_conn(op);
+            newPorts->push_back(np);
+            index++;
+          }
+        } else {
+          newPorts->push_back(p);
+        }
+      }
+    }
+    else
+    {
+      newPorts->push_back(p);
+    }
+  }
+}
+
 bool BitBlaster::bitBlast(const UHDM::any *object) {
   if (object == nullptr) return false;
   Serializer *s = object->GetSerializer();
@@ -75,40 +138,16 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
             VectorOfport *newPorts = s->MakePortVec();
-            for (port *p : *origPorts) {
-              any *lowc = p->Low_conn();
-              if (lowc->VpiName() == "in") {
-                any *highc = p->High_conn();
-                UHDM_OBJECT_TYPE high_conn_type = highc->UhdmType();
-                if (high_conn_type == uhdmconstant) {
-                  constant *c = (constant *)highc;
-                  ExprEval eval;
-                  uint64_t val = eval.getValue(c);
-                  for (uint64_t i = 0; i < k; i++) {
-                    port *np = s->MakePort();
-                    np->VpiName("in" + std::to_string(i));
-                    constant *cn = s->MakeConstant();
-                    cn->VpiSize(1);
-                    cn->VpiConstType(vpiBinaryConst);
-                    cn->VpiValue("BIN:" + std::to_string(val &= (1 << i)));
-                    np->High_conn(cn);
-                    newPorts->push_back(np);
-                  }
-                } else if (high_conn_type == uhdmoperation) {
-                  operation *oper = (operation *)highc;
-                  int index = 0;
-                  for (any *op : *oper->Operands()) {
-                    port *np = s->MakePort();
-                    np->VpiName("in" + std::to_string(index));
-                    np->High_conn(op);
-                    newPorts->push_back(np);
-                    index++;
-                  }
-                }
-              } else {
-                newPorts->push_back(p);
-              }
-            }
+            blastPorts(origPorts, newPorts, *s);
+            c->Ports(newPorts);
+          }
+        } else if (cellName.find("RS_DSP") != std::string::npos) {
+          std::string blastedName = cellName + "_BLASTED";
+          m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
+          c->VpiDefName(blastedName);
+          if (auto origPorts = c->Ports()) {
+            VectorOfport *newPorts = s->MakePortVec();
+            blastPorts(origPorts, newPorts, *s);
             c->Ports(newPorts);
           }
         }
