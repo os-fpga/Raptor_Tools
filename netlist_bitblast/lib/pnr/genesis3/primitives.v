@@ -635,3 +635,786 @@ module DFFSRE(
             Q <= D;
         
 endmodule
+
+module RS_DSP_MULT_BLASTED (
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Unchanged inputs
+    input  wire unsigned_a,
+    input  wire unsigned_b
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [37:0] z_internal; // Internal signal to hold the output of the original module
+
+    RS_DSP_MULT multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULT_BLASTED
+
+module RS_DSP_MULT_REGIN_BLASTED ( 
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Unchanged inputs
+    input  wire unsigned_a,
+    input  wire unsigned_b
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    RS_DSP_MULT_REGIN multiplier (
+        // Connect re-assembled inputs and outputs
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULT_REGIN_BLASTED
+
+module RS_DSP_MULT_REGOUT_BLASTED ( 
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Unchanged inputs
+    input  wire unsigned_a,
+    input  wire unsigned_b
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    RS_DSP_MULT_REGOUT multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULT_REGOUT_BLASTED
+
+module RS_DSP_MULT_REGIN_REGOUT_BLASTED ( 
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Unchanged inputs
+    input  wire unsigned_a,
+    input  wire unsigned_b
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    RS_DSP_MULT_REGIN_REGOUT_BLASTED multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULT_REGIN_REGOUT_BLASTED
+
+module RS_DSP_MULTADD_BLASTED ( 
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted inputs 'feedback' and 'acc_fir'
+    input wire feedback2, feedback1, feedback0,
+    input wire acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Unchanged inputs 
+    input  wire load_acc,
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+    input  wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Unchanged inputs 
+    input  wire round,
+    input  wire subtract,
+
+    // Bit-blasted output 'dly_b'
+    output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+    output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] acc_fir_reassembled = {acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+    wire [17:0] dly_b_internal;
+
+    RS_DSP_MULTADD multiplier (
+        // Connect re-assembled inputs and outputs
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .acc_fir(acc_fir_reassembled),
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract),
+        .dly_b(dly_b_internal)
+    );
+
+   assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+    // Connect the bit-blasted dly_b ports to the internal output
+    assign {dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+            dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0} = dly_b_internal; 
+
+endmodule
+
+
+module RS_DSP_MULTADD_REGIN_BLASTED ( 
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted inputs 'feedback' and 'acc_fir'
+    input wire feedback2, feedback1, feedback0,
+    input wire acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Unchanged inputs 
+    input  wire load_acc,
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+    input  wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Unchanged inputs 
+    input  wire round,
+    input  wire subtract,
+
+    // Bit-blasted output 'dly_b'
+    output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+    output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] acc_fir_reassembled = {acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+    wire [17:0] dly_b_internal;
+
+    RS_DSP_MULTADD_REGIN multiplier (
+        // Connect re-assembled inputs and outputs
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .acc_fir(acc_fir_reassembled),
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract),
+        .dly_b(dly_b_internal)
+    );
+
+      // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+    // Connect the bit-blasted dly_b ports to the internal output
+    assign {dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+            dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0} = dly_b_internal; 
+
+endmodule // RS_DSP_MULTADD_REGIN_BLASTED
+
+module RS_DSP_MULTADD_REGOUT_BLASTED (
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted inputs 'feedback' and 'acc_fir'
+    input wire feedback2, feedback1, feedback0,
+    input wire acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Unchanged inputs 
+    input  wire load_acc,
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+    input  wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Unchanged inputs 
+    input  wire round,
+    input  wire subtract,
+
+    // Bit-blasted output 'dly_b'
+    output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+    output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] acc_fir_reassembled = {acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+    wire [17:0] dly_b_internal;
+
+    RS_DSP_MULTADD_REGOUT multiplier (
+        // Connect re-assembled inputs and outputs
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .acc_fir(acc_fir_reassembled),
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract),
+        .dly_b(dly_b_internal)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+    // Connect the bit-blasted dly_b ports to the internal output
+    assign {dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+            dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0} = dly_b_internal; 
+
+endmodule // RS_DSP_MULTADD_REGOUT_BLASTED
+
+
+module RS_DSP_MULTADD_REGIN_REGOUT_BLASTED (
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted inputs 'feedback' and 'acc_fir'
+    input wire feedback2, feedback1, feedback0,
+    input wire acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Bit-blasted input 'load_acc'
+    input wire load_acc,
+
+    // Unchanged inputs 
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+
+    // Bit-blasted input 'saturate_enable'
+    input wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Bit-blasted inputs 'round' and 'subtract'
+    input wire round,
+    input wire subtract,
+
+    // Bit-blasted output 'dly_b'
+    output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+    output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
+);
+
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] acc_fir_reassembled = {acc_fir5, acc_fir4, acc_fir3, acc_fir2, acc_fir1, acc_fir0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+    wire [17:0] dly_b_internal;
+
+    RS_DSP_MULTADD_REGIN_REGOUT multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .acc_fir(acc_fir_reassembled),
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract),
+        .dly_b(dly_b_internal)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+    // Connect the bit-blasted dly_b ports to the internal output
+    assign {dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
+            dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0} = dly_b_internal; 
+
+endmodule // RS_DSP_MULTADD_REGIN_REGOUT_BLASTED
+
+
+
+module RS_DSP_MULTACC_BLASTED ( 
+ // Bit-blasted inputs 'a' and 'b'
+    input wire  a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input wire  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input wire  b17, b16, b15, b14, b13, b12, b11, b10, 
+    input wire  b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire  feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire  clk,
+    input wire  lreset,
+
+    // Bit-blasted input 'load_acc'
+    input wire  load_acc,
+
+    // Unchanged inputs 
+    input wire  unsigned_a,
+    input wire  unsigned_b,
+
+    // Bit-blasted input 'saturate_enable'
+    input wire  saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire  shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Bit-blasted inputs 'round' and 'subtract'
+    input wire  round,
+    input wire  subtract);
+       
+    // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    // Instantiate the bit-blasted module 
+    RS_DSP_MULTACC blasted_multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2,  z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULTACC_BLASTED
+
+
+module RS_DSP_MULTACC_REGIN_BLASTED (
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Bit-blasted input 'load_acc'
+    input wire load_acc,
+
+    // Unchanged inputs 
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+
+    // Bit-blasted input 'saturate_enable'
+    input wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Bit-blasted inputs 'round' and 'subtract'
+    input wire round,
+    input wire subtract
+);
+
+   // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    RS_DSP_MULTACC_REGIN multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULTACC_REGIN_BLASTED
+
+   
+module RS_DSP_MULTACC_REGOUT_BLASTED (
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Bit-blasted input 'load_acc'
+    input wire load_acc,
+
+    // Unchanged inputs 
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+
+    // Bit-blasted input 'saturate_enable'
+    input wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Bit-blasted inputs 'round' and 'subtract'
+    input wire round,
+    input wire subtract
+);
+
+   // Internal signals to re-assemble the bit-blasted ports
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    RS_DSP_MULTACC_REGOUT multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule // RS_DSP_MULTACC_REGOUT_BLASTED
+
+
+module RS_DSP_MULTACC_REGIN_REGOUT_BLASTED (
+    // Bit-blasted inputs 'a' and 'b'
+    input  wire a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+    input  wire a9, a8, a7, a6, a5, a4, a3, a2, a1, a0, 
+
+    input  wire b17, b16, b15, b14, b13, b12, b11, b10, 
+    input  wire b9, b8, b7, b6, b5, b4, b3, b2, b1, b0, 
+
+    // Bit-blasted output 'z'
+    output wire z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+    output wire z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0, 
+
+    // Bit-blasted input 'feedback'
+    input wire feedback2, feedback1, feedback0,
+
+    // Bit-blasted inputs 'clk' and 'lreset'
+    input wire clk,
+    input wire lreset,
+
+    // Bit-blasted input 'load_acc'
+    input wire load_acc,
+
+    // Unchanged inputs 
+    input  wire unsigned_a,
+    input  wire unsigned_b,
+
+    // Bit-blasted input 'saturate_enable'
+    input wire saturate_enable,
+
+    // Bit-blasted input 'shift_right'
+    input wire shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0,
+
+    // Bit-blasted inputs 'round' and 'subtract'
+    input wire round,
+    input wire subtract
+);
+
+    wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
+                                 a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
+    wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
+                                 b9, b8, b7, b6, b5, b4, b3, b2, b1, b0};
+    wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
+    wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
+    wire [37:0] z_internal; // Internal signal to hold the output
+
+    RS_DSP_MULTACC_REGIN_REGOUT multiplier (
+        .a(a_reassembled), 
+        .b(b_reassembled), 
+        .z(z_internal), 
+        .feedback(feedback_reassembled), 
+        .clk(clk),
+        .lreset(lreset),
+        .load_acc(load_acc),
+        .unsigned_a(unsigned_a), 
+        .unsigned_b(unsigned_b),
+        .saturate_enable(saturate_enable),
+        .shift_right(shift_right_reassembled),
+        .round(round),
+        .subtract(subtract)
+    );
+
+    // Connect the bit-blasted output ports to the internal output
+    assign {z37, z36, z35, z34, z33, z32, z31, z30, z29, z28, z27, z26, z25, z24, z23, z22, z21, z20, 
+            z19, z18, z17, z16, z15, z14, z13, z12, z11, z10, z9, z8, z7, z6, z5, z4, z3, z2, z1, z0} = z_internal;
+
+endmodule   

@@ -173,9 +173,12 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
                 std::string val = std::string(c->VpiValue());
                 val = val.substr(val.find(":") + 1);
                 out << val;
+              } else if (high_conn_type == uhdmoperation) {
+                // Empty connection
+                // .()
               } else {
-                std::cerr << "NOT HANDLED HIGH CONN TYPE: " << high_conn_type
-                          << "\n";
+                std::cerr << "NOT HANDLED HIGH CONN TYPE: " << UhdmName(high_conn_type)
+                          << " line: " << p->VpiLineNo() << "\n";
                 exit(1);
               }
             } else if (tmps.find("{") == std::string::npos) {
