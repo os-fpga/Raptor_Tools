@@ -96,7 +96,6 @@ void filterLocalParams(VectorOfparam_assign *oldParams_assigns,
     any *p = pa->Lhs();
     if (p->UhdmType() == uhdmparameter) {
       parameter *param = (parameter *)p;
-      UHDM::decompile(p);
       if (!param->VpiLocalParam()) {
         newParams->push_back(pa);
       }
