@@ -28,6 +28,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <uhdm/uhdm.h>
 #include <uhdm/uhdm_forward_decl.h>
 #include <uhdm/uhdm_types.h>
+#include <uhdm/vpi_visitor.h>
 
 #include "Utils.h"
 
@@ -35,34 +36,30 @@ using namespace UHDM;
 
 namespace BITBLAST {
 
-
-void blastPorts(const VectorOfport * origPorts, VectorOfport * newPorts, Serializer& s) {
-  for (port *p : *origPorts)
-  {
+void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
+                Serializer &s) {
+  for (port *p : *origPorts) {
     any *lowc = p->Low_conn();
     std::string_view port_name = lowc->VpiName();
-    const ref_typespec* port_reftps = p->Typespec();
-    const typespec* port_tps = port_reftps->Actual_typespec();
+    const ref_typespec *port_reftps = p->Typespec();
+    const typespec *port_tps = port_reftps->Actual_typespec();
     uint64_t k = 1;
     if (port_tps->UhdmType() == uhdmlogic_typespec) {
-      logic_typespec* ltps =(logic_typespec*) port_tps;
+      logic_typespec *ltps = (logic_typespec *)port_tps;
       bool invalidValue = false;
       if (ltps->Ranges()) {
-         ExprEval eval;
-         k = eval.size( ltps, invalidValue,nullptr, p, true);
+        ExprEval eval;
+        k = eval.size(ltps, invalidValue, nullptr, p, true);
       }
     }
-    if (k > 1)
-    {
+    if (k > 1) {
       any *highc = p->High_conn();
       UHDM_OBJECT_TYPE high_conn_type = highc->UhdmType();
-      if (high_conn_type == uhdmconstant)
-      {
+      if (high_conn_type == uhdmconstant) {
         constant *c = (constant *)highc;
         ExprEval eval;
         uint64_t val = eval.getValue(c);
-        for (uint64_t i = 0; i < k; i++)
-        {
+        for (uint64_t i = 0; i < k; i++) {
           port *np = s.MakePort();
           np->VpiName(std::string(port_name) + std::to_string(i));
           constant *cn = s.MakeConstant();
@@ -72,14 +69,11 @@ void blastPorts(const VectorOfport * origPorts, VectorOfport * newPorts, Seriali
           np->High_conn(cn);
           newPorts->push_back(np);
         }
-      }
-      else if (high_conn_type == uhdmoperation)
-      {
+      } else if (high_conn_type == uhdmoperation) {
         operation *oper = (operation *)highc;
         int index = 0;
         if (oper->Operands()) {
-          for (any *op : *oper->Operands())
-          {
+          for (any *op : *oper->Operands()) {
             port *np = s.MakePort();
             np->VpiName(std::string(port_name) + std::to_string(index));
             np->High_conn(op);
@@ -90,10 +84,22 @@ void blastPorts(const VectorOfport * origPorts, VectorOfport * newPorts, Seriali
           newPorts->push_back(p);
         }
       }
-    }
-    else
-    {
+    } else {
       newPorts->push_back(p);
+    }
+  }
+}
+
+void filterLocalParams(VectorOfparam_assign *oldParams_assigns,
+                       VectorOfparam_assign *newParams) {
+  for (param_assign *pa : *oldParams_assigns) {
+    any *p = pa->Lhs();
+    if (p->UhdmType() == uhdmparameter) {
+      parameter *param = (parameter *)p;
+      UHDM::decompile(p);
+      if (!param->VpiLocalParam()) {
+        newParams->push_back(pa);
+      }
     }
   }
 }
@@ -149,6 +155,11 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             VectorOfport *newPorts = s->MakePortVec();
             blastPorts(origPorts, newPorts, *s);
             c->Ports(newPorts);
+          }
+          if (auto params = c->Param_assigns()) {
+            VectorOfparam_assign *newParams = s->MakeParam_assignVec();
+            filterLocalParams(params, newParams);
+            c->Param_assigns(newParams);
           }
         }
       }

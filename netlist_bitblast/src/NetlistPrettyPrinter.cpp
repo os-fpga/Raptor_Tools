@@ -177,7 +177,8 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
                 // Empty connection
                 // .()
               } else {
-                std::cerr << "NOT HANDLED HIGH CONN TYPE: " << UhdmName(high_conn_type)
+                std::cerr << "NOT HANDLED HIGH CONN TYPE: "
+                          << UhdmName(high_conn_type)
                           << " line: " << p->VpiLineNo() << "\n";
                 exit(1);
               }
