@@ -655,7 +655,7 @@ module RS_DSP_MULT_BLASTED (
     input  wire unsigned_a,
     input  wire unsigned_b
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -664,7 +664,7 @@ module RS_DSP_MULT_BLASTED (
     wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
     wire [37:0] z_internal; // Internal signal to hold the output of the original module
 
-    RS_DSP_MULT multiplier (
+    RS_DSP_MULT #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -702,7 +702,7 @@ module RS_DSP_MULT_REGIN_BLASTED (
     input  wire unsigned_a,
     input  wire unsigned_b
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -711,7 +711,7 @@ module RS_DSP_MULT_REGIN_BLASTED (
     wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULT_REGIN multiplier (
+    RS_DSP_MULT_REGIN #(.MODE_BITS(MODE_BITS)) multiplier (
         // Connect re-assembled inputs and outputs
         .a(a_reassembled), 
         .b(b_reassembled), 
@@ -752,7 +752,7 @@ module RS_DSP_MULT_REGOUT_BLASTED (
     input  wire unsigned_a,
     input  wire unsigned_b
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -761,7 +761,7 @@ module RS_DSP_MULT_REGOUT_BLASTED (
     wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULT_REGOUT multiplier (
+    RS_DSP_MULT_REGOUT #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -801,7 +801,7 @@ module RS_DSP_MULT_REGIN_REGOUT_BLASTED (
     input  wire unsigned_a,
     input  wire unsigned_b
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -810,7 +810,7 @@ module RS_DSP_MULT_REGIN_REGOUT_BLASTED (
     wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULT_REGIN_REGOUT_BLASTED multiplier (
+    RS_DSP_MULT_REGIN_REGOUT_BLASTED #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -864,7 +864,7 @@ module RS_DSP_MULTADD_BLASTED (
     output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
     output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -876,7 +876,7 @@ module RS_DSP_MULTADD_BLASTED (
     wire [37:0] z_internal; // Internal signal to hold the output
     wire [17:0] dly_b_internal;
 
-    RS_DSP_MULTADD multiplier (
+    RS_DSP_MULTADD #(.MODE_BITS(MODE_BITS)) multiplier (
         // Connect re-assembled inputs and outputs
         .a(a_reassembled), 
         .b(b_reassembled), 
@@ -942,7 +942,7 @@ module RS_DSP_MULTADD_REGIN_BLASTED (
     output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
     output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -954,7 +954,7 @@ module RS_DSP_MULTADD_REGIN_BLASTED (
     wire [37:0] z_internal; // Internal signal to hold the output
     wire [17:0] dly_b_internal;
 
-    RS_DSP_MULTADD_REGIN multiplier (
+    RS_DSP_MULTADD_REGIN #(.MODE_BITS(MODE_BITS)) multiplier (
         // Connect re-assembled inputs and outputs
         .a(a_reassembled), 
         .b(b_reassembled), 
@@ -1020,7 +1020,7 @@ module RS_DSP_MULTADD_REGOUT_BLASTED (
     output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
     output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -1032,7 +1032,7 @@ module RS_DSP_MULTADD_REGOUT_BLASTED (
     wire [37:0] z_internal; // Internal signal to hold the output
     wire [17:0] dly_b_internal;
 
-    RS_DSP_MULTADD_REGOUT multiplier (
+    RS_DSP_MULTADD_REGOUT #(.MODE_BITS(MODE_BITS)) multiplier (
         // Connect re-assembled inputs and outputs
         .a(a_reassembled), 
         .b(b_reassembled), 
@@ -1103,7 +1103,7 @@ module RS_DSP_MULTADD_REGIN_REGOUT_BLASTED (
     output wire dly_b17, dly_b16, dly_b15, dly_b14, dly_b13, dly_b12, dly_b11, dly_b10,
     output wire dly_b9, dly_b8, dly_b7, dly_b6, dly_b5, dly_b4, dly_b3, dly_b2, dly_b1, dly_b0
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -1115,7 +1115,7 @@ module RS_DSP_MULTADD_REGIN_REGOUT_BLASTED (
     wire [37:0] z_internal; // Internal signal to hold the output
     wire [17:0] dly_b_internal;
 
-    RS_DSP_MULTADD_REGIN_REGOUT multiplier (
+    RS_DSP_MULTADD_REGIN_REGOUT #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -1180,7 +1180,7 @@ module RS_DSP_MULTACC_BLASTED (
     // Bit-blasted inputs 'round' and 'subtract'
     input wire  round,
     input wire  subtract);
-       
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;       
     // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
@@ -1191,7 +1191,7 @@ module RS_DSP_MULTACC_BLASTED (
     wire [37:0] z_internal; // Internal signal to hold the output
 
     // Instantiate the bit-blasted module 
-    RS_DSP_MULTACC blasted_multiplier (
+    RS_DSP_MULTACC #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -1250,8 +1250,8 @@ module RS_DSP_MULTACC_REGIN_BLASTED (
     input wire round,
     input wire subtract
 );
-
-   // Internal signals to re-assemble the bit-blasted ports
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
     wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
@@ -1260,7 +1260,7 @@ module RS_DSP_MULTACC_REGIN_BLASTED (
     wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULTACC_REGIN multiplier (
+    RS_DSP_MULTACC_REGIN #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -1319,8 +1319,8 @@ module RS_DSP_MULTACC_REGOUT_BLASTED (
     input wire round,
     input wire subtract
 );
-
-   // Internal signals to re-assemble the bit-blasted ports
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
+    // Internal signals to re-assemble the bit-blasted ports
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
     wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
@@ -1329,7 +1329,7 @@ module RS_DSP_MULTACC_REGOUT_BLASTED (
     wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULTACC_REGOUT multiplier (
+    RS_DSP_MULTACC_REGOUT #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
@@ -1388,7 +1388,7 @@ module RS_DSP_MULTACC_REGIN_REGOUT_BLASTED (
     input wire round,
     input wire subtract
 );
-
+    parameter [0:84] MODE_BITS = 85'b0000000000000000000000000000000000000000000000000000000000000000000000000000000000000;
     wire [19:0] a_reassembled = {a19, a18, a17, a16, a15, a14, a13, a12, a11, a10, 
                                  a9, a8, a7, a6, a5, a4, a3, a2, a1, a0};
     wire [17:0] b_reassembled = {b17, b16, b15, b14, b13, b12, b11, b10, 
@@ -1397,7 +1397,7 @@ module RS_DSP_MULTACC_REGIN_REGOUT_BLASTED (
     wire [5:0] shift_right_reassembled = {shift_right5, shift_right4, shift_right3, shift_right2, shift_right1, shift_right0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULTACC_REGIN_REGOUT multiplier (
+    RS_DSP_MULTACC_REGIN_REGOUT #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
