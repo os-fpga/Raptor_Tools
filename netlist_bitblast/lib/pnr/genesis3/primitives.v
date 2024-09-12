@@ -810,7 +810,7 @@ module RS_DSP_MULT_REGIN_REGOUT_BLASTED (
     wire [2:0] feedback_reassembled = {feedback2, feedback1, feedback0};
     wire [37:0] z_internal; // Internal signal to hold the output
 
-    RS_DSP_MULT_REGIN_REGOUT_BLASTED #(.MODE_BITS(MODE_BITS)) multiplier (
+    RS_DSP_MULT_REGIN_REGOUT #(.MODE_BITS(MODE_BITS)) multiplier (
         .a(a_reassembled), 
         .b(b_reassembled), 
         .z(z_internal), 
