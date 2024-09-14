@@ -1488,9 +1488,9 @@ module RS_TDP36K_BLASTED  #(
     // Internal signals to re-assemble the bit-blasted ports for interface 2
     wire [1:0] BE_A2_reassembled = {BE_A2_1, BE_A2_0};
     wire [1:0] BE_B2_reassembled = {BE_B2_1, BE_B2_0};
-    wire [14:0] ADDR_A2_reassembled = {ADDR_A2_13, ADDR_A2_12, ADDR_A2_11, ADDR_A2_10, ADDR_A2_9, ADDR_A2_8, ADDR_A2_7, ADDR_A2_6, ADDR_A2_5,
+    wire [13:0] ADDR_A2_reassembled = {ADDR_A2_13, ADDR_A2_12, ADDR_A2_11, ADDR_A2_10, ADDR_A2_9, ADDR_A2_8, ADDR_A2_7, ADDR_A2_6, ADDR_A2_5,
                                        ADDR_A2_4, ADDR_A2_3, ADDR_A2_2, ADDR_A2_1, ADDR_A2_0};
-    wire [14:0] ADDR_B2_reassembled = {ADDR_B2_13, ADDR_B2_12, ADDR_B2_11, ADDR_B2_10, ADDR_B2_9, ADDR_B2_8, ADDR_B2_7, ADDR_B2_6, ADDR_B2_5,
+    wire [13:0] ADDR_B2_reassembled = {ADDR_B2_13, ADDR_B2_12, ADDR_B2_11, ADDR_B2_10, ADDR_B2_9, ADDR_B2_8, ADDR_B2_7, ADDR_B2_6, ADDR_B2_5,
                                        ADDR_B2_4, ADDR_B2_3, ADDR_B2_2, ADDR_B2_1, ADDR_B2_0};
     wire [17:0] WDATA_A2_reassembled = {WDATA_A2_17, WDATA_A2_16, WDATA_A2_15, WDATA_A2_14, WDATA_A2_13, WDATA_A2_12, WDATA_A2_11, WDATA_A2_10, WDATA_A2_9, WDATA_A2_8,
                                         WDATA_A2_7, WDATA_A2_6, WDATA_A2_5, WDATA_A2_4, WDATA_A2_3, WDATA_A2_2, WDATA_A2_1, WDATA_A2_0};
@@ -1535,6 +1535,20 @@ module RS_TDP36K_BLASTED  #(
                     RDATA_B2_7, RDATA_B2_6, RDATA_B2_5, RDATA_B2_4, RDATA_B2_3, RDATA_B2_2, RDATA_B2_1, RDATA_B2_0}), 
         .FLUSH2(FLUSH2)           
     );
+
+
+  
+`ifndef SYNTHESIS
+ `ifdef TIMED_SIM
+     specify
+          // TODO: 1 to many:
+         (posedge CLK_A1 => (RDATA_A1_0+:WDATA_A1_0)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_0+:WDATA_A2_0)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_0+:WDATA_B1_0)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_0+:WDATA_B2_0)) = (0, 0);
+    endspecify
+ `endif  
+`endif   
    
 endmodule
 

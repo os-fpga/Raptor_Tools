@@ -24,7 +24,7 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <fstream>
 #include <iostream>
 #include <sstream>
-
+#include <regex>
 #include "Utils.h"
 
 namespace BITBLAST {
@@ -52,19 +52,34 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
     tmp = Utils::replaceAll(tmp, "in[3]", "in3");
     tmp = Utils::replaceAll(tmp, "in[4]", "in4");
     tmp = Utils::replaceAll(tmp, "in[5]", "in5");
+    tmp = Utils::replaceAll(tmp, "in[5]", "in5");
+
+    // TODO: expand the sdf path 1 to many:
+    tmp = Utils::replaceAll(tmp, "RDATA_A1", "RDATA_A1_0");
+    tmp = Utils::replaceAll(tmp, "RDATA_A2", "RDATA_A2_0");
+    tmp = Utils::replaceAll(tmp, "RDATA_B1", "RDATA_B1_0");
+    tmp = Utils::replaceAll(tmp, "RDATA_B2", "RDATA_B2_0");
+
     tmp = Utils::replaceAll(tmp, "\"dffre\"", "\"DFFRE\"");
     tmp = Utils::replaceAll(tmp, "\"dffnre\"", "\"DFFNRE\"");
     if (tmp.find("(CELLTYPE ") != std::string::npos) {
+      static std::regex expr(R"(\"([a-zA-Z0-9_]+)\")");
+      std::smatch match;
+      std::string origCellType;
+      if (std::regex_search(tmp, match, expr)) {
+        origCellType = match[1].str();
+      }
+ 
       std::string line_plus1 = std::string(lines[i + 1]);
       auto itr = line_plus1.find("(INSTANCE ");
       std::string instance = line_plus1.substr(itr + 10);
       instance = instance.substr(0, instance.size() - 2);
       instance = Utils::replaceAll(instance, "\\", "");
       std::string cellType = blaster->getCellType(instance);
-      // std::cout << "INSTANCE: " << instance << " CELL: " << cellType <<
-      // std::endl;
+      //std::cout << "ORIG: " << origCellType << " INSTANCE: " << instance << " CELL: " << cellType <<
+      //std::endl;
       if (!cellType.empty()) {
-        tmp = Utils::replaceAll(tmp, "LUT_K", cellType);
+        tmp = Utils::replaceAll(tmp, origCellType, cellType);
       }
     }
     result += tmp;
