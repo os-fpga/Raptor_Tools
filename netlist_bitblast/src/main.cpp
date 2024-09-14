@@ -102,13 +102,10 @@ int main(int argc, const char **argv) {
   if (success && (!clp->help())) {
     compiler = SURELOG::start_compiler(clp);
     vpi_design = SURELOG::get_uhdm_design(compiler);
-    auto stats = errors->getErrorStats();
-    code = (!success) | stats.nbFatal | stats.nbSyntax | stats.nbError;
   }
-
   SURELOG::ErrorContainer::Stats stats = errors->getErrorStats();
   errors->printStats(stats, false);
-
+  code = (!success) | stats.nbFatal | stats.nbSyntax | stats.nbError;
   if (vpi_design == nullptr) return code;
 
   if (bitblast) {
@@ -129,8 +126,6 @@ int main(int argc, const char **argv) {
         printer->prettyPrint(UhdmDesignFromVpiHandle(vpi_design));
     delete printer;
 
-    // std::cout << "DESIGN:\n" << result << "\n";
-
     std::ofstream ofs(verilog_output_file);
     if (ofs.good()) {
       ofs << result;
@@ -145,5 +140,5 @@ int main(int argc, const char **argv) {
   delete symbolTable;
   delete errors;
 
-  return 0;
+  return code;
 }
