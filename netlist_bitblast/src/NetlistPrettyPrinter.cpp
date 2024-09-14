@@ -128,14 +128,23 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
         if (cellName != "fpga_interconnect") {
           out << " #(\n";
         }
-        if (c->Param_assigns()) {
-          int nbParams = c->Param_assigns()->size();
+        if (auto passigns = c->Param_assigns()) {
           int index = 0;
-          for (param_assign *p : *c->Param_assigns()) {
-            prettyPrint(s, p, 8, out);
-            index++;
-            if (index < nbParams) out << ",";
-            out << "\n";
+          for (param_assign *pa : *passigns) {
+            any *p = pa->Lhs();
+            if (p->UhdmType() == uhdmparameter) {
+              parameter *param = (parameter *)p;
+              if (!param->VpiLocalParam()) {
+                if (index != 0) {
+                  out << ",\n";
+                }
+                prettyPrint(s, pa, 8, out);
+                index++;
+                if (index == 1) {
+                  out << "\n";
+                }
+              }
+            }
           }
         }
         if (cellName != "fpga_interconnect") {
