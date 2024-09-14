@@ -90,6 +90,7 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
   }
 }
 
+// Bit blasts: LUT_K, RS_DSP, RS_BRAM instances
 bool BitBlaster::bitBlast(const UHDM::any *object) {
   if (object == nullptr) return false;
   Serializer *s = object->GetSerializer();
