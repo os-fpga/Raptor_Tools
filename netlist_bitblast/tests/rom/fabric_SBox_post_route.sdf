@@ -1,0 +1,2282 @@
+(DELAYFILE
+    (SDFVERSION "2.1")
+    (DESIGN "fabric_SBox")
+    (VENDOR "verilog-to-routing")
+    (PROGRAM "vpr")
+    (VERSION "")
+    (DIVIDER /)
+    (TIMESCALE 1 ps)
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_clock_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_clock_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_clock_3_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_emu_init_sel_33_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$auto_26_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo2_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo3_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo1_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo7_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo6_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo4_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo5_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$clk_buf_\$ibuf_clk_output_0_0_to_dffre_\$abc\$267\$lo0_clock_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (894.351:894.351:894.351) (894.351:894.351:894.351))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[0\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1293.81:1293.81:1293.81) (1293.81:1293.81:1293.81))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[1\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1174.91:1174.91:1174.91) (1174.91:1174.91:1174.91))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[2\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_5)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1293.81:1293.81:1293.81) (1293.81:1293.81:1293.81))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[3\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_6)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1412.71:1412.71:1412.71) (1412.71:1412.71:1412.71))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[4\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_7)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1351.75:1351.75:1351.75) (1351.75:1351.75:1351.75))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[5\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_8)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1232.85:1232.85:1232.85) (1232.85:1232.85:1232.85))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[6\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_9)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1232.85:1232.85:1232.85) (1232.85:1232.85:1232.85))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_addr\[7\]_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_10)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1354.77:1354.77:1354.77) (1354.77:1354.77:1354.77))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_emu_init_sel_33_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo2_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo3_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo1_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo7_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo6_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo4_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo5_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_reset_output_0_0_to_dffre_\$abc\$267\$lo0_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1436.88:1436.88:1436.88) (1436.88:1436.88:1436.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_valid_in_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_4_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1293.81:1293.81:1293.81) (1293.81:1293.81:1293.81))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_valid_in_output_0_0_to_dffre_emu_init_sel_33_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1378.94:1378.94:1378.94) (1378.94:1378.94:1378.94))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_valid_in_output_0_0_to_dffre_\$auto_26_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1536.08:1536.08:1536.08) (1536.08:1536.08:1536.08))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_\$ibuf_valid_in_output_0_0_to_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1378.94:1378.94:1378.94) (1378.94:1378.94:1378.94))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1215_output_0_0_to_\$auto_1215_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1312.1:1312.1:1312.1) (1312.1:1312.1:1312.1))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1216_output_0_0_to_\$auto_1216_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1193.2:1193.2:1193.2) (1193.2:1193.2:1193.2))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1217_output_0_0_to_\$auto_1217_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1193.2:1193.2:1193.2) (1193.2:1193.2:1193.2))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1218_output_0_0_to_\$auto_1218_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1071.28:1071.28:1071.28) (1071.28:1071.28:1071.28))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1219_output_0_0_to_\$auto_1219_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1312.1:1312.1:1312.1) (1312.1:1312.1:1312.1))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1220_output_0_0_to_\$auto_1220_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1315.12:1315.12:1315.12) (1315.12:1315.12:1315.12))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1221_output_0_0_to_\$auto_1221_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (952.384:952.384:952.384) (952.384:952.384:952.384))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1222_output_0_0_to_\$auto_1222_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1013.34:1013.34:1013.34) (1013.34:1013.34:1013.34))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1223_output_0_0_to_\$auto_1223_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1254.16:1254.16:1254.16) (1254.16:1254.16:1254.16))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1224_output_0_0_to_\$auto_1224_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1434.02:1434.02:1434.02) (1434.02:1434.02:1434.02))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1225_output_0_0_to_\$auto_1225_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1312.1:1312.1:1312.1) (1312.1:1312.1:1312.1))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1226_output_0_0_to_\$auto_1226_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1013.34:1013.34:1013.34) (1013.34:1013.34:1013.34))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1227_output_0_0_to_\$auto_1227_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1312.1:1312.1:1312.1) (1312.1:1312.1:1312.1))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1228_output_0_0_to_\$auto_1228_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1013.34:1013.34:1013.34) (1013.34:1013.34:1013.34))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1229_output_0_0_to_\$auto_1229_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1013.34:1013.34:1013.34) (1013.34:1013.34:1013.34))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1230_output_0_0_to_\$auto_1230_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1190.18:1190.18:1190.18) (1190.18:1190.18:1190.18))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1231_output_0_0_to_\$auto_1231_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1193.2:1193.2:1193.2) (1193.2:1193.2:1193.2))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1232_output_0_0_to_\$auto_1232_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1315.12:1315.12:1315.12) (1315.12:1315.12:1315.12))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$auto_1233_output_0_0_to_\$auto_1233_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1013.34:1013.34:1013.34) (1013.34:1013.34:1013.34))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[0\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[0\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1193.2:1193.2:1193.2) (1193.2:1193.2:1193.2))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[1\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[1\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1254.16:1254.16:1254.16) (1254.16:1254.16:1254.16))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[2\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[2\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1132.24:1132.24:1132.24) (1132.24:1132.24:1132.24))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[3\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[3\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1251.14:1251.14:1251.14) (1251.14:1251.14:1251.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[4\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[4\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1312.1:1312.1:1312.1) (1312.1:1312.1:1312.1))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[5\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[5\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1193.2:1193.2:1193.2) (1193.2:1193.2:1193.2))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[6\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[6\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1312.1:1312.1:1312.1) (1312.1:1312.1:1312.1))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$f2g_tx_out_\$obuf_dout\[7\]_output_0_0_to_\$f2g_tx_out_\$obuf_dout\[7\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (1193.2:1193.2:1193.2) (1193.2:1193.2:1193.2))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (280.56:280.56:280.56) (280.56:280.56:280.56))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (280.56:280.56:280.56) (280.56:280.56:280.56))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (402.48:402.48:402.48) (402.48:402.48:402.48))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_11)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_12)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (460.42:460.42:460.42) (460.42:460.42:460.42))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_13)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (460.42:460.42:460.42) (460.42:460.42:460.42))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_2_14)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_6_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_7_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_8_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_8_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_9_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_9_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_12_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (280.56:280.56:280.56) (280.56:280.56:280.56))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_12_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (280.56:280.56:280.56) (280.56:280.56:280.56))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_12_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (280.56:280.56:280.56) (280.56:280.56:280.56))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_12_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (402.48:402.48:402.48) (402.48:402.48:402.48))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_12_14)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_14_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_15_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_16_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_18_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_18_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_20_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$false_output_0_0_to_RS_TDP36K_\$delete_wire\$1211_input_21_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (820.14:820.14:820.14) (820.14:820.14:820.14))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_dffre_emu_init_sel_33_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (464.88:464.88:464.88) (464.88:464.88:464.88))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_dffre_\$auto_26_input_1_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_dffre_\$auto_26_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1232_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1230_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1227_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1215_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1233_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1217_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1216_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1228_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1226_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1224_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1225_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1222_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1223_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1229_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1231_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1221_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1220_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1218_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$true_output_0_0_to_lut_\$auto_1219_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (603.49:603.49:603.49) (603.49:603.49:603.49))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[3\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[5\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[6\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[4\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[2\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[1\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[7\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$auto_26_output_0_0_to_lut_\$obuf_dout\[0\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo1_output_0_0_to_lut_\$obuf_dout\[1\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (307.75:307.75:307.75) (307.75:307.75:307.75))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[3\]_input_0_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[5\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[6\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[4\]_input_0_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[2\]_input_0_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[1\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[7\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_emu_init_sel_33_output_0_0_to_lut_\$obuf_dout\[0\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_1_to_lut_\$obuf_dout\[1\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[1\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[1\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (246.79:246.79:246.79) (246.79:246.79:246.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[1\]_output_0_0_to_dffre_\$abc\$267\$lo1_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (443.69:443.69:443.69) (443.69:443.69:443.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo0_output_0_0_to_lut_\$obuf_dout\[0\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_0_to_lut_\$obuf_dout\[0\]_input_0_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[0\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[0\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[0\]_output_0_0_to_dffre_\$abc\$267\$lo0_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (184.32:184.32:184.32) (184.32:184.32:184.32))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo7_output_0_0_to_lut_\$obuf_dout\[7\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_7_to_lut_\$obuf_dout\[7\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (423.63:423.63:423.63) (423.63:423.63:423.63))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[7\]_output_0_0_to_dffre_\$abc\$267\$lo7_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (501.63:501.63:501.63) (501.63:501.63:501.63))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[7\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[7\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo6_output_0_0_to_lut_\$obuf_dout\[6\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_6_to_lut_\$obuf_dout\[6\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[6\]_output_0_0_to_dffre_\$abc\$267\$lo6_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (452.53:452.53:452.53) (452.53:452.53:452.53))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[6\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[6\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo5_output_0_0_to_lut_\$obuf_dout\[5\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_5_to_lut_\$obuf_dout\[5\]_input_0_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[5\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[5\]_input_0_1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[5\]_output_0_0_to_dffre_\$abc\$267\$lo5_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (583.79:583.79:583.79) (583.79:583.79:583.79))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo4_output_0_0_to_lut_\$obuf_dout\[4\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_4_to_lut_\$obuf_dout\[4\]_input_0_2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[4\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[4\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[4\]_output_0_0_to_dffre_\$abc\$267\$lo4_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (574.45:574.45:574.45) (574.45:574.45:574.45))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo3_output_0_0_to_lut_\$obuf_dout\[3\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_3_to_lut_\$obuf_dout\[3\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (304.73:304.73:304.73) (304.73:304.73:304.73))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[3\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[3\]_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[3\]_output_0_0_to_dffre_\$abc\$267\$lo3_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (303.23:303.23:303.23) (303.23:303.23:303.23))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_dffre_\$abc\$267\$lo2_output_0_0_to_lut_\$obuf_dout\[2\]_input_0_3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_RS_TDP36K_\$delete_wire\$1211_output_0_2_to_lut_\$obuf_dout\[2\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (423.63:423.63:423.63) (423.63:423.63:423.63))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[2\]_output_0_0_to_dffre_\$abc\$267\$lo2_input_0_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (184.32:184.32:184.32) (184.32:184.32:184.32))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$obuf_dout\[2\]_output_0_0_to_lut_\$f2g_tx_out_\$obuf_dout\[2\]_input_0_4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (85.13:85.13:85.13) (85.13:85.13:85.13))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo2_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo3_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo1_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo7_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo6_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo4_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo5_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "fpga_interconnect")
+        (INSTANCE routing_segment_lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y_output_0_0_to_dffre_\$abc\$267\$lo0_input_2_0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH datain dataout (365.69:365.69:365.69) (365.69:365.69:365.69))
+            )
+        )
+    )
+
+    (CELL
+        (CELLTYPE "RS_TDP36K")
+        (INSTANCE RS_TDP36K_\$delete_wire\$1211)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge CLK_A1) RDATA_A1 (292.673:292.673:292.673) (292.673:292.673:292.673))
+                (IOPATH (posedge CLK_A2) RDATA_A2 (50.662:50.662:50.662) (50.662:50.662:50.662))
+                (IOPATH (posedge CLK_B1) RDATA_B1 (345.439:345.439:345.439) (345.439:345.439:345.439))
+                (IOPATH (posedge CLK_B2) RDATA_B2 (293.811:293.811:293.811) (293.811:293.811:293.811))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP ADDR_A1 (posedge  CLK_A1) (211.9:211.9:211.9))
+            (SETUP ADDR_A2 (posedge  CLK_A2) (125.4:125.4:125.4))
+            (SETUP ADDR_B1 (posedge  CLK_B1) (130.3:130.3:130.3))
+            (SETUP ADDR_B2 (posedge  CLK_B2) (133.5:133.5:133.5))
+            (SETUP BE_A1 (posedge  CLK_A1) (111.7:111.7:111.7))
+            (SETUP BE_A2 (posedge  CLK_A2) (118.9:118.9:118.9))
+            (SETUP BE_B1 (posedge  CLK_B1) (110.9:110.9:110.9))
+            (SETUP BE_B2 (posedge  CLK_B2) (109.3:109.3:109.3))
+            (SETUP FLUSH1 (posedge  CLK_A1) (29.7:29.7:29.7))
+            (SETUP FLUSH2 (posedge  CLK_A2) (60.12:60.12:60.12))
+            (SETUP REN_A1 (posedge  CLK_A1) (81.38:81.38:81.38))
+            (SETUP REN_A2 (posedge  CLK_A2) (85.36:85.36:85.36))
+            (SETUP REN_B1 (posedge  CLK_B1) (140.3:140.3:140.3))
+            (SETUP REN_B2 (posedge  CLK_B2) (120.9:120.9:120.9))
+            (SETUP WDATA_A1 (posedge  CLK_A1) (98.55:98.55:98.55))
+            (SETUP WDATA_A2 (posedge  CLK_A2) (144.3:144.3:144.3))
+            (SETUP WDATA_B1 (posedge  CLK_B1) (240.7:240.7:240.7))
+            (SETUP WDATA_B2 (posedge  CLK_B2) (167.8:167.8:167.8))
+            (SETUP WEN_A1 (posedge  CLK_A1) (158.8:158.8:158.8))
+            (SETUP WEN_A2 (posedge  CLK_A2) (198.8:198.8:198.8))
+            (SETUP WEN_B1 (posedge  CLK_B1) (230.7:230.7:230.7))
+            (SETUP WEN_B2 (posedge  CLK_B2) (227.8:227.8:227.8))
+            (HOLD ADDR_A1 (posedge CLK_A1) (211.9:211.9:211.9))
+            (HOLD ADDR_A2 (posedge CLK_A2) (125.4:125.4:125.4))
+            (HOLD ADDR_B1 (posedge CLK_B1) (130.3:130.3:130.3))
+            (HOLD ADDR_B2 (posedge CLK_B2) (133.5:133.5:133.5))
+            (HOLD BE_A1 (posedge CLK_A1) (111.7:111.7:111.7))
+            (HOLD BE_A2 (posedge CLK_A2) (118.9:118.9:118.9))
+            (HOLD BE_B1 (posedge CLK_B1) (110.9:110.9:110.9))
+            (HOLD BE_B2 (posedge CLK_B2) (109.3:109.3:109.3))
+            (HOLD FLUSH1 (posedge CLK_A1) (29.7:29.7:29.7))
+            (HOLD FLUSH2 (posedge CLK_A2) (60.12:60.12:60.12))
+            (HOLD REN_A1 (posedge CLK_A1) (81.38:81.38:81.38))
+            (HOLD REN_A2 (posedge CLK_A2) (85.36:85.36:85.36))
+            (HOLD REN_B1 (posedge CLK_B1) (140.3:140.3:140.3))
+            (HOLD REN_B2 (posedge CLK_B2) (120.9:120.9:120.9))
+            (HOLD WDATA_A1 (posedge CLK_A1) (98.55:98.55:98.55))
+            (HOLD WDATA_A2 (posedge CLK_A2) (144.3:144.3:144.3))
+            (HOLD WDATA_B1 (posedge CLK_B1) (240.7:240.7:240.7))
+            (HOLD WDATA_B2 (posedge CLK_B2) (167.8:167.8:167.8))
+            (HOLD WEN_A1 (posedge CLK_A1) (158.8:158.8:158.8))
+            (HOLD WEN_A2 (posedge CLK_A2) (198.8:198.8:198.8))
+            (HOLD WEN_B1 (posedge CLK_B1) (230.7:230.7:230.7))
+            (HOLD WEN_B2 (posedge CLK_B2) (227.8:227.8:227.8))
+        )
+    )
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_emu_init_sel_33)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$auto_26)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[3\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[1] out (196.9:196.9:196.9) (196.9:196.9:196.9))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[3\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[4\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[5\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+                (IOPATH in[1] out (196.9:196.9:196.9) (196.9:196.9:196.9))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[5\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[1] out (196.9:196.9:196.9) (196.9:196.9:196.9))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[6\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo2)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[2\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo3)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[4\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[1] out (196.9:196.9:196.9) (196.9:196.9:196.9))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[2\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+                (IOPATH in[1] out (196.9:196.9:196.9) (196.9:196.9:196.9))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[1\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo1)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[1\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo7)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[7\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$abc\$1113\$techmap\$techmap1019\$abc\$292\$auto_300\.\$logic_not\$\/home\/alain\/os\-fpga\/Raptor\/yosys_verific_rs\/yosys\/install\/share\/yosys\/rapidsilicon\/genesis3\/ffs_map\.v\:107\$818_Y)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[0\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo6)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[7\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo4)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo5)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1232)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1230)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "dffre")
+        (INSTANCE dffre_\$abc\$267\$lo0)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH (posedge C) Q (153.995:153.995:153.995) (153.995:153.995:153.995))
+            )
+        )
+        (TIMINGCHECK
+            (SETUP D (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP E (posedge  C) (31.5675:31.5675:31.5675))
+            (SETUP R (posedge  C) (31.5675:31.5675:31.5675))
+            (HOLD D (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD E (posedge C) (-28.3185:-28.3185:-28.3185))
+            (HOLD R (posedge C) (-28.3185:-28.3185:-28.3185))
+        )
+    )
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$obuf_dout\[0\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+                (IOPATH in[1] out (196.9:196.9:196.9) (196.9:196.9:196.9))
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+                (IOPATH in[3] out (135.5:135.5:135.5) (135.5:135.5:135.5))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$true)
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1227)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$false)
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$f2g_tx_out_\$obuf_dout\[6\])
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1215)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1233)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1217)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1216)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1228)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1226)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[0] out (218.1:218.1:218.1) (218.1:218.1:218.1))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1224)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1225)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1222)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1223)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1229)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1231)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1221)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1220)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[4] out (99.19:99.19:99.19) (99.19:99.19:99.19))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1218)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+    (CELL
+        (CELLTYPE "LUT_K")
+        (INSTANCE lut_\$auto_1219)
+        (DELAY
+            (ABSOLUTE
+                (IOPATH in[2] out (147.8:147.8:147.8) (147.8:147.8:147.8))
+            )
+        )
+    )
+    
+)

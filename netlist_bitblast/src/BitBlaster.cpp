@@ -37,7 +37,7 @@ using namespace UHDM;
 namespace BITBLAST {
 
 void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
-                Serializer &s) {
+                Serializer &s, const std::string suffix) {
   for (port *p : *origPorts) {
     any *lowc = p->Low_conn();
     std::string_view port_name = lowc->VpiName();
@@ -61,7 +61,7 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
         uint64_t val = eval.getValue(c);
         for (uint64_t i = 0; i < k; i++) {
           port *np = s.MakePort();
-          np->VpiName(std::string(port_name) + std::to_string(i));
+          np->VpiName(std::string(port_name) + suffix + std::to_string(i));
           constant *cn = s.MakeConstant();
           cn->VpiSize(1);
           cn->VpiConstType(vpiBinaryConst);
@@ -75,7 +75,7 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
         if (oper->Operands()) {
           for (any *op : *oper->Operands()) {
             port *np = s.MakePort();
-            np->VpiName(std::string(port_name) + std::to_string(index));
+            np->VpiName(std::string(port_name) + suffix + std::to_string(index));
             np->High_conn(op);
             newPorts->push_back(np);
             index++;
@@ -130,7 +130,7 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
             VectorOfport *newPorts = s->MakePortVec();
-            blastPorts(origPorts, newPorts, *s);
+            blastPorts(origPorts, newPorts, *s, "");
             c->Ports(newPorts);
           }
         } else if (cellName.find("RS_DSP") != std::string::npos) {
@@ -139,7 +139,16 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
             VectorOfport *newPorts = s->MakePortVec();
-            blastPorts(origPorts, newPorts, *s);
+            blastPorts(origPorts, newPorts, *s, "");
+            c->Ports(newPorts);
+          }
+        } else if (cellName.find("RS_TDP") != std::string::npos) {
+          std::string blastedName = cellName + "_BLASTED";
+          m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
+          c->VpiDefName(blastedName);
+          if (auto origPorts = c->Ports()) {
+            VectorOfport *newPorts = s->MakePortVec();
+            blastPorts(origPorts, newPorts, *s, "_");
             c->Ports(newPorts);
           }
         }
