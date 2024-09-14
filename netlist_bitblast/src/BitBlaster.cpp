@@ -81,7 +81,9 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
             index++;
           }
         } else {
-          newPorts->push_back(p);
+          // An operation with no operands is a high conn with .()
+          // We leave it implicitely unconnected
+          // DO NOT: newPorts->push_back(p);
         }
       }
     } else {
