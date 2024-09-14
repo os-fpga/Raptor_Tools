@@ -90,19 +90,6 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
   }
 }
 
-void filterLocalParams(VectorOfparam_assign *oldParams_assigns,
-                       VectorOfparam_assign *newParams) {
-  for (param_assign *pa : *oldParams_assigns) {
-    any *p = pa->Lhs();
-    if (p->UhdmType() == uhdmparameter) {
-      parameter *param = (parameter *)p;
-      if (!param->VpiLocalParam()) {
-        newParams->push_back(pa);
-      }
-    }
-  }
-}
-
 bool BitBlaster::bitBlast(const UHDM::any *object) {
   if (object == nullptr) return false;
   Serializer *s = object->GetSerializer();
@@ -154,11 +141,6 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             VectorOfport *newPorts = s->MakePortVec();
             blastPorts(origPorts, newPorts, *s);
             c->Ports(newPorts);
-          }
-          if (auto params = c->Param_assigns()) {
-            VectorOfparam_assign *newParams = s->MakeParam_assignVec();
-            filterLocalParams(params, newParams);
-            c->Param_assigns(newParams);
           }
         }
       }
