@@ -139,10 +139,10 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
                   out << ",\n";
                 }
                 prettyPrint(s, pa, 8, out);
-                index++;
                 if (index == 1) {
                   out << "\n";
                 }
+                index++;
               }
             }
           }

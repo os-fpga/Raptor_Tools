@@ -79,5 +79,20 @@ test_dsp:
 	  lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/primitives_mapping/DSP/rs_dsp_multxxx_post_pnr_mapping.v \
 	  -y lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/verilog/ -top fabric_GJC4 -nonote -noinfo
 
+test_rom:
+	mkdir -p test_results/rom
+	build/bin/bitblast -DSYNTHESIS=1 tests/rom/fabric_SBox_post_route.v \
+	  -v lib/pnr/genesis3/primitives.v \
+	  lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/primitives_mapping/DSP/rs_dsp_multxxx_post_pnr_mapping.v \
+	  lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/primitives_mapping/BRAM/rs_tdp36k_post_pnr_mapping.v \
+	  -y lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/verilog/ \
+	  -sdf_in tests/rom/fabric_SBox_post_route.sdf \
+	  -sdf_out test_results/rom/fabric_SBox_post_route.sdf \
+	  -top fabric_SBox -bitblast -write test_results/rom/bitblasted.v
+	build/bin/bitblast test_results/rom/bitblasted.v -v lib/pnr/genesis3/primitives.v \
+	  lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/primitives_mapping/DSP/rs_dsp_multxxx_post_pnr_mapping.v \
+      lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/primitives_mapping/BRAM/rs_tdp36k_post_pnr_mapping.v \
+	  -y lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS/sim_models/verilog/ \
+	  -top fabric_SBox -nonote -noinfo
 
-test: release test_gen_clk test_dsp
+test: release test_gen_clk test_dsp test_rom
