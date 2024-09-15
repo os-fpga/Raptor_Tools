@@ -164,9 +164,9 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
             eval.prettyPrint(s, p->High_conn(), 0, outtmp);
             std::string tmps = outtmp.str();
             if (tmps.empty()) {
-              UHDM_OBJECT_TYPE high_conn_type = uhdmmodule_inst; // This value represents an empty high conn  
-              if (p->High_conn())
-                high_conn_type = p->High_conn()->UhdmType();
+              UHDM_OBJECT_TYPE high_conn_type =
+                  uhdmmodule_inst;  // This value represents an empty high conn
+              if (p->High_conn()) high_conn_type = p->High_conn()->UhdmType();
               if (high_conn_type == uhdmconstant) {
                 // Must be missing the vpiDecompile field
                 constant *c = (constant *)p->High_conn();
@@ -188,7 +188,7 @@ void NetlistPrettyPrinter::prettyPrint(UHDM::Serializer &s,
                 // Empty connection
                 // .()
               } else if (high_conn_type == uhdmmodule_inst) {
-                // This value represents an empty high conn  
+                // This value represents an empty high conn
               } else {
                 std::cerr << "NOT HANDLED HIGH CONN TYPE: "
                           << UhdmName(high_conn_type)

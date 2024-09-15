@@ -61,7 +61,11 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
         uint64_t val = eval.getValue(c);
         for (uint64_t i = 0; i < k; i++) {
           port *np = s.MakePort();
-          np->VpiName(std::string(port_name) + suffix + std::to_string(i));
+          if (suffix.empty())  // LUT
+            np->VpiName(std::string(port_name) + suffix + std::to_string(i));
+          else  // RAM and DSP
+            np->VpiName(std::string(port_name) + suffix +
+                        std::to_string(k - 1 - i));
           constant *cn = s.MakeConstant();
           cn->VpiSize(1);
           cn->VpiConstType(vpiBinaryConst);
@@ -75,7 +79,12 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
         if (oper->Operands()) {
           for (any *op : *oper->Operands()) {
             port *np = s.MakePort();
-            np->VpiName(std::string(port_name) + suffix + std::to_string(index));
+            if (suffix.empty())  // LUT
+              np->VpiName(std::string(port_name) + suffix +
+                          std::to_string(index));
+            else  // RAM and DSP
+              np->VpiName(std::string(port_name) + suffix +
+                          std::to_string(oper->Operands()->size() - 1 - index));
             np->High_conn(op);
             newPorts->push_back(np);
             index++;

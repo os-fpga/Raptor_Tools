@@ -23,8 +23,9 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 #include <filesystem>
 #include <fstream>
 #include <iostream>
-#include <sstream>
 #include <regex>
+#include <sstream>
+
 #include "Utils.h"
 
 namespace BITBLAST {
@@ -69,15 +70,15 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
       if (std::regex_search(tmp, match, expr)) {
         origCellType = match[1].str();
       }
- 
+
       std::string line_plus1 = std::string(lines[i + 1]);
       auto itr = line_plus1.find("(INSTANCE ");
       std::string instance = line_plus1.substr(itr + 10);
       instance = instance.substr(0, instance.size() - 2);
       instance = Utils::replaceAll(instance, "\\", "");
       std::string cellType = blaster->getCellType(instance);
-      //std::cout << "ORIG: " << origCellType << " INSTANCE: " << instance << " CELL: " << cellType <<
-      //std::endl;
+      // std::cout << "ORIG: " << origCellType << " INSTANCE: " << instance << "
+      // CELL: " << cellType << std::endl;
       if (!cellType.empty()) {
         tmp = Utils::replaceAll(tmp, origCellType, cellType);
       }
