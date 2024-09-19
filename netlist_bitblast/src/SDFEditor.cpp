@@ -30,7 +30,13 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
 
 namespace BITBLAST {
 
-bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
+std::map<std::string, std::vector<std::string>> cellTypePortsToBlastMap = {
+    {"DEFAULT", {}},
+    {"LUT_K", {"in"}},
+    {"RS_TDP", {"RDATA"}},
+    {"RS_DSP", {"a", "b", "z", "dly_b", "feedback", "acc_fir", "shift_right"}}};
+
+bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
                      std::filesystem::path sdfOutputFile) {
   std::ifstream stream(sdfInputFile.string());
   if (!stream.good()) {
@@ -45,18 +51,56 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
   std::vector<std::string_view> lines = Utils::splitLines(sdf_in);
 
   std::string result;
+  std::string origCellType;
+  std::string baseCellName;
+  std::vector<std::string>& portsToBlast = cellTypePortsToBlastMap["DEFAULT"];
   for (uint32_t i = 0; i < lines.size(); i++) {
     std::string_view line = lines[i];
-    // LUTs
-    std::string tmp = Utils::replaceAll(line, "in[0]", "in0");
-    tmp = Utils::replaceAll(tmp, "in[1]", "in1");
-    tmp = Utils::replaceAll(tmp, "in[2]", "in2");
-    tmp = Utils::replaceAll(tmp, "in[3]", "in3");
-    tmp = Utils::replaceAll(tmp, "in[4]", "in4");
-    tmp = Utils::replaceAll(tmp, "in[5]", "in5");
-    tmp = Utils::replaceAll(tmp, "in[5]", "in5");
+    std::string tmp = std::string(line);
+    // Change module type to the corresponding basted type
+    if (tmp.find("(CELLTYPE ") != std::string::npos) {
+      static std::regex expr(R"(\"([a-zA-Z0-9_]+)\")");
+      std::smatch match;
+      if (std::regex_search(tmp, match, expr)) {
+        origCellType = match[1].str();
+        if (origCellType.find("LUT_K") != std::string::npos) {
+          baseCellName = "LUT_K";
+        } else if (origCellType.find("RS_TDP") != std::string::npos) {
+          baseCellName = "RS_TDP";
+        } else if (origCellType.find("RS_DSP") != std::string::npos) {
+          baseCellName = "RS_DSP";
+        }
+        std::map<std::string, std::vector<std::string>>::const_iterator
+            itrPort = cellTypePortsToBlastMap.find(baseCellName);
+        if (itrPort != cellTypePortsToBlastMap.end()) {
+          portsToBlast = (*itrPort).second;
+        }
 
-    // BRAMs
+        std::string line_plus1 = std::string(lines[i + 1]);
+        auto itr = line_plus1.find("(INSTANCE ");
+        std::string instance = line_plus1.substr(itr + 10);
+        instance = instance.substr(0, instance.size() - 2);
+        instance = Utils::replaceAll(instance, "\\", "");
+        std::string cellType = blaster->getCellType(instance);
+        // std::cout << "ORIG: " << origCellType << " INSTANCE: " << instance <<
+        // " CELL: " << cellType << std::endl;
+        if (!cellType.empty()) {
+          tmp = Utils::replaceAll(tmp, origCellType, cellType);
+        }
+      }
+    }
+
+    // LUTs and DSPs ports, no-op for BRAMs
+    for (std::string port : portsToBlast) {
+      std::regex expr(port + "\\[([0-9]+)\\]");
+      std::smatch match;
+      if (std::regex_search(tmp, match, expr)) {
+        std::string index = match[1].str();
+        tmp = Utils::replaceAll(tmp, port + "[" + index + "]", port + index);
+      }
+    }
+
+    // Special BRAMs ports duplication
     static std::regex exprdata(R"(RDATA_([a-zA-Z0-9_]+))");
     std::smatch match;
     std::string origPort;
@@ -66,34 +110,16 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
     if (!origPort.empty()) {
       std::string orig = tmp;
       tmp = Utils::replaceAll(tmp, origPort, origPort + "_0");
-      for (int i = 1; i <= 17; i++) {
+      for (int i = 1; i <= /*TODO: find from model the port size: */ 17; i++) {
         tmp += Utils::replaceAll(orig, origPort,
                                  origPort + "_" + std::to_string(i));
       }
     }
 
+    // Reverse map to simulation model names for dffs
     tmp = Utils::replaceAll(tmp, "\"dffre\"", "\"DFFRE\"");
     tmp = Utils::replaceAll(tmp, "\"dffnre\"", "\"DFFNRE\"");
-    if (tmp.find("(CELLTYPE ") != std::string::npos) {
-      static std::regex expr(R"(\"([a-zA-Z0-9_]+)\")");
-      std::smatch match;
-      std::string origCellType;
-      if (std::regex_search(tmp, match, expr)) {
-        origCellType = match[1].str();
-      }
 
-      std::string line_plus1 = std::string(lines[i + 1]);
-      auto itr = line_plus1.find("(INSTANCE ");
-      std::string instance = line_plus1.substr(itr + 10);
-      instance = instance.substr(0, instance.size() - 2);
-      instance = Utils::replaceAll(instance, "\\", "");
-      std::string cellType = blaster->getCellType(instance);
-      // std::cout << "ORIG: " << origCellType << " INSTANCE: " << instance << "
-      // CELL: " << cellType << std::endl;
-      if (!cellType.empty()) {
-        tmp = Utils::replaceAll(tmp, origCellType, cellType);
-      }
-    }
     result += tmp;
   }
 
