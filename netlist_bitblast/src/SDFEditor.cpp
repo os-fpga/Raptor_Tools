@@ -47,6 +47,7 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
   std::string result;
   for (uint32_t i = 0; i < lines.size(); i++) {
     std::string_view line = lines[i];
+    // LUTs
     std::string tmp = Utils::replaceAll(line, "in[0]", "in0");
     tmp = Utils::replaceAll(tmp, "in[1]", "in1");
     tmp = Utils::replaceAll(tmp, "in[2]", "in2");
@@ -55,11 +56,21 @@ bool SDFEditor::edit(BitBlaster *blaster, std::filesystem::path sdfInputFile,
     tmp = Utils::replaceAll(tmp, "in[5]", "in5");
     tmp = Utils::replaceAll(tmp, "in[5]", "in5");
 
-    // TODO: expand the sdf path 1 to many:
-    tmp = Utils::replaceAll(tmp, "RDATA_A1", "RDATA_A1_0");
-    tmp = Utils::replaceAll(tmp, "RDATA_A2", "RDATA_A2_0");
-    tmp = Utils::replaceAll(tmp, "RDATA_B1", "RDATA_B1_0");
-    tmp = Utils::replaceAll(tmp, "RDATA_B2", "RDATA_B2_0");
+    // BRAMs
+    static std::regex exprdata(R"(RDATA_([a-zA-Z0-9_]+))");
+    std::smatch match;
+    std::string origPort;
+    if (std::regex_search(tmp, match, exprdata)) {
+      origPort = std::string("RDATA_") + match[1].str();
+    }
+    if (!origPort.empty()) {
+      std::string orig = tmp;
+      tmp = Utils::replaceAll(tmp, origPort, origPort + "_0");
+      for (int i = 1; i <= 17; i++) {
+        tmp += Utils::replaceAll(orig, origPort,
+                                 origPort + "_" + std::to_string(i));
+      }
+    }
 
     tmp = Utils::replaceAll(tmp, "\"dffre\"", "\"DFFRE\"");
     tmp = Utils::replaceAll(tmp, "\"dffnre\"", "\"DFFNRE\"");

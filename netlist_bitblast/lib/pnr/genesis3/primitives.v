@@ -1541,11 +1541,81 @@ module RS_TDP36K_BLASTED  #(
 `ifndef SYNTHESIS
  `ifdef TIMED_SIM
      specify
-          // TODO: 1 to many:
          (posedge CLK_A1 => (RDATA_A1_0+:WDATA_A1_0)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_1+:WDATA_A1_1)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_2+:WDATA_A1_2)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_3+:WDATA_A1_3)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_4+:WDATA_A1_4)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_5+:WDATA_A1_5)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_6+:WDATA_A1_6)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_7+:WDATA_A1_7)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_8+:WDATA_A1_8)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_9+:WDATA_A1_9)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_10+:WDATA_A1_10)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_11+:WDATA_A1_11)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_12+:WDATA_A1_12)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_13+:WDATA_A1_13)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_14+:WDATA_A1_14)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_15+:WDATA_A1_15)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_16+:WDATA_A1_16)) = (0, 0);
+         (posedge CLK_A1 => (RDATA_A1_17+:WDATA_A1_17)) = (0, 0);
+
          (posedge CLK_A2 => (RDATA_A2_0+:WDATA_A2_0)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_1+:WDATA_A2_1)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_2+:WDATA_A2_2)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_3+:WDATA_A2_3)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_4+:WDATA_A2_4)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_5+:WDATA_A2_5)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_6+:WDATA_A2_6)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_7+:WDATA_A2_7)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_8+:WDATA_A2_8)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_9+:WDATA_A2_9)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_10+:WDATA_A2_10)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_11+:WDATA_A2_11)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_12+:WDATA_A2_12)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_13+:WDATA_A2_13)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_14+:WDATA_A2_14)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_15+:WDATA_A2_15)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_16+:WDATA_A2_16)) = (0, 0);
+         (posedge CLK_A2 => (RDATA_A2_17+:WDATA_A2_17)) = (0, 0);
+
          (posedge CLK_B1 => (RDATA_B1_0+:WDATA_B1_0)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_1+:WDATA_B1_1)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_2+:WDATA_B1_2)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_3+:WDATA_B1_3)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_4+:WDATA_B1_4)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_5+:WDATA_B1_5)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_6+:WDATA_B1_6)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_7+:WDATA_B1_7)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_8+:WDATA_B1_8)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_9+:WDATA_B1_9)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_10+:WDATA_B1_10)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_11+:WDATA_B1_11)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_12+:WDATA_B1_12)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_13+:WDATA_B1_13)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_14+:WDATA_B1_14)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_15+:WDATA_B1_15)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_16+:WDATA_B1_16)) = (0, 0);
+         (posedge CLK_B1 => (RDATA_B1_17+:WDATA_B1_17)) = (0, 0);
+
          (posedge CLK_B2 => (RDATA_B2_0+:WDATA_B2_0)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_1+:WDATA_B2_1)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_2+:WDATA_B2_2)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_3+:WDATA_B2_3)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_4+:WDATA_B2_4)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_5+:WDATA_B2_5)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_6+:WDATA_B2_6)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_7+:WDATA_B2_7)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_8+:WDATA_B2_8)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_9+:WDATA_B2_9)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_10+:WDATA_B2_10)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_11+:WDATA_B2_11)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_12+:WDATA_B2_12)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_13+:WDATA_B2_13)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_14+:WDATA_B2_14)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_15+:WDATA_B2_15)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_16+:WDATA_B2_16)) = (0, 0);
+         (posedge CLK_B2 => (RDATA_B2_17+:WDATA_B2_17)) = (0, 0);
     endspecify
  `endif  
 `endif   
