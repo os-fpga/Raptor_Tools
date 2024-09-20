@@ -146,7 +146,9 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             c->Ports(newPorts);
           }
         } else if (cellName.find("RS_DSP") != std::string::npos) {
-          std::string blastedName = cellName + "_BLASTED";
+          std::string blastedName = cellName;
+          if (cellName.find("_BLASTED") == std::string::npos)
+            blastedName += "_BLASTED";
           m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
@@ -155,7 +157,9 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             c->Ports(newPorts);
           }
         } else if (cellName.find("RS_TDP") != std::string::npos) {
-          std::string blastedName = cellName + "_BLASTED";
+          std::string blastedName = cellName;
+          if (cellName.find("_BLASTED") == std::string::npos)
+            blastedName += "_BLASTED";
           m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {

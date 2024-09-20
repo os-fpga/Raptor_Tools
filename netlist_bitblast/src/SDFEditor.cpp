@@ -51,9 +51,8 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
   std::vector<std::string_view> lines = Utils::splitLines(sdf_in);
 
   std::string result;
-  std::string origCellType;
-  std::string baseCellName;
   std::vector<std::string>& portsToBlast = cellTypePortsToBlastMap["DEFAULT"];
+  std::string baseCellName;
   for (uint32_t i = 0; i < lines.size(); i++) {
     std::string_view line = lines[i];
     std::string tmp = std::string(line);
@@ -62,7 +61,7 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
       static std::regex expr(R"(\"([a-zA-Z0-9_]+)\")");
       std::smatch match;
       if (std::regex_search(tmp, match, expr)) {
-        origCellType = match[1].str();
+        std::string origCellType = match[1].str();
         if (origCellType.find("LUT_K") != std::string::npos) {
           baseCellName = "LUT_K";
         } else if (origCellType.find("RS_TDP") != std::string::npos) {
@@ -91,28 +90,54 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
     }
 
     // LUTs and DSPs ports, no-op for BRAMs
-    for (std::string port : portsToBlast) {
-      std::regex expr(port + "\\[([0-9]+)\\]");
-      std::smatch match;
-      if (std::regex_search(tmp, match, expr)) {
-        std::string index = match[1].str();
-        tmp = Utils::replaceAll(tmp, port + "[" + index + "]", port + index);
+    if (baseCellName == "LUT_K" || baseCellName == "RS_DSP") {
+      for (std::string port : portsToBlast) {
+        std::regex expr(port + "\\[([0-9]+)\\]");
+        std::smatch match;
+        if (std::regex_search(tmp, match, expr)) {
+          std::string index = match[1].str();
+          tmp = Utils::replaceAll(tmp, port + "[" + index + "]", port + index);
+        }
       }
     }
 
-    // Special BRAMs ports duplication
-    static std::regex exprdata(R"(RDATA_([a-zA-Z0-9_]+))");
-    std::smatch match;
-    std::string origPort;
-    if (std::regex_search(tmp, match, exprdata)) {
-      origPort = std::string("RDATA_") + match[1].str();
+    if (baseCellName == "RS_TDP") {
+      // Special BRAMs ports duplication
+      static std::regex exprdata(R"(RDATA_([a-zA-Z0-9_]+))");
+      std::smatch matchdata;
+      if (std::regex_search(tmp, matchdata, exprdata)) {
+        std::string origPort = std::string("RDATA_") + matchdata[1].str();
+        std::string orig = tmp;
+        tmp = Utils::replaceAll(tmp, origPort, origPort + "_0");
+        for (int i = 1; i <= /*TODO: find from model the port size: */ 17;
+             i++) {
+          tmp += Utils::replaceAll(orig, origPort,
+                                   origPort + "_" + std::to_string(i));
+        }
+      }
     }
-    if (!origPort.empty()) {
-      std::string orig = tmp;
-      tmp = Utils::replaceAll(tmp, origPort, origPort + "_0");
-      for (int i = 1; i <= /*TODO: find from model the port size: */ 17; i++) {
-        tmp += Utils::replaceAll(orig, origPort,
-                                 origPort + "_" + std::to_string(i));
+    if (baseCellName == "RS_DSP") {
+      // Special DSPs ports duplication
+      if (tmp.find("dly_b ") != std::string::npos) {
+        std::string origPort = "dly_b";
+        std::string orig = tmp;
+        tmp = Utils::replaceAll(tmp, origPort, origPort + "0");
+        for (int i = 1; i <= /*TODO: find from model the port size: */ 17;
+             i++) {
+          tmp +=
+              Utils::replaceAll(orig, origPort, origPort + std::to_string(i));
+        }
+      }
+
+      if (tmp.find("z ") != std::string::npos) {
+        std::string origPort = "z";
+        std::string orig = tmp;
+        tmp = Utils::replaceAll(tmp, origPort, origPort + "0");
+        for (int i = 1; i <= /*TODO: find from model the port size: */ 37;
+             i++) {
+          tmp +=
+              Utils::replaceAll(orig, origPort, origPort + std::to_string(i));
+        }
       }
     }
 
