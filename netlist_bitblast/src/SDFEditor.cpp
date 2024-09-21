@@ -20,6 +20,15 @@ along with this program.  If not, see <http://www.gnu.org/licenses/>.
  */
 #include "SDFEditor.h"
 
+#include <uhdm/ExprEval.h>
+#include <uhdm/NumUtils.h>
+#include <uhdm/clone_tree.h>
+#include <uhdm/containers.h>
+#include <uhdm/uhdm.h>
+#include <uhdm/uhdm_forward_decl.h>
+#include <uhdm/uhdm_types.h>
+#include <uhdm/vpi_visitor.h>
+
 #include <filesystem>
 #include <fstream>
 #include <iostream>
@@ -36,6 +45,26 @@ std::map<std::string, std::vector<std::string>> cellTypePortsToBlastMap = {
     {"RS_TDP", {"RDATA"}},
     {"RS_DSP", {"a", "b", "z", "dly_b", "feedback", "acc_fir", "shift_right"}}};
 
+int portWidth(UHDM::design* design, std::string_view modName,
+              std::string_view portName) {
+  auto allModules = design->AllModules();
+  std::string modNameS = std::string("work@") + std::string(modName);
+  for (auto mod : *allModules) {
+    if (mod->VpiDefName() == modNameS) {
+      for (auto port : *mod->Ports()) {
+        if (port->VpiName() == portName) {
+          const UHDM::ref_typespec* tref = port->Typespec();
+          const UHDM::typespec* tps = tref->Actual_typespec();
+          bool invalidValue = false;
+          UHDM::ExprEval eval;
+          return eval.size(tps, invalidValue, mod, nullptr, true);
+        }
+      }
+    }
+  }
+  return 0;
+}
+
 bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
                      std::filesystem::path sdfOutputFile) {
   std::ifstream stream(sdfInputFile.string());
@@ -50,6 +79,10 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
 
   std::vector<std::string_view> lines = Utils::splitLines(sdf_in);
 
+  UHDM::design* design = blaster->getDesign();
+  int rdataWidth = portWidth(design, "RS_TDP36K", "RDATA_A1");
+  int zWidth = portWidth(design, "RS_DSP_MULT", "z");
+  int dly_bWidth = portWidth(design, "RS_DSP_MULTADD_REGIN_REGOUT", "dly_b");
   std::string result;
   std::vector<std::string>& portsToBlast = cellTypePortsToBlastMap["DEFAULT"];
   std::string baseCellName;
@@ -109,8 +142,7 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
         std::string origPort = std::string("RDATA_") + matchdata[1].str();
         std::string orig = tmp;
         tmp = Utils::replaceAll(tmp, origPort, origPort + "_0");
-        for (int i = 1; i <= /*TODO: find from model the port size: */ 17;
-             i++) {
+        for (int i = 1; i <= rdataWidth - 1; i++) {
           tmp += Utils::replaceAll(orig, origPort,
                                    origPort + "_" + std::to_string(i));
         }
@@ -122,8 +154,7 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
         std::string origPort = "dly_b";
         std::string orig = tmp;
         tmp = Utils::replaceAll(tmp, origPort, origPort + "0");
-        for (int i = 1; i <= /*TODO: find from model the port size: */ 17;
-             i++) {
+        for (int i = 1; i <= dly_bWidth - 1; i++) {
           tmp +=
               Utils::replaceAll(orig, origPort, origPort + std::to_string(i));
         }
@@ -133,8 +164,7 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
         std::string origPort = "z";
         std::string orig = tmp;
         tmp = Utils::replaceAll(tmp, origPort, origPort + "0");
-        for (int i = 1; i <= /*TODO: find from model the port size: */ 37;
-             i++) {
+        for (int i = 1; i <= zWidth - 1; i++) {
           tmp +=
               Utils::replaceAll(orig, origPort, origPort + std::to_string(i));
         }
