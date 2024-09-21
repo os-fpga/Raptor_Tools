@@ -61,15 +61,12 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
         uint64_t val = eval.getValue(c);
         for (uint64_t i = 0; i < k; i++) {
           port *np = s.MakePort();
-          if (suffix.empty())  // LUT
-            np->VpiName(std::string(port_name) + suffix + std::to_string(i));
-          else  // RAM and DSP
-            np->VpiName(std::string(port_name) + suffix +
-                        std::to_string(k - 1 - i));
+          np->VpiName(std::string(port_name) + suffix +
+                      std::to_string(k - 1 - i));
           constant *cn = s.MakeConstant();
           cn->VpiSize(1);
           cn->VpiConstType(vpiBinaryConst);
-          cn->VpiValue("BIN:" + std::to_string(val &= (1 << i)));
+          cn->VpiValue("BIN:" + std::to_string(val &= (1 << (k - 1 - i))));
           np->High_conn(cn);
           newPorts->push_back(np);
         }
@@ -79,12 +76,8 @@ void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
         if (oper->Operands()) {
           for (any *op : *oper->Operands()) {
             port *np = s.MakePort();
-            if (suffix.empty())  // LUT
-              np->VpiName(std::string(port_name) + suffix +
-                          std::to_string(index));
-            else  // RAM and DSP
-              np->VpiName(std::string(port_name) + suffix +
-                          std::to_string(oper->Operands()->size() - 1 - index));
+            np->VpiName(std::string(port_name) + suffix +
+                        std::to_string(oper->Operands()->size() - 1 - index));
             np->High_conn(op);
             newPorts->push_back(np);
             index++;
@@ -146,9 +139,7 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             c->Ports(newPorts);
           }
         } else if (cellName.find("RS_DSP") != std::string::npos) {
-          std::string blastedName = cellName;
-          if (cellName.find("_BLASTED") == std::string::npos)
-            blastedName += "_BLASTED";
+          std::string blastedName = cellName + "_BLASTED";
           m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
@@ -157,9 +148,7 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
             c->Ports(newPorts);
           }
         } else if (cellName.find("RS_TDP") != std::string::npos) {
-          std::string blastedName = cellName;
-          if (cellName.find("_BLASTED") == std::string::npos)
-            blastedName += "_BLASTED";
+          std::string blastedName = cellName + "_BLASTED";
           m_instanceCellMap.emplace(std::string(c->VpiName()), blastedName);
           c->VpiDefName(blastedName);
           if (auto origPorts = c->Ports()) {
