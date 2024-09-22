@@ -112,13 +112,16 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
         auto itr = line_plus1.find("(INSTANCE ");
         std::string instance = line_plus1.substr(itr + 10);
         instance = instance.substr(0, instance.size() - 2);
-        instance = Utils::replaceAll(instance, "\\", "");
-        std::string cellType = blaster->getCellType(instance);
+        instance = BitBlaster::filterIcarusSDFUnsupportedCharacters(instance);
+        std::string instance_lookup = Utils::replaceAll(instance, "\\", "");
+        std::string cellType = blaster->getCellType(instance_lookup);
         // std::cout << "ORIG: " << origCellType << " INSTANCE: " << instance <<
         // " CELL: " << cellType << std::endl;
         if (!cellType.empty()) {
           tmp = Utils::replaceAll(tmp, origCellType, cellType);
         }
+        tmp += "        (INSTANCE " + instance + ")\n";
+        i++;
       }
     }
 
@@ -134,6 +137,7 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
       }
     }
 
+    // Special cases
     if (baseCellName == "RS_TDP") {
       // Special BRAMs ports duplication
       static std::regex exprdata(R"(RDATA_([a-zA-Z0-9_]+))");
@@ -147,8 +151,7 @@ bool SDFEditor::edit(BitBlaster* blaster, std::filesystem::path sdfInputFile,
                                    origPort + "_" + std::to_string(i));
         }
       }
-    }
-    if (baseCellName == "RS_DSP") {
+    } else if (baseCellName == "RS_DSP") {
       // Special DSPs ports duplication
       if (tmp.find("dly_b ") != std::string::npos) {
         std::string origPort = "dly_b";
