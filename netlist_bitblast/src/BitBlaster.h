@@ -60,6 +60,8 @@ class BitBlaster {
   bool bitBlast(const UHDM::any* handle);
   const std::string& getCellType(const std::string& instance);
   UHDM::design* getDesign() { return m_design; }
+  static std::string filterIcarusSDFUnsupportedCharacters(
+      const std::string& st);
 
  protected:
  private:

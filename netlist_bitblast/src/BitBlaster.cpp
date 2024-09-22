@@ -36,6 +36,19 @@ using namespace UHDM;
 
 namespace BITBLAST {
 
+std::string BitBlaster::filterIcarusSDFUnsupportedCharacters(
+    const std::string &st) {
+  std::string result;
+  for (uint32_t i = 0; i < st.size(); i++) {
+    char c = st[i];
+    if (c == '.' || c == ':' || c == '/')
+      result += "_";
+    else
+      result += c;
+  }
+  return result;
+}
+
 void blastPorts(const VectorOfport *origPorts, VectorOfport *newPorts,
                 Serializer &s, const std::string suffix) {
   for (port *p : *origPorts) {
@@ -118,6 +131,8 @@ bool BitBlaster::bitBlast(const UHDM::any *object) {
         }
       } else {
         std::string cellName = Utils::removeLibName(c->VpiDefName());
+        c->VpiName(
+            filterIcarusSDFUnsupportedCharacters(std::string(c->VpiName())));
         if (cellName == "LUT_K") {
           uint64_t k = 0;
           if (c->Param_assigns()) {
