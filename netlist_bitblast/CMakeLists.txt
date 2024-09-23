@@ -102,6 +102,7 @@ set(bitblast_SRC
 add_executable(bitblast-bin ${bitblast_SRC})
 
 set_target_properties(bitblast-bin PROPERTIES OUTPUT_NAME bitblast)
+set_target_properties(bitblast-bin PROPERTIES RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/bin)
 
 # Raptor builds synlig which builds Surelog and UHDM, but it does not "install" them on the system.
 # The usual cmake package discovery does not work for Surelog if Surelog is not installed.
