@@ -19,3 +19,6 @@
 [submodule "netlist_bitblast/lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS"]
 	path = netlist_bitblast/lib/pnr/genesis3/mockup/FPGA_PRIMITIVES_MODELS
 	url = https://github.com/os-fpga/FPGA_PRIMITIVES_MODELS.git
+[submodule "parser_plugins/synlig"]
+	path = parser_plugins/synlig
+	url = https://github.com/chipsalliance/synlig.git
