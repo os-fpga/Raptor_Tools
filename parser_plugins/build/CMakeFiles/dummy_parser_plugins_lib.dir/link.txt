@@ -1,0 +1,2 @@
+/usr/bin/ar qc libdummy_parser_plugins_lib.a CMakeFiles/dummy_parser_plugins_lib.dir/dummy.cpp.o
+/usr/bin/ranlib libdummy_parser_plugins_lib.a
