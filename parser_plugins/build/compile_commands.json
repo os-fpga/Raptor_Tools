@@ -1,7 +1,0 @@
-[
-{
-  "directory": "/home/alain/os-fpga/Raptor_Tools/parser_plugins/build",
-  "command": "/usr/bin/c++   -O3 -DNDEBUG -fPIC -std=gnu++17 -o CMakeFiles/dummy_parser_plugins_lib.dir/dummy.cpp.o -c /home/alain/os-fpga/Raptor_Tools/parser_plugins/dummy.cpp",
-  "file": "/home/alain/os-fpga/Raptor_Tools/parser_plugins/dummy.cpp"
-}
-]
