@@ -78,7 +78,7 @@ add_custom_command(OUTPUT ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/p
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so ${YOSYS_PATH}/install/share/yosys/plugins/
     COMMAND ${CMAKE_COMMAND} -E copy ${PROJECT_SOURCE_DIR}/synlig/out/current/share/yosys/plugins/systemverilog.so.* ${YOSYS_PATH}/install/share/yosys/plugins/
     WORKING_DIRECTORY "${PROJECT_SOURCE_DIR}/synlig"
-    DEPENDS ${PROJECT_SOURCE_DIR}/synlig/frontends/systemverilog/uhdm_ast.cc
+    DEPENDS ${PROJECT_SOURCE_DIR}/synlig/src/frontends/systemverilog/uhdm_ast.cc
   )
 
 add_custom_target(ghdl_install DEPENDS ${GHDL_BIN_PATH})
