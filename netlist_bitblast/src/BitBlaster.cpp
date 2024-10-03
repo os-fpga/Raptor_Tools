@@ -39,12 +39,17 @@ namespace BITBLAST {
 std::string BitBlaster::filterIcarusSDFUnsupportedCharacters(
     const std::string &st) {
   std::string result;
+  char c_1 = ' ';
   for (uint32_t i = 0; i < st.size(); i++) {
     char c = st[i];
-    if (c == '.' || c == ':' || c == '/')
+    if (c == '\\' && c_1 == '\\') {
+      result = result.substr(0, result.size()-1);
+      result += "_";
+    } else if (c == '.' || c == ':' || c == '/')
       result += "_";
     else
       result += c;
+    c_1 = c;
   }
   return result;
 }
